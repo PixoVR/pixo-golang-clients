@@ -60,6 +60,7 @@ var _ = Describe("Multiplayer", func() {
 		res, err := primaryClient.Post("api/multiplayer-server-version", body)
 
 		Expect(err).NotTo(HaveOccurred())
+		Expect(res).NotTo(BeNil())
 		Expect(res.StatusCode()).To(Equal(http.StatusOK))
 	})
 
