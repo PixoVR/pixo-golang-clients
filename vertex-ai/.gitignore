@@ -1,0 +1,15 @@
+
+**/.idea
+**/main
+**/rambler-api
+
+bin/example
+
+
+**/.env
+
+**/*.sqlite
+
+**/cov
+**/coverage.out
+**/coverprofile.out

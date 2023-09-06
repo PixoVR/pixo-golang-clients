@@ -1,0 +1,28 @@
+#!/bin/bash
+
+API_ENDPOINT="us-central1-aiplatform.googleapis.com"
+MODEL_ID="text-bison@001"
+
+if [[ ! $PROJECT_ID ]]; then
+    echo "PROJECT_ID is not set"
+    exit 1
+fi
+
+curl \
+-X POST \
+-H "Authorization: Bearer $(gcloud auth print-access-token)" \
+-H "Content-Type: application/json" \
+"https://${API_ENDPOINT}/v1/projects/${PROJECT_ID}/locations/us-central1/publishers/google/models/${MODEL_ID}:predict" -d \
+$'{
+    "instances": [
+        {
+            "content": "Who\'s the best basketball player ever"
+        }
+    ],
+    "parameters": {
+        "temperature": 0.2,
+        "maxOutputTokens": 256,
+        "topP": 0.8,
+        "topK": 40
+    }
+}'
