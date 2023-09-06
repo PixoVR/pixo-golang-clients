@@ -13,10 +13,12 @@ func main() {
 	res, err := updateMultiplayerServerVersion()
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to update multiplayer server version")
+		return
 	}
 
 	if res.StatusCode() != http.StatusOK {
 		log.Error().Err(err).Msg("Failed to update multiplayer server version")
+		return
 	}
 
 	log.Info().Msg("Successfully updated multiplayer server version")
