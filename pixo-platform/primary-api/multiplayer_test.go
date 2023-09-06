@@ -51,9 +51,9 @@ var _ = Describe("Multiplayer", func() {
 			Engine:           "unreal",
 			Status:           "enabled",
 			ImageRegistry:    "us-docker.pkg.dev/agones-images/examples/simple-game-server:0.14",
-			Version:          "1.0.0",
+			Version:          "1.00.00",
 			Filename:         "test.exe",
-			MinClientVersion: "1.0.0",
+			MinClientVersion: "1.00.00",
 		}
 		body, err := json.Marshal(multiplayerServerVersion)
 

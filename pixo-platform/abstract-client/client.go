@@ -36,6 +36,7 @@ func (p *PixoAbstractAPIClient) IsAuthenticated() bool {
 func (p *PixoAbstractAPIClient) FormatRequest() *resty.Request {
 	return p.restClient.R().
 		SetHeader("x-access-token", p.token).
+		SetHeader("Content-Type", "application/json").
 		SetHeader("Authorization", fmt.Sprintf("Bearer %s", p.token))
 }
 
