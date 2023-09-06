@@ -22,23 +22,23 @@ func main() {
 	log.Info().Msg("Successfully updated multiplayer server version")
 }
 
-//func deployMultiplayerServerVersion() (*resty.Response, error)) {
-//	if len(os.Args) != 3 {
-//		log.Error().Msg("Invalid number of arguments. Expected 2 arguments: moduleID, imageRegistry")
-//		return
-//	}
-//
-//	moduleID, err := strconv.Atoi(os.Args[1])
-//	if err != nil {
-//		log.Error().Err(err).Msg("Failed to parse moduleID as int")
-//		return
-//	}
-//
-//	imageRegistry := os.Args[2]
-//
-//	primaryClient := primary_api.NewClientWithBasicAuth(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"), "")
-//	return primaryClient.DeployMultiplayerServerVersion(moduleID, imageRegistry)
-//}
+func deployMultiplayerServerVersion() (*resty.Response, error) {
+	if len(os.Args) != 3 {
+		log.Error().Msg("Invalid number of arguments. Expected 2 arguments: moduleID, imageRegistry")
+		return nil, nil
+	}
+
+	moduleID, err := strconv.Atoi(os.Args[1])
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to parse moduleID as int")
+		return nil, nil
+	}
+
+	imageRegistry := os.Args[2]
+
+	primaryClient := primary_api.NewClientWithBasicAuth(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"), "")
+	return primaryClient.DeployMultiplayerServerVersion(moduleID, imageRegistry)
+}
 
 func updateMultiplayerServerVersion() (*resty.Response, error) {
 	if len(os.Args) != 3 {
