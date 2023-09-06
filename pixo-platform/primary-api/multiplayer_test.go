@@ -35,7 +35,7 @@ var _ = Describe("Multiplayer", func() {
 	It("should be able to update a multiplayer server version using a function", func() {
 		imageRegistry := "us-docker.pkg.dev/agones-images/examples/simple-game-server:0.14"
 		status := "enabled"
-		res, err := primaryClient.UpdateMultiplayerServerVersion(imageRegistry, status)
+		res, err := primaryClient.UpdateMultiplayerServerVersion(1, imageRegistry, status)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(res.StatusCode()).To(Equal(http.StatusOK))
 	})
