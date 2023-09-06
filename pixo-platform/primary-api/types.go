@@ -22,8 +22,14 @@ type FieldValidationError struct {
 }
 
 type MultiplayerServerVersion struct {
-	Status        string `json:"status"`
-	ImageRegistry string `json:"imageRegistry"`
+	ModuleID         int    `json:"moduleId,omitempty"`
+	VersionID        int    `json:"versionId,omitempty"`
+	Engine           string `json:"engine,omitempty"`
+	Status           string `json:"status,omitempty"`
+	ImageRegistry    string `json:"imageRegistry"`
+	Version          string `json:"version,omitempty"`
+	MinClientVersion string `json:"minClientVersion,omitempty"`
+	Filename         string `json:"filename,omitempty"`
 }
 
 type FieldValidationErrors struct {

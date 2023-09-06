@@ -13,12 +13,16 @@ import (
 var _ = Describe("Multiplayer", func() {
 
 	var (
-		primaryClient *primary_api.PrimaryAPIClient
+		primaryClient   *primary_api.PrimaryAPIClient
+		secretKeyClient *primary_api.PrimaryAPIClient
 	)
 
 	BeforeEach(func() {
-		primaryClient = primary_api.NewClient(os.Getenv("SECRET_KEY"), "")
+		primaryClient = primary_api.NewClientWithBasicAuth(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"), "")
 		Expect(primaryClient.IsAuthenticated()).To(BeTrue())
+
+		secretKeyClient = primary_api.NewClient(os.Getenv("SECRET_KEY"), "")
+		Expect(secretKeyClient.IsAuthenticated()).To(BeTrue())
 	})
 
 	It("should be able to update a multiplayer server version using the rest client", func() {
@@ -27,17 +31,43 @@ var _ = Describe("Multiplayer", func() {
 			ImageRegistry: "us-docker.pkg.dev/agones-images/examples/simple-game-server:0.14",
 		}
 		body, err := json.Marshal(multiplayerPatch)
-		res, err := primaryClient.Patch("api/external/multiplayer-server-versions/1", body)
+
+		res, err := secretKeyClient.Patch("api/external/multiplayer-server-versions/1", body)
+
 		Expect(err).NotTo(HaveOccurred())
 		Expect(res.StatusCode()).To(Equal(http.StatusOK))
 	})
 
 	It("should be able to update a multiplayer server version using a function", func() {
 		imageRegistry := "us-docker.pkg.dev/agones-images/examples/simple-game-server:0.14"
-		status := "enabled"
-		res, err := primaryClient.UpdateMultiplayerServerVersion(1, imageRegistry, status)
+		res, err := secretKeyClient.UpdateMultiplayerServerVersion(1, imageRegistry)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(res.StatusCode()).To(Equal(http.StatusOK))
 	})
+
+	It("should be able to create a multiplayer server version using the rest client", func() {
+		multiplayerServerVersion := primary_api.MultiplayerServerVersion{
+			ModuleID:         17,
+			Engine:           "unreal",
+			Status:           "enabled",
+			ImageRegistry:    "us-docker.pkg.dev/agones-images/examples/simple-game-server:0.14",
+			Version:          "1.0.0",
+			Filename:         "test.exe",
+			MinClientVersion: "1.0.0",
+		}
+		body, err := json.Marshal(multiplayerServerVersion)
+
+		res, err := primaryClient.Post("api/multiplayer-server-version", body)
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(res.StatusCode()).To(Equal(http.StatusOK))
+	})
+
+	//It("should be able to deploy a multiplayer server version using a function", func() {
+	//	imageRegistry := "us-docker.pkg.dev/agones-images/examples/simple-game-server:0.14"
+	//	res, err := primaryClient.DeployMultiplayerServerVersion(17, imageRegistry)
+	//	Expect(err).NotTo(HaveOccurred())
+	//	Expect(res.StatusCode()).To(Equal(http.StatusOK))
+	//})
 
 })

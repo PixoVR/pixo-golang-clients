@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/go-resty/resty/v2"
 	"github.com/rs/zerolog/log"
-	"net/http"
 )
 
 // GetURL returns the URL of the restClient
@@ -46,13 +45,13 @@ func (p *PixoAbstractAPIClient) Get(path string) (*resty.Response, error) {
 
 	res, err := p.FormatRequest().Get(url)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to get data")
+		log.Error().Err(err).Msg("Failed to perform get request")
 		return nil, err
 	}
 
-	if res.StatusCode() != http.StatusOK {
-		log.Error().Err(err).Msg("Failed to get data")
-		return nil, errors.New("failed to get data")
+	if res.IsError() {
+		log.Error().Err(err).Msg("Failed to get data from API")
+		return nil, errors.New(string(res.Body()))
 	}
 
 	return res, nil
@@ -62,15 +61,16 @@ func (p *PixoAbstractAPIClient) Get(path string) (*resty.Response, error) {
 func (p *PixoAbstractAPIClient) Post(path string, body []byte) (*resty.Response, error) {
 	url := p.GetURLWithPath(path)
 
-	res, err := p.FormatRequest().SetBody(body).Post(url)
+	req := p.FormatRequest().SetBody(body)
+	res, err := req.Post(url)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to post data")
+		log.Error().Err(err).Msg("Failed to perform post request")
 		return nil, err
 	}
 
 	if res.IsError() {
-		log.Error().Err(err).Msg("Error response from server")
-		return nil, errors.New("error response from server")
+		log.Error().Err(err).Msg("Failed to post data to API")
+		return nil, errors.New(string(res.Body()))
 	}
 
 	return res, nil
@@ -82,13 +82,13 @@ func (p *PixoAbstractAPIClient) Patch(path string, body []byte) (*resty.Response
 
 	res, err := p.FormatRequest().SetBody(body).Patch(url)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to post data")
+		log.Error().Err(err).Msg("Failed to perform patch request")
 		return nil, err
 	}
 
 	if res.IsError() {
-		log.Error().Err(err).Msg("Error response from server")
-		return nil, errors.New("error response from server")
+		log.Error().Err(err).Msg("Failed to patch data to API")
+		return nil, errors.New(string(res.Body()))
 	}
 
 	return res, nil

@@ -9,23 +9,21 @@ import (
 )
 
 func main() {
-	if len(os.Args) != 4 {
-		log.Error().Msg("Invalid number of arguments. Expected 3 arguments: versionID, imageRegistry, status")
+	if len(os.Args) != 3 {
+		log.Error().Msg("Invalid number of arguments. Expected 2 arguments: moduleID, imageRegistry")
 		return
 	}
 
-	versionIDString := os.Args[1]
-	versionID, err := strconv.Atoi(versionIDString)
+	moduleID, err := strconv.Atoi(os.Args[1])
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to parse versionID as int")
+		log.Error().Err(err).Msg("Failed to parse moduleID as int")
 		return
 	}
 
 	imageRegistry := os.Args[2]
-	status := os.Args[3]
 
 	primaryClient := primary_api.NewClient(os.Getenv("SECRET_KEY"), "")
-	res, err := primaryClient.UpdateMultiplayerServerVersion(versionID, imageRegistry, status)
+	res, err := primaryClient.DeployMultiplayerServerVersion(moduleID, imageRegistry)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to update multiplayer server version")
 	}
