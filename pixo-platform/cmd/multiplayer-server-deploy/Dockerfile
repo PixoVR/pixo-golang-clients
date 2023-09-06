@@ -11,7 +11,7 @@ FROM alpine:latest
 
 WORKDIR /client
 
-COPY --from=builder /build/cmd/multiplayer-server-deploy/deploy .
+COPY --from=builder /build/cmd/multiplayer-server-deploy/deploy /usr/bin/deploy
 RUN ls -la
 
-ENTRYPOINT ["./deploy"]
+ENTRYPOINT ["/usr/bin/deploy"]
