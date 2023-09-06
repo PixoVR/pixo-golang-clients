@@ -10,5 +10,9 @@ build:
 image:
 	docker build ../.. -t multiplayer-server-deploy:latest -f ./Dockerfile
 
-container: image
-	docker run -d multiplayer-server-deploy:latest
+container: clean image
+	docker run -d --rm -it multiplayer-server-deploy:latest -- ./deploy
+
+clean:
+	rm -f multiplayer-server-deploy || true
+	docker rmi --force multiplayer-server-deploy:latest || true
