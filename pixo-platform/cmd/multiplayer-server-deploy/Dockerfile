@@ -1,9 +1,16 @@
-FROM golang:1.20-alpine
+FROM golang:1.20-alpine as builder
 
-WORKDIR /client
+WORKDIR /build
 
 COPY . .
 
-RUN cd cmd/multiplayer-server-deploy && go build -o multiplayer-server-deploy
+RUN cd cmd/multiplayer-server-deploy && go build -o deploy
 
-CMD ["./cmd/multiplayer-server-deploy/multiplayer-server-deploy"]
+
+FROM alpine:latest
+
+WORKDIR /client
+
+COPY --from=builder /build/cmd/multiplayer-server-deploy/deploy .
+
+ENTRYPOINT ["./deploy"]
