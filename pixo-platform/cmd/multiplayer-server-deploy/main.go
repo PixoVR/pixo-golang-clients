@@ -42,7 +42,7 @@ func deployMultiplayerServerVersion() (*resty.Response, error) {
 
 func updateMultiplayerServerVersion() (*resty.Response, error) {
 	if len(os.Args) != 3 {
-		log.Error().Msg("Invalid number of arguments. Expected 3 arguments: versionID, imageRegistry")
+		log.Error().Msg("Invalid number of arguments. Expected 2 arguments: versionID, imageRegistry")
 		return nil, nil
 	}
 
