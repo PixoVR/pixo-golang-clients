@@ -2,7 +2,7 @@
 all: container
 
 run:
-	go run main.go 1 gcr.io/some-image
+	go run main.go 221 gcr.io/some-image
 
 build:
 	go build -o multiplayer-server-deploy

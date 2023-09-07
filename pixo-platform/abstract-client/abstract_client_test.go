@@ -11,7 +11,7 @@ var _ = Describe("Abstract", func() {
 
 	It("should return the correct URL", func() {
 		client := abstract_client.NewClient(os.Getenv("API_TOKEN"), "")
-		Expect(client.GetURL()).To(Equal("http://localhost:3001"))
+		Expect(client.GetURL()).To(Equal("https://api.apex.pixovr.com"))
 	})
 
 	It("can set the token", func() {

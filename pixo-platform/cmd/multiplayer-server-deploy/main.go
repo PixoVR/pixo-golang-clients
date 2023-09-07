@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	res, err := deployMultiplayerServerVersion()
+	res, err := updateMultiplayerServerVersion()
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to update multiplayer server version")
 		return

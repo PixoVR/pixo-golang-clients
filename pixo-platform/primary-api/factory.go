@@ -47,19 +47,19 @@ func (p *PrimaryAPIClient) Login(username, password string) error {
 		SetBody(loginInput).
 		Post(url)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to login")
-		return errors.New("failed to login")
+		log.Error().Err(err).Msg("Failed to perform login request")
+		return err
 	}
 
 	if res.IsError() {
-		log.Error().Err(err).Msg("Failed to login")
-		return errors.New("failed to login")
+		log.Error().Err(err).Msg("Login attempt failed")
+		return errors.New(string(res.Body()))
 	}
 
 	var loginResponse AuthResponse
 	if err = json.Unmarshal(res.Body(), &loginResponse); err != nil {
 		log.Error().Err(err).Msg("Failed to login")
-		return errors.New("failed to login")
+		return errors.New(string(res.Body()))
 	}
 
 	p.SetToken(loginResponse.User.Token)
