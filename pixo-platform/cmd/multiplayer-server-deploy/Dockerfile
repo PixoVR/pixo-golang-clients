@@ -4,7 +4,7 @@ WORKDIR /build
 
 COPY . .
 
-RUN cd cmd/multiplayer-server-deploy && go build -o deploy && ls -la
+RUN cd cmd/multiplayer-server-deploy && go build -o deploy
 
 
 FROM alpine:latest
@@ -12,6 +12,5 @@ FROM alpine:latest
 WORKDIR /client
 
 COPY --from=builder /build/cmd/multiplayer-server-deploy/deploy /usr/bin/deploy
-RUN ls -la
 
 ENTRYPOINT ["/usr/bin/deploy"]
