@@ -42,8 +42,3 @@ func deployMultiplayerServerVersion(id int, image, semanticVersion string) (*res
 	primaryClient := primary_api.NewClientWithBasicAuth(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"), "")
 	return primaryClient.DeployMultiplayerServerVersion(id, image, semanticVersion)
 }
-
-func updateMultiplayerServerVersion(id int, image string) (*resty.Response, error) {
-	secretKeyClient := primary_api.NewClient(os.Getenv("SECRET_KEY"), "")
-	return secretKeyClient.UpdateMultiplayerServerVersion(id, image)
-}
