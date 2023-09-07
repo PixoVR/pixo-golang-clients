@@ -10,7 +10,21 @@ import (
 )
 
 func main() {
-	res, err := updateMultiplayerServerVersion()
+	if len(os.Args) != 4 {
+		log.Error().Msg("Invalid number of arguments. Expected 2 arguments: id, image, semantic version (e.g. 1.00.00)")
+		return
+	}
+
+	id, err := strconv.Atoi(os.Args[1])
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to parse id as int")
+		return
+	}
+
+	image := os.Args[2]
+	semanticVersion := os.Args[3]
+
+	res, err := deployMultiplayerServerVersion(id, image, semanticVersion)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to update multiplayer server version")
 		return
@@ -24,38 +38,12 @@ func main() {
 	log.Info().Msg("Successfully deployed multiplayer server version")
 }
 
-func deployMultiplayerServerVersion() (*resty.Response, error) {
-	if len(os.Args) != 3 {
-		log.Error().Msg("Invalid number of arguments. Expected 2 arguments: moduleID, imageRegistry")
-		return nil, nil
-	}
-
-	moduleID, err := strconv.Atoi(os.Args[1])
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to parse moduleID as int")
-		return nil, nil
-	}
-
-	imageRegistry := os.Args[2]
-
+func deployMultiplayerServerVersion(id int, image, semanticVersion string) (*resty.Response, error) {
 	primaryClient := primary_api.NewClientWithBasicAuth(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"), "")
-	return primaryClient.DeployMultiplayerServerVersion(moduleID, imageRegistry)
+	return primaryClient.DeployMultiplayerServerVersion(id, image, semanticVersion)
 }
 
-func updateMultiplayerServerVersion() (*resty.Response, error) {
-	if len(os.Args) != 3 {
-		log.Error().Msg("Invalid number of arguments. Expected 2 arguments: versionID, imageRegistry")
-		return nil, nil
-	}
-
-	versionID, err := strconv.Atoi(os.Args[1])
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to parse versionID as int")
-		return nil, nil
-	}
-
-	imageRegistry := os.Args[2]
-
+func updateMultiplayerServerVersion(id int, image string) (*resty.Response, error) {
 	secretKeyClient := primary_api.NewClient(os.Getenv("SECRET_KEY"), "")
-	return secretKeyClient.UpdateMultiplayerServerVersion(versionID, imageRegistry)
+	return secretKeyClient.UpdateMultiplayerServerVersion(id, image)
 }

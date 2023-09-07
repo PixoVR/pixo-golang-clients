@@ -7,11 +7,15 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (p *PrimaryAPIClient) DeployMultiplayerServerVersion(moduleID int, imageRegistry string) (*resty.Response, error) {
+func (p *PrimaryAPIClient) DeployMultiplayerServerVersion(moduleID int, image, semanticVersion string) (*resty.Response, error) {
 	multiplayerServerVersion := MultiplayerServerVersion{
-		ModuleID:      moduleID,
-		Status:        "enabled",
-		ImageRegistry: imageRegistry,
+		ModuleID:         moduleID,
+		Status:           "enabled",
+		ImageRegistry:    image,
+		Engine:           "unreal",
+		Version:          semanticVersion,
+		MinClientVersion: semanticVersion,
+		Filename:         "nonexistent-file.exe",
 	}
 
 	body, err := json.Marshal(multiplayerServerVersion)
@@ -25,10 +29,10 @@ func (p *PrimaryAPIClient) DeployMultiplayerServerVersion(moduleID int, imageReg
 	return p.Post(path, body)
 }
 
-func (p *PrimaryAPIClient) UpdateMultiplayerServerVersion(versionID int, imageRegistry string) (*resty.Response, error) {
+func (p *PrimaryAPIClient) UpdateMultiplayerServerVersion(versionID int, image string) (*resty.Response, error) {
 	multiplayerPatch := MultiplayerServerVersion{
 		Status:        "enabled",
-		ImageRegistry: imageRegistry,
+		ImageRegistry: image,
 	}
 	body, err := json.Marshal(multiplayerPatch)
 	if err != nil {

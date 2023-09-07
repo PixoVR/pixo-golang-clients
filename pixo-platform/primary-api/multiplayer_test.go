@@ -39,8 +39,8 @@ var _ = Describe("Multiplayer", func() {
 	})
 
 	It("should be able to update a multiplayer server version using a function", func() {
-		imageRegistry := "us-docker.pkg.dev/agones-images/examples/simple-game-server:0.14"
-		res, err := secretKeyClient.UpdateMultiplayerServerVersion(1, imageRegistry)
+		image := "us-docker.pkg.dev/agones-images/examples/simple-game-server:0.14"
+		res, err := secretKeyClient.UpdateMultiplayerServerVersion(1, image)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(res.StatusCode()).To(Equal(http.StatusOK))
 	})
@@ -64,11 +64,11 @@ var _ = Describe("Multiplayer", func() {
 		Expect(res.StatusCode()).To(Equal(http.StatusOK))
 	})
 
-	//It("should be able to deploy a multiplayer server version using a function", func() {
-	//	imageRegistry := "us-docker.pkg.dev/agones-images/examples/simple-game-server:0.14"
-	//	res, err := primaryClient.DeployMultiplayerServerVersion(17, imageRegistry)
-	//	Expect(err).NotTo(HaveOccurred())
-	//	Expect(res.StatusCode()).To(Equal(http.StatusOK))
-	//})
+	It("should be able to deploy a multiplayer server version using a function", func() {
+		image := "us-docker.pkg.dev/agones-images/examples/simple-game-server:0.14"
+		res, err := primaryClient.DeployMultiplayerServerVersion(17, image, "1.00.00")
+		Expect(err).NotTo(HaveOccurred())
+		Expect(res.StatusCode()).To(Equal(http.StatusOK))
+	})
 
 })
