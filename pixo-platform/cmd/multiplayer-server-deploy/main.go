@@ -21,7 +21,7 @@ func main() {
 		return
 	}
 
-	log.Info().Msg("Successfully updated multiplayer server version")
+	log.Info().Msg("Successfully deployed multiplayer server version")
 }
 
 func deployMultiplayerServerVersion() (*resty.Response, error) {
