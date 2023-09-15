@@ -7,26 +7,26 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
+	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 )
 
 var _ = Describe("Multiplayer", func() {
 
 	var (
-		primaryClient   *primary_api.PrimaryAPIClient
-		secretKeyClient *primary_api.PrimaryAPIClient
+		primaryClient   *PrimaryAPIClient
+		secretKeyClient *PrimaryAPIClient
 	)
 
 	BeforeEach(func() {
-		primaryClient = primary_api.NewClientWithBasicAuth(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"), "")
+		primaryClient = NewClientWithBasicAuth(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"), "")
 		Expect(primaryClient.IsAuthenticated()).To(BeTrue())
 
-		secretKeyClient = primary_api.NewClient(os.Getenv("SECRET_KEY"), "")
+		secretKeyClient = NewClient(os.Getenv("SECRET_KEY"), "")
 		Expect(secretKeyClient.IsAuthenticated()).To(BeTrue())
 	})
 
 	It("should be able to update a multiplayer server version using the rest client", func() {
-		multiplayerPatch := primary_api.MultiplayerServerVersion{
+		multiplayerPatch := MultiplayerServerVersion{
 			Status:        "enabled",
 			ImageRegistry: "us-docker.pkg.dev/agones-images/examples/simple-game-server:0.14",
 		}
@@ -46,7 +46,7 @@ var _ = Describe("Multiplayer", func() {
 	})
 
 	It("should be able to create a multiplayer server version using the rest client", func() {
-		multiplayerServerVersion := primary_api.MultiplayerServerVersion{
+		multiplayerServerVersion := MultiplayerServerVersion{
 			ModuleID:         17,
 			Engine:           "unreal",
 			Status:           "enabled",

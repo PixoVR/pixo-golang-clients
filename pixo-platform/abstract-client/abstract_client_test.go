@@ -4,6 +4,7 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"net/http"
 	"os"
 )
 
@@ -30,8 +31,9 @@ var _ = Describe("Abstract", func() {
 
 	It("should be able to make a get request", func() {
 		client := abstract_client.NewClient("", "")
-		_, err := client.Get("health")
+		res, err := client.Get("health")
 		Expect(err).NotTo(HaveOccurred())
+		Expect(res.StatusCode()).To(Equal(http.StatusOK))
 	})
 
 })

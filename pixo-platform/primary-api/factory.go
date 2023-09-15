@@ -12,6 +12,11 @@ type PrimaryAPIClient struct {
 
 // NewClient is a function that returns a PixoAbstractAPIClient
 func NewClient(token, apiURL string) *PrimaryAPIClient {
+
+	if apiURL == "" {
+		apiURL = getURL()
+	}
+
 	return &PrimaryAPIClient{
 		PixoAbstractAPIClient: *abstractClient.NewClient(token, apiURL),
 	}
