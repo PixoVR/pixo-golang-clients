@@ -2,7 +2,7 @@ package multiplayer_allocator
 
 import "github.com/go-resty/resty/v2"
 
-type AllocateServerRequest struct {
+type AllocationRequest struct {
 	ModuleID           int    `json:"module_id"`
 	OrgID              int    `json:"org_id"`
 	ImageRegistry      string `json:"image_registry"`

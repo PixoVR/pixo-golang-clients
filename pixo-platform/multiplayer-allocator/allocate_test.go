@@ -27,7 +27,7 @@ var _ = Describe("Allocate", func() {
 	})
 
 	It("should be able to allocate a multiplayer server", func() {
-		req := AllocateServerRequest{
+		req := AllocationRequest{
 			ModuleID:           1,
 			OrgID:              1,
 			ImageRegistry:      "us-docker.pkg.dev/agones-images/examples/simple-game-server:0.14",
