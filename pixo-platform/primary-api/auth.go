@@ -36,5 +36,6 @@ func (p *PrimaryAPIClient) Login(username, password string) error {
 	}
 
 	p.SetToken(loginResponse.User.Token)
+
 	return nil
 }
