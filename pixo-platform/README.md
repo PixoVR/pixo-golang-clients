@@ -11,4 +11,3 @@ Secret Key or Username/Password are needed to authenticate with the Pixo Platfor
 ```bash
 go get github.com/PixoVR/pixo-golang-clients/pixo-platform
 ```
-
