@@ -25,7 +25,7 @@ func (p *AllocatorClient) AllocateGameserver(request AllocationRequest) (Allocat
 	err = json.Unmarshal(res.Body(), &response)
 	if err != nil {
 		log.Debug().Err(err).Msg("Failed to unmarshal allocate server response")
-		return AllocationResponse{}, err
+		return response, err
 	}
 
 	response.HTTPResponse = res
