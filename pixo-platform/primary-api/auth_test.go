@@ -18,6 +18,7 @@ var _ = Describe("Auth", func() {
 
 	It("should be able get a new client with basic auth", func() {
 		client := primary_api.NewClientWithBasicAuth(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"), "")
+		Expect(client).NotTo(BeNil())
 		Expect(client.IsAuthenticated()).To(BeTrue())
 	})
 

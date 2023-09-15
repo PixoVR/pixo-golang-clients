@@ -34,6 +34,7 @@ func (p *PrimaryAPIClient) UpdateMultiplayerServerVersion(versionID int, image s
 		Status:        "enabled",
 		ImageRegistry: image,
 	}
+
 	body, err := json.Marshal(multiplayerPatch)
 	if err != nil {
 		log.Debug().Err(err).Msg("Failed to marshal multiplayer server version")
@@ -43,4 +44,12 @@ func (p *PrimaryAPIClient) UpdateMultiplayerServerVersion(versionID int, image s
 	path := fmt.Sprintf("api/external/multiplayer-server-versions/%d", versionID)
 
 	return p.Patch(path, body)
+}
+
+func (p *PrimaryAPIClient) GetMultiplayerConfigurations() (*resty.Response, error) {
+	path := "api/openmatch/configurations"
+
+	p.AddHeader("x-openmatch-header", p.GetToken())
+
+	return p.Get(path)
 }

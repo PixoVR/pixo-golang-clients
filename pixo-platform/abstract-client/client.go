@@ -34,10 +34,20 @@ func (p *PixoAbstractAPIClient) IsAuthenticated() bool {
 
 // FormatRequest formats the request headers needed for authentication
 func (p *PixoAbstractAPIClient) FormatRequest() *resty.Request {
-	return p.restClient.R().
+	req := p.restClient.R().
 		SetHeader("Content-Type", "application/json").
 		SetHeader("x-access-token", p.token).
 		SetHeader("Authorization", fmt.Sprintf("Bearer %s", p.token))
+
+	for key, value := range p.headers {
+		req.SetHeader(key, value)
+	}
+
+	return req
+}
+
+func (p *PixoAbstractAPIClient) AddHeader(key string, value string) {
+	p.headers[key] = value
 }
 
 // Get makes a GET request to the API

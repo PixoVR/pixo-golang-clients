@@ -8,6 +8,7 @@ import (
 type PixoAbstractAPIClient struct {
 	url        string
 	token      string
+	headers    map[string]string
 	restClient *resty.Client
 }
 
@@ -22,5 +23,6 @@ func NewClient(token, apiURL string) *PixoAbstractAPIClient {
 		url:        apiURL,
 		restClient: resty.New(),
 		token:      token,
+		headers:    make(map[string]string),
 	}
 }
