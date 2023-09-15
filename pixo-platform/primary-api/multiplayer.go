@@ -46,10 +46,23 @@ func (p *PrimaryAPIClient) UpdateMultiplayerServerVersion(versionID int, image s
 	return p.Patch(path, body)
 }
 
-func (p *PrimaryAPIClient) GetMultiplayerConfigurations() (*resty.Response, error) {
+func (p *PrimaryAPIClient) GetMatchmakingProfiles() ([]*GameProfileMetadata, error) {
 	path := "api/openmatch/configurations"
 
 	p.AddHeader("x-openmatch-header", p.GetToken())
 
-	return p.Get(path)
+	res, err := p.Get(path)
+	if err != nil {
+		log.Debug().Err(err).Msg("Failed to get multiplayer configurations")
+		return nil, err
+	}
+
+	var profilesResponse GameProfileMetaDataResponse
+	err = json.Unmarshal(res.Body(), &profilesResponse)
+	if err != nil {
+		log.Debug().Err(err).Msg("Failed to unmarshal multiplayer configurations")
+		return nil, err
+	}
+
+	return profilesResponse.Profiles, nil
 }

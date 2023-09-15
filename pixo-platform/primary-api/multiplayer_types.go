@@ -31,3 +31,16 @@ type MultiplayerServerVersion struct {
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }
+
+type GameProfileMetaDataResponse struct {
+	Error      bool                   `json:"error"`
+	StatusCode int                    `json:"statusCode"`
+	Message    string                 `json:"message"`
+	Profiles   []*GameProfileMetadata `json:"profiles"`
+}
+
+type GameProfileMetadata struct {
+	OrgID         int                      `json:"orgId"`
+	Config        MultiplayerServerConfig  `json:"config"`
+	ServerVersion MultiplayerServerVersion `json:"serverVersion"`
+}

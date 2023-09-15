@@ -35,9 +35,10 @@ var _ = Describe("Multiplayer", func() {
 	})
 
 	It("should be able to get the multiplayer configurations available", func() {
-		res, err := secretKeyClient.GetMultiplayerConfigurations()
+		profiles, err := secretKeyClient.GetMatchmakingProfiles()
 		Expect(err).NotTo(HaveOccurred())
-		Expect(res.StatusCode()).To(Equal(http.StatusOK))
+		Expect(profiles).NotTo(BeNil())
+		Expect(len(profiles)).To(BeNumerically(">", 0))
 	})
 
 	It("should be able to deploy a multiplayer server version", func() {
