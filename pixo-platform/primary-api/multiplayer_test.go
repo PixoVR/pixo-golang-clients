@@ -26,19 +26,19 @@ var _ = Describe("Multiplayer", func() {
 		Expect(secretKeyClient.IsAuthenticated()).To(BeTrue())
 	})
 
+	It("should be able to get the matchmaking profiles available", func() {
+		profiles, err := secretKeyClient.GetMatchmakingProfiles()
+		Expect(err).NotTo(HaveOccurred())
+		Expect(profiles).NotTo(BeNil())
+		Expect(len(profiles)).To(BeNumerically(">", 0))
+	})
+
 	It("should be able to update a multiplayer server version", func() {
 		image := "us-docker.pkg.dev/agones-images/examples/simple-game-server:0.14"
 		res, err := secretKeyClient.UpdateMultiplayerServerVersion(1, image)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(res.StatusCode()).To(Equal(http.StatusOK))
 
-	})
-
-	It("should be able to get the multiplayer configurations available", func() {
-		profiles, err := secretKeyClient.GetMatchmakingProfiles()
-		Expect(err).NotTo(HaveOccurred())
-		Expect(profiles).NotTo(BeNil())
-		Expect(len(profiles)).To(BeNumerically(">", 0))
 	})
 
 	It("should be able to deploy a multiplayer server version", func() {
