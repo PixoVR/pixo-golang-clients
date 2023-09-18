@@ -2,6 +2,7 @@ package parser
 
 import (
 	"errors"
+	"fmt"
 	"gopkg.in/ini.v1"
 )
 
@@ -30,10 +31,27 @@ func NewIniParser(input *string) (*IniParser, error) {
 	}, nil
 }
 
-func (i *IniParser) ParseServerVersion() (string, error) {
-	if section := i.iniFile.Section("Project"); section != nil {
-		return section.Key("ProjectVersion").String(), nil
+func (i *IniParser) ParseServerVersion(iniInfo ...string) (string, error) {
+
+	var sectionName string
+	var key string
+
+	if len(iniInfo) == 0 {
+		sectionName = DefaultVersionSectionName
+		key = DefaultVersionKey
+	}
+
+	if len(iniInfo) > 0 {
+		sectionName = iniInfo[0]
+	}
+
+	if len(iniInfo) > 1 {
+		key = iniInfo[1]
+	}
+
+	if section := i.iniFile.Section(sectionName); section != nil {
+		return section.Key(key).String(), nil
 	} else {
-		return "", errors.New("could not find Project section in ini file")
+		return "", errors.New(fmt.Sprintf("could not find %s section in ini file", sectionName))
 	}
 }
