@@ -33,4 +33,8 @@ var _ = Describe("GraphQL API", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
+	It("should be able to get a matchmaking profile by org id and module id", func() {
+		Expect(1).To(Equal(2))
+	})
+
 })
