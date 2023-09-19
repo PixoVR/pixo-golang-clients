@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/go-jose/go-jose/v3"
+	jwt2 "github.com/go-jose/go-jose/v3/jwt"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/rs/zerolog/log"
 	"net/http"
@@ -163,7 +163,8 @@ func ParseJWT(tokenString string) (RawToken, error) {
 
 	var claims map[string]interface{}
 
-	token, err := jose.ParseSigned(tokenString)
+	var token *jwt2.JSONWebToken
+	token, err := jwt2.ParseSigned(tokenString)
 	if err != nil {
 		return RawToken{}, errors.New("no token found")
 	}
