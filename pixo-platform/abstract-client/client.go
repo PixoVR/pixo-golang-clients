@@ -5,7 +5,13 @@ import (
 	"fmt"
 	"github.com/go-resty/resty/v2"
 	"github.com/rs/zerolog/log"
+	"net/http"
 )
+
+// GetClient returns the resty client
+func (p *PixoAbstractAPIClient) GetClient() *http.Client {
+	return p.restClient.GetClient()
+}
 
 // GetURL returns the URL of the restClient
 func (p *PixoAbstractAPIClient) GetURL() string {
