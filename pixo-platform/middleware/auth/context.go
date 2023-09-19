@@ -5,12 +5,11 @@ import (
 )
 
 type CustomContext struct {
-	Services     *interface{}
 	FindUserByID func(id int) (*interface{}, error)
 }
 
 func GetContext(ctx context.Context) *CustomContext {
-	customContext, ok := ctx.Value(CustomContextKey).(*CustomContext)
+	customContext, ok := ctx.Value(AbstractCustomContextKey).(*CustomContext)
 	if !ok {
 		return nil
 	}
