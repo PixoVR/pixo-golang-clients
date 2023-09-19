@@ -10,6 +10,10 @@ import (
 	"time"
 )
 
+var (
+	l *zerolog.Logger
+)
+
 func init() {
 	lifecycle := os.Getenv("LIFECYCLE")
 
@@ -23,9 +27,14 @@ func init() {
 
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339})
+	l = &log.Logger
 }
 
 func LoggingMiddleware(logger *zerolog.Logger) gin.HandlerFunc {
+	if logger == nil {
+		logger = l
+	}
+
 	return func(c *gin.Context) {
 		startTime := time.Now()
 		c.Next()
