@@ -14,6 +14,7 @@ type MultiplayerServerConfig struct {
 }
 
 type MultiplayerServerVersion struct {
+	ID               int    `json:"id,omitempty" graphql:"id"`
 	ModuleID         int    `json:"moduleId,omitempty" graphql:"moduleId"`
 	Engine           string `json:"engine,omitempty" graphql:"engine"`
 	Status           string `json:"status,omitempty" graphql:"status"`
