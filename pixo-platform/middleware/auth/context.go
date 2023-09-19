@@ -6,6 +6,7 @@ import (
 )
 
 type CustomContext struct {
+	Services     *interface{}
 	FindUserByID func(id int) (*platform.User, error)
 }
 
