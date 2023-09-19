@@ -4,54 +4,53 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/parser"
 	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
 	"github.com/rs/zerolog/log"
+	"github.com/spf13/pflag"
 	"os"
-	"strconv"
 )
 
 var (
-	apiClient *graphql_api.GraphQLAPIClient
+	apiClient       *graphql_api.GraphQLAPIClient
+	iniFilePath     string
+	semanticVersion string
+	image           string
+	moduleID        int
 )
 
 func init() {
 	apiClient = graphql_api.NewClient(os.Getenv("SECRET_KEY"), "")
+	pflag.StringVarP(&semanticVersion, "semantic-version", "v", "", "Multiplayer server version semantic version (e.g: 1.00.00)")
+	pflag.StringVarP(&image, "image", "i", "", "Multiplayer server version image")
+	pflag.StringVarP(&iniFilePath, "ini", "c", parser.DefaultConfigFilepath, "Path to ini config file")
+	pflag.IntVarP(&moduleID, "module-id", "m", 0, "Multiplayer server version module id")
+	pflag.Parse()
 }
 
 func main() {
-	if len(os.Args) < 3 {
-		log.Error().Msg("Invalid number of arguments. Expected at least 2 arguments: id, image, and optionally an ini config file path (default: ./Config/DefaultGame.ini)")
-		return
+
+	if moduleID == 0 {
+		log.Fatal().Msg("Module id is required using -m <module-id> or --module-id <module-id>")
 	}
 
-	id, err := strconv.Atoi(os.Args[1])
+	if image == "" {
+		log.Fatal().Msg("Image is required using -i <image> or --image <image>")
+	}
+
+	iniParser, err := parser.NewIniParser(&iniFilePath)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to parse id as int")
+		log.Fatal().Err(err).Msg("Failed to create ini parser")
 		return
 	}
 
-	image := os.Args[2]
-
-	var ini *string
-	if len(os.Args) < 4 {
-		log.Info().Msg("No ini config file path provided. Using default: ./Config/DefaultGame.ini")
-	} else {
-		ini = &os.Args[3]
+	if semanticVersion == "" {
+		semanticVersion, err = iniParser.ParseServerVersion()
+		if err != nil {
+			log.Debug().Err(err).Msg("Failed to parse server version from ini file. Using default version: 1.0.0")
+			semanticVersion = "1.0.0"
+		}
 	}
 
-	iniParser, err := parser.NewIniParser(ini)
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to create ini parser")
-		return
-	}
-
-	semanticVersion, err := iniParser.ParseServerVersion()
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to parse server version")
-		return
-	}
-
-	if err = apiClient.DeployMultiplayerServerVersion(id, image, semanticVersion); err != nil {
-		log.Error().Err(err).Msg("Failed to update multiplayer server version")
-		return
+	if err = apiClient.DeployMultiplayerServerVersion(moduleID, image, semanticVersion); err != nil {
+		log.Fatal().Err(err).Msg("Failed to update multiplayer server version")
 	}
 
 	log.Info().Msg("Successfully deployed multiplayer server version")
