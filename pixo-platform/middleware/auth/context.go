@@ -2,12 +2,11 @@ package auth
 
 import (
 	"context"
-	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 )
 
 type CustomContext struct {
 	Services     *interface{}
-	FindUserByID func(id int) (*platform.User, error)
+	FindUserByID func(id int) (*interface{}, error)
 }
 
 func GetContext(ctx context.Context) *CustomContext {

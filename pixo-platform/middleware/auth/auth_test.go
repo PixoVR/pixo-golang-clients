@@ -10,17 +10,18 @@ import (
 var _ = Describe("Auth", func() {
 	It("can initialize a custom context with a findUserByID function", func() {
 		customCtx := auth.CustomContext{
-			FindUserByID: func(id int) (*platform.User, error) {
+			FindUserByID: func(id int) (*interface{}, error) {
 				user := &platform.User{
 					ID: id,
 				}
-				return user, nil
+				userVal := interface{}(user)
+				return &userVal, nil
 			},
 		}
 
 		user, err := customCtx.FindUserByID(1)
 
 		Expect(err).NotTo(HaveOccurred())
-		Expect(user.ID).To(Equal(1))
+		Expect(user).NotTo(BeNil())
 	})
 })

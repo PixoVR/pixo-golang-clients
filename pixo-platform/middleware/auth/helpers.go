@@ -2,12 +2,11 @@ package auth
 
 import (
 	"errors"
-	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 )
 
-func GetCurrentUser(c *gin.Context) (*platform.User, error) {
+func GetCurrentUser(c *gin.Context) (*interface{}, error) {
 	context := GetContext(c.Request.Context())
 
 	tokenString := ExtractSecretKey(c.Request)
