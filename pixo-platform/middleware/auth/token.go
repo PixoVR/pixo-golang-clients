@@ -21,7 +21,7 @@ func TokenAuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		user, err := GetCurrentUser(c)
+		user, err := GetParsedJWT(c.Request)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"error": "unauthorized",
@@ -35,7 +35,7 @@ func TokenAuthMiddleware() gin.HandlerFunc {
 }
 
 func TokenValid(r *http.Request) error {
-	tokenString := ExtractSecretKey(r)
+	tokenString := ExtractToken(r)
 	_, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -48,13 +48,13 @@ func TokenValid(r *http.Request) error {
 	return nil
 }
 
-func ExtractSecretKey(r *http.Request) string {
+func ExtractToken(r *http.Request) string {
 	accessToken := r.Header.Get(SecretKeyHeader)
 	if accessToken != "" {
 		return accessToken
 	}
 
-	authToken := r.Header.Get("Authorization")
+	authToken := r.Header.Get(AuthorizationHeader)
 	if len(strings.Split(authToken, " ")) == 2 {
 		return strings.Split(authToken, " ")[1]
 	}

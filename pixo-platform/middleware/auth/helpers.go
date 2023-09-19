@@ -2,14 +2,12 @@ package auth
 
 import (
 	"errors"
-	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
+	"net/http"
 )
 
-func GetCurrentUser(c *gin.Context) (*interface{}, error) {
-	context := GetContext(c.Request.Context())
-
-	tokenString := ExtractSecretKey(c.Request)
+func GetParsedJWT(req *http.Request) (*RawToken, error) {
+	tokenString := ExtractToken(req)
 
 	if tokenString == "" {
 		log.Debug().Msg("token not found")
@@ -22,38 +20,5 @@ func GetCurrentUser(c *gin.Context) (*interface{}, error) {
 		return nil, err
 	}
 
-	if context.FindUserByID == nil {
-		log.Debug().Msg("user not found")
-		return nil, errors.New("user not found")
-	}
-
-	user, err := context.FindUserByID(rawToken.UserID)
-	if err != nil {
-		log.Debug().Msg("user not found")
-		return nil, err
-	}
-
-	return user, nil
+	return &rawToken, nil
 }
-
-//func GetOrgAccess(orgService services.OrgService, userOrg *models.Org) []*models.Org {
-//	if userOrg == nil {
-//		return nil
-//	}
-//
-//	if userOrg.Type == "platform" {
-//		allOrgs, err := orgService.GetAll()
-//		if err != nil {
-//			log.Debug().Msg(ErrOrgAccess)
-//			return nil
-//		}
-//		return allOrgs
-//	}
-//
-//	orgsInTree, err := orgService.GetOrgsInTree(userOrg)
-//	if err != nil {
-//		log.Debug().Msg(ErrOrgAccess)
-//		return nil
-//	}
-//	return orgsInTree
-//}
