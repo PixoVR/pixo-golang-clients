@@ -27,20 +27,10 @@ var _ = Describe("GraphQL API", func() {
 		Expect(len(mpServerVersions)).To(BeNumerically(">", 0))
 	})
 
-	//It("should be able to create a multiplayer server version with a secret key", func() {
-	//multiplayerServerVersion := primary_api.MultiplayerServerVersion{
-	//	ModuleID:         moduleID,
-	//	Status:           "enabled",
-	//	ImageRegistry:    image,
-	//	Engine:           "unreal",
-	//	Version:          semanticVersion,
-	//	MinClientVersion: semanticVersion,
-	//}
-
-	//	image := "us-docker.pkg.dev/agones-images/examples/simple-game-server:0.14"
-	//	res, err := gqlClient.CreateMultiplayerServerVersion(125, image, "1.00.00")
-	//	Expect(err).NotTo(HaveOccurred())
-	//	Expect(res.StatusCode()).To(Equal(http.StatusOK))
-	//})
+	It("should be able to create a multiplayer server version with a secret key", func() {
+		image := "us-docker.pkg.dev/agones-images/examples/simple-game-server:0.14"
+		err := gqlClient.DeployMultiplayerServerVersion(1, image, "1.00.00")
+		Expect(err).NotTo(HaveOccurred())
+	})
 
 })

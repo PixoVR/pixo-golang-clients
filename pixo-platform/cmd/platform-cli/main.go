@@ -2,13 +2,19 @@ package main
 
 import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/parser"
-	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
-	"github.com/go-resty/resty/v2"
+	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
 	"github.com/rs/zerolog/log"
-	"net/http"
 	"os"
 	"strconv"
 )
+
+var (
+	apiClient *graphql_api.GraphQLAPIClient
+)
+
+func init() {
+	apiClient = graphql_api.NewClient(os.Getenv("SECRET_KEY"), "")
+}
 
 func main() {
 	if len(os.Args) < 3 {
@@ -43,21 +49,10 @@ func main() {
 		return
 	}
 
-	res, err := deployMultiplayerServerVersion(id, image, semanticVersion)
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to update multiplayer server version")
-		return
-	}
-
-	if res.StatusCode() != http.StatusOK {
+	if err = apiClient.DeployMultiplayerServerVersion(id, image, semanticVersion); err != nil {
 		log.Error().Err(err).Msg("Failed to update multiplayer server version")
 		return
 	}
 
 	log.Info().Msg("Successfully deployed multiplayer server version")
-}
-
-func deployMultiplayerServerVersion(id int, image, semanticVersion string) (*resty.Response, error) {
-	primaryClient := primary_api.NewClientWithBasicAuth(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"), "")
-	return primaryClient.DeployMultiplayerServerVersion(id, image, semanticVersion)
 }

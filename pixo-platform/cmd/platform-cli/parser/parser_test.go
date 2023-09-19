@@ -34,7 +34,7 @@ var _ = Describe("Parser", func() {
 
 	It("can parse the server version from a specific .ini file", func() {
 		expectedVersion := "1.02.03"
-		version, err := iniParser.ParseServerVersion("Project", "Version")
+		version, err := iniParser.ParseServerVersion("Project", "SemanticVersion")
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(version).To(Equal(expectedVersion))

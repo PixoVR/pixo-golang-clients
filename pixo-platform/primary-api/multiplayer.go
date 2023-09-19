@@ -13,7 +13,7 @@ func (p *PrimaryAPIClient) DeployMultiplayerServerVersion(moduleID int, image, s
 		Status:           "enabled",
 		ImageRegistry:    image,
 		Engine:           "unreal",
-		Version:          semanticVersion,
+		SemanticVersion:  semanticVersion,
 		MinClientVersion: semanticVersion,
 		Filename:         "nonexistent-file.exe",
 	}
