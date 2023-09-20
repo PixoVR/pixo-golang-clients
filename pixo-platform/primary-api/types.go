@@ -17,12 +17,17 @@ type Module struct {
 	ID            int         `json:"id"`
 	Name          string      `json:"name"`
 	Description   string      `json:"description"`
-	ImageName     interface{} `json:"imageName"`
-	ImagePath     interface{} `json:"imagePath"`
+	ImageName     string      `json:"imageName"`
+	ImagePath     string      `json:"imagePath"`
 	ThumbnailPath string      `json:"thumbnailPath"`
 	ShortDesc     string      `json:"shortDesc"`
-	UpdatedAt     time.Time   `json:"updatedAt"`
+	GitOrgName    string      `json:"gitOrgName"`
+	GitRepoName   string      `json:"gitRepoName"`
+	GitRevision   string      `json:"gitRevision"`
 	OrgModule     []OrgModule `json:"orgModule"`
+
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 type Event struct {

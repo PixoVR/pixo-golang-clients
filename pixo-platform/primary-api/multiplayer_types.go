@@ -2,9 +2,11 @@ package primary_api
 
 type MultiplayerServerConfig struct {
 	ID       int   `json:"id"`
-	ModuleID int   `json:"moduleId"`
 	Capacity int32 `json:"capacity"`
 	Disabled bool  `json:"disabled"`
+
+	ModuleID int     `json:"moduleId"`
+	Module   *Module `json:"module"`
 
 	CreatedBy string `json:"createdBy"`
 	UpdatedBy string `json:"updatedBy"`
@@ -15,13 +17,15 @@ type MultiplayerServerConfig struct {
 
 type MultiplayerServerVersion struct {
 	ID               int    `json:"id,omitempty" graphql:"id"`
-	ModuleID         int    `json:"moduleId,omitempty" graphql:"moduleId"`
 	Engine           string `json:"engine,omitempty" graphql:"engine"`
 	Status           string `json:"status,omitempty" graphql:"status"`
 	ImageRegistry    string `json:"imageRegistry" graphql:"imageRegistry"`
 	SemanticVersion  string `json:"semanticVersion,omitempty" graphql:"semanticVersion"`
 	MinClientVersion string `json:"minClientVersion,omitempty" graphql:"minClientVersion"`
 	Filename         string `json:"filename,omitempty" graphql:"filename"`
+
+	ModuleID int     `json:"moduleId,omitempty" graphql:"moduleId"`
+	Module   *Module `json:"module,omitempty" graphql:"module"`
 
 	CreatedBy string `json:"createdBy" graphql:"createdBy"`
 	UpdatedBy string `json:"updatedBy" graphql:"updatedBy"`
