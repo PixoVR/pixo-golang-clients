@@ -14,18 +14,14 @@ type OrgModule struct {
 }
 
 type Module struct {
-	ID                 int         `json:"id"`
-	Name               string      `json:"name"`
-	Description        string      `json:"description"`
-	ImageName          string      `json:"imageName"`
-	ImagePath          string      `json:"imagePath"`
-	ThumbnailPath      string      `json:"thumbnailPath"`
-	ShortDesc          string      `json:"shortDesc"`
-	GitOrgName         string      `json:"gitOrgName"`
-	GitRepoName        string      `json:"gitRepoName"`
-	GitRevision        string      `json:"gitRevision"`
-	DockerfileLocation string      `json:"dockerfileLocation"`
-	OrgModule          []OrgModule `json:"orgModule"`
+	ID            int         `json:"id"`
+	Name          string      `json:"name"`
+	Description   string      `json:"description"`
+	ImageName     string      `json:"imageName"`
+	ImagePath     string      `json:"imagePath"`
+	ThumbnailPath string      `json:"thumbnailPath"`
+	ShortDesc     string      `json:"shortDesc"`
+	OrgModule     []OrgModule `json:"orgModule"`
 
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
