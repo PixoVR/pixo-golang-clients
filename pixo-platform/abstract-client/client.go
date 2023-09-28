@@ -113,3 +113,39 @@ func (p *PixoAbstractAPIClient) Patch(path string, body []byte) (*resty.Response
 
 	return res, nil
 }
+
+// Put makes a PUT request to the API
+func (p *PixoAbstractAPIClient) Put(path string, body []byte) (*resty.Response, error) {
+	url := p.GetURLWithPath(path)
+
+	res, err := p.FormatRequest().SetBody(body).Put(url)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to perform put request")
+		return nil, err
+	}
+
+	if res.IsError() {
+		log.Error().Err(err).Msg("Failed to put data to API")
+		return nil, errors.New(string(res.Body()))
+	}
+
+	return res, nil
+}
+
+// Delete makes a DELETE request to the API
+func (p *PixoAbstractAPIClient) Delete(path string) (*resty.Response, error) {
+	url := p.GetURLWithPath(path)
+
+	res, err := p.FormatRequest().Delete(url)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to perform delete request")
+		return nil, err
+	}
+
+	if res.IsError() {
+		log.Error().Err(err).Msg("Failed to delete data from API")
+		return nil, errors.New(string(res.Body()))
+	}
+
+	return res, nil
+}

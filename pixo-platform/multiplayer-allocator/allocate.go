@@ -5,7 +5,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (p *AllocatorClient) AllocateGameserver(request AllocationRequest) (AllocationResponse, error) {
+func (a *AllocatorClient) AllocateGameserver(request AllocationRequest) (AllocationResponse, error) {
 
 	body, err := json.Marshal(request)
 	if err != nil {
@@ -15,7 +15,7 @@ func (p *AllocatorClient) AllocateGameserver(request AllocationRequest) (Allocat
 
 	path := "allocator/allocate"
 
-	res, err := p.Post(path, body)
+	res, err := a.Post(path, body)
 	if err != nil {
 		log.Debug().Err(err).Msg("Failed to post allocate server request")
 		return AllocationResponse{}, err
