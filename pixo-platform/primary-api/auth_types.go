@@ -14,6 +14,7 @@ type AuthResponse struct {
 
 type User struct {
 	ID         int    `json:"id,omitempty"`
+	Role       string `json:"role,omitempty"`
 	OrgID      int    `json:"orgId,omitempty"`
 	Org        Org    `json:"org,omitempty"`
 	First      string `json:"first,omitempty"`
