@@ -13,11 +13,11 @@ type AuthResponse struct {
 }
 
 type User struct {
-	ID         int    `json:"id"`
-	OrgID      int    `json:"orgId"`
-	Org        Org    `json:"org"`
-	First      string `json:"first"`
-	Last       string `json:"last"`
-	Email      string `json:"email"`
-	ExternalID string `json:"externalId"`
+	ID         int    `json:"id,omitempty"`
+	OrgID      int    `json:"orgId,omitempty"`
+	Org        Org    `json:"org,omitempty"`
+	First      string `json:"first,omitempty"`
+	Last       string `json:"last,omitempty"`
+	Email      string `json:"email,omitempty"`
+	ExternalID string `json:"externalId,omitempty"`
 }
