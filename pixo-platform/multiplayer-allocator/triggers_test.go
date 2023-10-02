@@ -22,8 +22,15 @@ var _ = Describe("Triggers", func() {
 
 	It("can register and delete a multiplayer server trigger", func() {
 		trigger := platform.MultiplayerServerTrigger{
-			ID:         1,
-			ModuleID:   1,
+			ID:       1,
+			ModuleID: 1,
+			Module: &platform.Module{
+				ID: 1,
+				GitConfig: platform.GitConfig{
+					OrgName:  "PixoVR",
+					RepoName: "multiplayer-gameservers",
+				},
+			},
 			Revision:   "dev",
 			Dockerfile: "Server/Dockerfile",
 			Context:    ".",
