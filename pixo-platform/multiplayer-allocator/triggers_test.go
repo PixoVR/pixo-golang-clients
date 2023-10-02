@@ -24,8 +24,6 @@ var _ = Describe("Triggers", func() {
 		trigger := platform.MultiplayerServerTrigger{
 			ID:         1,
 			ModuleID:   1,
-			GitOrgName: "PixoVR",
-			RepoName:   "multiplayer-gameservers",
 			Revision:   "dev",
 			Dockerfile: "Server/Dockerfile",
 			Context:    ".",

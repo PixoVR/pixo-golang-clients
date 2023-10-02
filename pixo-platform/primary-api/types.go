@@ -14,17 +14,21 @@ type OrgModule struct {
 }
 
 type Module struct {
-	ID            int         `json:"id"`
-	Name          string      `json:"name"`
-	Description   string      `json:"description"`
-	ImageName     string      `json:"imageName"`
-	ImagePath     string      `json:"imagePath"`
-	ThumbnailPath string      `json:"thumbnailPath"`
-	ShortDesc     string      `json:"shortDesc"`
-	OrgModule     []OrgModule `json:"orgModule"`
+	ID            int    `json:"id,omitempty"`
+	Name          string `json:"name,omitempty"`
+	Description   string `json:"description,omitempty"`
+	ImageName     string `json:"imageName,omitempty"`
+	ImagePath     string `json:"imagePath,omitempty"`
+	ThumbnailPath string `json:"thumbnailPath,omitempty"`
+	ShortDesc     string `json:"shortDesc,omitempty"`
 
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	GitConfigID int       `json:"gitConfigId,omitempty"`
+	GitConfig   GitConfig `json:"gitConfig,omitempty"`
+
+	OrgModules []OrgModule `json:"orgModule,omitempty"`
+
+	CreatedAt time.Time `json:"createdAt,omitempty"`
+	UpdatedAt time.Time `json:"updatedAt,omitempty"`
 }
 
 type Event struct {

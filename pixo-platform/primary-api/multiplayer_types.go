@@ -16,8 +16,6 @@ type MultiplayerServerConfig struct {
 
 type MultiplayerServerTrigger struct {
 	ID         int    `json:"id,omitempty"`
-	GitOrgName string `json:"gitOrgName,omitempty"`
-	RepoName   string `json:"repoName,omitempty"`
 	Revision   string `json:"revision,omitempty"`
 	Dockerfile string `json:"dockerfile,omitempty"`
 	Context    string `json:"context,omitempty"`
