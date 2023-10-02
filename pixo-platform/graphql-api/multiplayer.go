@@ -1,13 +1,11 @@
 package graphql_api
 
 import (
-	"context"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/rs/zerolog/log"
 )
 
 func (g *GraphQLAPIClient) DeployMultiplayerServerVersion(moduleID int, image, semanticVersion string) error {
-
 	query := `mutation createMultiplayerServerVersion($input: MultiplayerServerVersionInput!) { createMultiplayerServerVersion(input: $input) { id imageRegistry semanticVersion module { name } } }`
 
 	variables := map[string]interface{}{
@@ -20,7 +18,7 @@ func (g *GraphQLAPIClient) DeployMultiplayerServerVersion(moduleID int, image, s
 		},
 	}
 
-	if _, err := g.gqlClient.ExecRaw(context.Background(), query, variables); err != nil {
+	if _, err := g.ExecRaw(query, variables); err != nil {
 		log.Debug().Msgf("error deploying multiplayer server version: %v", err)
 		return err
 	}
@@ -32,7 +30,7 @@ func (g *GraphQLAPIClient) DeployMultiplayerServerVersion(moduleID int, image, s
 func (g *GraphQLAPIClient) GetMultiplayerServerVersions() ([]*platform.MultiplayerServerVersion, error) {
 	var res MultiplayerServerVersionQuery
 
-	if err := g.gqlClient.Query(context.Background(), &res, nil); err != nil {
+	if err := g.Query(&res, nil); err != nil {
 		return nil, err
 	}
 
