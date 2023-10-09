@@ -9,6 +9,7 @@ type AllocationRequest struct {
 	Engine             string `json:"engine"`
 	BackfillID         string `json:"backfill_id"`
 	AllocateGameServer bool   `json:"allocate_game_server"`
+	ClientVersion      string `json:"client_version"`
 }
 
 type AllocationResponse struct {

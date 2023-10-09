@@ -32,6 +32,7 @@ var _ = Describe("Allocate", func() {
 			OrgID:              1,
 			ImageRegistry:      "us-docker.pkg.dev/agones-images/examples/simple-game-server:0.14",
 			AllocateGameServer: true,
+			ClientVersion:      "1.0.0",
 		}
 
 		res, err := allocatorClient.AllocateGameserver(req)
