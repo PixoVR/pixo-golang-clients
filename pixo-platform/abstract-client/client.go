@@ -90,7 +90,7 @@ func (p *PixoAbstractAPIClient) Post(path string, body []byte) (*resty.Response,
 
 	if res.IsError() {
 		log.Error().Err(err).Msg("Failed to post data to API")
-		return nil, errors.New(string(res.Body()))
+		return res, errors.New("invalid HTTP response received")
 	}
 
 	return res, nil

@@ -50,4 +50,13 @@ var _ = Describe("Abstract", func() {
 		Expect(res.StatusCode()).To(Equal(http.StatusOK))
 	})
 
+	It("should return a response if the request fails", func() {
+		client := abstract_client.NewClient("", "")
+
+		res, err := client.Post("invalid", nil)
+
+		Expect(err).To(HaveOccurred())
+		Expect(res).To(BeNil())
+	})
+
 })

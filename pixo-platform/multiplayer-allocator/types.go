@@ -15,7 +15,7 @@ type AllocationRequest struct {
 type AllocationResponse struct {
 	HTTPResponse *resty.Response `json:"http_response"`
 	Results      GameServer      `json:"results"`
-	IsError      bool            `json:"error"`
+	Error        error           `json:"error"`
 }
 
 type GameServer struct {
