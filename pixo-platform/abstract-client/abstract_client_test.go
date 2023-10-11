@@ -10,7 +10,7 @@ import (
 
 var _ = Describe("Abstract", func() {
 
-	It("should return the correct URL", func() {
+	It("should return the correct url", func() {
 		client := abstract_client.NewClient(os.Getenv("API_TOKEN"), "")
 		Expect(client.GetURL()).NotTo(BeEmpty())
 	})

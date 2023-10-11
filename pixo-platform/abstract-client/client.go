@@ -13,7 +13,7 @@ func (p *PixoAbstractAPIClient) GetClient() *http.Client {
 	return p.restClient.GetClient()
 }
 
-// GetURL returns the URL of the restClient
+// GetURL returns the url of the restClient
 func (p *PixoAbstractAPIClient) GetURL() string {
 	return p.url
 }
@@ -28,7 +28,7 @@ func (p *PixoAbstractAPIClient) SetToken(token string) {
 	p.token = token
 }
 
-// GetURLWithPath returns the URL of the restClient with a path appended
+// GetURLWithPath returns the url of the restClient with a path appended
 func (p *PixoAbstractAPIClient) GetURLWithPath(path string) string {
 	return fmt.Sprintf("%s/%s", p.url, path)
 }
