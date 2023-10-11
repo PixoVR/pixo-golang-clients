@@ -3,6 +3,7 @@ package matchmaker
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	abstractClient "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
 	"github.com/rs/zerolog/log"
 	"io"
@@ -14,6 +15,20 @@ type PixoMatchmaker struct {
 	abstractClient.PixoAbstractAPIClient
 }
 
+func NewMatchmaker(url, token string) *PixoMatchmaker {
+
+	if url == "" {
+		url = getURL()
+	}
+
+	return &PixoMatchmaker{
+		PixoAbstractAPIClient: *abstractClient.NewClient(token, url),
+	}
+}
+
+func getURL() string {
+	return fmt.Sprintf("%s/%s", DefaultMatchmakingURL, MatchmakingEndpoint)
+}
 func (p *PixoMatchmaker) Connect(moduleID, orgID int) (*net.UDPAddr, error) {
 	log.Info().Msg("Connecting to matchmaking server")
 
