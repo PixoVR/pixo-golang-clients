@@ -76,7 +76,8 @@ func (p *PixoMatchmaker) Connect(moduleID, orgID int) (*net.UDPAddr, error) {
 	}
 
 	if !matchResponse.IsValid() {
-		log.Error().Msg("Match response did not contain match details")
+		err = errors.New("match response is invalid")
+		log.Error().Err(err)
 		return nil, err
 	}
 

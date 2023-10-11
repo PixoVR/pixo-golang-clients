@@ -10,12 +10,11 @@ import (
 var _ = Describe("Multiplayer", func() {
 
 	var (
-		matchURL = "wss://match.apex.pixovr.com/matchmaking/matchmake"
-		m        matchmaker.Matchmaker
+		m matchmaker.Matchmaker
 	)
 
 	BeforeEach(func() {
-		m = matchmaker.NewMatchmaker(matchURL, os.Getenv("AUTH_TOKEN"))
+		m = matchmaker.NewMatchmaker("", os.Getenv("AUTH_TOKEN"))
 	})
 
 	It("can return an error message if the module ID is invalid", func() {
