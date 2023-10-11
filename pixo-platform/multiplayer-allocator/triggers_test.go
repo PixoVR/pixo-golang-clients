@@ -20,7 +20,7 @@ var _ = Describe("Triggers", func() {
 		Expect(allocatorClient.IsAuthenticated()).To(BeTrue())
 	})
 
-	It("can register and delete a multiplayer server trigger", func() {
+	It("can register, update and delete a multiplayer server trigger", func() {
 		trigger := platform.MultiplayerServerTrigger{
 			ID:       1,
 			ModuleID: 1,
@@ -40,6 +40,10 @@ var _ = Describe("Triggers", func() {
 		res, err := allocatorClient.RegisterTrigger(trigger)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(res.StatusCode()).To(Equal(http.StatusCreated))
+
+		res, err = allocatorClient.UpdateTrigger(trigger)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(res.StatusCode()).To(Equal(http.StatusOK))
 
 		res, err = allocatorClient.DeleteTrigger(trigger.ID)
 		Expect(err).NotTo(HaveOccurred())

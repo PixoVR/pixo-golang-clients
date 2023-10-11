@@ -27,6 +27,25 @@ func (a *AllocatorClient) RegisterTrigger(trigger platform.MultiplayerServerTrig
 	return res, nil
 }
 
+func (a *AllocatorClient) UpdateTrigger(trigger platform.MultiplayerServerTrigger) (*resty.Response, error) {
+
+	body, err := json.Marshal(trigger)
+	if err != nil {
+		log.Debug().Err(err).Msg("Failed to marshal trigger update request")
+		return nil, err
+	}
+
+	path := fmt.Sprintf("allocator/build/triggers/%d", trigger.ID)
+
+	res, err := a.Put(path, body)
+	if err != nil {
+		log.Debug().Err(err).Msg("Failed to put trigger update request")
+		return nil, err
+	}
+
+	return res, nil
+}
+
 func (a *AllocatorClient) DeleteTrigger(id int) (*resty.Response, error) {
 
 	path := fmt.Sprintf("allocator/build/triggers/%d", id)
