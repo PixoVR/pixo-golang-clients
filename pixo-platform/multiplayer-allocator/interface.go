@@ -8,5 +8,6 @@ import (
 type Allocator interface {
 	AllocateGameserver(request AllocationRequest) AllocationResponse
 	RegisterTrigger(trigger platform.MultiplayerServerTrigger) (*resty.Response, error)
+	UpdateTrigger(trigger platform.MultiplayerServerTrigger) (*resty.Response, error)
 	DeleteTrigger(id int) (*resty.Response, error)
 }
