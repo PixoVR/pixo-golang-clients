@@ -9,6 +9,7 @@ import (
 type AllocatorSpy struct {
 	CalledAllocateGameserver bool
 	CalledRegisterTrigger    bool
+	CalledUpdateTrigger      bool
 	CalledDeleteTrigger      bool
 }
 
@@ -34,6 +35,16 @@ func (a *AllocatorSpy) RegisterTrigger(trigger platform.MultiplayerServerTrigger
 	return &resty.Response{
 		RawResponse: &http.Response{
 			StatusCode: http.StatusCreated,
+		},
+	}, nil
+}
+
+func (a *AllocatorSpy) UpdateTrigger(trigger platform.MultiplayerServerTrigger) (*resty.Response, error) {
+	a.CalledUpdateTrigger = true
+
+	return &resty.Response{
+		RawResponse: &http.Response{
+			StatusCode: http.StatusOK,
 		},
 	}, nil
 }
