@@ -14,7 +14,12 @@ type AllocatorSpy struct {
 }
 
 func NewAllocatorSpy() *AllocatorSpy {
-	return &AllocatorSpy{}
+	return &AllocatorSpy{
+		CalledAllocateGameserver: false,
+		CalledRegisterTrigger:    false,
+		CalledUpdateTrigger:      false,
+		CalledDeleteTrigger:      false,
+	}
 }
 
 func (a *AllocatorSpy) AllocateGameserver(request AllocationRequest) AllocationResponse {
