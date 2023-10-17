@@ -54,4 +54,19 @@ var _ = Describe("Allocate", func() {
 		Expect(res.Error).To(HaveOccurred())
 	})
 
+	It("should be able to register a fleet", func() {
+		fleetReq := FleetRegisterRequest{
+			StandbyReplicas: 1,
+			ModuleID:        43,
+			OrgID:           20,
+			ImageRegistry:   "us-docker.pkg.dev/agones-images/examples/simple-game-server:0.14",
+			ClientVersion:   "1.0.0",
+		}
+
+		res := allocatorClient.RegisterFleet(fleetReq)
+
+		Expect(res).NotTo(BeNil())
+		Expect(res.Error).NotTo(HaveOccurred())
+	})
+
 })

@@ -34,6 +34,16 @@ func (a *AllocatorSpy) AllocateGameserver(request AllocationRequest) AllocationR
 	}
 }
 
+func (a *AllocatorSpy) RegisterFleet(fleet FleetRegisterRequest) (*resty.Response, error) {
+	a.CalledRegisterTrigger = true
+
+	return &resty.Response{
+		RawResponse: &http.Response{
+			StatusCode: http.StatusCreated,
+		},
+	}, nil
+}
+
 func (a *AllocatorSpy) RegisterTrigger(trigger platform.MultiplayerServerTrigger) (*resty.Response, error) {
 	a.CalledRegisterTrigger = true
 

@@ -2,14 +2,28 @@ package multiplayer_allocator
 
 import "github.com/go-resty/resty/v2"
 
+type FleetRegisterRequest struct {
+	StandbyReplicas int    `json:"standby_replicas,omitempty"`
+	ModuleID        int    `json:"module_id,omitempty"`
+	OrgID           int    `json:"org_id,omitempty"`
+	SemanticVersion string `json:"semantic_version,omitempty"`
+	ImageRegistry   string `json:"image_registry,omitempty"`
+	ClientVersion   string `json:"client_version,omitempty"`
+}
+
+type FleetRegisterResponse struct {
+	HTTPResponse *resty.Response `json:"http_response"`
+	Error        error           `json:"error"`
+}
+
 type AllocationRequest struct {
-	ModuleID           int    `json:"module_id"`
-	OrgID              int    `json:"org_id"`
-	ImageRegistry      string `json:"image_registry"`
-	Engine             string `json:"engine"`
-	BackfillID         string `json:"backfill_id"`
-	AllocateGameServer bool   `json:"allocate_game_server"`
-	ClientVersion      string `json:"client_version"`
+	ModuleID           int    `json:"module_id,omitempty"`
+	OrgID              int    `json:"org_id,omitempty"`
+	ImageRegistry      string `json:"image_registry,omitempty"`
+	Engine             string `json:"engine,omitempty"`
+	BackfillID         string `json:"backfill_id,omitempty"`
+	AllocateGameServer bool   `json:"allocate_game_server,omitempty"`
+	ClientVersion      string `json:"client_version,omitempty"`
 }
 
 type AllocationResponse struct {
