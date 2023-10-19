@@ -23,22 +23,50 @@ var _ = Describe("Allocate", func() {
 		client := NewClient("", "")
 		res, err := client.Get("health")
 		Expect(err).NotTo(HaveOccurred())
+		Expect(res).NotTo(BeNil())
 		Expect(res.StatusCode()).To(Equal(http.StatusOK))
 	})
 
 	It("should be able to allocate a multiplayer server", func() {
 		req := AllocationRequest{
-			ModuleID:           1,
-			OrgID:              1,
+			ModuleID:           43,
+			OrgID:              20,
 			ImageRegistry:      "us-docker.pkg.dev/agones-images/examples/simple-game-server:0.14",
 			AllocateGameServer: true,
 			ClientVersion:      "1.0.0",
 		}
 
-		res, err := allocatorClient.AllocateGameserver(req)
+		res := allocatorClient.AllocateGameserver(req)
 
-		Expect(err).NotTo(HaveOccurred())
+		Expect(res.Error).NotTo(HaveOccurred())
 		Expect(res.HTTPResponse.StatusCode()).To(Equal(http.StatusOK))
+	})
+
+	It("should throw an error if the server allocation failed", func() {
+		allocationReq := AllocationRequest{
+			ModuleID:      43,
+			OrgID:         20,
+			ImageRegistry: "invalid",
+		}
+		res := allocatorClient.AllocateGameserver(allocationReq)
+
+		Expect(res).NotTo(BeNil())
+		Expect(res.Error).To(HaveOccurred())
+	})
+
+	It("should be able to register a fleet", func() {
+		fleetReq := FleetRegisterRequest{
+			StandbyReplicas: 1,
+			ModuleID:        43,
+			OrgID:           20,
+			ImageRegistry:   "us-docker.pkg.dev/agones-images/examples/simple-game-server:0.14",
+			ClientVersion:   "1.0.0",
+		}
+
+		res := allocatorClient.RegisterFleet(fleetReq)
+
+		Expect(res).NotTo(BeNil())
+		Expect(res.Error).NotTo(HaveOccurred())
 	})
 
 })
