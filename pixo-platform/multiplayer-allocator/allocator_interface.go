@@ -4,7 +4,7 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-type Allocator interface {
+type ServerAllocatorClient interface {
 	AllocateGameserver(request AllocationRequest) AllocationResponse
 	RegisterFleet(fleet FleetRequest) (*resty.Response, error)
 }

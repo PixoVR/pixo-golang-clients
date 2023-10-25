@@ -5,7 +5,7 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-type BuildTrigger interface {
+type BuildTriggerClient interface {
 	RegisterTrigger(trigger platform.MultiplayerServerTrigger) (*resty.Response, error)
 	UpdateTrigger(trigger platform.MultiplayerServerTrigger) (*resty.Response, error)
 	DeleteTrigger(id int) (*resty.Response, error)
