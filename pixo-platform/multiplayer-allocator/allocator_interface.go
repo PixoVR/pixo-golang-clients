@@ -1,10 +1,14 @@
 package multiplayer_allocator
 
 import (
-	"github.com/go-resty/resty/v2"
+	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 )
 
-type ServerAllocatorClient interface {
+type Allocator interface {
 	AllocateGameserver(request AllocationRequest) AllocationResponse
-	RegisterFleet(fleet FleetRequest) (*resty.Response, error)
+	RegisterFleet(fleet FleetRequest) Response
+	DeregisterFleet(fleet FleetRequest) Response
+	RegisterTrigger(trigger platform.MultiplayerServerTrigger) Response
+	UpdateTrigger(trigger platform.MultiplayerServerTrigger) Response
+	DeleteTrigger(id int) Response
 }

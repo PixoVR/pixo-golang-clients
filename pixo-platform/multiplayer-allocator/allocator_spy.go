@@ -1,6 +1,7 @@
 package multiplayer_allocator
 
 import (
+	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/go-resty/resty/v2"
 	"net/http"
 )
@@ -9,6 +10,9 @@ type AllocatorSpy struct {
 	CalledAllocateGameserver bool
 	CalledRegisterFleet      bool
 	CalledDeregisterFleet    bool
+	CalledRegisterTrigger    bool
+	CalledUpdateTrigger      bool
+	CalledDeleteTrigger      bool
 }
 
 func NewAllocatorSpy() *AllocatorSpy {
@@ -31,22 +35,62 @@ func (a *AllocatorSpy) AllocateGameserver(request AllocationRequest) AllocationR
 	}
 }
 
-func (a *AllocatorSpy) RegisterFleet(fleet FleetRequest) (*resty.Response, error) {
+func (a *AllocatorSpy) RegisterFleet(fleet FleetRequest) Response {
 	a.CalledRegisterFleet = true
 
-	return &resty.Response{
-		RawResponse: &http.Response{
-			StatusCode: http.StatusCreated,
+	return Response{
+		HTTPResponse: &resty.Response{
+			RawResponse: &http.Response{
+				StatusCode: http.StatusCreated,
+			},
 		},
-	}, nil
+	}
 }
 
-func (a *AllocatorSpy) DeregisterFleet(fleet FleetRequest) (*resty.Response, error) {
+func (a *AllocatorSpy) DeregisterFleet(fleet FleetRequest) Response {
 	a.CalledDeregisterFleet = true
 
-	return &resty.Response{
-		RawResponse: &http.Response{
-			StatusCode: http.StatusNoContent,
+	return Response{
+		HTTPResponse: &resty.Response{
+			RawResponse: &http.Response{
+				StatusCode: http.StatusNoContent,
+			},
 		},
-	}, nil
+	}
+}
+
+func (b *AllocatorSpy) RegisterTrigger(trigger platform.MultiplayerServerTrigger) Response {
+	b.CalledRegisterTrigger = true
+
+	return Response{
+		HTTPResponse: &resty.Response{
+			RawResponse: &http.Response{
+				StatusCode: http.StatusCreated,
+			},
+		},
+	}
+}
+
+func (b *AllocatorSpy) UpdateTrigger(trigger platform.MultiplayerServerTrigger) Response {
+	b.CalledUpdateTrigger = true
+
+	return Response{
+		HTTPResponse: &resty.Response{
+			RawResponse: &http.Response{
+				StatusCode: http.StatusOK,
+			},
+		},
+	}
+}
+
+func (b *AllocatorSpy) DeleteTrigger(id int) Response {
+	b.CalledDeleteTrigger = true
+
+	return Response{
+		HTTPResponse: &resty.Response{
+			RawResponse: &http.Response{
+				StatusCode: http.StatusNoContent,
+			},
+		},
+	}
 }
