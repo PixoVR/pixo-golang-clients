@@ -9,19 +9,11 @@ import (
 	"os"
 )
 
-var _ = Describe("Triggers", func() {
+var _ = Describe("Triggers", Ordered, func() {
 
 	var (
 		allocatorClient *AllocatorClient
-	)
-
-	BeforeEach(func() {
-		allocatorClient = NewClient(os.Getenv("SECRET_KEY"), "")
-		Expect(allocatorClient.IsAuthenticated()).To(BeTrue())
-	})
-
-	It("can register, update and delete a multiplayer server trigger", func() {
-		trigger := platform.MultiplayerServerTrigger{
+		trigger         = platform.MultiplayerServerTrigger{
 			ID:       1,
 			ModuleID: 1,
 			Module: &platform.Module{
@@ -33,19 +25,30 @@ var _ = Describe("Triggers", func() {
 			},
 			Revision:   "dev",
 			Dockerfile: "Server/Dockerfile",
-			Context:    ".",
+			Context:    "Server",
 			Config:     "Config/DefaultGame.ini",
 		}
+	)
 
+	BeforeEach(func() {
+		allocatorClient = NewClient(os.Getenv("SECRET_KEY"), "")
+		Expect(allocatorClient.IsAuthenticated()).To(BeTrue())
+	})
+
+	It("can register a multiplayer server trigger", func() {
 		res, err := allocatorClient.RegisterTrigger(trigger)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(res.StatusCode()).To(Equal(http.StatusCreated))
+	})
 
-		res, err = allocatorClient.UpdateTrigger(trigger)
+	It("can update a multiplayer server trigger", func() {
+		res, err := allocatorClient.UpdateTrigger(trigger)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(res.StatusCode()).To(Equal(http.StatusOK))
+	})
 
-		res, err = allocatorClient.DeleteTrigger(trigger.ID)
+	It("can delete a multiplayer server trigger", func() {
+		res, err := allocatorClient.DeleteTrigger(trigger.ID)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(res.StatusCode()).To(Equal(http.StatusNoContent))
 	})
