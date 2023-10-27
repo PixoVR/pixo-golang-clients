@@ -41,9 +41,9 @@ func (a *AllocatorClient) RegisterFleet(request FleetRequest) Response {
 }
 
 func (a *AllocatorClient) DeregisterFleet(request FleetRequest) Response {
-	cleanedSemanticVersion := strings.ReplaceAll(request.SemanticVersion, ".", "-")
+	cleanedServerVersion := strings.ReplaceAll(request.ServerVersion, ".", "-")
 
-	path := fmt.Sprintf("allocator/fleets/org/%d/module/%d/semVer/%s", request.OrgID, request.ModuleID, cleanedSemanticVersion)
+	path := fmt.Sprintf("allocator/fleets/module/%d/serverVersion/%s", request.ModuleID, cleanedServerVersion)
 
 	res, err := a.Delete(path)
 	if err != nil {

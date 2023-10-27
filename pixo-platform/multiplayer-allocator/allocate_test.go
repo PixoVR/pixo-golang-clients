@@ -32,7 +32,7 @@ var _ = Describe("Allocate", Ordered, func() {
 		req := AllocationRequest{
 			ModuleID:           1,
 			OrgID:              1,
-			SemanticVersion:    "1.0.0",
+			ServerVersion:      "1.0.0",
 			ImageRegistry:      agones.SimpleGameServerImage,
 			AllocateGameServer: true,
 		}
@@ -59,9 +59,8 @@ var _ = Describe("Allocate", Ordered, func() {
 		fleetReq := FleetRequest{
 			StandbyReplicas: 1,
 			ModuleID:        1,
-			OrgID:           1,
 			ImageRegistry:   agones.SimpleGameServerImage,
-			SemanticVersion: "1.0.0",
+			ServerVersion:   "1.0.0",
 		}
 
 		res := allocatorClient.RegisterFleet(fleetReq)
@@ -72,9 +71,8 @@ var _ = Describe("Allocate", Ordered, func() {
 
 	It("should be able to deregister a fleet", func() {
 		fleetReq := FleetRequest{
-			ModuleID:        1,
-			OrgID:           1,
-			SemanticVersion: "1.0.0",
+			ModuleID:      1,
+			ServerVersion: "1.0.0",
 		}
 
 		res := allocatorClient.DeregisterFleet(fleetReq)

@@ -24,8 +24,8 @@ var _ = Describe("Triggers", Ordered, func() {
 				},
 			},
 			Revision:   "dev",
-			Dockerfile: "Server/Dockerfile",
-			Context:    "Server",
+			Dockerfile: "Dockerfile",
+			Context:    "simple-server",
 			Config:     "Config/DefaultGame.ini",
 		}
 	)
@@ -36,21 +36,21 @@ var _ = Describe("Triggers", Ordered, func() {
 	})
 
 	It("can register a multiplayer server trigger", func() {
-		res, err := allocatorClient.RegisterTrigger(trigger)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(res.StatusCode()).To(Equal(http.StatusCreated))
+		res := allocatorClient.RegisterTrigger(trigger)
+		Expect(res.Error).NotTo(HaveOccurred())
+		Expect(res.HTTPResponse.StatusCode()).To(Equal(http.StatusCreated))
 	})
 
 	It("can update a multiplayer server trigger", func() {
-		res, err := allocatorClient.UpdateTrigger(trigger)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(res.StatusCode()).To(Equal(http.StatusOK))
+		res := allocatorClient.UpdateTrigger(trigger)
+		Expect(res.Error).NotTo(HaveOccurred())
+		Expect(res.HTTPResponse.StatusCode()).To(Equal(http.StatusOK))
 	})
 
 	It("can delete a multiplayer server trigger", func() {
-		res, err := allocatorClient.DeleteTrigger(trigger.ID)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(res.StatusCode()).To(Equal(http.StatusNoContent))
+		res := allocatorClient.DeleteTrigger(trigger.ID)
+		Expect(res.Error).NotTo(HaveOccurred())
+		Expect(res.HTTPResponse.StatusCode()).To(Equal(http.StatusNoContent))
 	})
 
 })
