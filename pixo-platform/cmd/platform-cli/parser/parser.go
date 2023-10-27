@@ -31,7 +31,7 @@ func NewIniParser(input *string) (*IniParser, error) {
 	}, nil
 }
 
-func (i *IniParser) ParseServerVersion(iniInfo ...string) (string, error) {
+func (i *IniParser) ParseSemanticVersion(iniInfo ...string) (string, error) {
 
 	var sectionName string
 	var key string
