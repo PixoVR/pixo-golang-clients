@@ -31,13 +31,12 @@ type MultiplayerServerTrigger struct {
 }
 
 type MultiplayerServerVersion struct {
-	ID               int    `json:"id,omitempty" graphql:"id"`
-	Engine           string `json:"engine,omitempty" graphql:"engine"`
-	Status           string `json:"status,omitempty" graphql:"status"`
-	ImageRegistry    string `json:"imageRegistry" graphql:"imageRegistry"`
-	SemanticVersion  string `json:"semanticVersion,omitempty" graphql:"semanticVersion"`
-	MinClientVersion string `json:"minClientVersion,omitempty" graphql:"minClientVersion"`
-	Filename         string `json:"filename,omitempty" graphql:"filename"`
+	ID              int    `json:"id,omitempty" graphql:"id"`
+	Engine          string `json:"engine,omitempty" graphql:"engine"`
+	Status          string `json:"status,omitempty" graphql:"status"`
+	ImageRegistry   string `json:"imageRegistry" graphql:"imageRegistry"`
+	SemanticVersion string `json:"semanticVersion,omitempty" graphql:"semanticVersion"`
+	Filename        string `json:"filename,omitempty" graphql:"filename"`
 
 	ModuleID int     `json:"moduleId,omitempty" graphql:"moduleId"`
 	Module   *Module `json:"module,omitempty" graphql:"module"`
