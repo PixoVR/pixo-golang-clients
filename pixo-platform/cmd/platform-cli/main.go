@@ -42,10 +42,9 @@ func main() {
 	}
 
 	if semanticVersion == "" {
-		semanticVersion, err = iniParser.ParseServerVersion()
+		semanticVersion, err = iniParser.ParseSemanticVersion()
 		if err != nil {
-			log.Info().Err(err).Msg("Failed to parse server version from ini file. Using default version: 1.0.0")
-			semanticVersion = "1.0.0"
+			log.Fatal().Err(err).Msgf("No semantic version given and failed to parse server version from ini file %s", iniFilePath)
 		}
 	}
 
