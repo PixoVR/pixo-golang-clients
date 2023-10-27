@@ -18,8 +18,8 @@ func (g *GraphQLAPIClient) DeployMultiplayerServerVersion(moduleID int, image, s
 		},
 	}
 
-	if _, err := g.ExecRaw(query, variables); err != nil {
-		log.Debug().Msgf("error deploying multiplayer server version: %v", err)
+	if res, err := g.ExecRaw(query, variables); err != nil {
+		log.Debug().Msgf("error deploying multiplayer server version: %s", res)
 		return err
 	}
 
