@@ -9,13 +9,12 @@ import (
 
 func (p *PrimaryAPIClient) DeployMultiplayerServerVersion(moduleID int, image, semanticVersion string) (*resty.Response, error) {
 	multiplayerServerVersion := MultiplayerServerVersion{
-		ModuleID:         moduleID,
-		Status:           "enabled",
-		ImageRegistry:    image,
-		Engine:           "unreal",
-		SemanticVersion:  semanticVersion,
-		MinClientVersion: semanticVersion,
-		Filename:         "nonexistent-file.exe",
+		ModuleID:        moduleID,
+		Status:          "enabled",
+		ImageRegistry:   image,
+		Engine:          "unreal",
+		SemanticVersion: semanticVersion,
+		Filename:        "nonexistent-file.exe",
 	}
 
 	body, err := json.Marshal(multiplayerServerVersion)

@@ -2,13 +2,14 @@ package multiplayer_allocator_test
 
 import (
 	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/multiplayer-allocator"
+	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/k8s/agones"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"net/http"
 	"os"
 )
 
-var _ = Describe("Allocate", func() {
+var _ = Describe("Allocate", Ordered, func() {
 
 	var (
 		allocatorClient *AllocatorClient
@@ -21,7 +22,7 @@ var _ = Describe("Allocate", func() {
 
 	It("should be able make a health check against the allocator", func() {
 		client := NewClient("", "")
-		res, err := client.Get("health")
+		res, err := client.Get("allocator/health")
 		Expect(err).NotTo(HaveOccurred())
 		Expect(res).NotTo(BeNil())
 		Expect(res.StatusCode()).To(Equal(http.StatusOK))
@@ -29,11 +30,11 @@ var _ = Describe("Allocate", func() {
 
 	It("should be able to allocate a multiplayer server", func() {
 		req := AllocationRequest{
-			ModuleID:           43,
-			OrgID:              20,
-			ImageRegistry:      "us-docker.pkg.dev/agones-images/examples/simple-game-server:0.14",
+			ModuleID:           1,
+			OrgID:              1,
+			ServerVersion:      "1.0.0",
+			ImageRegistry:      agones.SimpleGameServerImage,
 			AllocateGameServer: true,
-			ClientVersion:      "1.0.0",
 		}
 
 		res := allocatorClient.AllocateGameserver(req)
@@ -44,8 +45,8 @@ var _ = Describe("Allocate", func() {
 
 	It("should throw an error if the server allocation failed", func() {
 		allocationReq := AllocationRequest{
-			ModuleID:      43,
-			OrgID:         20,
+			ModuleID:      1,
+			OrgID:         1,
 			ImageRegistry: "invalid",
 		}
 		res := allocatorClient.AllocateGameserver(allocationReq)
@@ -55,15 +56,26 @@ var _ = Describe("Allocate", func() {
 	})
 
 	It("should be able to register a fleet", func() {
-		fleetReq := FleetRegisterRequest{
+		fleetReq := FleetRequest{
 			StandbyReplicas: 1,
-			ModuleID:        43,
-			OrgID:           20,
-			ImageRegistry:   "us-docker.pkg.dev/agones-images/examples/simple-game-server:0.14",
-			ClientVersion:   "1.0.0",
+			ModuleID:        1,
+			ImageRegistry:   agones.SimpleGameServerImage,
+			ServerVersion:   "1.0.0",
 		}
 
 		res := allocatorClient.RegisterFleet(fleetReq)
+
+		Expect(res).NotTo(BeNil())
+		Expect(res.Error).NotTo(HaveOccurred())
+	})
+
+	It("should be able to deregister a fleet", func() {
+		fleetReq := FleetRequest{
+			ModuleID:      1,
+			ServerVersion: "1.0.0",
+		}
+
+		res := allocatorClient.DeregisterFleet(fleetReq)
 
 		Expect(res).NotTo(BeNil())
 		Expect(res.Error).NotTo(HaveOccurred())
