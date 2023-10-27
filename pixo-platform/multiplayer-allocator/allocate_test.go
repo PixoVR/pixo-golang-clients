@@ -2,6 +2,7 @@ package multiplayer_allocator_test
 
 import (
 	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/multiplayer-allocator"
+	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/k8s/agones"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -57,10 +58,12 @@ var _ = Describe("Allocate", Ordered, func() {
 
 	It("should be able to register a fleet", func() {
 		fleetReq := FleetRequest{
+			ServerVersion: primary_api.MultiplayerServerVersion{
+				ModuleID:        1,
+				SemanticVersion: "1.0.0",
+				ImageRegistry:   agones.SimpleGameServerImage,
+			},
 			StandbyReplicas: 1,
-			ModuleID:        1,
-			ImageRegistry:   agones.SimpleGameServerImage,
-			ServerVersion:   "1.0.0",
 		}
 
 		res := allocatorClient.RegisterFleet(fleetReq)
@@ -71,8 +74,10 @@ var _ = Describe("Allocate", Ordered, func() {
 
 	It("should be able to deregister a fleet", func() {
 		fleetReq := FleetRequest{
-			ModuleID:      1,
-			ServerVersion: "1.0.0",
+			ServerVersion: primary_api.MultiplayerServerVersion{
+				ModuleID:        1,
+				SemanticVersion: "1.0.0",
+			},
 		}
 
 		res := allocatorClient.DeregisterFleet(fleetReq)
