@@ -48,7 +48,7 @@ func main() {
 		}
 	}
 
-	if err = apiClient.DeployMultiplayerServerVersion(moduleID, image, semanticVersion); err != nil {
+	if err = apiClient.CreateMultiplayerServerVersion(moduleID, image, semanticVersion); err != nil {
 		log.Fatal().Err(err).Msg("Failed to update multiplayer server version")
 	}
 
