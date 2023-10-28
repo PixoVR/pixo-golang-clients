@@ -1,13 +1,13 @@
 package multiplayer_allocator
 
 import (
-	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
+	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/go-resty/resty/v2"
 )
 
 type FleetRequest struct {
-	ServerVersion   primary_api.MultiplayerServerVersion `json:"serverVersion,omitempty"`
-	StandbyReplicas int                                  `json:"standbyReplicas,omitempty"`
+	ServerConfig  platform.MultiplayerServerConfig  `json:"serverConfig,omitempty"`
+	ServerVersion platform.MultiplayerServerVersion `json:"serverVersion,omitempty"`
 }
 
 type Response struct {

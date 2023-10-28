@@ -58,12 +58,14 @@ var _ = Describe("Allocate", Ordered, func() {
 
 	It("should be able to register a fleet", func() {
 		fleetReq := FleetRequest{
+			ServerConfig: primary_api.MultiplayerServerConfig{
+				Capacity: 1,
+			},
 			ServerVersion: primary_api.MultiplayerServerVersion{
 				ModuleID:        1,
 				SemanticVersion: "1.0.0",
 				ImageRegistry:   agones.SimpleGameServerImage,
 			},
-			StandbyReplicas: 1,
 		}
 
 		res := allocatorClient.RegisterFleet(fleetReq)
