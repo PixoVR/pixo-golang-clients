@@ -26,8 +26,8 @@ type MatchDetails struct {
 	SessionID      string `json:"SessionID"`
 	MapName        string `json:"MapName"`
 	OwningUserName string `json:"OwningUserName"`
-	OrgID          int    `json:"OrgId"`
-	ModuleID       int    `json:"ModuleId"`
+	OrgID          int32  `json:"OrgId"`
+	ModuleID       int32  `json:"ModuleId"`
 	ModuleVersion  string `json:"ModuleVersion"`
 }
 
