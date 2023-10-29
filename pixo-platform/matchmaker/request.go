@@ -20,15 +20,15 @@ type MatchResponse struct {
 }
 
 type MatchDetails struct {
-	IP             string `json:"IPAddress"`
-	Port           string `json:"Port"`
-	SessionName    string `json:"SessionName"`
-	SessionID      string `json:"SessionID"`
-	MapName        string `json:"MapName"`
-	OwningUserName string `json:"OwningUserName"`
-	OrgID          int32  `json:"OrgId"`
-	ModuleID       int32  `json:"ModuleId"`
-	ModuleVersion  string `json:"ModuleVersion"`
+	IP             string `json:"IPAddress,omitempty"`
+	Port           string `json:"Port,omitempty"`
+	SessionName    string `json:"SessionName,omitempty"`
+	SessionID      string `json:"SessionID,omitempty"`
+	MapName        string `json:"MapName,omitempty"`
+	OwningUserName string `json:"OwningUserName,omitempty"`
+	OrgID          int32  `json:"OrgId,omitempty"`
+	ModuleID       int32  `json:"ModuleId,omitempty"`
+	ModuleVersion  string `json:"ModuleVersion,omitempty"`
 }
 
 func (m MatchResponse) IsValid() bool {
