@@ -11,17 +11,17 @@ import (
 	"strconv"
 )
 
-type PixoMatchmaker struct {
+type MultiplayerMatchmaker struct {
 	abstractClient.PixoAbstractAPIClient
 }
 
-func NewMatchmaker(url, token string) *PixoMatchmaker {
+func NewMatchmaker(url, token string) *MultiplayerMatchmaker {
 
 	if url == "" {
 		url = getURL()
 	}
 
-	return &PixoMatchmaker{
+	return &MultiplayerMatchmaker{
 		PixoAbstractAPIClient: *abstractClient.NewClient(token, url),
 	}
 }
@@ -29,7 +29,8 @@ func NewMatchmaker(url, token string) *PixoMatchmaker {
 func getURL() string {
 	return fmt.Sprintf("%s/%s", DefaultMatchmakingURL, MatchmakingEndpoint)
 }
-func (p *PixoMatchmaker) Connect(moduleID, orgID int) (*net.UDPAddr, error) {
+
+func (p *MultiplayerMatchmaker) Connect(moduleID, orgID int) (*net.UDPAddr, error) {
 	log.Info().Msg("Connecting to matchmaking server")
 
 	httpResponse, err := p.ConnectToWebsocket()
