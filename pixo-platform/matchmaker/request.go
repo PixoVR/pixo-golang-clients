@@ -20,7 +20,7 @@ type MatchResponse struct {
 }
 
 type MatchDetails struct {
-	IPAddress      string `json:"IPAddress"`
+	IP             string `json:"IPAddress"`
 	Port           string `json:"Port"`
 	SessionName    string `json:"SessionName"`
 	SessionID      string `json:"SessionID"`
