@@ -14,9 +14,9 @@ func (m MatchRequest) IsValid() bool {
 }
 
 type MatchResponse struct {
-	Error        bool         `json:"error"`
-	Message      string       `json:"message"`
-	MatchDetails MatchDetails `json:"matchDetails"`
+	Error        bool         `json:"error,omitempty"`
+	Message      string       `json:"message,omitempty"`
+	MatchDetails MatchDetails `json:"matchDetails,omitempty"`
 }
 
 type MatchDetails struct {
