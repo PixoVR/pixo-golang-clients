@@ -40,7 +40,7 @@ type GameServer struct {
 	OwningUserName string `json:"owning_user_name,omitempty"`
 	OrgID          int    `json:"org_id,omitempty"`
 	ModuleID       int    `json:"module_id,omitempty"`
-	ModuleVersion  string `json:"module_version,omitempty"`
+	ServerVersion  string `json:"server_version,omitempty"`
 	MapName        string `json:"map_name,omitempty"`
 	State          string `json:"state,omitempty"`
 	NumPlaying     int    `json:"num_playing,omitempty"`
