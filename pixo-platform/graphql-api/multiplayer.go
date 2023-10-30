@@ -1,7 +1,6 @@
 package graphql_api
 
 import (
-	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/rs/zerolog/log"
 )
 
@@ -17,16 +16,6 @@ func (g *GraphQLAPIClient) GetMultiplayerServerConfigs(params MultiplayerServerC
 	}
 
 	return query.MultiplayerServerConfigs, nil
-}
-
-func (g *GraphQLAPIClient) GetMultiplayerServerVersions() ([]*platform.MultiplayerServerVersion, error) {
-	var res MultiplayerServerVersionQuery
-
-	if err := g.Query(&res, nil); err != nil {
-		return nil, err
-	}
-
-	return res.MultiplayerServerVersions, nil
 }
 
 func (g *GraphQLAPIClient) CreateMultiplayerServerVersion(moduleID int, image, semanticVersion string) error {

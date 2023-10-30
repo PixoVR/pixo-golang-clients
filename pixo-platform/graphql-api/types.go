@@ -7,8 +7,9 @@ type MultiplayerServerConfigQuery struct {
 }
 
 type MultiplayerServerConfigParams struct {
-	ModuleID int `json:"moduleId,omitempty"`
-	OrgID    int `json:"orgId,omitempty"`
+	ModuleID      int    `json:"moduleId,omitempty"`
+	OrgID         int    `json:"orgId,omitempty"`
+	ServerVersion string `json:"serverVersion,omitempty"`
 }
 
 type MultiplayerServerConfigQueryParams struct {
@@ -34,10 +35,6 @@ type MultiplayerServerConfigInput struct {
 
 type CreateMultiplayerServerConfigResponse struct {
 	CreateMultiplayerServerConfig platform.MultiplayerServerConfig `graphql:"createMultiplayerServerConfig(input: $input)"`
-}
-
-type MultiplayerServerVersionQuery struct {
-	MultiplayerServerVersions []*platform.MultiplayerServerVersion `graphql:"multiplayerServerVersions"`
 }
 
 type MultiplayerServerVersionInput struct {

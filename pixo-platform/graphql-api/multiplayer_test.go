@@ -21,17 +21,12 @@ var _ = Describe("GraphQL API", func() {
 
 	It("should be able to get the multiplayer server configs with a secret key", func() {
 		mpServerConfigs, err := gqlClient.GetMultiplayerServerConfigs(MultiplayerServerConfigParams{
-			OrgID:    1,
-			ModuleID: 1,
+			OrgID:         1,
+			ModuleID:      1,
+			ServerVersion: "1.00.00",
 		})
 		Expect(err).NotTo(HaveOccurred())
 		Expect(mpServerConfigs).NotTo(BeEmpty())
-	})
-
-	It("should be able to get the multiplayer server versions with a secret key", func() {
-		mpServerVersions, err := gqlClient.GetMultiplayerServerVersions()
-		Expect(err).NotTo(HaveOccurred())
-		Expect(mpServerVersions).NotTo(BeEmpty())
 	})
 
 	It("should be able to create a multiplayer server version with a secret key", func() {
