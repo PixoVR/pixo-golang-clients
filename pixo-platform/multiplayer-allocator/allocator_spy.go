@@ -35,9 +35,9 @@ func (a *AllocatorSpy) AllocateGameserver(request AllocationRequest) AllocationR
 			},
 		},
 		Results: GameServer{
-			ResourceName: "test-gameserver",
-			Address:      matchmaker.Localhost,
-			Port:         fmt.Sprint(matchmaker.DefaultGameserverPort),
+			Name: "test-gameserver",
+			IP:   matchmaker.Localhost,
+			Port: fmt.Sprint(matchmaker.DefaultGameserverPort),
 		},
 	}
 }
