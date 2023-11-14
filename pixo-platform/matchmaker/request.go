@@ -1,6 +1,8 @@
 package matchmaker
 
-import "strconv"
+import (
+	"strconv"
+)
 
 type MatchRequest struct {
 	OrgID    int `json:"orgId"`
@@ -12,12 +14,21 @@ func (m MatchRequest) IsValid() bool {
 }
 
 type MatchResponse struct {
-	Error        bool   `json:"error"`
-	Message      string `json:"message"`
-	MatchDetails struct {
-		IP   string `json:"IPAddress"`
-		Port string `json:"Port"`
-	} `json:"matchDetails"`
+	Error        bool         `json:"error,omitempty"`
+	Message      string       `json:"message,omitempty"`
+	MatchDetails MatchDetails `json:"matchDetails,omitempty"`
+}
+
+type MatchDetails struct {
+	IP             string `json:"IPAddress,omitempty"`
+	Port           string `json:"Port,omitempty"`
+	SessionName    string `json:"SessionName,omitempty"`
+	SessionID      string `json:"SessionID,omitempty"`
+	MapName        string `json:"MapName,omitempty"`
+	OwningUserName string `json:"OwningUserName,omitempty"`
+	OrgID          int32  `json:"OrgId,omitempty"`
+	ModuleID       int32  `json:"ModuleId,omitempty"`
+	ModuleVersion  string `json:"ServerVersion,omitempty"`
 }
 
 func (m MatchResponse) IsValid() bool {

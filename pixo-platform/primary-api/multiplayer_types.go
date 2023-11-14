@@ -1,9 +1,10 @@
 package primary_api
 
 type MultiplayerServerConfig struct {
-	ID       int   `json:"id"`
-	Capacity int32 `json:"capacity,omitempty"`
-	Disabled bool  `json:"disabled,omitempty"`
+	ID              int    `json:"id"`
+	Capacity        int    `json:"capacity,omitempty"`
+	StandbyReplicas string `json:"standbyReplicas,omitempty"`
+	Disabled        bool   `json:"disabled,omitempty"`
 
 	ModuleID int     `json:"moduleId,omitempty"`
 	Module   *Module `json:"module,omitempty"`

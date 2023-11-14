@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 
 	abstract_client "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
 	"github.com/hasura/go-graphql-client"
@@ -19,6 +20,11 @@ type GraphQLAPIClient struct {
 
 // NewClient is a function that returns a PixoAbstractAPIClient
 func NewClient(token, apiURL string) *GraphQLAPIClient {
+
+	if token == "" {
+		token = os.Getenv("SECRET_KEY")
+	}
+
 	if apiURL == "" {
 		apiURL = getURL()
 	}

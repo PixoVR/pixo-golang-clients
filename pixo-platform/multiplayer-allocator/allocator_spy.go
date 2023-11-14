@@ -1,6 +1,8 @@
 package multiplayer_allocator
 
 import (
+	"fmt"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/go-resty/resty/v2"
 	"net/http"
@@ -31,6 +33,11 @@ func (a *AllocatorSpy) AllocateGameserver(request AllocationRequest) AllocationR
 			RawResponse: &http.Response{
 				StatusCode: http.StatusCreated,
 			},
+		},
+		Results: GameServer{
+			Name: "test-gameserver",
+			IP:   matchmaker.Localhost,
+			Port: fmt.Sprint(matchmaker.DefaultGameserverPort),
 		},
 	}
 }
