@@ -3,9 +3,11 @@ package main
 import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/parser"
 	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/pflag"
 	"os"
+	"time"
 )
 
 var (
@@ -17,6 +19,9 @@ var (
 )
 
 func init() {
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339})
+
 	apiClient = graphql_api.NewClient(os.Getenv("SECRET_KEY"), "")
 	pflag.StringVarP(&semanticVersion, "semantic-version", "v", "", "Multiplayer server version semantic version (e.g: 1.00.00)")
 	pflag.StringVarP(&image, "image", "i", "", "Multiplayer server version image")
