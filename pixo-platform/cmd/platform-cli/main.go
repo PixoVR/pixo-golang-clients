@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/parser"
 	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
+	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/config"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/pflag"
@@ -16,13 +17,15 @@ var (
 	semanticVersion string
 	image           string
 	moduleID        int
+	secretKey       = config.GetEnvOrCrash("SECRET_KEY")
 )
 
 func init() {
+
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339})
 
-	apiClient = graphql_api.NewClient(os.Getenv("SECRET_KEY"), "")
+	apiClient = graphql_api.NewClient(secretKey, "")
 	pflag.StringVarP(&semanticVersion, "semantic-version", "v", "", "Multiplayer server version semantic version (e.g: 1.00.00)")
 	pflag.StringVarP(&image, "image", "i", "", "Multiplayer server version image")
 	pflag.StringVarP(&iniFilePath, "ini", "c", parser.DefaultConfigFilepath, "Path to ini config file")
@@ -54,7 +57,7 @@ func main() {
 	}
 
 	if err = apiClient.CreateMultiplayerServerVersion(moduleID, image, semanticVersion); err != nil {
-		log.Fatal().Err(err).Msg("Failed to update multiplayer server version")
+		log.Fatal().Err(err).Msgf("Failed to create multiplayer server version: %s", semanticVersion)
 	}
 
 	log.Info().Msg("Successfully deployed multiplayer server version")
