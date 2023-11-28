@@ -26,11 +26,6 @@ var deployCmd = &cobra.Command{
 			log.Panic().Err(err).Msgf("Failed to parse module ID: %s", moduleIDVal)
 		}
 
-		image := cmd.Flag("image").Value.String()
-		if image == "" {
-			log.Panic().Msg("No image given")
-		}
-
 		semanticVersion := cmd.Flag("version").Value.String()
 		if semanticVersion == "" {
 			iniPath := cmd.Flag("ini").Value.String()
@@ -60,6 +55,11 @@ var deployCmd = &cobra.Command{
 
 			log.Info().Msg("Server version does not exist yet")
 			return
+		}
+
+		image := cmd.Flag("image").Value.String()
+		if image == "" {
+			log.Panic().Msg("No image given")
 		}
 
 		if err := apiClient.CreateMultiplayerServerVersion(moduleID, image, semanticVersion); err != nil {
