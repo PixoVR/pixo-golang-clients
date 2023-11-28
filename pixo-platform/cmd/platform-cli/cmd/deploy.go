@@ -4,6 +4,7 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/parser"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	platformAPI "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
@@ -51,7 +52,7 @@ var deployCmd = &cobra.Command{
 				log.Fatal().Msgf("server version %s already exists", semanticVersion)
 			}
 
-			log.Info().Msgf("server version %s does not exist yet", semanticVersion)
+			cmd.Println(fmt.Sprintf("server version %s does not exist yet", semanticVersion))
 			return
 		}
 
@@ -63,6 +64,8 @@ var deployCmd = &cobra.Command{
 		if err := apiClient.CreateMultiplayerServerVersion(moduleID, image, semanticVersion); err != nil {
 			log.Fatal().Err(err).Msgf("Failed to create multiplayer server version: %s", semanticVersion)
 		}
+
+		cmd.Println("Successfully created multiplayer server version: ", semanticVersion)
 	},
 }
 

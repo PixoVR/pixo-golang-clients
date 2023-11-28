@@ -71,4 +71,6 @@ func init() {
 	if err := viper.ReadInConfig(); err != nil {
 		log.Error().Err(err).Msg("Failed to read config file")
 	}
+
+	apiClient = platformAPI.NewClient(viper.GetString("token"), viper.GetString("platform-api-url"))
 }
