@@ -1,6 +1,8 @@
 
+NAME=platform-cli
+EXECUTABLE=./bin/$(NAME)
+
 all: clean test container
-EXECUTABLE=./bin/platform-cli
 
 test:
 	ginkgo -r -v
@@ -12,11 +14,11 @@ build:
 	go build -o $(EXECUTABLE) main.go
 
 image:
-	docker build ../.. -t platform-cli -f ./Dockerfile
+	docker build ../.. -t ${NAME} -f ./Dockerfile
 
 container:
-	docker run -d --rm -it platform-cli -- /usr/bin/pixo-platform-cli mp serverVersions deploy --module-id=1 --image=gcr.io/some-image
+	docker run -d --rm -it ${NAME} -- /usr/bin/pixo-platform-cli mp serverVersions deploy --module-id=1 --image=gcr.io/some-image
 
 clean:
-	rm -f platform-cli || true
-	docker rmi --force platform-cli:latest || true
+	rm -f ${NAME} || true
+	docker rmi --force ${NAME}:latest || true

@@ -59,6 +59,7 @@ var deployCmd = &cobra.Command{
 			}
 
 			log.Info().Msg("Server version does not exist yet")
+			return
 		}
 
 		if err := apiClient.CreateMultiplayerServerVersion(moduleID, image, semanticVersion); err != nil {
