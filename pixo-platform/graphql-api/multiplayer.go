@@ -1,6 +1,7 @@
 package graphql_api
 
 import (
+	"errors"
 	"github.com/rs/zerolog/log"
 )
 
@@ -32,10 +33,27 @@ func (g *GraphQLAPIClient) CreateMultiplayerServerVersion(moduleID int, image, s
 	}
 
 	if res, err := g.ExecRaw(query, variables); err != nil {
-		log.Debug().Msgf("error deploying multiplayer server version: %s", res)
+		log.Debug().Err(err).Msgf("error deploying multiplayer server version: %s", res)
 		return err
 	}
 
 	log.Debug().Msgf("created multiplayer server version")
 	return nil
+}
+
+func (g *GraphQLAPIClient) GetMultiplayerServerVersions(params MultiplayerServerVersionQueryParams) ([]*MultiplayerServerVersion, error) {
+
+	configs, err := g.GetMultiplayerServerConfigs(MultiplayerServerConfigParams{
+		ModuleID:      params.ModuleID,
+		ServerVersion: params.SemanticVersion,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if len(configs) == 0 {
+		return nil, errors.New("no multiplayer server configurations found")
+	}
+
+	return configs[0].ServerVersions, nil
 }

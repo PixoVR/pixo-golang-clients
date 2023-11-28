@@ -6,6 +6,10 @@ type MultiplayerServerConfigQuery struct {
 	MultiplayerServerConfigs []*MultiplayerServerConfigQueryParams `graphql:"multiplayerServerConfigs(params: $params)"`
 }
 
+type MultiplayerServerVersionQuery struct {
+	MultiplayerServerVersions []*MultiplayerServerVersion `graphql:"multiplayerServerVersions(params: $params)"`
+}
+
 type MultiplayerServerConfigParams struct {
 	ModuleID      int    `json:"moduleId,omitempty"`
 	OrgID         int    `json:"orgId,omitempty"`
@@ -21,12 +25,19 @@ type MultiplayerServerConfigQueryParams struct {
 		ID   int    `json:"id" graphql:"id"`
 		Name string `json:"name" graphql:"name"`
 	}
-	ServerVersions []struct {
-		Engine          string `json:"engine" graphql:"engine"`
-		SemanticVersion string `json:"semanticVersion" graphql:"semanticVersion"`
-		ImageRegistry   string `json:"imageRegistry" graphql:"imageRegistry"`
-		Status          string `json:"status" graphql:"status"`
-	}
+	ServerVersions []*MultiplayerServerVersion `json:"serverVersions" graphql:"serverVersions"`
+}
+
+type MultiplayerServerVersionQueryParams struct {
+	ModuleID        int    `json:"moduleId" graphql:"moduleId"`
+	SemanticVersion string `json:"semanticVersion" graphql:"semanticVersion"`
+}
+
+type MultiplayerServerVersion struct {
+	Engine          string `json:"engine" graphql:"engine"`
+	SemanticVersion string `json:"semanticVersion" graphql:"semanticVersion"`
+	ImageRegistry   string `json:"imageRegistry" graphql:"imageRegistry"`
+	Status          string `json:"status" graphql:"status"`
 }
 
 type MultiplayerServerConfigInput struct {

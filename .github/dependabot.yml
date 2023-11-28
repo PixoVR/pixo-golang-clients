@@ -11,7 +11,7 @@ updates:
       interval: "daily"
 
   - package-ecosystem: "docker"
-    directory: "/pixo-platform/cmd/platform-cli"
+    directory: "/pixo-platform/platform-cli"
     schedule:
       interval: "daily"
 

@@ -1,6 +1,6 @@
 module github.com/PixoVR/pixo-golang-clients/pixo-platform
 
-go 1.21
+go 1.21.4
 
 require (
 	github.com/PixoVR/pixo-golang-server-utilities/pixo-platform v0.0.0-20231117160337-dc6fe2ee8088
@@ -10,7 +10,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.13.1
 	github.com/onsi/gomega v1.30.0
 	github.com/rs/zerolog v1.31.0
-	github.com/spf13/pflag v1.0.5
+	github.com/spf13/cobra v1.8.0
 	gopkg.in/ini.v1 v1.67.0
 )
 
@@ -46,6 +46,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.17.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/imdario/mergo v0.3.16 // indirect
+	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
@@ -68,6 +69,7 @@ require (
 	github.com/spf13/afero v1.9.5 // indirect
 	github.com/spf13/cast v1.5.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.16.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/tidwall/gjson v1.17.0 // indirect

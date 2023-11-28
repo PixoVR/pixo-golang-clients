@@ -2,15 +2,18 @@ FROM golang:1.21-alpine as builder
 
 WORKDIR /build
 
+COPY go.mod go.sum ./
+RUN go mod download
+
 COPY . .
 
-RUN cd cmd/platform-cli && go build -o deploy
+RUN go build -o main cmd/platform-cli/main.go
 
 
 FROM alpine:latest
 
 WORKDIR /client
 
-COPY --from=builder /build/cmd/platform-cli/deploy /usr/bin/deploy
+COPY --from=builder /build/main /usr/bin/pixo-platform-cli
 
-ENTRYPOINT ["/usr/bin/deploy"]
+ENTRYPOINT ["/usr/bin/pixo-platform-cli"]
