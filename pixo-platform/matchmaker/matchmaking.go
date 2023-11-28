@@ -17,17 +17,18 @@ type MultiplayerMatchmaker struct {
 
 func NewMatchmaker(url, token string) *MultiplayerMatchmaker {
 
-	if url == "" {
-		url = getURL()
-	}
+	url = getURL(url)
 
 	return &MultiplayerMatchmaker{
 		PixoAbstractAPIClient: *abstractClient.NewClient(token, url),
 	}
 }
 
-func getURL() string {
-	return fmt.Sprintf("%s/%s", DefaultMatchmakingURL, MatchmakingEndpoint)
+func getURL(host string) string {
+	if host == "" {
+		host = DefaultMatchmakingURL
+	}
+	return fmt.Sprintf("%s/%s", host, MatchmakingEndpoint)
 }
 
 func (p *MultiplayerMatchmaker) Connect(req MatchRequest) (*net.UDPAddr, error) {

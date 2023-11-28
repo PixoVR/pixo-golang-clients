@@ -16,7 +16,7 @@ var _ = Describe("GraphQL API", func() {
 	)
 
 	BeforeEach(func() {
-		gqlClient = NewClient("", "")
+		gqlClient = NewClient("", "https://primary.apex.dev.pixovr.com")
 		Expect(gqlClient).NotTo(BeNil())
 		Expect(gqlClient.IsAuthenticated()).To(BeTrue())
 	})

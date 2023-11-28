@@ -1,6 +1,7 @@
 
-NAME=pixo
-EXECUTABLE=./bin/$(NAME)
+NAME = pixo
+EXECUTABLE = ./bin/$(NAME)
+SERVER_VERSION ?= "1.3.1"
 
 all: build cp
 
@@ -25,3 +26,9 @@ container:
 clean:
 	rm -f ${NAME} || true
 	docker rmi --force ${NAME}:latest || true
+
+deploy: build
+	$(EXECUTABLE) -d mp serverVersions deploy --image gcr.io/pixo-bootstrap/multiplayer/gameservers/simple-server:latest
+
+matchmake: build
+	$(EXECUTABLE) -d mp matchmake --server-version ${SERVER_VERSION}

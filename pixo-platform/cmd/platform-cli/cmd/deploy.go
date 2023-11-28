@@ -5,10 +5,10 @@ package cmd
 
 import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/parser"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	platformAPI "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
-	"strconv"
 )
 
 // deployCmd represents the deploy command
@@ -17,22 +17,19 @@ var deployCmd = &cobra.Command{
 	Short: "Deploy a multiplayer server version",
 	Long:  `Deploy a new image as a multiplayer server version on the Pixo Platform for a specific module`,
 	Run: func(cmd *cobra.Command, args []string) {
-		moduleIDVal := cmd.Flag("module-id").Value.String()
-		if moduleIDVal == "" {
-			log.Panic().Msg("No module ID given")
-		}
-		moduleID, err := strconv.Atoi(moduleIDVal)
-		if err != nil {
-			log.Panic().Err(err).Msgf("Failed to parse module ID: %s", moduleIDVal)
+		moduleID := input.GetIntValue(cmd, "module-id", "MODULE_ID")
+		if moduleID == 0 {
+			cmd.Println("No module ID provided")
+			return
 		}
 
-		semanticVersion := cmd.Flag("version").Value.String()
+		semanticVersion := input.GetStringValue(cmd, "server-version", "SERVER_VERSION")
 		if semanticVersion == "" {
 			iniPath := cmd.Flag("ini").Value.String()
 
 			iniParser, err := parser.NewIniParser(&iniPath)
 			if err != nil {
-				log.Panic().Err(err).Msg("Failed to create ini parser")
+				log.Debug().Err(err).Msgf("Failed to parse ini file %s", iniPath)
 				return
 			}
 
@@ -40,6 +37,7 @@ var deployCmd = &cobra.Command{
 			if err != nil {
 				log.Fatal().Err(err).Msgf("No semantic version given and failed to parse server version from ini file %s", iniPath)
 			}
+
 		}
 
 		if cmd.Flag("pre-check").Value.String() == "true" {
@@ -57,9 +55,9 @@ var deployCmd = &cobra.Command{
 			return
 		}
 
-		image := cmd.Flag("image").Value.String()
+		image := input.GetStringValue(cmd, "image", "GAMESERVER_IMAGE")
 		if image == "" {
-			log.Panic().Msg("No image given")
+			log.Fatal().Msg("No gameserver image provided")
 		}
 
 		if err := apiClient.CreateMultiplayerServerVersion(moduleID, image, semanticVersion); err != nil {
@@ -71,14 +69,8 @@ var deployCmd = &cobra.Command{
 func init() {
 	serverVersionsCmd.AddCommand(deployCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
 	deployCmd.PersistentFlags().StringP("image", "i", "", "Docker image to deploy as the multiplayer server version")
-	deployCmd.PersistentFlags().StringP("version", "v", "", "Semantic Version of the multiplayer server version")
+	deployCmd.PersistentFlags().StringP("server-version", "v", "", "Semantic Version of the multiplayer server version")
 
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
 	deployCmd.Flags().BoolP("pre-check", "p", false, "Check if server version exists already")
 }

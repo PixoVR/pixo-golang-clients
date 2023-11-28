@@ -18,10 +18,6 @@ type PixoAbstractAPIClient struct {
 // NewClient is a function that returns a PixoAbstractAPIClient
 func NewClient(token, apiURL string) *PixoAbstractAPIClient {
 
-	if apiURL == "" {
-		apiURL = getAPIURL()
-	}
-
 	return &PixoAbstractAPIClient{
 		url:        apiURL,
 		restClient: resty.New(),

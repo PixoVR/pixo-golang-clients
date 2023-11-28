@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/parser"
 	platformAPI "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
-	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/config"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
@@ -21,8 +20,8 @@ var (
 	homeDir          = os.Getenv("HOME")
 	cfgDir           = fmt.Sprintf("%s/.pixo", homeDir)
 	globalConfigFile = fmt.Sprintf("%s/config.yaml", cfgDir)
-	secretKey        = config.GetEnvOrReturn("SECRET_KEY", "fake-key")
-	apiClient        = platformAPI.NewClient(secretKey, "")
+
+	apiClient *platformAPI.GraphQLAPIClient
 
 	cfgFile string
 )
@@ -51,12 +50,12 @@ func init() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339})
 
-	rootCmd.PersistentFlags().Bool("debug", false, "Enable debug logging")
+	rootCmd.PersistentFlags().BoolP("debug", "d", false, "Enable debug logging")
 	if viper.GetBool("debug") {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	} else {
+		zerolog.SetGlobalLevel(zerolog.WarnLevel)
 	}
-
-	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", fmt.Sprintf("config file (default is %s)", globalConfigFile))
 	rootCmd.PersistentFlags().StringP("ini", "c", parser.DefaultConfigFilepath, "Path to the ini file to use for the command")
