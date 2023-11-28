@@ -52,6 +52,6 @@ brews:
       repository:
         owner: PixoVR
         name: homebrew-pixo-golang-clients
-      homepage: https://github.com/PixoVR/pixo-golang-clients
+      homepage: https://github.com/PixoVR/homebrew-pixo-golang-clients
       description: Pixo Platform CLI tool
       url_template: "https://github.com/PixoVR/pixo-golang-clients/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
