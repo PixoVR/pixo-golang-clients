@@ -5,12 +5,13 @@ import (
 )
 
 type MatchRequest struct {
-	OrgID    int `json:"orgId"`
-	ModuleID int `json:"moduleId"`
+	OrgID         int    `json:"orgId"`
+	ModuleID      int    `json:"moduleId"`
+	ServerVersion string `json:"serverVersion"`
 }
 
 func (m MatchRequest) IsValid() bool {
-	return m.OrgID != 0 && m.ModuleID != 0
+	return m.OrgID != 0 && m.ModuleID != 0 && m.ServerVersion != ""
 }
 
 type MatchResponse struct {

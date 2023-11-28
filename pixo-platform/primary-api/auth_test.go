@@ -20,6 +20,7 @@ var _ = Describe("Auth", func() {
 		client := primary_api.NewClientWithBasicAuth(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"), "")
 		Expect(client).NotTo(BeNil())
 		Expect(client.IsAuthenticated()).To(BeTrue())
+		Expect(client.GetToken()).NotTo(BeEmpty())
 	})
 
 })

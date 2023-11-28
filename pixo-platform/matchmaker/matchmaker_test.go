@@ -18,14 +18,48 @@ var _ = Describe("Multiplayer", func() {
 	})
 
 	It("can return an error message if the module ID is invalid", func() {
-		addr, err := m.Connect(99999999, 20)
+		req := matchmaker.MatchRequest{
+			ModuleID:      0,
+			OrgID:         1,
+			ServerVersion: "1.00.00",
+		}
+		addr, err := m.Connect(req)
+
+		Expect(err).To(HaveOccurred())
+		Expect(addr).To(BeNil())
+	})
+
+	It("can return an error message if the org ID is invalid", func() {
+		req := matchmaker.MatchRequest{
+			ModuleID:      1,
+			OrgID:         0,
+			ServerVersion: "1.00.00",
+		}
+		addr, err := m.Connect(req)
+
+		Expect(err).To(HaveOccurred())
+		Expect(addr).To(BeNil())
+	})
+
+	It("can return an error message if the server version is invalid", func() {
+		req := matchmaker.MatchRequest{
+			ModuleID:      1,
+			OrgID:         1,
+			ServerVersion: "",
+		}
+		addr, err := m.Connect(req)
 
 		Expect(err).To(HaveOccurred())
 		Expect(addr).To(BeNil())
 	})
 
 	It("can retrieve a game server address using the matchmaker", func() {
-		addr, err := m.Connect(43, 20)
+		req := matchmaker.MatchRequest{
+			ModuleID:      43,
+			OrgID:         20,
+			ServerVersion: "1.03.01",
+		}
+		addr, err := m.Connect(req)
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(addr).NotTo(BeNil())

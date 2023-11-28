@@ -4,9 +4,11 @@ Copyright © 2023 NAME HERE walker.obrien@pixovr.com
 package cmd
 
 import (
-	"fmt"
-
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
+	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // loginCmd represents the login command
@@ -21,7 +23,28 @@ var loginCmd = &cobra.Command{
 	Will prioritize in order of the above list, and will prompt the user if none is found.	
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("login called")
+		var client *platform.PrimaryAPIClient
+
+		username := input.GetStringValue(cmd, "username", "PIXO_USERNAME")
+		log.Debug().Msgf("Attempting to login as user: %s", username)
+
+		password := input.GetStringValue(cmd, "password", "PIXO_PASSWORD")
+		log.Debug().Msgf("Attempting to login with password: %s", password)
+
+		if client = platform.NewClientWithBasicAuth(username, password, ""); client == nil {
+			return
+		}
+
+		log.Info().Msgf("Login successful. Here is your API token: %s", client.GetToken())
+
+		viper.Set("username", username)
+		viper.Set("password", password)
+		viper.Set("token", client.GetToken())
+
+		if err := viper.WriteConfigAs(cfgFile); err != nil {
+			log.Error().Err(err).Msg("Could not write config file")
+		}
+
 	},
 }
 

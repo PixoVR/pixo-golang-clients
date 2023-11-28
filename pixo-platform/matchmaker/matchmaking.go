@@ -30,7 +30,7 @@ func getURL() string {
 	return fmt.Sprintf("%s/%s", DefaultMatchmakingURL, MatchmakingEndpoint)
 }
 
-func (p *MultiplayerMatchmaker) Connect(moduleID, orgID int) (*net.UDPAddr, error) {
+func (p *MultiplayerMatchmaker) Connect(req MatchRequest) (*net.UDPAddr, error) {
 	log.Info().Msg("Connecting to matchmaking server")
 
 	httpResponse, err := p.ConnectToWebsocket()
@@ -44,18 +44,13 @@ func (p *MultiplayerMatchmaker) Connect(moduleID, orgID int) (*net.UDPAddr, erro
 		}
 	}(httpResponse.Body)
 
-	match := MatchRequest{
-		ModuleID: moduleID,
-		OrgID:    orgID,
-	}
-
-	if !match.IsValid() {
+	if !req.IsValid() {
 		err = errors.New("match request is invalid")
 		log.Error().Err(err).Msg("Match request is invalid")
 		return nil, err
 	}
 
-	message, err := json.Marshal(match)
+	message, err := json.Marshal(req)
 	if err != nil {
 		log.Error().Err(err).Msg("Error deserializing match request")
 		return nil, err

@@ -1,14 +1,17 @@
 
-NAME=platform-cli
+NAME=pixo
 EXECUTABLE=./bin/$(NAME)
 
-all: clean test container
+all: build cp
+
+cp:
+	sudo cp $(EXECUTABLE) /usr/local/bin/$(NAME)
 
 test:
 	ginkgo -r -v
 
 run:
-	go run main.go mp serverVersions deploy --module-id=1 --image=gcr.io/some-image
+	go run main.go
 
 build:
 	go build -o $(EXECUTABLE) main.go

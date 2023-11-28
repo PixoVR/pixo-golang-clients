@@ -3,5 +3,5 @@ package matchmaker
 import "net"
 
 type Matchmaker interface {
-	Connect(moduleID, orgID int) (*net.UDPAddr, error)
+	Connect(req MatchRequest) (*net.UDPAddr, error)
 }
