@@ -53,7 +53,7 @@ var deployCmd = &cobra.Command{
 				log.Fatal().Msgf("server version %s already exists", semanticVersion)
 			}
 
-			log.Info().Msg("Server version does not exist yet")
+			log.Info().Msgf("server version %s does not exist yet", semanticVersion)
 			return
 		}
 
