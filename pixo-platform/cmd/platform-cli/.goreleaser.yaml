@@ -44,3 +44,11 @@ changelog:
       - 'README'
       - Merge pull request
       - Merge branch
+
+
+brews:
+    - name: pixo-cli
+      folder: Formula
+      homepage: https://github.com/PixoVR/pixo-golang-clients
+      description: Pixo Platform CLI tool
+      url_template: "https://github.com/PixoVR/pixo-golang-clients/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
