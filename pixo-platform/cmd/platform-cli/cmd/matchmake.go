@@ -60,6 +60,12 @@ var matchmakeCmd = &cobra.Command{
 
 				cmd.Println(string(response))
 			}
+
+			log.Info().Msg("Closing connection to gameserver")
+			if err := mm.CloseGameserverConnection(); err != nil {
+				log.Error().Err(err).Msg("Could not close connection to gameserver")
+			}
+
 		}
 
 	},
