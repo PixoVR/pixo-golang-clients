@@ -13,6 +13,8 @@ import (
 
 type MultiplayerMatchmaker struct {
 	abstractClient.PixoAbstractAPIClient
+	gameserverAddress    *net.UDPAddr
+	gameserverConnection *net.UDPConn
 }
 
 func NewMatchmaker(url, token string) *MultiplayerMatchmaker {
@@ -31,10 +33,10 @@ func getURL(host string) string {
 	return fmt.Sprintf("%s/%s", host, MatchmakingEndpoint)
 }
 
-func (p *MultiplayerMatchmaker) Connect(req MatchRequest) (*net.UDPAddr, error) {
+func (m *MultiplayerMatchmaker) FindMatch(req MatchRequest) (*net.UDPAddr, error) {
 	log.Info().Msg("Connecting to matchmaking server")
 
-	httpResponse, err := p.ConnectToWebsocket()
+	httpResponse, err := m.ConnectToWebsocket()
 	if err != nil {
 		return nil, err
 	}
@@ -57,11 +59,11 @@ func (p *MultiplayerMatchmaker) Connect(req MatchRequest) (*net.UDPAddr, error) 
 		return nil, err
 	}
 
-	if err = p.SendMessageToWebsocket(message); err != nil {
+	if err = m.SendMessageToWebsocket(message); err != nil {
 		return nil, err
 	}
 
-	response, err := p.ReadFromWebsocket()
+	response, err := m.ReadFromWebsocket()
 	if err != nil {
 		return nil, err
 	}
@@ -84,8 +86,79 @@ func (p *MultiplayerMatchmaker) Connect(req MatchRequest) (*net.UDPAddr, error) 
 		return nil, err
 	}
 
-	return &net.UDPAddr{
+	m.gameserverAddress = &net.UDPAddr{
 		IP:   net.ParseIP(matchResponse.MatchDetails.IP),
 		Port: port,
-	}, nil
+	}
+	return m.gameserverAddress, nil
+}
+
+func (m *MultiplayerMatchmaker) DialGameserver(addr *net.UDPAddr) error {
+	log.Info().Msg("Connecting to gameserver")
+
+	udpServer, err := net.ResolveUDPAddr(addr.Network(), addr.String())
+	if err != nil {
+		log.Debug().Err(err).Msg("unable to resolve address")
+		return err
+	}
+
+	conn, err := net.DialUDP(addr.Network(), nil, udpServer)
+	if err != nil {
+		log.Debug().Err(err).Msg("unable to dial gameserver address")
+		return err
+	}
+
+	m.gameserverConnection = conn
+	return nil
+}
+
+func (m *MultiplayerMatchmaker) SendAndReceiveMessage(message []byte) ([]byte, error) {
+	if m.gameserverConnection == nil {
+		err := errors.New("gameserver connection is nil")
+		log.Debug().Err(err).Msg("unable to send message to gameserver")
+		return nil, err
+	}
+
+	if err := m.sendGameServerMessage(message); err != nil {
+		return nil, err
+	}
+
+	response, err := m.readGameServerMessage()
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+func (m *MultiplayerMatchmaker) CloseGameserverConnection() error {
+	if err := m.gameserverConnection.Close(); err != nil {
+		log.Debug().Err(err).Msg("unable to close gameserver connection")
+		return err
+	}
+
+	return nil
+}
+
+func (m *MultiplayerMatchmaker) sendGameServerMessage(message []byte) error {
+	if _, err := m.gameserverConnection.Write(message); err != nil {
+		log.Debug().Err(err).Msg("unable to write to gameserver")
+		return err
+	}
+
+	return nil
+}
+
+func (m *MultiplayerMatchmaker) readGameServerMessage() ([]byte, error) {
+	received := make([]byte, 1024)
+	n, err := m.gameserverConnection.Read(received)
+	if err != nil {
+		log.Debug().Err(err).Msg("unable to read from gameserver")
+		return nil, err
+	}
+
+	response := received[:n]
+
+	log.Debug().Msgf("Received message from gameserver: %s", response)
+	return response, nil
 }

@@ -14,28 +14,16 @@ var _ = Describe("Multiplayer", func() {
 	)
 
 	BeforeEach(func() {
-		m = matchmaker.NewMatchmaker("", os.Getenv("AUTH_TOKEN"))
+		m = matchmaker.NewMatchmaker("wss://match.apex.dev.pixovr.com", os.Getenv("AUTH_TOKEN"))
 	})
 
 	It("can return an error message if the module ID is invalid", func() {
 		req := matchmaker.MatchRequest{
 			ModuleID:      0,
-			OrgID:         1,
 			ServerVersion: "1.00.00",
 		}
-		addr, err := m.Connect(req)
 
-		Expect(err).To(HaveOccurred())
-		Expect(addr).To(BeNil())
-	})
-
-	It("can return an error message if the org ID is invalid", func() {
-		req := matchmaker.MatchRequest{
-			ModuleID:      1,
-			OrgID:         0,
-			ServerVersion: "1.00.00",
-		}
-		addr, err := m.Connect(req)
+		addr, err := m.FindMatch(req)
 
 		Expect(err).To(HaveOccurred())
 		Expect(addr).To(BeNil())
@@ -44,27 +32,34 @@ var _ = Describe("Multiplayer", func() {
 	It("can return an error message if the server version is invalid", func() {
 		req := matchmaker.MatchRequest{
 			ModuleID:      1,
-			OrgID:         1,
 			ServerVersion: "",
 		}
-		addr, err := m.Connect(req)
+
+		addr, err := m.FindMatch(req)
 
 		Expect(err).To(HaveOccurred())
 		Expect(addr).To(BeNil())
 	})
 
-	It("can retrieve a game server address using the matchmaker", func() {
+	It("can retrieve a game server address using the matchmaker and send a message to it", func() {
 		req := matchmaker.MatchRequest{
 			ModuleID:      43,
-			OrgID:         20,
 			ServerVersion: "1.03.01",
 		}
-		addr, err := m.Connect(req)
+
+		addr, err := m.FindMatch(req)
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(addr).NotTo(BeNil())
 		Expect(addr.IP).NotTo(BeEmpty())
 		Expect(addr.Port).NotTo(BeZero())
+
+		err = m.DialGameserver(addr)
+		Expect(err).NotTo(HaveOccurred())
+
+		response, err := m.SendAndReceiveMessage([]byte("hello world"))
+		Expect(err).NotTo(HaveOccurred())
+		Expect(response).NotTo(BeEmpty())
 	})
 
 })

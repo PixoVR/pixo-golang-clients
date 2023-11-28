@@ -3,5 +3,8 @@ package matchmaker
 import "net"
 
 type Matchmaker interface {
-	Connect(req MatchRequest) (*net.UDPAddr, error)
+	FindMatch(req MatchRequest) (*net.UDPAddr, error)
+	DialGameserver(addr *net.UDPAddr) error
+	CloseGameserverConnection() error
+	SendAndReceiveMessage(message []byte) ([]byte, error)
 }
