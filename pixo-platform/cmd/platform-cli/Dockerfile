@@ -14,6 +14,11 @@ FROM debian:stable
 
 WORKDIR /client
 
+RUN apt-get update \
+        && apt-get upgrade -y \
+        && apt-get install ca-certificates -y \
+        && update-ca-certificates 2>/dev/null
+
 COPY --from=builder /build/main /usr/bin/platform-cli
 
 ENTRYPOINT ["/usr/bin/platform-cli"]
