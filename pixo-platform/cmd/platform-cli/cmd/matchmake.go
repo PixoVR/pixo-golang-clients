@@ -75,5 +75,4 @@ func init() {
 	mpCmd.AddCommand(matchmakeCmd)
 
 	matchmakeCmd.PersistentFlags().StringP("server-version", "s", "", "Server version to matchmake against")
-	matchmakeCmd.PersistentFlags().Bool("connect", false, "Whether UDP connection should be made when gameserver is found")
 }
