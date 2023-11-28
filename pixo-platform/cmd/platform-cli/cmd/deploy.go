@@ -76,7 +76,7 @@ func init() {
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
 	deployCmd.PersistentFlags().StringP("image", "i", "", "Docker image to deploy as the multiplayer server version")
-	deployCmd.PersistentFlags().StringP("version", "v", "1.00.00", "Semantic Version of the multiplayer server version")
+	deployCmd.PersistentFlags().StringP("version", "v", "", "Semantic Version of the multiplayer server version")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
