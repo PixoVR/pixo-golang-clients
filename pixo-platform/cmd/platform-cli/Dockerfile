@@ -10,10 +10,10 @@ COPY . .
 RUN go build -o main cmd/platform-cli/main.go
 
 
-FROM alpine:latest
+FROM debian:stable
 
 WORKDIR /client
 
-COPY --from=builder /build/main /usr/bin/pixo-platform-cli
+COPY --from=builder /build/main /usr/bin/platform-cli
 
-ENTRYPOINT ["/usr/bin/pixo-platform-cli"]
+ENTRYPOINT ["/usr/bin/platform-cli"]
