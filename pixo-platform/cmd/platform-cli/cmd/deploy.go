@@ -50,7 +50,7 @@ var deployCmd = &cobra.Command{
 			if versions, err := apiClient.GetMultiplayerServerVersions(params); err != nil {
 				log.Fatal().Err(err).Msgf("unable to retrieve from platform api")
 			} else if len(versions) > 0 {
-				log.Fatal().Msgf("server version already exists")
+				log.Fatal().Msgf("server version %s already exists", semanticVersion)
 			}
 
 			log.Info().Msg("Server version does not exist yet")
