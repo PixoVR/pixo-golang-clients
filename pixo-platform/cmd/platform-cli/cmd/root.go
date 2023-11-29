@@ -30,8 +30,9 @@ var (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "pixo",
-	Short: "A CLI for the Pixo Platform",
+	Use:     "pixo",
+	Version: "0.0.80",
+	Short:   "A CLI for the Pixo Platform",
 	Long: `A CLI tool used to simplify interactions with the Pixo Platform 
 `,
 	// Uncomment the following line if your bare application
