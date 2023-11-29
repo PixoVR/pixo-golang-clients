@@ -1,5 +1,5 @@
 
-NAME = pixo
+NAME = pixo-dev
 EXECUTABLE = ./bin/$(NAME)
 SERVER_VERSION ?= "1.3.1"
 

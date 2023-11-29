@@ -1,11 +1,13 @@
 /*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
+Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 */
 package cmd
 
 import (
 	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/parser"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/config"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	platformAPI "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -59,7 +61,6 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", fmt.Sprintf("config file (default is %s)", globalConfigFile))
 	rootCmd.PersistentFlags().StringP("ini", "c", parser.DefaultConfigFilepath, "Path to the ini file to use for the command")
-	rootCmd.PersistentFlags().StringP("org-id", "o", "", "Org ID to use for the command")
 	rootCmd.PersistentFlags().StringP("module-id", "m", "", "Module ID to use for the command")
 
 	if cfgFile == "" {
@@ -72,5 +73,5 @@ func init() {
 		log.Error().Err(err).Msg("Failed to read config file")
 	}
 
-	apiClient = platformAPI.NewClient(viper.GetString("token"), viper.GetString("platform-api-url"))
+	apiClient = platformAPI.NewClient(viper.GetString("token"), input.GetConfigValue("platform-api-url", config.PixoPlatformAPIURLEnvVarKey))
 }

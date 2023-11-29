@@ -1,10 +1,11 @@
 /*
-Copyright © 2023 NAME HERE walker.obrien@pixovr.com
+Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 */
 package cmd
 
 import (
 	"fmt"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/config"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/rs/zerolog/log"
@@ -30,14 +31,14 @@ var loginCmd = &cobra.Command{
 			viper.Set("token", token)
 		} else {
 
-			username := input.GetStringValue(cmd, "username", "PIXO_USERNAME")
+			username := input.GetStringValue(cmd, "username", config.PixoUsernameEnvVarKey)
 			log.Debug().Msgf("Attempting to login as user: %s", username)
 
-			password := input.GetStringValue(cmd, "password", "PIXO_PASSWORD")
+			password := input.GetStringValue(cmd, "password", config.PixoPasswordEnvVarKey)
 			log.Debug().Msgf("Attempting to login with password: %s", password)
 
 			var client *platform.PrimaryAPIClient
-			if client = platform.NewClientWithBasicAuth(username, password, input.GetConfigValue("legacy-api-url", "PIXO_LEGACY_API_URL")); client == nil {
+			if client = platform.NewClientWithBasicAuth(username, password, input.GetConfigValue("legacy-api-url", config.PixoLegacyAPIURLEnvVarKey)); client == nil {
 				return
 			}
 

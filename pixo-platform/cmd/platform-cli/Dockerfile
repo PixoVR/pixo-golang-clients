@@ -19,6 +19,6 @@ RUN apt-get update \
         && apt-get install ca-certificates -y \
         && update-ca-certificates 2>/dev/null
 
-COPY --from=builder /build/main /usr/bin/platform-cli
+COPY --from=builder /build/main /usr/bin/pixo
 
-ENTRYPOINT ["/usr/bin/platform-cli"]
+ENTRYPOINT ["/usr/bin/pixo"]

@@ -4,6 +4,7 @@ Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
 
@@ -14,7 +15,10 @@ var configCmd = &cobra.Command{
 	Long: `Manage settings like region, org, and module ID.  This commands will prompt you for the settings if they are not already set.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		cmd.Println("config called")
+		if err := cmd.Help(); err != nil {
+			log.Error().Err(err).Msg("Could not display help")
+			return
+		}
 	},
 }
 

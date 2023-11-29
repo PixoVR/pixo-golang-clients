@@ -1,5 +1,5 @@
 /*
-Copyright © 2023 NAME HERE walker.obrien@pixovr.com
+Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 */
 package cmd
 
@@ -14,7 +14,10 @@ var authCmd = &cobra.Command{
 	Short: "Authenticate with the Pixo Platform",
 	Long:  `Manage authentication and authorization with the Pixo Platform.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Info().Msg("auth called")
+		if err := cmd.Help(); err != nil {
+			log.Error().Err(err).Msg("Could not display help")
+			return
+		}
 	},
 }
 
