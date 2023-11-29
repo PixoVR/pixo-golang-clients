@@ -4,6 +4,7 @@ Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/config"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
 	"github.com/rs/zerolog/log"
@@ -57,9 +58,10 @@ var mpCmd = &cobra.Command{
 }
 
 func init() {
-	mm = matchmaker.NewMatchmaker(input.GetConfigValue("matchmaking-api-url", "PIXO_PLATFORM_MATCHMAKING_URL"), input.GetConfigValue("token", "SECRET_KEY"))
+	mm = matchmaker.NewMatchmaker(input.GetConfigValue("matchmaking-api-url", config.PixoMatchmakingAPIURLEnvVarKey), input.GetConfigValue("token", config.PixoSecretKeyEnvVarKey))
 
 	rootCmd.AddCommand(mpCmd)
 
+	mpCmd.PersistentFlags().StringP("server-version", "v", "", "Semantic Version of the multiplayer server version")
 	mpCmd.PersistentFlags().Bool("connect", false, "Whether to connect to the gameserver found from a match request")
 }

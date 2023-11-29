@@ -82,6 +82,4 @@ func gameserverReadLoop(cmd *cobra.Command, mm matchmaker.Matchmaker, addr *net.
 
 func init() {
 	mpCmd.AddCommand(matchmakeCmd)
-
-	matchmakeCmd.PersistentFlags().StringP("server-version", "s", "", "Server version to matchmake against")
 }

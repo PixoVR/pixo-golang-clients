@@ -17,12 +17,16 @@ type MultiplayerMatchmaker struct {
 	gameserverConnection *net.UDPConn
 }
 
-func NewMatchmaker(url, token string) *MultiplayerMatchmaker {
+func NewMatchmaker(url, token string, timeoutSeconds ...int) *MultiplayerMatchmaker {
+
+	if len(timeoutSeconds) == 0 {
+		timeoutSeconds = []int{60}
+	}
 
 	url = getURL(url)
 
 	return &MultiplayerMatchmaker{
-		PixoAbstractAPIClient: *abstractClient.NewClient(token, url),
+		PixoAbstractAPIClient: *abstractClient.NewClient(token, url, timeoutSeconds[0]),
 	}
 }
 

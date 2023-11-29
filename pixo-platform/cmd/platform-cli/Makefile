@@ -27,7 +27,7 @@ container:
 	docker run -d --rm -it ${NAME}
 
 clean:
-	rm -f ${NAME} || true
+	rm -rf ${EXECUTABLE} || true
 	docker rmi --force ${NAME}:latest || true
 
 deploy: build

@@ -9,7 +9,7 @@ import (
 )
 
 func (p *PixoAbstractAPIClient) ConnectToWebsocket() (*http.Response, error) {
-	log.Info().Msg("Connecting to websocket")
+	log.Debug().Msg("Connecting to websocket")
 
 	httpHeader := http.Header{}
 	if p.token != "" {
@@ -18,40 +18,35 @@ func (p *PixoAbstractAPIClient) ConnectToWebsocket() (*http.Response, error) {
 
 	conn, httpResponse, err := websocket.DefaultDialer.Dial(p.url, httpHeader)
 	if err != nil {
-		log.Error().Err(err).Msg("Error connecting to websocket")
-		return httpResponse, err
+		log.Error().Err(err).Msg("unable to connect to websocket")
+		return nil, err
 	}
 
 	if err = conn.SetReadDeadline(time.Now().Add(p.timeoutDuration())); err != nil {
-		log.Info().Err(err).Msg("Error setting read deadline for websocket")
-		return httpResponse, err
+		log.Error().Err(err).Msg("unable to set read deadline for websocket")
+		return nil, err
 	}
 
 	p.conn = conn
 
-	log.Info().Msg("Successfully connected to websocket")
+	log.Debug().Msg("Successfully connected to websocket")
 	return httpResponse, nil
 }
 
 func (p *PixoAbstractAPIClient) SendMessageToWebsocket(message []byte) error {
-	log.Info().Msg("Sending message to websocket")
+	log.Debug().Msg("Sending message to websocket")
 
 	if err := p.conn.WriteMessage(websocket.TextMessage, message); err != nil {
-		log.Error().Err(err).Msg("Error during writing to websocket")
+		log.Error().Err(err).Msg("unable to write to websocket")
 		return err
 	}
 
-	log.Info().Msgf("Sent message to websocket: %s", message)
+	log.Debug().Msgf("Sent message to websocket: %s", message)
 	return nil
 }
 
 func (p *PixoAbstractAPIClient) ReadFromWebsocket() ([]byte, error) {
-	log.Info().Msg("Reading message from websocket")
-
-	if err := p.conn.SetReadDeadline(time.Now().Add(p.timeoutDuration())); err != nil {
-		log.Info().Err(err).Msg("Error setting read deadline")
-		return nil, err
-	}
+	log.Debug().Msg("Reading message from websocket")
 
 	_, msg, err := p.conn.ReadMessage()
 	if err != nil {
@@ -63,19 +58,19 @@ func (p *PixoAbstractAPIClient) ReadFromWebsocket() ([]byte, error) {
 		return nil, errors.New("empty response data")
 	}
 
-	log.Info().Msgf("Received message from websocket: %s", msg)
+	log.Debug().Msgf("Received message from websocket: %s", msg)
 	return msg, nil
 }
 
 func (p *PixoAbstractAPIClient) CloseWebsocketConnection() error {
-	log.Info().Msg("Closing websocket")
+	log.Debug().Msg("Closing websocket")
 
 	if err := p.conn.Close(); err != nil {
 		log.Error().Err(err).Msg("Error closing websocket")
 		return err
 	}
 
-	log.Info().Msg("Websocket closed")
+	log.Debug().Msg("Websocket closed")
 	return nil
 }
 
