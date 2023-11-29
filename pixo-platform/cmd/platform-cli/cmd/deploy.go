@@ -18,13 +18,13 @@ var deployCmd = &cobra.Command{
 	Short: "Deploy a multiplayer server version",
 	Long:  `Deploy a new image as a multiplayer server version on the Pixo Platform for a specific module`,
 	Run: func(cmd *cobra.Command, args []string) {
-		moduleID := input.GetIntValue(cmd, "module-id", "MODULE_ID")
+		moduleID := input.GetIntValueOrAskUser(cmd, "module-id", "MODULE_ID")
 		if moduleID == 0 {
 			cmd.Println("No module ID provided")
 			return
 		}
 
-		semanticVersion := input.GetStringValue(cmd, "server-version", "SERVER_VERSION")
+		semanticVersion := input.GetStringValueOrAskUser(cmd, "server-version", "SERVER_VERSION")
 		if semanticVersion == "" {
 			iniPath := cmd.Flag("ini").Value.String()
 
@@ -56,7 +56,7 @@ var deployCmd = &cobra.Command{
 			return
 		}
 
-		image := input.GetStringValue(cmd, "image", "GAMESERVER_IMAGE")
+		image := input.GetStringValueOrAskUser(cmd, "image", "GAMESERVER_IMAGE")
 		if image == "" {
 			log.Fatal().Msg("No gameserver image provided")
 		}

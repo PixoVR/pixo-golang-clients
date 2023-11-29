@@ -8,6 +8,9 @@ all: build cp
 cp:
 	sudo cp $(EXECUTABLE) /usr/local/bin/$(NAME)
 
+lint:
+	golangci-lint run
+
 test:
 	ginkgo -r -v
 
@@ -32,3 +35,6 @@ deploy: build
 
 matchmake: build
 	$(EXECUTABLE) -d mp matchmake --server-version ${SERVER_VERSION}
+
+mockserver: build
+	$(EXECUTABLE) -d mp matchmake mockserver

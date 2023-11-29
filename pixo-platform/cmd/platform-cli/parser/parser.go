@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"errors"
 	"fmt"
 	"gopkg.in/ini.v1"
 )
@@ -52,6 +51,6 @@ func (i *IniParser) ParseSemanticVersion(iniInfo ...string) (string, error) {
 	if section := i.iniFile.Section(sectionName); section != nil {
 		return section.Key(key).String(), nil
 	} else {
-		return "", errors.New(fmt.Sprintf("could not find %s section in ini file", sectionName))
+		return "", fmt.Errorf("could not find %s section in ini file", sectionName)
 	}
 }

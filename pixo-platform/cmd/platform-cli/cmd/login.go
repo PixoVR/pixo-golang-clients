@@ -31,10 +31,10 @@ var loginCmd = &cobra.Command{
 			viper.Set("token", token)
 		} else {
 
-			username := input.GetStringValue(cmd, "username", config.PixoUsernameEnvVarKey)
+			username := input.GetStringValueOrAskUser(cmd, "username", config.PixoUsernameEnvVarKey)
 			log.Debug().Msgf("Attempting to login as user: %s", username)
 
-			password := input.GetStringValue(cmd, "password", config.PixoPasswordEnvVarKey)
+			password := input.GetStringValueOrAskUser(cmd, "password", config.PixoPasswordEnvVarKey)
 			log.Debug().Msgf("Attempting to login with password: %s", password)
 
 			var client *platform.PrimaryAPIClient

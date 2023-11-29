@@ -24,8 +24,8 @@ var matchmakeCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		mm := matchmaker.NewMatchmaker(input.GetConfigValue("matchmaking-api-url", config.PixoMatchmakingAPIURLEnvVarKey), input.GetConfigValue("token", config.PixoSecretKeyEnvVarKey))
 
-		moduleID := input.GetIntValue(cmd, "module-id", "PIXO_MODULE_ID")
-		semanticVersion := input.GetStringValue(cmd, "server-version", "PIXO_SERVER_VERSION")
+		moduleID := input.GetIntValueOrAskUser(cmd, "module-id", "PIXO_MODULE_ID")
+		semanticVersion := input.GetStringValueOrAskUser(cmd, "server-version", "PIXO_SERVER_VERSION")
 
 		cmd.Println(fmt.Sprintf("Attempting to find a match for module %d with server version %s...", moduleID, semanticVersion))
 

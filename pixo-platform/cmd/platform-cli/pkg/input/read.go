@@ -11,11 +11,11 @@ import (
 	"strings"
 )
 
-func GetIntValue(cmd *cobra.Command, flagName, envVarName string) int {
-	return ToInt(GetStringValue(cmd, flagName, envVarName))
+func GetIntValueOrAskUser(cmd *cobra.Command, flagName, envVarName string) int {
+	return ToInt(GetStringValueOrAskUser(cmd, flagName, envVarName))
 }
 
-func GetStringValue(cmd *cobra.Command, flagName, envVarName string) string {
+func GetStringValueOrAskUser(cmd *cobra.Command, flagName, envVarName string) string {
 	if cmd.Flag(flagName).Value.String() != "" {
 		return cmd.Flag(flagName).Value.String()
 	}
@@ -26,6 +26,19 @@ func GetStringValue(cmd *cobra.Command, flagName, envVarName string) string {
 	}
 
 	val = ReadFromUser(fmt.Sprintf("Enter %s: ", strings.ReplaceAll(flagName, "-", " ")))
+	if val != "" {
+		return val
+	}
+
+	return cmd.Flag(flagName).DefValue
+}
+
+func GetStringValue(cmd *cobra.Command, flagName, envVarName string) string {
+	if cmd.Flag(flagName).Value.String() != "" {
+		return cmd.Flag(flagName).Value.String()
+	}
+
+	val := GetConfigValue(flagName, envVarName)
 	if val != "" {
 		return val
 	}

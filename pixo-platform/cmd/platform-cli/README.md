@@ -3,12 +3,12 @@
 ## Prerequisites
 - [Pixo Account](https://apex.pixovr.com)
 
-API Key or Username/Password are needed to authenticate with the Pixo Platform API.
+API Key or Username/Password are needed to authenticate with the Pixo Platform APIs.
 
 ## Configuration
-Credentials can be configured using environment variables or a configuration file.  
+Credentials can be configured using flags, environment variables or a configuration file.  
 
-Configurations are loaded in the following order:
+Configurations are prioritized in the following order:
 1. Flags
 2. Environment Variables
 3. Configuration File
@@ -44,6 +44,7 @@ platform-api-url : https://primary.apex.dev.pixovr.com
 legacy-api-url: https://api.apex.dev.pixovr.com
 matchmaking-api-url : wss://match.apex.dev.pixovr.com
 
+# Default Module ID
 module-id : 271
 ```
 
@@ -88,3 +89,34 @@ pixo mp --connect
 # Enter message to send to gameserver: hello
 # ACK: hello
 ```
+
+## Mock Matchmaking Server
+
+Run a mock matchmaking server to test matchmaking functionality locally.
+It has a single websocket endpoint, `/matchmaking/matchmake`, that accepts a single message (which it ignores)
+and sends a single message back containing a reference to the game server to connect to.
+
+```bash
+# Run the server - Ctrl-C to stop
+pixo mp matchmake mockserver
+
+# Expected output:
+Mon, 02 Jan 2006 15:04:05 MST INF Starting mock server on port 8080
+```
+
+To customize the response, use the command line flags or create a yaml file at `./.pixo/server.yaml`.
+
+Defaults to the equivalent of the following config file:
+```yaml
+server-port: 8080
+gameserver-ip: 127.0.0.1
+gameserver-port: 7777
+map-name: Default
+session-name: Test
+session-id: FB0HIFBMY8NAME99IS7C3WALKERB4D76
+owning-user-name: PixoServer
+server-version: 1.00.00
+module-id: 1
+org-id: 1
+```
+
