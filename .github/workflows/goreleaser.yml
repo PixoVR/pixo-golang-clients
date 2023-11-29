@@ -3,9 +3,7 @@ name: Pixo CLI Release
 on:
   push:
     tags:
-      - v*
-    paths:
-      - 'pixo-platform/cmd/platform-cli/**'
+      - '*'
 
 permissions:
   contents: write
@@ -28,5 +26,6 @@ jobs:
           distribution: goreleaser
           version: latest
           args: release --clean
+          workdir: pixo-platform/cmd/platform-cli
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
