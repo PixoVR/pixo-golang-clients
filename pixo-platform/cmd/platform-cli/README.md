@@ -40,12 +40,12 @@ username: username
 password: password
 
 # API URLs
-platform-api-url : https://primary.apex.dev.pixovr.com
+platform-api-url: https://primary.apex.dev.pixovr.com
 legacy-api-url: https://api.apex.dev.pixovr.com
-matchmaking-api-url : wss://match.apex.dev.pixovr.com
+matchmaking-api-url: wss://match.apex.dev.pixovr.com
 
 # Default Module ID
-module-id : 271
+module-id: 271
 ```
 
 ## Installation
