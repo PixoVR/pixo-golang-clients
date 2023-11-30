@@ -27,14 +27,16 @@ var loginCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		token := input.GetConfigValue("secret-key", "SECRET_KEY")
 		if token != "" {
-			log.Debug().Msgf("Found token in environment variable: %s", token)
+			log.Debug().Msgf("Found secret key in config: %s", token)
 			viper.Set("token", token)
 		} else {
 
 			username := input.GetStringValueOrAskUser(cmd, "username", config.PixoUsernameEnvVarKey)
+			viper.Set("username", username)
 			log.Debug().Msgf("Attempting to login as user: %s", username)
 
 			password := input.GetStringValueOrAskUser(cmd, "password", config.PixoPasswordEnvVarKey)
+			viper.Set("password", password)
 			log.Debug().Msgf("Attempting to login with password: %s", password)
 
 			var client *platform.PrimaryAPIClient
@@ -44,8 +46,6 @@ var loginCmd = &cobra.Command{
 
 			cmd.Println(fmt.Sprintf("Login successful. Here is your API token: \n%s", client.GetToken()))
 
-			viper.Set("username", username)
-			viper.Set("password", password)
 			viper.Set("token", client.GetToken())
 		}
 

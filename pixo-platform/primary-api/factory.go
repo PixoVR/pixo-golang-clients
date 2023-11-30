@@ -24,6 +24,10 @@ func NewClient(token, apiURL string) *PrimaryAPIClient {
 
 // NewClientWithBasicAuth is a function that returns a PixoAbstractAPIClient with basic auth performed
 func NewClientWithBasicAuth(username, password, apiURL string) *PrimaryAPIClient {
+	if apiURL == "" {
+		apiURL = getURL()
+	}
+
 	primaryClient := &PrimaryAPIClient{
 		PixoAbstractAPIClient: *abstractClient.NewClient("", apiURL),
 	}

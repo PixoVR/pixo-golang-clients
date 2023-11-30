@@ -54,7 +54,7 @@ var matchmakeCmd = &cobra.Command{
 }
 
 func gameserverReadLoop(cmd *cobra.Command, mm matchmaker.Matchmaker, addr *net.UDPAddr) {
-	log.Info().Msg("Connecting to gameserver")
+	log.Debug().Msg("Connecting to gameserver")
 	if err := mm.DialGameserver(addr); err != nil {
 		log.Error().Err(err).Msg("Could not connect to gameserver")
 	}
@@ -73,7 +73,7 @@ func gameserverReadLoop(cmd *cobra.Command, mm matchmaker.Matchmaker, addr *net.
 		cmd.Println(string(response))
 	}
 
-	log.Info().Msg("Closing connection to gameserver")
+	log.Debug().Msg("Closing connection to gameserver")
 	if err := mm.CloseGameserverConnection(); err != nil {
 		log.Error().Err(err).Msg("Could not close connection to gameserver")
 	}

@@ -34,11 +34,12 @@ func getURL(host string) string {
 	if host == "" {
 		host = DefaultMatchmakingURL
 	}
+
 	return fmt.Sprintf("%s/%s", host, MatchmakingEndpoint)
 }
 
 func (m *MultiplayerMatchmaker) FindMatch(req MatchRequest) (*net.UDPAddr, error) {
-	log.Info().Msg("Connecting to matchmaking server")
+	log.Debug().Msg("Connecting to matchmaking server")
 
 	httpResponse, err := m.ConnectToWebsocket()
 	if err != nil {
@@ -98,17 +99,17 @@ func (m *MultiplayerMatchmaker) FindMatch(req MatchRequest) (*net.UDPAddr, error
 }
 
 func (m *MultiplayerMatchmaker) DialGameserver(addr *net.UDPAddr) error {
-	log.Info().Msg("Connecting to gameserver")
+	log.Debug().Msg("Connecting to gameserver")
 
 	udpServer, err := net.ResolveUDPAddr(addr.Network(), addr.String())
 	if err != nil {
-		log.Debug().Err(err).Msg("unable to resolve address")
+		log.Error().Err(err).Msg("unable to resolve address")
 		return err
 	}
 
 	conn, err := net.DialUDP(addr.Network(), nil, udpServer)
 	if err != nil {
-		log.Debug().Err(err).Msg("unable to dial gameserver address")
+		log.Error().Err(err).Msg("unable to dial gameserver address")
 		return err
 	}
 
@@ -137,19 +138,21 @@ func (m *MultiplayerMatchmaker) SendAndReceiveMessage(message []byte) ([]byte, e
 
 func (m *MultiplayerMatchmaker) CloseGameserverConnection() error {
 	if err := m.gameserverConnection.Close(); err != nil {
-		log.Debug().Err(err).Msg("unable to close gameserver connection")
+		log.Error().Err(err).Msg("unable to close gameserver connection")
 		return err
 	}
 
+	log.Debug().Msg("Closed gameserver connection")
 	return nil
 }
 
 func (m *MultiplayerMatchmaker) sendGameServerMessage(message []byte) error {
 	if _, err := m.gameserverConnection.Write(message); err != nil {
-		log.Debug().Err(err).Msg("unable to write to gameserver")
+		log.Error().Err(err).Msg("unable to write to gameserver")
 		return err
 	}
 
+	log.Debug().Msgf("Sent message to gameserver: %s", message)
 	return nil
 }
 
@@ -157,7 +160,7 @@ func (m *MultiplayerMatchmaker) readGameServerMessage() ([]byte, error) {
 	received := make([]byte, 1024)
 	n, err := m.gameserverConnection.Read(received)
 	if err != nil {
-		log.Debug().Err(err).Msg("unable to read from gameserver")
+		log.Error().Err(err).Msg("unable to read from gameserver")
 		return nil, err
 	}
 
