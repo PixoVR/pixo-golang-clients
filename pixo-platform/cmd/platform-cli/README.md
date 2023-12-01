@@ -5,6 +5,27 @@
 
 API Key or Username/Password are needed to authenticate with the Pixo Platform APIs.
 
+
+
+## Installation
+### MacOS - HomeBrew
+```bash
+brew tap PixoVR/pixo-golang-clients
+brew install pixo-cli
+pixo help
+```
+
+### Windows - Snap
+Unfortunately the Pixo CLI is not yet available on Windows via a package manager.
+The CLI can be installed by downloading the latest release from the [releases page](https://github.com/PixoVR/pixo-golang-clients/releases)
+or building from source.
+```
+git clone git@github.com:PixoVR/pixo-golang-clients.git
+cd pixo-golang-clients/pixo-platform/cmd/platform-cli
+make build
+./bin/pixo help
+```
+
 ## Configuration
 Credentials can be configured using flags, environment variables or a configuration file.  
 
@@ -46,13 +67,6 @@ matchmaking-api-url: wss://match.apex.dev.pixovr.com
 
 # Default Module ID
 module-id: 271
-```
-
-## Installation
-```bash
-brew tap PixoVR/pixo-golang-clients
-brew install pixo-cli
-pixo help
 ```
 
 ## Initialization

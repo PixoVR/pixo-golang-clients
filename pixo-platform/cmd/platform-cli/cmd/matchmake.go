@@ -60,7 +60,7 @@ func gameserverReadLoop(cmd *cobra.Command, mm matchmaker.Matchmaker, addr *net.
 	}
 
 	for {
-		userInput := input.ReadFromUser("Enter message to send to gameserver: ")
+		userInput := input.ReadFromUser(cmd, "Enter message to send to gameserver: ")
 		if userInput == "" || userInput == "exit" {
 			break
 		}
