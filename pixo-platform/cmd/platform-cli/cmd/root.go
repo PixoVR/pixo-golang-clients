@@ -69,6 +69,7 @@ func init() {
 		cfgFile = globalConfigFile
 	}
 	viper.AddConfigPath(cfgDir)
+	viper.AddConfigPath(".pixo")
 	viper.SetConfigType("yaml")
 
 	if err := viper.ReadInConfig(); err != nil {
