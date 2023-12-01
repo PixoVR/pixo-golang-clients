@@ -92,10 +92,15 @@ pixo mp serverVersions deploy \
 ## Testing Multiplayer Matchmaking
 ```bash
 # Request a match
-pixo mp matchmake --module-id 1 --server-version 1.00.00
+pixo mp matchmake \
+    --module-id 1 \
+    --server-version 1.00.00
 
 # Request a match and connect to the game server
-pixo mp matchmake --connect --module-id 1 --server-version 1.00.00
+pixo mp matchmake \
+    --module-id 1 \
+    --server-version 1.00.00 \
+    --connect
 
 # If a match was previously found, the gameserver connection will be saved and can be used to reconnect
 pixo mp --connect
