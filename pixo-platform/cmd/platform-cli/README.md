@@ -86,6 +86,7 @@ pixo mp serverVersions deploy \
 # Deploy a new version
 pixo mp serverVersions deploy \
     --module-id 1 \
+    --server-version 1.00.00 \
     --image gcr.io/pixo-bootstrap/multiplayer/gameservers/simple-server:latest
 ```
 
