@@ -26,5 +26,6 @@ func newServiceConfig(lifecycle, region string) urlfinder.ServiceConfig {
 		Tenant:    "multiplayer",
 		Lifecycle: lifecycle,
 		Region:    region,
+		Port:      8003,
 	}
 }

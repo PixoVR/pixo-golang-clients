@@ -59,7 +59,7 @@ var mockserverCmd = &cobra.Command{
 }
 
 func init() {
-	matchmakeCmd.AddCommand(mockserverCmd)
+	mpCmd.AddCommand(mockserverCmd)
 
 	mockserverCmd.Flags().StringP("server-port", "p", "8080", "Port to run the server on")
 	mockserverCmd.Flags().String("gameserver-ip", "127.0.0.1", "IP address of the game server to be returned in the response")

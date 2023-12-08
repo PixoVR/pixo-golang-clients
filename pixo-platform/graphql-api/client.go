@@ -43,5 +43,6 @@ func newServiceConfig(lifecycle, region string) urlfinder.ServiceConfig {
 		Service:   "primary",
 		Lifecycle: lifecycle,
 		Region:    region,
+		Port:      8000,
 	}
 }

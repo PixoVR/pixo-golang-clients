@@ -15,7 +15,7 @@ brew install pixo-cli
 pixo help
 ```
 
-### Windows - Snap
+### Windows
 Unfortunately the Pixo CLI is not yet available on Windows via a package manager.
 The CLI can be installed by downloading the latest release from the [releases page](https://github.com/PixoVR/pixo-golang-clients/releases)
 or building from source.
@@ -65,7 +65,7 @@ lifecycle: stage
 region: na
 
 # Default Module ID
-module-id: 271
+module-id: 1
 ```
 
 ## Initialization
@@ -120,15 +120,15 @@ pixo mp --connect
 ## Mock Matchmaking Server
 
 Run a mock matchmaking server to test matchmaking functionality locally.
-It has a single websocket endpoint, `/matchmaking/matchmake`, that accepts a single message (which it ignores)
-and sends a single message back containing a reference to the game server to connect to.
+It has a single websocket endpoint, `/matchmaking/matchmake`, that accepts a message (which it ignores)
+and sends a message back containing the IP and port of the game server to connect to.
 
 ```bash
 # Run the server - Ctrl-C to stop
-pixo mp matchmake mockserver
+pixo mp mockserver
 
 # Expected output:
-Mon, 02 Jan 2006 15:04:05 MST INF Starting mock server on port 8080
+Mon, 02 Jan 2006 15:04:05 MST INF Starting mock server serving endpoint matchmaking/matchmake on port 8080
 ```
 
 To customize the response, use the command line flags or create a yaml file at `./.pixo/server.yaml`.
@@ -147,3 +147,14 @@ module-id: 1
 org-id: 1
 ```
 
+You can even use the Pixo CLI to test the mock server (run [simple agones server](https://github.com/PixoVR/multiplayer-gameservers/tree/dev/simple-server) to test the example below):
+```bash
+# In one terminal, run the mock server
+pixo mp mockserver
+
+# In another terminal, request a match
+pixo mp matchmake \
+    --module-id 1 \
+    --server-version 1.00.00 \
+    --connect
+```

@@ -6,13 +6,22 @@ import (
 
 type ServiceConfig struct {
 	Service   string
+	Port      int
 	Tenant    string
 	Region    string
 	Lifecycle string
 }
 
-// func FormatURL(service, tenant, region, lifecycle string) string {
 func (s ServiceConfig) FormatURL() string {
+
+	if s.Lifecycle == "local" {
+		if s.Service == "match" {
+			return fmt.Sprintf("ws://localhost:%d", s.Port)
+		}
+
+		return fmt.Sprintf("http://localhost:%d", s.Port)
+	}
+
 	if s.Service == "" {
 		s.Service = DefaultAPIService
 	}
@@ -52,6 +61,10 @@ func (s ServiceConfig) FormatURL() string {
 }
 
 func (s ServiceConfig) GetBaseDomain() string {
+	if s.Lifecycle == "local" {
+		return "localhost"
+	}
+
 	if s.Lifecycle != "" && s.Lifecycle != "prod" {
 		return fmt.Sprintf("%s.%s", s.Lifecycle, Domain)
 	}
