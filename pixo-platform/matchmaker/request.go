@@ -27,8 +27,8 @@ type MatchDetails struct {
 	MapName        string `json:"MapName,omitempty"`
 	OwningUserName string `json:"OwningUserName,omitempty"`
 	ModuleVersion  string `json:"ServerVersion,omitempty"`
-	ModuleID       int    `json:"ModuleId,omitempty"`
-	OrgID          int    `json:"OrgId,omitempty"`
+	ModuleID       int    `json:"ModuleID,omitempty"`
+	OrgID          int    `json:"OrgID,omitempty"`
 }
 
 func (m MatchResponse) IsValid() bool {

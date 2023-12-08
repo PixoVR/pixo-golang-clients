@@ -40,7 +40,9 @@ var setCmd = &cobra.Command{
 		if err := viper.WriteConfigAs(cfgFile); err != nil {
 			log.Error().Err(err).Msg("Could not write config file")
 		} else {
-			cmd.Println("Config file updated successfully")
+			cmd.Printf("Config file updated successfully: %s\n", cfgFile)
+			cmd.Println("Region: ", region)
+			cmd.Println("Lifecycle: ", lifecycle)
 		}
 	},
 }
