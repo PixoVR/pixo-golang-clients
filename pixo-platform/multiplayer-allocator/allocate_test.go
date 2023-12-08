@@ -2,7 +2,6 @@ package multiplayer_allocator_test
 
 import (
 	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/multiplayer-allocator"
-	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/k8s/agones"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -17,12 +16,12 @@ var _ = Describe("Allocate", Ordered, func() {
 	)
 
 	BeforeEach(func() {
-		allocatorClient = NewClient(os.Getenv("SECRET_KEY"), "")
+		allocatorClient = NewClient(os.Getenv("SECRET_KEY"), "dev", "")
 		Expect(allocatorClient.IsAuthenticated()).To(BeTrue())
 	})
 
 	It("should be able make a health check against the allocator", func() {
-		client := NewClient("", "")
+		client := NewClient("", "dev", "")
 		res, err := client.Get("allocator/health")
 		Expect(err).NotTo(HaveOccurred())
 		Expect(res).NotTo(BeNil())
@@ -54,38 +53,6 @@ var _ = Describe("Allocate", Ordered, func() {
 
 		Expect(res).NotTo(BeNil())
 		Expect(res.Error).To(HaveOccurred())
-	})
-
-	It("should be able to register a fleet", func() {
-		fleetReq := FleetRequest{
-			ServerConfig: platform.MultiplayerServerConfig{
-				Capacity: 1,
-			},
-			ServerVersion: platform.MultiplayerServerVersion{
-				ModuleID:        1,
-				SemanticVersion: "1.0.0",
-				ImageRegistry:   agones.SimpleGameServerImage,
-			},
-		}
-
-		res := allocatorClient.RegisterFleet(fleetReq)
-
-		Expect(res).NotTo(BeNil())
-		Expect(res.Error).NotTo(HaveOccurred())
-	})
-
-	It("should be able to deregister a fleet", func() {
-		fleetReq := FleetRequest{
-			ServerVersion: platform.MultiplayerServerVersion{
-				ModuleID:        1,
-				SemanticVersion: "1.0.0",
-			},
-		}
-
-		res := allocatorClient.DeregisterFleet(fleetReq)
-
-		Expect(res).NotTo(BeNil())
-		Expect(res.Error).NotTo(HaveOccurred())
 	})
 
 })

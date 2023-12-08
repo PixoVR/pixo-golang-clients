@@ -4,7 +4,6 @@ Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/config"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
 	"github.com/rs/zerolog/log"
@@ -58,7 +57,11 @@ var mpCmd = &cobra.Command{
 }
 
 func init() {
-	mm = matchmaker.NewMatchmaker(input.GetConfigValue("matchmaking-api-url", config.PixoMatchmakingAPIURLEnvVarKey), input.GetConfigValue("token", config.PixoSecretKeyEnvVarKey))
+	mm = matchmaker.NewMatchmaker(
+		input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
+		input.GetConfigValue("region", "PIXO_REGION"),
+		input.GetConfigValue("token", "PIXO_TOKEN"),
+	)
 
 	rootCmd.AddCommand(mpCmd)
 

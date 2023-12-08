@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	abstractClient "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
+	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"github.com/rs/zerolog/log"
 	"io"
 	"net"
@@ -17,13 +19,32 @@ type MultiplayerMatchmaker struct {
 	gameserverConnection *net.UDPConn
 }
 
-func NewMatchmaker(url, token string, timeoutSeconds ...int) *MultiplayerMatchmaker {
+func newServiceConfig(lifecycle, region string) urlfinder.ServiceConfig {
+	return urlfinder.ServiceConfig{
+		Service:   "match",
+		Lifecycle: lifecycle,
+		Region:    region,
+	}
+}
+
+func NewMatchmakerWithBasicAuth(username, password, lifecycle, region string, timeoutSeconds ...int) (*MultiplayerMatchmaker, error) {
+	primaryClient, err := primary_api.NewClientWithBasicAuth(username, password, lifecycle, region)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to create api client")
+		return nil, err
+	}
+
+	return NewMatchmaker(lifecycle, region, primaryClient.GetToken(), timeoutSeconds...), nil
+}
+
+func NewMatchmaker(lifecycle, region, token string, timeoutSeconds ...int) *MultiplayerMatchmaker {
 
 	if len(timeoutSeconds) == 0 {
 		timeoutSeconds = []int{60}
 	}
 
-	url = getURL(url)
+	config := newServiceConfig(lifecycle, region)
+	url := getURL(config.FormatURL())
 
 	return &MultiplayerMatchmaker{
 		PixoAbstractAPIClient: *abstractClient.NewClient(token, url, timeoutSeconds[0]),

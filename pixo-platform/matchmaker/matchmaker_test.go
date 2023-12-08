@@ -14,7 +14,9 @@ var _ = Describe("Multiplayer", func() {
 	)
 
 	BeforeEach(func() {
-		m = matchmaker.NewMatchmaker("wss://match.apex.dev.pixovr.com", os.Getenv("AUTH_TOKEN"))
+		var err error
+		m, err = matchmaker.NewMatchmakerWithBasicAuth(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"), "dev", "na")
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	It("can return an error message if the module ID is invalid", func() {
@@ -43,7 +45,7 @@ var _ = Describe("Multiplayer", func() {
 
 	It("can retrieve a game server address using the matchmaker and send a message to it", func() {
 		req := matchmaker.MatchRequest{
-			ModuleID:      43,
+			ModuleID:      271,
 			ServerVersion: "1.03.01",
 		}
 

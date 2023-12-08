@@ -75,6 +75,13 @@ pixo init # Initialize the configuration file
 pixo auth login # Authenticate with the Pixo Platform API
 ```
 
+## Configuration
+```bash
+# Requires logging in again
+pixo config set --region saudi # Switch to saudi environment
+pixo config set --lifecycle stage # Switch to stage environment
+```
+
 ## Deploying a Module Gameserver Version
 ```bash
 # Check if server version with semantic version already exists

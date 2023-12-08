@@ -40,8 +40,14 @@ var loginCmd = &cobra.Command{
 			viper.Set("password", password)
 			log.Debug().Msgf("Attempting to login with password: %s", password)
 
-			var client *platform.PrimaryAPIClient
-			if client = platform.NewClientWithBasicAuth(username, password, input.GetConfigValue("legacy-api-url", config.PixoLegacyAPIURLEnvVarKey)); client == nil {
+			client, err := platform.NewClientWithBasicAuth(
+				username,
+				password,
+				input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
+				input.GetConfigValue("region", "PIXO_REGION"),
+			)
+			if err != nil || client == nil {
+				log.Error().Err(err).Msg("Could not create platform client")
 				return
 			}
 

@@ -5,7 +5,6 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/config"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
 	"github.com/rs/zerolog/log"
@@ -22,7 +21,11 @@ var matchmakeCmd = &cobra.Command{
 	Long: `Test multiplayer matchmaking.  This command will create a matchmake request and wait for a match to be found.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		mm := matchmaker.NewMatchmaker(input.GetConfigValue("matchmaking-api-url", config.PixoMatchmakingAPIURLEnvVarKey), input.GetConfigValue("token", config.PixoSecretKeyEnvVarKey))
+		mm = matchmaker.NewMatchmaker(
+			input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
+			input.GetConfigValue("region", "PIXO_REGION"),
+			input.GetConfigValue("token", "PIXO_TOKEN"),
+		)
 
 		moduleID := input.GetIntValueOrAskUser(cmd, "module-id", "PIXO_MODULE_ID")
 		semanticVersion := input.GetStringValueOrAskUser(cmd, "server-version", "PIXO_SERVER_VERSION")

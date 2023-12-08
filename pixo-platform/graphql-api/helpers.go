@@ -1,12 +1,9 @@
 package graphql_api
 
-import "os"
+import (
+	"fmt"
+)
 
-func getURL() string {
-	apiURL, ok := os.LookupEnv("PIXO_PLATFORM_API_URL")
-	if !ok {
-		return "https://primary.apex.pixovr.com"
-	}
-
-	return apiURL
+func getURL(host string) string {
+	return fmt.Sprintf("%s/v2/query", host)
 }

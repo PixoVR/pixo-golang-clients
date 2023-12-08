@@ -6,7 +6,6 @@ package cmd
 import (
 	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/parser"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/config"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	platformAPI "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
 	"github.com/rs/zerolog"
@@ -77,5 +76,9 @@ func init() {
 		log.Error().Err(err).Msg("Failed to read config file")
 	}
 
-	apiClient = platformAPI.NewClient(viper.GetString("token"), input.GetConfigValue("platform-api-url", config.PixoPlatformAPIURLEnvVarKey))
+	apiClient = platformAPI.NewClient(
+		viper.GetString("token"),
+		input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
+		input.GetConfigValue("region", "PIXO_REGION"),
+	)
 }

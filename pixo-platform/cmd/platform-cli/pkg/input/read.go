@@ -15,7 +15,7 @@ func GetIntValueOrAskUser(cmd *cobra.Command, flagName, envVarName string) int {
 	return ToInt(GetStringValueOrAskUser(cmd, flagName, envVarName))
 }
 
-func GetStringValueOrAskUser(cmd *cobra.Command, flagName, envVarName string) string {
+func GetStringValueOrAskUser(cmd *cobra.Command, flagName, envVarName string, defaultVal ...string) string {
 	if cmd.Flag(flagName).Value.String() != "" {
 		return cmd.Flag(flagName).Value.String()
 	}
@@ -25,9 +25,20 @@ func GetStringValueOrAskUser(cmd *cobra.Command, flagName, envVarName string) st
 		return val
 	}
 
-	val = ReadFromUser(cmd, fmt.Sprintf("Enter %s: ", strings.ReplaceAll(flagName, "-", " ")))
+	prompt := fmt.Sprintf("Enter %s", strings.ReplaceAll(flagName, "-", " "))
+	if len(defaultVal) > 0 {
+		prompt = fmt.Sprintf("%s (press enter for default - %s): ", prompt, defaultVal[0])
+	} else {
+		prompt = fmt.Sprintf("%s: ", prompt)
+	}
+
+	val = ReadFromUser(cmd, prompt)
 	if val != "" {
 		return val
+	}
+
+	if len(defaultVal) > 0 {
+		return defaultVal[0]
 	}
 
 	return cmd.Flag(flagName).DefValue
@@ -60,7 +71,7 @@ func GetConfigValue(flagName, envVarName string) string {
 }
 
 func ReadFromUser(cmd *cobra.Command, prompt string) string {
-	cmd.Println(prompt)
+	cmd.Print(prompt)
 
 	reader := bufio.NewReader(cmd.InOrStdin())
 	message, _ := reader.ReadString('\n')

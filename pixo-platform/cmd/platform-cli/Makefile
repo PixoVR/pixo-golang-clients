@@ -31,11 +31,14 @@ clean:
 	rm -rf ${EXECUTABLE} || true
 	docker rmi --force ${NAME}:latest || true
 
+auth: build
+	$(EXECUTABLE) -d auth login
+
 deploy: build
 	$(EXECUTABLE) -d -m ${MODULE_ID} mp serverVersions deploy --image gcr.io/pixo-bootstrap/multiplayer/gameservers/simple-server:latest
 
 matchmake: build
-	$(EXECUTABLE) --debug -m ${MODULE_ID} mp matchmake --server-version ${SERVER_VERSION}
+	$(EXECUTABLE) -d -m ${MODULE_ID} mp matchmake --server-version ${SERVER_VERSION}
 
 mockserver: build
 	$(EXECUTABLE) -d mp matchmake mockserver
