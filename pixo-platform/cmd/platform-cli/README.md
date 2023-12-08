@@ -79,6 +79,7 @@ pixo auth login # Authenticate with the Pixo Platform API
 # Requires logging in again
 pixo config set --region saudi # Switch to saudi environment
 pixo config set --lifecycle dev # Switch to dev environment
+pixo config set --key module-id --val 1 # Set default module id
 ```
 
 ## Deploying a Module Gameserver Version
