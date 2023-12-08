@@ -21,6 +21,9 @@ var matchmakeCmd = &cobra.Command{
 	Long: `Test multiplayer matchmaking.  This command will create a matchmake request and wait for a match to be found.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
+
+		initLogger(cmd)
+
 		mm = matchmaker.NewMatchmaker(
 			input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
 			input.GetConfigValue("region", "PIXO_REGION"),

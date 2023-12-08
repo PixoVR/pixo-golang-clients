@@ -21,6 +21,8 @@ var mockserverCmd = &cobra.Command{
 	Long:  `Runs a mock matchmaking server that returns a static response determined by the server configuration or user input `,
 	Run: func(cmd *cobra.Command, args []string) {
 
+		initLogger(cmd)
+
 		viper.AddConfigPath(".pixo")
 		viper.SetConfigName("server")
 		viper.SetDefault("module-id", 1)

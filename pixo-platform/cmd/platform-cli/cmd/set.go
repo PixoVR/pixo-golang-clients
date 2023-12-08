@@ -17,6 +17,8 @@ var setCmd = &cobra.Command{
 	Long:  `Can set a single value, or change region/lifecycle of the Pixo Platform APIs used`,
 	Run: func(cmd *cobra.Command, args []string) {
 
+		initLogger(cmd)
+
 		if key, err := cmd.Flags().GetString("key"); err != nil {
 			log.Error().Err(err).Msg("Could not get key flag")
 		} else if key != "" {

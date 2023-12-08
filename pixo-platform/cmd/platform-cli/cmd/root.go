@@ -30,7 +30,7 @@ var (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:     "pixo",
-	Version: "0.0.91",
+	Version: "0.0.92",
 	Short:   "A CLI for the Pixo Platform",
 	Long:    `A CLI tool used to simplify interactions with the Pixo Platform`,
 	// Uncomment the following line if your bare application
@@ -46,20 +46,22 @@ func Execute() {
 	}
 }
 
-func init() {
-	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC1123})
+func initLogger(cmd *cobra.Command) {
 
-	rootCmd.PersistentFlags().BoolP("debug", "d", false, "Enable debug logging")
-
-	if enabled, err := rootCmd.PersistentFlags().GetBool("debug"); err != nil {
-		log.Error().Err(err).Msg("Failed to get debug flag")
-	} else if enabled {
+	if cmd.Flag("debug").Value.String() == "true" {
 		log.Info().Msg("Debug logging enabled")
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	} else {
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	}
+
+}
+
+func init() {
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: rootCmd.OutOrStdout(), TimeFormat: time.RFC1123})
+
+	rootCmd.PersistentFlags().BoolP("debug", "d", false, "Enable debug logging")
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", fmt.Sprintf("config file (default is %s)", globalConfigFile))
 	rootCmd.PersistentFlags().StringP("ini", "c", parser.DefaultConfigFilepath, "Path to the ini file to use for the command")

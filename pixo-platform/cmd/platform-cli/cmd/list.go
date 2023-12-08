@@ -15,6 +15,8 @@ var listCmd = &cobra.Command{
 	Long: `Lists configuration settings like region, org, and module ID.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
+		initLogger(cmd)
+
 		config := viper.AllSettings()
 		for key, value := range config {
 			cmd.Println(key, ":", value)

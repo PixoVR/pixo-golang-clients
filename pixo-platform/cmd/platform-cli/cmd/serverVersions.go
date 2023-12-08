@@ -15,6 +15,8 @@ var serverVersionsCmd = &cobra.Command{
 	Long: `Used to list and manage multiplayer server versions.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
+		initLogger(cmd)
+	
 		if err := cmd.Help(); err != nil {
 			log.Error().Err(err).Msg("Could not display help")
 			return

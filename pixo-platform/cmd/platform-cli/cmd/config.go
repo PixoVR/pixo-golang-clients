@@ -15,6 +15,7 @@ var configCmd = &cobra.Command{
 	Long: `Manage settings like region, org, and module ID.  This commands will prompt you for the settings if they are not already set.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
+		initLogger(cmd)
 		if err := cmd.Help(); err != nil {
 			log.Error().Err(err).Msg("Could not display help")
 			return

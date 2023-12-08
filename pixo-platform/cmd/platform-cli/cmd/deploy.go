@@ -18,6 +18,8 @@ var deployCmd = &cobra.Command{
 	Short: "Deploy a multiplayer server version",
 	Long:  `Deploy a new image as a multiplayer server version on the Pixo Platform for a specific module`,
 	Run: func(cmd *cobra.Command, args []string) {
+		initLogger(cmd)
+
 		moduleID := input.GetIntValueOrAskUser(cmd, "module-id", "MODULE_ID")
 		if moduleID == 0 {
 			cmd.Println("No module ID provided")

@@ -24,6 +24,8 @@ var mpCmd = &cobra.Command{
 	Short: "Manage Pixo Platform multiplayer resources",
 	Long:  `Manage resources like server configurations, versions, triggers. Test game servers and matchmaking.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		initLogger(cmd)
+
 		if cmd.Flag("connect").Value.String() != "true" {
 			if err := cmd.Help(); err != nil {
 				log.Error().Err(err).Msg("Could not display help")

@@ -26,12 +26,14 @@ var loginCmd = &cobra.Command{
 	Will prioritize in order of the above list, and will prompt the user if none is found.	
 `,
 	Run: func(cmd *cobra.Command, args []string) {
+		initLogger(cmd)
+
 		token := input.GetConfigValue("secret-key", "SECRET_KEY")
 		if token != "" {
 			log.Debug().Msgf("Found secret key in config: %s", token)
 			viper.Set("token", token)
+		
 		} else {
-
 			username := input.GetStringValueOrAskUser(cmd, "username", config.PixoUsernameEnvVarKey)
 			viper.Set("username", username)
 			log.Debug().Msgf("Attempting to login as user: %s", username)
