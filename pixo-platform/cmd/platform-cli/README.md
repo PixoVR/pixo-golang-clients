@@ -43,10 +43,10 @@ export SECRET_KEY=secretkey
 export PIXO_USERNAME=username
 export PIXO_PASSWORD=password
 
-# API URLs
-export PIXO_PLATFORM_API_URL=https://primary.apex.dev.pixovr.com
-export PIXO_LEGACY_API_URL=https://api.apex.dev.pixovr.com
-export PIXO_MATCHMAKING_API_URL=wss://match.apex.dev.pixovr.com
+# Platform APIs
+export PIXO_LIFECYCLE=stage
+export PIXO_REGION=na
+
 ```
 
 ### Sample Configuration File:
@@ -60,10 +60,9 @@ secret-key: secretkey
 username: username
 password: password
 
-# API URLs
-platform-api-url: https://primary.apex.dev.pixovr.com
-legacy-api-url: https://api.apex.dev.pixovr.com
-matchmaking-api-url: wss://match.apex.dev.pixovr.com
+# Platform APIs
+lifecycle: stage
+region: na
 
 # Default Module ID
 module-id: 271
@@ -79,7 +78,7 @@ pixo auth login # Authenticate with the Pixo Platform API
 ```bash
 # Requires logging in again
 pixo config set --region saudi # Switch to saudi environment
-pixo config set --lifecycle stage # Switch to stage environment
+pixo config set --lifecycle dev # Switch to dev environment
 ```
 
 ## Deploying a Module Gameserver Version

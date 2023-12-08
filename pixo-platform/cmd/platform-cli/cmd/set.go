@@ -5,7 +5,6 @@ package cmd
 
 import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -35,20 +34,6 @@ var setCmd = &cobra.Command{
 
 		viper.Set("lifecycle", lifecycle)
 		viper.Set("region", region)
-
-		config := urlfinder.ServiceConfig{
-			Region:    region,
-			Lifecycle: lifecycle,
-		}
-
-		config.Service = "api"
-		viper.Set("legacy-api-url", config.FormatURL())
-
-		config.Service = "primary"
-		viper.Set("platform-api-url", config.FormatURL())
-
-		config.Service = "match"
-		viper.Set("matchmaking-api-url", config.FormatURL())
 
 		if err := viper.WriteConfigAs(cfgFile); err != nil {
 			log.Error().Err(err).Msg("Could not write config file")
