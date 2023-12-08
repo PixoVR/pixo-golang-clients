@@ -37,9 +37,9 @@ auth: build
 deploy: build
 	$(EXECUTABLE) -d -m ${MODULE_ID} mp serverVersions deploy --image gcr.io/pixo-bootstrap/multiplayer/gameservers/simple-server:latest
 
-matchmake: build
+match: build
 	$(EXECUTABLE) -d -m ${MODULE_ID} mp matchmake --server-version ${SERVER_VERSION}
 
 mockserver: build
-	$(EXECUTABLE) -d mp matchmake mockserver
+	$(EXECUTABLE) -d mp mockserver
 

@@ -153,6 +153,7 @@ You can even use the Pixo CLI to test the mock server (run [simple agones server
 pixo mp mockserver
 
 # In another terminal, request a match
+pixo config set --lifecycle local
 pixo mp matchmake \
     --module-id 1 \
     --server-version 1.00.00 \
