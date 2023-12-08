@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/config"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
@@ -52,7 +53,6 @@ var loginCmd = &cobra.Command{
 		if err := viper.WriteConfigAs(cfgFile); err != nil {
 			log.Error().Err(err).Msg("Could not write config file")
 		}
-
 	},
 }
 
