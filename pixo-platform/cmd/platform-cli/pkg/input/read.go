@@ -6,6 +6,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"gitlab.com/david_mbuvi/go_asterisks"
 	"os"
 	"strconv"
 	"strings"
@@ -13,6 +14,35 @@ import (
 
 func GetIntValueOrAskUser(cmd *cobra.Command, flagName, envVarName string) int {
 	return ToInt(GetStringValueOrAskUser(cmd, flagName, envVarName))
+}
+
+func GetSensitiveStringValueOrAskUser(cmd *cobra.Command, flagName, envVarName string, defaultVal ...string) string {
+	if cmd.Flag(flagName).Value.String() != "" {
+		return cmd.Flag(flagName).Value.String()
+	}
+
+	val := GetConfigValue(flagName, envVarName)
+	if val != "" {
+		return val
+	}
+
+	prompt := fmt.Sprintf("Enter %s", strings.ReplaceAll(flagName, "-", " "))
+	if len(defaultVal) > 0 {
+		prompt = fmt.Sprintf("%s (press enter for default - %s): ", prompt, defaultVal[0])
+	} else {
+		prompt = fmt.Sprintf("%s: ", prompt)
+	}
+
+	val = ReadSensitiveFromUser(cmd, prompt)
+	if val != "" {
+		return val
+	}
+
+	if len(defaultVal) > 0 {
+		return defaultVal[0]
+	}
+
+	return cmd.Flag(flagName).DefValue
 }
 
 func GetStringValueOrAskUser(cmd *cobra.Command, flagName, envVarName string, defaultVal ...string) string {
@@ -68,6 +98,16 @@ func GetConfigValue(flagName, envVarName string) string {
 	}
 
 	return ""
+}
+
+func ReadSensitiveFromUser(cmd *cobra.Command, prompt string) string {
+	val, err := go_asterisks.GetUsersPassword(prompt, true, os.Stdin, cmd.OutOrStdout())
+	if err != nil {
+		log.Error().Err(err).Msg("unable to read password")
+		return ""
+	}
+
+	return strings.Trim(string(val), "\r\n")
 }
 
 func ReadFromUser(cmd *cobra.Command, prompt string) string {

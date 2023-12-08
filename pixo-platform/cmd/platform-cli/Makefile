@@ -31,6 +31,9 @@ clean:
 	rm -rf ${EXECUTABLE} || true
 	docker rmi --force ${NAME}:latest || true
 
+help: build
+	$(EXECUTABLE) -h
+
 auth: build
 	$(EXECUTABLE) -d auth login
 

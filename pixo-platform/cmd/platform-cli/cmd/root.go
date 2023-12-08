@@ -8,6 +8,7 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/parser"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	platformAPI "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
+	cc "github.com/ivanpirog/coloredcobra"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
@@ -33,14 +34,23 @@ var rootCmd = &cobra.Command{
 	Version: "0.0.94",
 	Short:   "A CLI for the Pixo Platform",
 	Long:    `A CLI tool used to simplify interactions with the Pixo Platform`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
+
+	cc.Init(&cc.Config{
+		RootCmd:         rootCmd,
+		Headings:        cc.HiYellow + cc.Bold + cc.Underline,
+		ExecName:        cc.HiRed + cc.Bold,
+		Commands:        cc.HiRed + cc.Bold,
+		CmdShortDescr:   cc.HiWhite + cc.Italic,
+		Example:         cc.Italic,
+		Flags:           cc.HiRed + cc.Bold,
+		FlagsDataType:   cc.HiCyan,
+		FlagsDescr:      cc.HiWhite + cc.Italic,
+		NoExtraNewlines: true,
+	})
+
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}

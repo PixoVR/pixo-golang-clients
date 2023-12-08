@@ -32,13 +32,13 @@ var loginCmd = &cobra.Command{
 		if token != "" {
 			log.Debug().Msgf("Found secret key in config: %s", token)
 			viper.Set("token", token)
-		
+
 		} else {
 			username := input.GetStringValueOrAskUser(cmd, "username", config.PixoUsernameEnvVarKey)
 			viper.Set("username", username)
 			log.Debug().Msgf("Attempting to login as user: %s", username)
 
-			password := input.GetStringValueOrAskUser(cmd, "password", config.PixoPasswordEnvVarKey)
+			password := input.GetSensitiveStringValueOrAskUser(cmd, "password", config.PixoPasswordEnvVarKey)
 			viper.Set("password", password)
 			log.Debug().Msgf("Attempting to login with password: %s", password)
 

@@ -26,6 +26,7 @@ var mockserverCmd = &cobra.Command{
 		viper.AddConfigPath(".pixo")
 		viper.SetConfigName("server")
 		viper.SetDefault("module-id", 1)
+		viper.SetDefault("server-port", 8080)
 
 		if err := viper.ReadInConfig(); err != nil {
 			if _, ok := err.(viper.ConfigFileNotFoundError); ok {
