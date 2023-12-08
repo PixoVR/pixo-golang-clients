@@ -31,7 +31,7 @@ var (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:     "pixo",
-	Version: "0.0.80",
+	Version: "0.0.86",
 	Short:   "A CLI for the Pixo Platform",
 	Long: `A CLI tool used to simplify interactions with the Pixo Platform 
 `,
@@ -43,8 +43,7 @@ var rootCmd = &cobra.Command{
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	err := rootCmd.Execute()
-	if err != nil {
+	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
 }
@@ -55,9 +54,11 @@ func init() {
 
 	rootCmd.PersistentFlags().BoolP("debug", "d", false, "Enable debug logging")
 
-	if viper.GetBool("debug") {
+	if enabled, err := rootCmd.Flags().GetBool("debug"); err != nil || enabled {
+		log.Info().Msg("Debug logging enabled")
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	} else {
+		log.Info().Msg("Debug logging disabled")
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	}
 

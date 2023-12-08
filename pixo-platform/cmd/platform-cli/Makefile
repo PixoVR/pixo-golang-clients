@@ -1,7 +1,8 @@
 
 NAME = pixo-dev
 EXECUTABLE = ./bin/$(NAME)
-SERVER_VERSION ?= "1.3.1"
+MODULE_ID ?= 271
+SERVER_VERSION ?= "1.03.01"
 
 all: build cp
 
@@ -31,10 +32,11 @@ clean:
 	docker rmi --force ${NAME}:latest || true
 
 deploy: build
-	$(EXECUTABLE) -d mp serverVersions deploy --image gcr.io/pixo-bootstrap/multiplayer/gameservers/simple-server:latest
+	$(EXECUTABLE) -d -m ${MODULE_ID} mp serverVersions deploy --image gcr.io/pixo-bootstrap/multiplayer/gameservers/simple-server:latest
 
 matchmake: build
-	$(EXECUTABLE) -d mp matchmake --server-version ${SERVER_VERSION}
+	$(EXECUTABLE) --debug -m ${MODULE_ID} mp matchmake --server-version ${SERVER_VERSION}
 
 mockserver: build
 	$(EXECUTABLE) -d mp matchmake mockserver
+
