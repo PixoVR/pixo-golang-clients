@@ -33,8 +33,7 @@ var rootCmd = &cobra.Command{
 	Use:     "pixo",
 	Version: "0.0.86",
 	Short:   "A CLI for the Pixo Platform",
-	Long: `A CLI tool used to simplify interactions with the Pixo Platform 
-`,
+	Long:    `A CLI tool used to simplify interactions with the Pixo Platform`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
@@ -54,7 +53,9 @@ func init() {
 
 	rootCmd.PersistentFlags().BoolP("debug", "d", false, "Enable debug logging")
 
-	if enabled, err := rootCmd.Flags().GetBool("debug"); err != nil || enabled {
+	if enabled, err := rootCmd.PersistentFlags().GetBool("debug"); err != nil {
+		log.Error().Err(err).Msg("Failed to get debug flag")
+	} else if enabled {
 		log.Info().Msg("Debug logging enabled")
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	} else {
