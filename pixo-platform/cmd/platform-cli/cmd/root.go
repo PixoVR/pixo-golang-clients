@@ -58,7 +58,6 @@ func init() {
 		log.Info().Msg("Debug logging enabled")
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	} else {
-		log.Info().Msg("Debug logging disabled")
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	}
 
