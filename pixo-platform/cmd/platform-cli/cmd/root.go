@@ -31,7 +31,7 @@ var (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:     "pixo",
-	Version: "0.0.95",
+	Version: "0.0.96",
 	Short:   "A CLI for the Pixo Platform",
 	Long:    `A CLI tool used to simplify interactions with the Pixo Platform`,
 }
@@ -43,11 +43,11 @@ func Execute() {
 		Headings:        cc.HiYellow + cc.Bold + cc.Underline,
 		ExecName:        cc.HiRed + cc.Bold,
 		Commands:        cc.HiRed + cc.Bold,
-		CmdShortDescr:   cc.HiWhite + cc.Italic,
+		CmdShortDescr:   cc.White + cc.Italic,
 		Example:         cc.Italic,
 		Flags:           cc.HiRed + cc.Bold,
 		FlagsDataType:   cc.HiCyan,
-		FlagsDescr:      cc.HiWhite + cc.Italic,
+		FlagsDescr:      cc.White + cc.Italic,
 		NoExtraNewlines: true,
 	})
 
