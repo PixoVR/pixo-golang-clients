@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"github.com/spf13/cobra"
 	"net/http"
 	"strings"
 )
@@ -18,7 +19,7 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func Run(mode string, endpoint string, mockResponse []byte) {
+func Run(cmd *cobra.Command, mode string, endpoint string, mockResponse []byte) {
 	gin.SetMode(mode)
 	router := gin.Default()
 	_ = router.SetTrustedProxies(nil)
@@ -28,10 +29,10 @@ func Run(mode string, endpoint string, mockResponse []byte) {
 	})
 
 	port := input.GetConfigValue("server-port", "SERVER_PORT")
-	log.Info().Msgf("Starting mock server serving endpoint %s on port %s", endpoint, port)
+	cmd.Printf("Starting mock server serving endpoint %s on port %s", endpoint, port)
 
 	if err := router.Run(fmt.Sprintf(":%s", port)); err != nil {
-		log.Error().Err(err).Msg("failed to run mock server")
+		cmd.Printf("Failed to start mock server: %s", err.Error())
 		return
 	}
 }

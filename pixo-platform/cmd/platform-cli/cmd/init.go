@@ -4,7 +4,6 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"github.com/rs/zerolog/log"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -19,7 +18,6 @@ var initCmd = &cobra.Command{
 
 		if _, err := os.Stat(cfgDir); os.IsNotExist(err) {
 			if err = os.Mkdir(cfgDir, 0755); err != nil {
-				log.Error().Err(err).Msg("unable to create config directory")
 				return err
 			}
 
@@ -36,7 +34,6 @@ var initCmd = &cobra.Command{
 		}
 
 		cmd.Println("Welcome to the Pixo Platform CLI! Your config file is located at ~/.pixo/config.yaml. Please run `pixo auth login` to get started.")
-
 		return nil
 	},
 }
