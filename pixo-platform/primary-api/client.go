@@ -31,7 +31,7 @@ func NewClientWithBasicAuth(username, password, lifecycle, region string) (*Prim
 	}
 
 	if err := primaryClient.Login(username, password); err != nil {
-		log.Error().Err(err).Msg("Failed to login")
+		log.Error().Err(err).Msg("Failed to login to the pixo platform")
 		return nil, err
 	}
 

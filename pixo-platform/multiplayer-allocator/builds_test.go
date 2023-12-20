@@ -14,7 +14,9 @@ var _ = Describe("Builds", func() {
 	)
 
 	BeforeEach(func() {
-		allocatorClient = multiplayerAllocator.NewClient(os.Getenv("SECRET_KEY"), "dev", "")
+		var err error
+		allocatorClient, err = multiplayerAllocator.NewClientWithBasicAuth(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"), "dev", "")
+		Expect(err).NotTo(HaveOccurred())
 		Expect(allocatorClient.IsAuthenticated()).To(BeTrue())
 	})
 

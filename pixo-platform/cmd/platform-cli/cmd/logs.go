@@ -1,5 +1,5 @@
 /*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
+Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 */
 package cmd
 
@@ -12,10 +12,7 @@ import (
 var logsCmd = &cobra.Command{
 	Use:   "logs",
 	Short: "Retrieve logs from the platform",
-	Long: `Retrieve logs from different components of the platform:
-		- gameservers
-		- build workflows
-`,
+	Long:  `Retrieve logs from different components of the platform`,
 	Run: func(cmd *cobra.Command, args []string) {
 		initLogger(cmd)
 		if err := cmd.Help(); err != nil {
@@ -27,7 +24,4 @@ var logsCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(logsCmd)
-
-	// logsCmd.PersistentFlags().String("foo", "", "A help for foo")
-	// logsCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

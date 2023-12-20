@@ -43,6 +43,9 @@ check: build
 deploy: build
 	$(EXECUTABLE) -d -m ${MODULE_ID} mp serverVersions deploy --image gcr.io/pixo-bootstrap/multiplayer/gameservers/simple-server:latest
 
+logs: build
+	$(EXECUTABLE) -d -m ${MODULE_ID} logs build
+
 match: build
 	$(EXECUTABLE) -d -m ${MODULE_ID} mp matchmake --server-version ${SERVER_VERSION}
 
