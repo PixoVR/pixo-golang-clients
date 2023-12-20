@@ -4,25 +4,24 @@ Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
+	"errors"
+	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/parser"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	platformAPI "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
 	"github.com/spf13/cobra"
-	"os"
 )
 
-// deployCmd represents the deploy command
+// deployCmd represents the deploy rootCmd
 var deployCmd = &cobra.Command{
 	Use:   "deploy",
 	Short: "Deploy a multiplayer server version",
-	Long:  `Deploy a new image as a multiplayer server version on the Pixo Platform for a specific module`,
-	Run: func(cmd *cobra.Command, args []string) {
-		initLogger(cmd)
+	Long:  `Deploy a docker image as a multiplayer server version on the Pixo Platform for a module`,
+	RunE: func(cmd *cobra.Command, args []string) error {
 
 		moduleID := input.GetIntValueOrAskUser(cmd, "module-id", "MODULE_ID")
 		if moduleID == 0 {
-			cmd.Println("No module ID provided")
-			os.Exit(1)
+			return errors.New("no module id provided")
 		}
 
 		semanticVersion := input.GetStringValueOrAskUser(cmd, "server-version", "SERVER_VERSION")
@@ -31,47 +30,51 @@ var deployCmd = &cobra.Command{
 
 			iniParser, err := parser.NewIniParser(&iniPath)
 			if err != nil {
-				cmd.Printf("Failed to parse ini file %s", iniPath)
-				os.Exit(1)
+				msg := fmt.Sprintf("failed to parse ini file %s", iniPath)
+				return errors.New(msg)
 			}
 
 			semanticVersion, err = iniParser.ParseSemanticVersion()
 			if err != nil {
-				cmd.Printf("No semantic version given and failed to parse server version from ini file %s\n", iniPath)
-				os.Exit(1)
+				msg := fmt.Sprintf("no semantic version given and failed to parse server version from ini file %s", iniPath)
+				return errors.New(msg)
 			}
 
 		}
 
-		if cmd.Flag("pre-check").Value.String() == "true" {
+		isPrecheck := cmd.Flag("pre-check").Value.String()
+		if isPrecheck == "true" {
+
 			params := platformAPI.MultiplayerServerVersionQueryParams{
 				ModuleID:        moduleID,
 				SemanticVersion: semanticVersion,
 			}
+
 			if versions, err := apiClient.GetMultiplayerServerVersions(params); err != nil {
-				cmd.Println("unable to retrieve from platform api")
-				os.Exit(1)
+				cmd.Println("unable to retrieve server versions from platform api")
+				return err
+
 			} else if len(versions) > 0 {
-				cmd.Printf("server version %s already exists\n", semanticVersion)
-				os.Exit(1)
+				errMsg := fmt.Sprintf("server version %s already exists\n", semanticVersion)
+				return errors.New(errMsg)
 			}
 
-			cmd.Printf("server version %s does not exist yet\n", semanticVersion)
-			return
+			cmd.Println("server version does not exist yet:", semanticVersion)
+			return nil
 		}
 
 		image := input.GetStringValueOrAskUser(cmd, "image", "GAMESERVER_IMAGE")
 		if image == "" {
-			cmd.Println("No gameserver image provided")
-			os.Exit(1)
+			return errors.New("no gameserver image provided")
 		}
 
 		if err := apiClient.CreateMultiplayerServerVersion(moduleID, image, semanticVersion); err != nil {
-			cmd.Printf("Failed to create multiplayer server version: %s\n", semanticVersion)
-			os.Exit(1)
+			msg := fmt.Sprintf("Failed to create multiplayer server version: %s - %s", semanticVersion, err.Error())
+			return errors.New(msg)
 		}
 
-		cmd.Println("Successfully created multiplayer server version: ", semanticVersion)
+		cmd.Println("Successfully created multiplayer server version:", semanticVersion)
+		return nil
 	},
 }
 

@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// listCmd represents the list command
+// listCmd represents the list rootCmd
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "Lists configuration settings",

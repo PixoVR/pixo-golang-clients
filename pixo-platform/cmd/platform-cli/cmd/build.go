@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// buildCmd represents the build command
+// buildCmd represents the build rootCmd
 var buildCmd = &cobra.Command{
 	Use:   "build",
 	Short: "Retrieve logs from the platform for a specific gameserver build",

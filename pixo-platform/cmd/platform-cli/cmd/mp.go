@@ -4,9 +4,9 @@ Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
+	"errors"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
-	"github.com/rs/zerolog/log"
 	"net"
 	"strconv"
 	"strings"
@@ -18,43 +18,38 @@ var (
 	mm matchmaker.Matchmaker
 )
 
-// mpCmd represents the mp command
+// mpCmd represents the mp rootCmd
 var mpCmd = &cobra.Command{
 	Use:   "mp",
 	Short: "Manage Pixo Platform multiplayer resources",
 	Long:  `Manage resources like server configurations, versions, triggers. Test game servers and matchmaking.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		initLogger(cmd)
+	RunE: func(cmd *cobra.Command, args []string) error {
 
-		if cmd.Flag("connect").Value.String() != "true" {
-			if err := cmd.Help(); err != nil {
-				log.Error().Err(err).Msg("Could not display help")
-				return
-			}
-		} else {
+		if cmd.Flag("connect").Value.String() == "true" {
 
 			addr := input.GetConfigValue("gameserver", "PIXO_GAMESERVER")
 			if addr == "" {
-				log.Error().Msg("No gameserver address provided")
-				return
+				return errors.New("no gameserver address provided")
 			}
 
 			splitAddr := strings.Split(addr, ":")
 			if len(splitAddr) != 2 {
-				log.Error().Str("addr", addr).Msg("Invalid gameserver address")
-				return
+				return errors.New("invalid gameserver address")
 			}
 
 			gameserverHost := splitAddr[0]
 			gameserverPort, err := strconv.Atoi(splitAddr[1])
 			if err != nil {
-				log.Error().Err(err).Msg("Could not parse gameserver port")
-				return
+				return err
 			}
 
 			udpAddr := &net.UDPAddr{IP: net.ParseIP(gameserverHost), Port: gameserverPort}
 			gameserverReadLoop(cmd, mm, udpAddr)
+		} else {
+			_ = cmd.Help()
 		}
+
+		return nil
 	},
 }
 

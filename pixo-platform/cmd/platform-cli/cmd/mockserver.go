@@ -15,7 +15,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// mockserverCmd represents the mockserver command
+// mockserverCmd represents the mockserver rootCmd
 var mockserverCmd = &cobra.Command{
 	Use:   "mockserver",
 	Short: "Starts a mock matchmaking server used for local testing",
