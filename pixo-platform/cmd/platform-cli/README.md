@@ -14,7 +14,11 @@ API Key or Username/Password are needed to authenticate with the Pixo Platform A
 ```bash
 brew tap PixoVR/pixo-golang-clients
 brew install pixo-cli
+
 pixo help
+
+# Update
+brew tap PixoVR/pixo-golang-clients
 ```
 
 ### Windows
