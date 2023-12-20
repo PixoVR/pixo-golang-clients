@@ -4,6 +4,7 @@ Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/config"
@@ -25,7 +26,7 @@ var loginCmd = &cobra.Command{
 	- global config file ~/.pixo/config.yaml
 	Will prioritize in order of the above list, and will prompt the user if none is found.	
 `,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		initLogger(cmd)
 
 		token := input.GetConfigValue("secret-key", "SECRET_KEY")
@@ -50,7 +51,7 @@ var loginCmd = &cobra.Command{
 			)
 			if err != nil || client == nil {
 				log.Error().Err(err).Msg("Could not create platform client")
-				return
+				return errors.New("could not create platform client")
 			}
 
 			cmd.Println(fmt.Sprintf("Login successful. Here is your API token: \n%s", client.GetToken()))
@@ -60,7 +61,10 @@ var loginCmd = &cobra.Command{
 
 		if err := viper.WriteConfigAs(cfgFile); err != nil {
 			log.Error().Err(err).Msg("Could not write config file")
+			return err
 		}
+
+		return nil
 	},
 }
 
