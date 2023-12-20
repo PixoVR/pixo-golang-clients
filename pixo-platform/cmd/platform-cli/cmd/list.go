@@ -12,8 +12,7 @@ import (
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "Lists configuration settings",
-	Long: `Lists configuration settings like region, org, and module ID.
-`,
+	Long:  `Lists configuration settings like region, org, and module ID.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		initLogger(cmd)
 

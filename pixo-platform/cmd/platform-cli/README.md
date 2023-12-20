@@ -1,10 +1,12 @@
 # Pixo Platform CLI
+This is a CLI that allows you to interact with the Pixo Platform in various ways. It is likely to be most helpful to  
+developers building modules to be deployed on the Pixo Platform. It can be used for things like authenticating  
+with the platform, deploying gameserver versions, and simplifying the testing of multiplayer components.
 
 ## Prerequisites
 - [Pixo Account](https://apex.pixovr.com)
 
 API Key or Username/Password are needed to authenticate with the Pixo Platform APIs.
-
 
 
 ## Installation
@@ -26,13 +28,21 @@ make build
 ./bin/pixo help
 ```
 
+
+## Initialization
+```bash
+pixo init # Initialize the configuration file
+pixo auth login # Authenticate with the Pixo Platform API
+```
+
 ## Configuration
-Credentials can be configured using flags, environment variables or a configuration file.  
+Configurations can be set using flags, environment variables or a config file.
 
 Configurations are prioritized in the following order:
 1. Flags
 2. Environment Variables
-3. Configuration File
+3. Local Configuration File `./.pixo/config.yaml`
+4. Global Configuration File `~/.pixo/config.yaml`
 
 ### Sample Environment Variables:
 ```bash
@@ -43,10 +53,9 @@ export SECRET_KEY=secretkey
 export PIXO_USERNAME=username
 export PIXO_PASSWORD=password
 
-# Platform APIs
+# Pixo Platform Used - if not set, defaults to na and prod
 export PIXO_LIFECYCLE=stage
 export PIXO_REGION=na
-
 ```
 
 ### Sample Configuration File:
@@ -60,7 +69,7 @@ secret-key: secretkey
 username: username
 password: password
 
-# Platform APIs
+# Platform Used - if not set, defaults to na and prod
 lifecycle: stage
 region: na
 
@@ -68,15 +77,9 @@ region: na
 module-id: 1
 ```
 
-## Initialization
+## Set via Command Line
 ```bash
-pixo init # Initialize the configuration file
-pixo auth login # Authenticate with the Pixo Platform API
-```
-
-## Configuration
-```bash
-# Requires logging in again
+# Requires logging in again after switching environments
 pixo config set --region saudi # Switch to saudi environment
 pixo config set --lifecycle dev # Switch to dev environment
 pixo config set --key module-id --val 1 # Set default module id
@@ -90,11 +93,17 @@ pixo mp serverVersions deploy \
     --module-id 1 \
     --server-version 1.00.00
 
-# Deploy a new version
+# Deploy a new version - used in CI/CD pipelines or to test with a simple server like below
 pixo mp serverVersions deploy \
     --module-id 1 \
     --server-version 1.00.00 \
     --image gcr.io/pixo-bootstrap/multiplayer/gameservers/simple-server:latest
+```
+
+## Tailing logs of a Gameserver Version Deployment
+```bash
+# Check if server version with semantic version already exists
+pixo logs workflow --module-id 1
 ```
 
 ## Testing Multiplayer Matchmaking
@@ -147,7 +156,7 @@ module-id: 1
 org-id: 1
 ```
 
-You can even use the Pixo CLI to test the mock server (run [simple agones server](https://github.com/PixoVR/multiplayer-gameservers/tree/dev/simple-server) to test the example below):
+You can even use the Pixo CLI to test the mock server (run [simple agones server](https://github.com/PixoVR/multiplayer-gameservers/tree/dev/simple-server) locally to test the example below):
 ```bash
 # In one terminal, run the mock server
 pixo mp mockserver

@@ -17,7 +17,7 @@ var configCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		initLogger(cmd)
 		if err := cmd.Help(); err != nil {
-			log.Error().Err(err).Msg("Could not display help")
+			log.Debug().Err(err).Msg("Could not display help")
 			return
 		}
 	},

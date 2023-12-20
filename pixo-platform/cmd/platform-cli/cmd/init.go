@@ -25,7 +25,7 @@ var initCmd = &cobra.Command{
 				return
 			}
 
-			log.Info().Msg("created config directory")
+			cmd.Println("created config directory")
 		}
 
 		if _, err := os.Stat(globalConfigFile); os.IsNotExist(err) {

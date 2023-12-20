@@ -18,10 +18,10 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func Run(endpoint string, mockResponse []byte) {
-	gin.SetMode(gin.ReleaseMode)
+func Run(mode string, endpoint string, mockResponse []byte) {
+	gin.SetMode(mode)
 	router := gin.Default()
-	router.SetTrustedProxies(nil)
+	_ = router.SetTrustedProxies(nil)
 
 	router.GET(endpoint, func(c *gin.Context) {
 		requestHandler(c.Writer, c.Request, mockResponse)

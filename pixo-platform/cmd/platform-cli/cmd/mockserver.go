@@ -8,6 +8,7 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/mockserver"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
+	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 
@@ -30,9 +31,9 @@ var mockserverCmd = &cobra.Command{
 
 		if err := viper.ReadInConfig(); err != nil {
 			if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-				log.Warn().Msg("Config file not found")
+				log.Debug().Msg("Config file not found")
 			} else {
-				log.Error().Err(err).Msg("Config file was found but another error was produced")
+				log.Debug().Err(err).Msg("Config file was found but another error was produced")
 			}
 		}
 
@@ -46,7 +47,7 @@ var mockserverCmd = &cobra.Command{
 				SessionID:      input.GetStringValue(cmd, "session-id", "SESSION_ID"),
 				OwningUserName: input.GetStringValue(cmd, "owning-user-name", "OWNING_USER_NAME"),
 				MapName:        input.GetStringValue(cmd, "map-name", "MAP_NAME"),
-				ModuleVersion:  input.GetStringValueOrAskUser(cmd, "server-version", "SERVER_VERSION"),
+				ModuleVersion:  input.GetStringValue(cmd, "server-version", "SERVER_VERSION"),
 				ModuleID:       input.GetIntValueOrAskUser(cmd, "module-id", "MODULE_ID"),
 				OrgID:          input.GetIntValueOrAskUser(cmd, "org-id", "ORG_ID"),
 			},
@@ -54,10 +55,17 @@ var mockserverCmd = &cobra.Command{
 
 		response, err := json.Marshal(data)
 		if err != nil {
-			log.Error().Err(err).Msg("Failed to marshal response")
+			log.Debug().Err(err).Msg("Failed to marshal response")
 			return
 		}
-		mockserver.Run(matchmaker.MatchmakingEndpoint, response)
+
+		mode := gin.ReleaseMode
+
+		if isDebug(cmd) {
+			mode = gin.DebugMode
+		}
+
+		mockserver.Run(mode, matchmaker.MatchmakingEndpoint, response)
 	},
 }
 

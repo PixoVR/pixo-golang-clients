@@ -37,6 +37,9 @@ help: build
 auth: build
 	$(EXECUTABLE) -d auth login
 
+check: build
+	$(EXECUTABLE) -d -m ${MODULE_ID} mp serverVersions deploy --pre-check -v 1.03.01
+
 deploy: build
 	$(EXECUTABLE) -d -m ${MODULE_ID} mp serverVersions deploy --image gcr.io/pixo-bootstrap/multiplayer/gameservers/simple-server:latest
 

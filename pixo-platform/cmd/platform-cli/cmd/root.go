@@ -56,17 +56,6 @@ func Execute() {
 	}
 }
 
-func initLogger(cmd *cobra.Command) {
-
-	if cmd.Flag("debug").Value.String() == "true" {
-		log.Info().Msg("Debug logging enabled")
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	} else {
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	}
-
-}
-
 func init() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: rootCmd.OutOrStdout(), TimeFormat: time.RFC1123})
@@ -93,4 +82,19 @@ func init() {
 		input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
 		input.GetConfigValue("region", "PIXO_REGION"),
 	)
+}
+
+func initLogger(cmd *cobra.Command) {
+
+	if isDebug(cmd) {
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+		log.Debug().Msg("Debug logging enabled")
+	} else {
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	}
+
+}
+
+func isDebug(cmd *cobra.Command) bool {
+	return cmd.Flag("debug").Value.String() == "true"
 }
