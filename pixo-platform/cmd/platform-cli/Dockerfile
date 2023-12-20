@@ -10,10 +10,15 @@ COPY . .
 RUN go build -o main cmd/platform-cli/main.go
 
 
-FROM alpine:latest
+FROM debian:bookworm-20231218-slim
 
 WORKDIR /client
 
-COPY --from=builder /build/main /usr/bin/pixo-platform-cli
+RUN apt-get update \
+        && apt-get upgrade -y \
+        && apt-get install ca-certificates -y \
+        && update-ca-certificates 2>/dev/null
 
-ENTRYPOINT ["/usr/bin/pixo-platform-cli"]
+COPY --from=builder /build/main /usr/bin/pixo
+
+ENTRYPOINT ["/usr/bin/pixo"]

@@ -2,7 +2,7 @@ package graphql_api
 
 import (
 	"context"
-	"fmt"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"net/http"
 	"os"
 
@@ -18,24 +18,31 @@ type GraphQLAPIClient struct {
 	defaultContext      context.Context
 }
 
-// NewClient is a function that returns a PixoAbstractAPIClient
-func NewClient(token, apiURL string) *GraphQLAPIClient {
+// NewClient is a function that returns a GraphQLAPIClient
+func NewClient(token, lifecycle, region string) *GraphQLAPIClient {
 
 	if token == "" {
 		token = os.Getenv("SECRET_KEY")
 	}
 
-	if apiURL == "" {
-		apiURL = getURL()
-	}
+	config := newServiceConfig(lifecycle, region)
 
-	url := fmt.Sprintf("%s/v2/query", apiURL)
+	url := getURL(config.FormatURL())
 
 	c := http.Client{Transport: &transport{underlyingTransport: http.DefaultTransport, token: token}}
 
 	return &GraphQLAPIClient{
-		PixoAbstractAPIClient: *abstract_client.NewClient(token, apiURL),
+		PixoAbstractAPIClient: *abstract_client.NewClient(token, url),
 		gqlClient:             graphql.NewClient(url, &c),
-		defaultContext:        context.TODO(),
+		defaultContext:        context.Background(),
+	}
+}
+
+func newServiceConfig(lifecycle, region string) urlfinder.ServiceConfig {
+	return urlfinder.ServiceConfig{
+		Service:   "primary",
+		Lifecycle: lifecycle,
+		Region:    region,
+		Port:      8000,
 	}
 }

@@ -1,40 +1,30 @@
 /*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-
+Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 */
 package cmd
 
 import (
-	"fmt"
-
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
 
 // authCmd represents the auth command
 var authCmd = &cobra.Command{
 	Use:   "auth",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Authenticate with the Pixo Platform",
+	Long:  `Manage authentication and authorization with the Pixo Platform.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("auth called")
+		initLogger(cmd)
+		if err := cmd.Help(); err != nil {
+			log.Debug().Err(err).Msg("Could not display auth help")
+			return
+		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(authCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// authCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// authCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	authCmd.PersistentFlags().StringP("username", "u", "", "PixoVR username")
+	authCmd.PersistentFlags().StringP("password", "p", "", "PixoVR password")
 }

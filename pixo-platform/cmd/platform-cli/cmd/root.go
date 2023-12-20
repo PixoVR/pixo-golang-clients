@@ -1,14 +1,17 @@
 /*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
+Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 */
 package cmd
 
 import (
+	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/parser"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	platformAPI "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
-	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/config"
+	cc "github.com/ivanpirog/coloredcobra"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"github.com/spf13/viper"
 	"os"
 	"time"
 
@@ -16,44 +19,82 @@ import (
 )
 
 var (
-	secretKey = config.GetEnvOrReturn("SECRET_KEY", "fake-key")
-	apiClient = platformAPI.NewClient(secretKey, "")
+	homeDir          = os.Getenv("HOME")
+	cfgDir           = fmt.Sprintf("%s/.pixo", homeDir)
+	globalConfigFile = fmt.Sprintf("%s/config.yaml", cfgDir)
+
+	apiClient *platformAPI.GraphQLAPIClient
+
+	cfgFile string
 )
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "pixo-cli",
-	Short: "A CLI for Pixo Platform",
-	Long: `A CLI for Pixo Platform for managing platform resources
-`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	Use:     "pixo",
+	Version: "0.0.96",
+	Short:   "A CLI for the Pixo Platform",
+	Long:    `A CLI tool used to simplify interactions with the Pixo Platform`,
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	err := rootCmd.Execute()
-	if err != nil {
+
+	cc.Init(&cc.Config{
+		RootCmd:         rootCmd,
+		Headings:        cc.HiYellow + cc.Bold + cc.Underline,
+		ExecName:        cc.HiRed + cc.Bold,
+		Commands:        cc.HiRed + cc.Bold,
+		CmdShortDescr:   cc.White + cc.Italic,
+		Example:         cc.Italic,
+		Flags:           cc.HiRed + cc.Bold,
+		FlagsDataType:   cc.HiCyan,
+		FlagsDescr:      cc.White + cc.Italic,
+		NoExtraNewlines: true,
+	})
+
+	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
 }
 
 func init() {
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339})
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: rootCmd.OutOrStdout(), TimeFormat: time.RFC1123})
 
-	//rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.platform-cli.yaml)")
+	rootCmd.PersistentFlags().BoolP("debug", "d", false, "Enable debug logging")
 
-	deployCmd.PersistentFlags().StringP("ini", "c", parser.DefaultConfigFilepath, "Path to the ini file to use for the command")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", fmt.Sprintf("config file (default is %s)", globalConfigFile))
+	rootCmd.PersistentFlags().StringP("ini", "c", parser.DefaultConfigFilepath, "Path to the ini file to use for the command")
 	rootCmd.PersistentFlags().StringP("module-id", "m", "", "Module ID to use for the command")
 
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	if cfgFile == "" {
+		cfgFile = globalConfigFile
+	}
+	viper.AddConfigPath(cfgDir)
+	viper.AddConfigPath(".pixo")
+	viper.SetConfigType("yaml")
+
+	if err := viper.ReadInConfig(); err != nil {
+		log.Error().Err(err).Msg("Failed to read config file")
+	}
+
+	apiClient = platformAPI.NewClient(
+		viper.GetString("token"),
+		input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
+		input.GetConfigValue("region", "PIXO_REGION"),
+	)
+}
+
+func initLogger(cmd *cobra.Command) {
+
+	if isDebug(cmd) {
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+		log.Debug().Msg("Debug logging enabled")
+	} else {
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	}
+
+}
+
+func isDebug(cmd *cobra.Command) bool {
+	return cmd.Flag("debug").Value.String() == "true"
 }

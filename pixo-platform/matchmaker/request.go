@@ -5,12 +5,12 @@ import (
 )
 
 type MatchRequest struct {
-	OrgID    int `json:"orgId"`
-	ModuleID int `json:"moduleId"`
+	ModuleID      int    `json:"moduleId"`
+	ServerVersion string `json:"serverVersion"`
 }
 
 func (m MatchRequest) IsValid() bool {
-	return m.OrgID != 0 && m.ModuleID != 0
+	return m.ModuleID != 0 && m.ServerVersion != ""
 }
 
 type MatchResponse struct {
@@ -26,9 +26,9 @@ type MatchDetails struct {
 	SessionID      string `json:"SessionID,omitempty"`
 	MapName        string `json:"MapName,omitempty"`
 	OwningUserName string `json:"OwningUserName,omitempty"`
-	OrgID          int32  `json:"OrgId,omitempty"`
-	ModuleID       int32  `json:"ModuleId,omitempty"`
 	ModuleVersion  string `json:"ServerVersion,omitempty"`
+	ModuleID       int    `json:"ModuleID,omitempty"`
+	OrgID          int    `json:"OrgID,omitempty"`
 }
 
 func (m MatchResponse) IsValid() bool {

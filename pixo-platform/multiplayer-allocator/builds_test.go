@@ -1,0 +1,36 @@
+package multiplayer_allocator_test
+
+import (
+	multiplayerAllocator "github.com/PixoVR/pixo-golang-clients/pixo-platform/multiplayer-allocator"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	"os"
+)
+
+var _ = Describe("Builds", func() {
+
+	var (
+		allocatorClient *multiplayerAllocator.AllocatorClient
+	)
+
+	BeforeEach(func() {
+		allocatorClient = multiplayerAllocator.NewClient(os.Getenv("SECRET_KEY"), "dev", "")
+		Expect(allocatorClient.IsAuthenticated()).To(BeTrue())
+	})
+
+	It("can get the build workflows and their logs", func() {
+		workflows, err := allocatorClient.GetBuildWorkflows()
+		Expect(err).NotTo(HaveOccurred())
+		Expect(workflows).NotTo(BeNil())
+		Expect(len(workflows)).To(BeNumerically(">", 0))
+
+		logsCh, err := allocatorClient.GetBuildWorkflowLogs(workflows[0].Name)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(logsCh).NotTo(BeNil())
+		log := <-logsCh
+		Expect(log).NotTo(BeNil())
+		Expect(log.Step).NotTo(BeEmpty())
+		Expect(log.Lines).NotTo(BeEmpty())
+	})
+
+})

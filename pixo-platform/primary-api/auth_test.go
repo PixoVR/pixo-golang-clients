@@ -10,16 +10,18 @@ import (
 var _ = Describe("Auth", func() {
 
 	It("should be able to login", func() {
-		primaryAPIClient := primary_api.NewClient("", "")
+		primaryAPIClient := primary_api.NewClient("", "dev", "na")
 		err := primaryAPIClient.Login(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(primaryAPIClient.IsAuthenticated()).To(BeTrue())
 	})
 
 	It("should be able get a new client with basic auth", func() {
-		client := primary_api.NewClientWithBasicAuth(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"), "")
+		client, err := primary_api.NewClientWithBasicAuth(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"), "dev", "")
+		Expect(err).NotTo(HaveOccurred())
 		Expect(client).NotTo(BeNil())
 		Expect(client.IsAuthenticated()).To(BeTrue())
+		Expect(client.GetToken()).NotTo(BeEmpty())
 	})
 
 })

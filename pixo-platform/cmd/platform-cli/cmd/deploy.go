@@ -1,14 +1,14 @@
 /*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
+Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 */
 package cmd
 
 import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/parser"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	platformAPI "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
-	"strconv"
+	"os"
 )
 
 // deployCmd represents the deploy command
@@ -17,34 +17,30 @@ var deployCmd = &cobra.Command{
 	Short: "Deploy a multiplayer server version",
 	Long:  `Deploy a new image as a multiplayer server version on the Pixo Platform for a specific module`,
 	Run: func(cmd *cobra.Command, args []string) {
-		moduleIDVal := cmd.Flag("module-id").Value.String()
-		if moduleIDVal == "" {
-			log.Panic().Msg("No module ID given")
-		}
-		moduleID, err := strconv.Atoi(moduleIDVal)
-		if err != nil {
-			log.Panic().Err(err).Msgf("Failed to parse module ID: %s", moduleIDVal)
+		initLogger(cmd)
+
+		moduleID := input.GetIntValueOrAskUser(cmd, "module-id", "MODULE_ID")
+		if moduleID == 0 {
+			cmd.Println("No module ID provided")
+			os.Exit(1)
 		}
 
-		image := cmd.Flag("image").Value.String()
-		if image == "" {
-			log.Panic().Msg("No image given")
-		}
-
-		semanticVersion := cmd.Flag("version").Value.String()
+		semanticVersion := input.GetStringValueOrAskUser(cmd, "server-version", "SERVER_VERSION")
 		if semanticVersion == "" {
 			iniPath := cmd.Flag("ini").Value.String()
 
 			iniParser, err := parser.NewIniParser(&iniPath)
 			if err != nil {
-				log.Panic().Err(err).Msg("Failed to create ini parser")
-				return
+				cmd.Printf("Failed to parse ini file %s", iniPath)
+				os.Exit(1)
 			}
 
 			semanticVersion, err = iniParser.ParseSemanticVersion()
 			if err != nil {
-				log.Fatal().Err(err).Msgf("No semantic version given and failed to parse server version from ini file %s", iniPath)
+				cmd.Printf("No semantic version given and failed to parse server version from ini file %s\n", iniPath)
+				os.Exit(1)
 			}
+
 		}
 
 		if cmd.Flag("pre-check").Value.String() == "true" {
@@ -53,32 +49,35 @@ var deployCmd = &cobra.Command{
 				SemanticVersion: semanticVersion,
 			}
 			if versions, err := apiClient.GetMultiplayerServerVersions(params); err != nil {
-				log.Fatal().Err(err).Msgf("unable to retrieve from platform api")
+				cmd.Println("unable to retrieve from platform api")
+				os.Exit(1)
 			} else if len(versions) > 0 {
-				log.Fatal().Msgf("server version already exists")
+				cmd.Printf("server version %s already exists\n", semanticVersion)
+				os.Exit(1)
 			}
 
-			log.Info().Msg("Server version does not exist yet")
+			cmd.Printf("server version %s does not exist yet\n", semanticVersion)
 			return
 		}
 
-		if err := apiClient.CreateMultiplayerServerVersion(moduleID, image, semanticVersion); err != nil {
-			log.Fatal().Err(err).Msgf("Failed to create multiplayer server version: %s", semanticVersion)
+		image := input.GetStringValueOrAskUser(cmd, "image", "GAMESERVER_IMAGE")
+		if image == "" {
+			cmd.Println("No gameserver image provided")
+			os.Exit(1)
 		}
+
+		if err := apiClient.CreateMultiplayerServerVersion(moduleID, image, semanticVersion); err != nil {
+			cmd.Printf("Failed to create multiplayer server version: %s\n", semanticVersion)
+			os.Exit(1)
+		}
+
+		cmd.Println("Successfully created multiplayer server version: ", semanticVersion)
 	},
 }
 
 func init() {
 	serverVersionsCmd.AddCommand(deployCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
 	deployCmd.PersistentFlags().StringP("image", "i", "", "Docker image to deploy as the multiplayer server version")
-	deployCmd.PersistentFlags().StringP("version", "v", "1.00.00", "Semantic Version of the multiplayer server version")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
 	deployCmd.Flags().BoolP("pre-check", "p", false, "Check if server version exists already")
 }
