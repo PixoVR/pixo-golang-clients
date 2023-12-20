@@ -4,7 +4,7 @@ EXECUTABLE = ./bin/$(NAME)
 MODULE_ID ?= 271
 SERVER_VERSION ?= "1.03.01"
 
-all: build cp
+all: lint test build cp
 
 cp:
 	sudo cp $(EXECUTABLE) /usr/local/bin/$(NAME)
@@ -13,10 +13,7 @@ lint:
 	golangci-lint run
 
 test:
-	ginkgo -r -v
-
-run:
-	go run main.go
+	ginkgo -r -v --cover ./...
 
 build:
 	go build -o $(EXECUTABLE) main.go
@@ -30,22 +27,3 @@ container:
 clean:
 	rm -rf ${EXECUTABLE} || true
 	docker rmi --force ${NAME}:latest || true
-
-help: build
-	$(EXECUTABLE) -h
-
-auth: build
-	$(EXECUTABLE) -d auth login
-
-check: build
-	$(EXECUTABLE) -d -m ${MODULE_ID} mp serverVersions deploy --pre-check -v 1.03.01
-
-deploy: build
-	$(EXECUTABLE) -d -m ${MODULE_ID} mp serverVersions deploy --image gcr.io/pixo-bootstrap/multiplayer/gameservers/simple-server:latest
-
-match: build
-	$(EXECUTABLE) -d -m ${MODULE_ID} mp matchmake --server-version ${SERVER_VERSION}
-
-mockserver: build
-	$(EXECUTABLE) -d mp mockserver
-

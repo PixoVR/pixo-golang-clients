@@ -1,33 +1,22 @@
 /*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
+Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 */
 package cmd
 
 import (
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
 
-// logsCmd represents the logs command
+// logsCmd represents the logs rootCmd
 var logsCmd = &cobra.Command{
 	Use:   "logs",
 	Short: "Retrieve logs from the platform",
-	Long: `Retrieve logs from different components of the platform:
-		- gameservers
-		- build workflows
-`,
+	Long:  `Retrieve logs from different components of the platform`,
 	Run: func(cmd *cobra.Command, args []string) {
-		initLogger(cmd)
-		if err := cmd.Help(); err != nil {
-			log.Debug().Err(err).Msg("Could not display logs help")
-			return
-		}
+		_ = cmd.Help()
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(logsCmd)
-
-	// logsCmd.PersistentFlags().String("foo", "", "A help for foo")
-	// logsCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

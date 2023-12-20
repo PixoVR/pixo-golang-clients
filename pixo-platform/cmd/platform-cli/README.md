@@ -85,7 +85,7 @@ pixo config set --lifecycle dev # Switch to dev environment
 pixo config set --key module-id --val 1 # Set default module id
 ```
 
-## Deploying a Module Gameserver Version
+## Deploy a Module Game Server Version
 ```bash
 # Check if server version with semantic version already exists
 pixo mp serverVersions deploy \
@@ -100,13 +100,13 @@ pixo mp serverVersions deploy \
     --image gcr.io/pixo-bootstrap/multiplayer/gameservers/simple-server:latest
 ```
 
-## Tailing logs of a Gameserver Version Deployment
+## Tail logs of a Game Server Build
 ```bash
 # Check if server version with semantic version already exists
-pixo logs workflow --module-id 1
+pixo logs build --module-id 1
 ```
 
-## Testing Multiplayer Matchmaking
+## Test Multiplayer Matchmaking
 ```bash
 # Request a match
 pixo mp matchmake \
@@ -126,7 +126,7 @@ pixo mp --connect
 # ACK: hello
 ```
 
-## Mock Matchmaking Server
+## Run Mock Matchmaking Server
 
 Run a mock matchmaking server to test matchmaking functionality locally.
 It has a single websocket endpoint, `/matchmaking/matchmake`, that accepts a message (which it ignores)

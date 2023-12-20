@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// authCmd represents the auth command
+// authCmd represents the auth rootCmd
 var authCmd = &cobra.Command{
 	Use:   "auth",
 	Short: "Authenticate with the Pixo Platform",

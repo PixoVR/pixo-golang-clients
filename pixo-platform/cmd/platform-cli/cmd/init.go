@@ -10,19 +10,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// initCmd represents the init command
+// initCmd represents the init rootCmd
 var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Initialize the Pixo Platform CLI",
 	Long:  `Initialize the Pixo Platform CLI by setting up a default configuration file at ~/.pixo/config.yaml`,
-	Run: func(cmd *cobra.Command, args []string) {
-
-		initLogger(cmd)
+	RunE: func(cmd *cobra.Command, args []string) error {
 
 		if _, err := os.Stat(cfgDir); os.IsNotExist(err) {
 			if err = os.Mkdir(cfgDir, 0755); err != nil {
 				log.Error().Err(err).Msg("unable to create config directory")
-				return
+				return err
 			}
 
 			cmd.Println("created config directory")
@@ -31,19 +29,15 @@ var initCmd = &cobra.Command{
 		if _, err := os.Stat(globalConfigFile); os.IsNotExist(err) {
 			f, err := os.Create(globalConfigFile)
 			if err != nil {
-				log.Error().
-					Err(err).
-					Str("cfgFile", cfgFile).
-					Msg("unable to create config file")
-				return
+				return err
 			}
-
-			log.Info().
-				Str("cfgFile", cfgFile).
-				Msg("created config file")
 
 			defer f.Close()
 		}
+
+		cmd.Println("Welcome to the Pixo Platform CLI! Your config file is located at ~/.pixo/config.yaml. Please run `pixo auth login` to get started.")
+
+		return nil
 	},
 }
 

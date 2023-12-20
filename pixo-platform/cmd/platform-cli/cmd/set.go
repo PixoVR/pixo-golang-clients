@@ -10,14 +10,12 @@ import (
 	"github.com/spf13/viper"
 )
 
-// setCmd represents the set command
+// setCmd represents the set rootCmd
 var setCmd = &cobra.Command{
 	Use:   "set",
 	Short: "Set	a config value",
 	Long:  `Can set a single value, or change region/lifecycle of the Pixo Platform APIs used`,
 	Run: func(cmd *cobra.Command, args []string) {
-
-		initLogger(cmd)
 
 		if key, err := cmd.Flags().GetString("key"); err != nil {
 			log.Error().Err(err).Msg("Could not get key flag")
@@ -41,8 +39,9 @@ var setCmd = &cobra.Command{
 			log.Error().Err(err).Msg("Could not write config file")
 		} else {
 			cmd.Printf("Config file updated successfully: %s\n", cfgFile)
-			cmd.Println("Region: ", region)
-			cmd.Println("Lifecycle: ", lifecycle)
+			newCmd := NewRootCmd()
+			newCmd.SetArgs([]string{"config", "list"})
+			_ = cmd.Execute()
 		}
 	},
 }

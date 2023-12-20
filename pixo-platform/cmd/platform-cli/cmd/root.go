@@ -8,7 +8,6 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/parser"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	platformAPI "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
-	cc "github.com/ivanpirog/coloredcobra"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
@@ -28,29 +27,19 @@ var (
 	cfgFile string
 )
 
-// rootCmd represents the base command when called without any subcommands
+func NewRootCmd() *cobra.Command {
+	return rootCmd
+}
+
+// rootCmd represents the base rootCmd when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:     "pixo",
-	Version: "0.0.96",
+	Version: "0.0.98",
 	Short:   "A CLI for the Pixo Platform",
-	Long:    `A CLI tool used to simplify interactions with the Pixo Platform`,
+	Long:    `A CLI tool used to streamline interactions with the Pixo Platform`,
 }
 
 func Execute() {
-
-	cc.Init(&cc.Config{
-		RootCmd:         rootCmd,
-		Headings:        cc.HiYellow + cc.Bold + cc.Underline,
-		ExecName:        cc.HiRed + cc.Bold,
-		Commands:        cc.HiRed + cc.Bold,
-		CmdShortDescr:   cc.White + cc.Italic,
-		Example:         cc.Italic,
-		Flags:           cc.HiRed + cc.Bold,
-		FlagsDataType:   cc.HiCyan,
-		FlagsDescr:      cc.White + cc.Italic,
-		NoExtraNewlines: true,
-	})
-
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
@@ -63,8 +52,8 @@ func init() {
 	rootCmd.PersistentFlags().BoolP("debug", "d", false, "Enable debug logging")
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", fmt.Sprintf("config file (default is %s)", globalConfigFile))
-	rootCmd.PersistentFlags().StringP("ini", "c", parser.DefaultConfigFilepath, "Path to the ini file to use for the command")
-	rootCmd.PersistentFlags().StringP("module-id", "m", "", "Module ID to use for the command")
+	rootCmd.PersistentFlags().StringP("ini", "c", parser.DefaultConfigFilepath, "Path to the ini file to use for the rootCmd")
+	rootCmd.PersistentFlags().StringP("module-id", "m", "", "Module ID to use for the rootCmd")
 
 	if cfgFile == "" {
 		cfgFile = globalConfigFile
@@ -82,6 +71,10 @@ func init() {
 		input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
 		input.GetConfigValue("region", "PIXO_REGION"),
 	)
+
+	rootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
+		initLogger(cmd)
+	}
 }
 
 func initLogger(cmd *cobra.Command) {

@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// serverVersionsCmd represents the serverVersions command
+// serverVersionsCmd represents the serverVersions rootCmd
 var serverVersionsCmd = &cobra.Command{
 	Use:   "serverVersions",
 	Short: "Used to list and manage multiplayer server versions",
@@ -16,7 +16,7 @@ var serverVersionsCmd = &cobra.Command{
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		initLogger(cmd)
-	
+
 		if err := cmd.Help(); err != nil {
 			log.Error().Err(err).Msg("Could not display help")
 			return
