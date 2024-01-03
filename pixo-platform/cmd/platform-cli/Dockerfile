@@ -10,7 +10,7 @@ COPY . .
 RUN go build -o main cmd/platform-cli/main.go
 
 
-FROM debian:bookworm-20231218-slim
+FROM gcr.io/distroless/static-debian12
 
 WORKDIR /client
 
