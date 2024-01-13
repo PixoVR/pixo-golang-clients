@@ -6,6 +6,11 @@ import (
 	"time"
 )
 
+type SessionsClient interface {
+	GetSession(id int) (*Session, error)
+	CreateSession(moduleID int, ipAddress, deviceId string) (*Session, error)
+}
+
 type Session struct {
 	ID       int `json:"id"`
 	UserID   int `json:"userId"`
