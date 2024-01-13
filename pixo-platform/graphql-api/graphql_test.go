@@ -15,7 +15,7 @@ var _ = Describe("GraphQL API", func() {
 	var (
 		secretKeyClient *GraphQLAPIClient
 		tokenClient     *GraphQLAPIClient
-		lifecycle       = "local"
+		lifecycle       = "dev"
 	)
 
 	BeforeEach(func() {
