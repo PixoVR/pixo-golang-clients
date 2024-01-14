@@ -6,6 +6,7 @@ import (
 	"errors"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	. "github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/commonerrors"
+	"github.com/rs/zerolog/log"
 	"time"
 )
 
@@ -67,7 +68,7 @@ func (m *MockSessionsClient) CreateEvent(ctx context.Context, sessionID int, uui
 
 	var jsonData platform.EventResult
 	if err := json.Unmarshal([]byte(data), &jsonData); err != nil {
-		return nil, err
+		log.Error().Err(err).Msg("error unmarshalling event data")
 	}
 
 	return &platform.Event{
