@@ -32,12 +32,14 @@ type Module struct {
 }
 
 type Event struct {
-	ID          int         `json:"id"`
-	SessionID   int         `json:"sessionId"`
-	UserID      int         `json:"userId"`
-	EventType   string      `json:"eventType"`
-	CreatedAt   time.Time   `json:"createdAt"`
-	EventResult EventResult `json:"jsonData"`
+	ID        int         `json:"id"`
+	SessionID int         `json:"sessionId"`
+	UserID    int         `json:"userId"`
+	EventType string      `json:"eventType"`
+	Data      EventResult `json:"jsonData"`
+
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 type EventResult struct {

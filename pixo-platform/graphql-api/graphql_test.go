@@ -38,7 +38,7 @@ var _ = Describe("GraphQL API", func() {
 		Expect(client.IsAuthenticated()).To(BeTrue())
 	})
 
-	It("should be able to get create and get a session with a secret key", func() {
+	It("should be able to create and get a session, and then create an event with a secret key", func() {
 		session, err := tokenClient.CreateSession(1, "127.0.0.1", "test")
 		Expect(err).NotTo(HaveOccurred())
 		Expect(session).NotTo(BeNil())
@@ -49,6 +49,10 @@ var _ = Describe("GraphQL API", func() {
 		Expect(retrievedSession).NotTo(BeNil())
 		Expect(retrievedSession.ID).To(Equal(session.ID))
 		Expect(retrievedSession.UserID).NotTo(BeZero())
+
+		event, err := tokenClient.CreateEvent(session.ID, "test", "test", "{}")
+		Expect(err).NotTo(HaveOccurred())
+		Expect(event).NotTo(BeNil())
 	})
 
 	It("should be able to get the multiplayer server configs with a secret key", func() {

@@ -2,13 +2,14 @@ package graphql_api
 
 import (
 	"encoding/json"
-	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
+	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"time"
 )
 
 type SessionsClient interface {
 	GetSession(id int) (*Session, error)
 	CreateSession(moduleID int, ipAddress, deviceId string) (*Session, error)
+	CreateEvent(sessionID int, uuid string, eventType string, data map[string]interface{}) (*platform.Event, error)
 }
 
 type Session struct {
@@ -21,8 +22,8 @@ type Session struct {
 	IPAddress string `json:"ipAddress"`
 	DeviceID  string `json:"deviceId"`
 
-	Module primary_api.Module  `json:"module"`
-	Events []primary_api.Event `json:"events"`
+	Module platform.Module  `json:"module"`
+	Events []platform.Event `json:"events"`
 
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
@@ -34,6 +35,10 @@ type CreateSessionResponse struct {
 
 type SessionResponse struct {
 	Session Session `json:"session"`
+}
+
+type CreateEventResponse struct {
+	Event platform.Event `json:"createEvent"`
 }
 
 func (g *GraphQLAPIClient) GetSession(id int) (*Session, error) {
@@ -78,4 +83,29 @@ func (g *GraphQLAPIClient) CreateSession(moduleID int, ipAddress, deviceId strin
 	}
 
 	return &sessionResponse.Session, nil
+}
+
+func (g *GraphQLAPIClient) CreateEvent(sessionID int, uuid string, eventType string, data string) (*platform.Event, error) {
+	query := `mutation createEvent($input: EventInput!) { createEvent(input: $input) { id } }`
+
+	variables := map[string]interface{}{
+		"input": map[string]interface{}{
+			"sessionId": sessionID,
+			"uuid":      uuid,
+			"eventType": eventType,
+			"jsonData":  data,
+		},
+	}
+
+	res, err := g.ExecRaw(query, variables)
+	if err != nil {
+		return nil, err
+	}
+
+	var eventResponse CreateEventResponse
+	if err = json.Unmarshal(res, &eventResponse); err != nil {
+		return nil, err
+	}
+
+	return &platform.Event{}, nil
 }
