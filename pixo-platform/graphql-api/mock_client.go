@@ -65,10 +65,6 @@ func (m *MockSessionsClient) CreateEvent(ctx context.Context, sessionID int, uui
 		return nil, ErrorRequired("event type")
 	}
 
-	if data == "" {
-		return nil, ErrorRequired("data")
-	}
-
 	var jsonData platform.EventResult
 	if err := json.Unmarshal([]byte(data), &jsonData); err != nil {
 		return nil, err

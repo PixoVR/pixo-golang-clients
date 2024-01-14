@@ -108,5 +108,5 @@ func (g *GraphQLAPIClient) CreateEvent(ctx context.Context, sessionID int, uuid 
 		return nil, err
 	}
 
-	return &platform.Event{}, nil
+	return &eventResponse.Event, nil
 }
