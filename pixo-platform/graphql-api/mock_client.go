@@ -1,6 +1,7 @@
 package graphql_api
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
@@ -14,7 +15,7 @@ type MockSessionsClient struct {
 	CalledCreateEvent   bool
 }
 
-func (m *MockSessionsClient) GetSession(id int) (*Session, error) {
+func (m *MockSessionsClient) GetSession(ctx context.Context, id int) (*Session, error) {
 
 	m.CalledGetSession = true
 
@@ -31,7 +32,7 @@ func (m *MockSessionsClient) GetSession(id int) (*Session, error) {
 	}, nil
 }
 
-func (m *MockSessionsClient) CreateSession(moduleID int, ipAddress, deviceId string) (*Session, error) {
+func (m *MockSessionsClient) CreateSession(ctx context.Context, moduleID int, ipAddress, deviceId string) (*Session, error) {
 
 	m.CalledCreateSession = true
 
@@ -52,7 +53,7 @@ func (m *MockSessionsClient) CreateSession(moduleID int, ipAddress, deviceId str
 	}, nil
 }
 
-func (m *MockSessionsClient) CreateEvent(sessionID int, uuid string, eventType string, data string) (*platform.Event, error) {
+func (m *MockSessionsClient) CreateEvent(ctx context.Context, sessionID int, uuid string, eventType string, data string) (*platform.Event, error) {
 
 	m.CalledCreateEvent = true
 

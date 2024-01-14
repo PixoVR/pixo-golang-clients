@@ -1,15 +1,16 @@
 package graphql_api
 
 import (
+	"context"
 	"encoding/json"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"time"
 )
 
 type SessionsClient interface {
-	GetSession(id int) (*Session, error)
-	CreateSession(moduleID int, ipAddress, deviceId string) (*Session, error)
-	CreateEvent(sessionID int, uuid string, eventType string, data string) (*platform.Event, error)
+	GetSession(ctx context.Context, id int) (*Session, error)
+	CreateSession(ctx context.Context, moduleID int, ipAddress, deviceId string) (*Session, error)
+	CreateEvent(ctx context.Context, sessionID int, uuid string, eventType string, data string) (*platform.Event, error)
 }
 
 type Session struct {
@@ -41,14 +42,14 @@ type CreateEventResponse struct {
 	Event platform.Event `json:"createEvent"`
 }
 
-func (g *GraphQLAPIClient) GetSession(id int) (*Session, error) {
+func (g *GraphQLAPIClient) GetSession(ctx context.Context, id int) (*Session, error) {
 	query := `query session($id: ID!) { session(id: $id) { id userId } }`
 
 	variables := map[string]interface{}{
 		"id": id,
 	}
 
-	res, err := g.ExecRaw(query, variables)
+	res, err := g.gqlClient.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +62,7 @@ func (g *GraphQLAPIClient) GetSession(id int) (*Session, error) {
 	return &sessionResponse.Session, nil
 }
 
-func (g *GraphQLAPIClient) CreateSession(moduleID int, ipAddress, deviceId string) (*Session, error) {
+func (g *GraphQLAPIClient) CreateSession(ctx context.Context, moduleID int, ipAddress, deviceId string) (*Session, error) {
 	query := `mutation createSession($input: SessionInput!) { createSession(input: $input) { id } }`
 
 	variables := map[string]interface{}{
@@ -72,7 +73,7 @@ func (g *GraphQLAPIClient) CreateSession(moduleID int, ipAddress, deviceId strin
 		},
 	}
 
-	res, err := g.ExecRaw(query, variables)
+	res, err := g.gqlClient.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +86,7 @@ func (g *GraphQLAPIClient) CreateSession(moduleID int, ipAddress, deviceId strin
 	return &sessionResponse.Session, nil
 }
 
-func (g *GraphQLAPIClient) CreateEvent(sessionID int, uuid string, eventType string, data string) (*platform.Event, error) {
+func (g *GraphQLAPIClient) CreateEvent(ctx context.Context, sessionID int, uuid string, eventType string, data string) (*platform.Event, error) {
 	query := `mutation createEvent($input: EventInput!) { createEvent(input: $input) { id } }`
 
 	variables := map[string]interface{}{
@@ -97,7 +98,7 @@ func (g *GraphQLAPIClient) CreateEvent(sessionID int, uuid string, eventType str
 		},
 	}
 
-	res, err := g.ExecRaw(query, variables)
+	res, err := g.gqlClient.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return nil, err
 	}
