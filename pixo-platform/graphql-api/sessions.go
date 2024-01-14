@@ -9,7 +9,7 @@ import (
 type SessionsClient interface {
 	GetSession(id int) (*Session, error)
 	CreateSession(moduleID int, ipAddress, deviceId string) (*Session, error)
-	CreateEvent(sessionID int, uuid string, eventType string, data map[string]interface{}) (*platform.Event, error)
+	CreateEvent(sessionID int, uuid string, eventType string, data string) (*platform.Event, error)
 }
 
 type Session struct {

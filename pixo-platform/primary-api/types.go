@@ -33,6 +33,7 @@ type Module struct {
 
 type Event struct {
 	ID        int         `json:"id"`
+	UUID      string      `json:"uuid"`
 	SessionID int         `json:"sessionId"`
 	UserID    int         `json:"userId"`
 	EventType string      `json:"eventType"`

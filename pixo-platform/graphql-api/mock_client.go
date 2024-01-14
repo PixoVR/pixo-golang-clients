@@ -52,7 +52,7 @@ func (m *MockSessionsClient) CreateSession(moduleID int, ipAddress, deviceId str
 	}, nil
 }
 
-func (m *MockSessionsClient) CreateEvent(sessionID int, eventType string, data string) (*platform.Event, error) {
+func (m *MockSessionsClient) CreateEvent(sessionID int, uuid string, eventType string, data string) (*platform.Event, error) {
 
 	m.CalledCreateEvent = true
 
@@ -64,6 +64,10 @@ func (m *MockSessionsClient) CreateEvent(sessionID int, eventType string, data s
 		return nil, ErrorRequired("event type")
 	}
 
+	if data == "" {
+		return nil, ErrorRequired("data")
+	}
+
 	var jsonData platform.EventResult
 	if err := json.Unmarshal([]byte(data), &jsonData); err != nil {
 		return nil, err
@@ -72,6 +76,7 @@ func (m *MockSessionsClient) CreateEvent(sessionID int, eventType string, data s
 	return &platform.Event{
 		ID:        1,
 		SessionID: sessionID,
+		UUID:      uuid,
 		EventType: eventType,
 		Data:      jsonData,
 		CreatedAt: time.Now().UTC(),
