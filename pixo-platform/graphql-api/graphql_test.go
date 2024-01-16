@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
+	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/k8s/agones"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -43,7 +44,14 @@ var _ = Describe("GraphQL API", func() {
 	})
 
 	It("can create a service account with a secret key and login with it", func() {
-		serviceAccount, err := secretKeyClient.CreateUser(ctx, "test", "SomePassword!", 1)
+		user := platform.User{
+			FirstName: "test",
+			LastName:  "test",
+			Username:  "test",
+			Password:  "SomePassword!",
+			OrgID:     1,
+		}
+		serviceAccount, err := tokenClient.CreateUser(ctx, user)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(serviceAccount).NotTo(BeNil())
 		Expect(serviceAccount.ID).NotTo(BeZero())

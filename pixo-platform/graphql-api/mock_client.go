@@ -11,12 +11,15 @@ import (
 )
 
 type MockGraphQLClient struct {
+	CalledCreateUser    bool
 	CalledGetSession    bool
 	CalledCreateSession bool
 	CalledCreateEvent   bool
 }
 
 func (m *MockGraphQLClient) CreateUser(ctx context.Context, username, password string, orgID int) (*platform.User, error) {
+
+	m.CalledCreateUser = true
 
 	if username == "" {
 		return nil, commonerrors.ErrorRequired("username")

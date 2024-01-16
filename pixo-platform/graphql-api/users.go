@@ -7,21 +7,23 @@ import (
 )
 
 type UsersClient interface {
-	CreateUser(ctx context.Context, username, password string, orgID int) (*platform.User, error)
+	CreateUser(ctx context.Context, user platform.User) (*platform.User, error)
 }
 
 type CreateUserResponse struct {
 	User platform.User `json:"createUser"`
 }
 
-func (g *GraphQLAPIClient) CreateUser(ctx context.Context, username, password string, orgID int) (*platform.User, error) {
+func (g *GraphQLAPIClient) CreateUser(ctx context.Context, user platform.User) (*platform.User, error) {
 	query := `mutation createUser($input: UserInput!) { createUser(input: $input) { id } }`
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{
-			"username": username,
-			"password": password,
-			"orgId":    orgID,
+			"firstName": user.FirstName,
+			"lastName":  user.LastName,
+			"username":  user.Username,
+			"password":  user.Password,
+			"orgId":     user.OrgID,
 		},
 	}
 
