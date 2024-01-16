@@ -5,18 +5,42 @@ import (
 	"encoding/json"
 	"errors"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
-	. "github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/commonerrors"
+	commonerrors "github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/commonerrors"
 	"github.com/rs/zerolog/log"
 	"time"
 )
 
-type MockSessionsClient struct {
+type MockGraphQLClient struct {
 	CalledGetSession    bool
 	CalledCreateSession bool
 	CalledCreateEvent   bool
 }
 
-func (m *MockSessionsClient) GetSession(ctx context.Context, id int) (*Session, error) {
+func (m *MockGraphQLClient) CreateUser(ctx context.Context, username, password string, orgID int) (*platform.User, error) {
+
+	if username == "" {
+		return nil, commonerrors.ErrorRequired("username")
+	}
+
+	if password == "" {
+		return nil, commonerrors.ErrorRequired("password")
+	}
+
+	if orgID <= 0 {
+		return nil, errors.New("invalid org id")
+	}
+
+	return &platform.User{
+		ID:        1,
+		Username:  username,
+		Password:  password,
+		OrgID:     orgID,
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+	}, nil
+}
+
+func (m *MockGraphQLClient) GetSession(ctx context.Context, id int) (*Session, error) {
 
 	m.CalledGetSession = true
 
@@ -33,7 +57,7 @@ func (m *MockSessionsClient) GetSession(ctx context.Context, id int) (*Session, 
 	}, nil
 }
 
-func (m *MockSessionsClient) CreateSession(ctx context.Context, moduleID int, ipAddress, deviceId string) (*Session, error) {
+func (m *MockGraphQLClient) CreateSession(ctx context.Context, moduleID int, ipAddress, deviceId string) (*Session, error) {
 
 	m.CalledCreateSession = true
 
@@ -42,7 +66,7 @@ func (m *MockSessionsClient) CreateSession(ctx context.Context, moduleID int, ip
 	}
 
 	if ipAddress == "" {
-		return nil, ErrorRequired("ip address")
+		return nil, commonerrors.ErrorRequired("ip address")
 	}
 
 	return &Session{
@@ -54,7 +78,7 @@ func (m *MockSessionsClient) CreateSession(ctx context.Context, moduleID int, ip
 	}, nil
 }
 
-func (m *MockSessionsClient) CreateEvent(ctx context.Context, sessionID int, uuid string, eventType string, data string) (*platform.Event, error) {
+func (m *MockGraphQLClient) CreateEvent(ctx context.Context, sessionID int, uuid string, eventType string, data string) (*platform.Event, error) {
 
 	m.CalledCreateEvent = true
 
@@ -63,7 +87,7 @@ func (m *MockSessionsClient) CreateEvent(ctx context.Context, sessionID int, uui
 	}
 
 	if eventType == "" {
-		return nil, ErrorRequired("event type")
+		return nil, commonerrors.ErrorRequired("event type")
 	}
 
 	var jsonData platform.EventResult

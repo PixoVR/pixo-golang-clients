@@ -1,6 +1,7 @@
 package graphql_api_test
 
 import (
+	"context"
 	"fmt"
 	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
 	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/k8s/agones"
@@ -15,7 +16,8 @@ var _ = Describe("GraphQL API", func() {
 	var (
 		secretKeyClient *GraphQLAPIClient
 		tokenClient     *GraphQLAPIClient
-		lifecycle       = "dev"
+		lifecycle       = "local"
+		ctx             context.Context
 	)
 
 	BeforeEach(func() {
@@ -29,34 +31,43 @@ var _ = Describe("GraphQL API", func() {
 		Expect(tokenClient).NotTo(BeNil())
 		Expect(tokenClient.IsAuthenticated()).To(BeTrue())
 		Expect(tokenClient.GetToken()).NotTo(BeEmpty())
+
+		ctx = context.Background()
 	})
 
-	It("should be able to login", func() {
+	It("can login", func() {
 		client := NewClient("", lifecycle, "na")
 		err := client.Login(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(client.IsAuthenticated()).To(BeTrue())
 	})
 
-	It("should be able to create and get a session, and then create an event with a secret key", func() {
-		session, err := tokenClient.CreateSession(1, "127.0.0.1", "test")
+	It("can create a service account with a secret key and login with it", func() {
+		serviceAccount, err := secretKeyClient.CreateUser(ctx, "test", "SomePassword!", 1)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(serviceAccount).NotTo(BeNil())
+		Expect(serviceAccount.ID).NotTo(BeZero())
+	})
+
+	It("can create and get a session, and then create an event with a secret key", func() {
+		session, err := tokenClient.CreateSession(ctx, 1, "127.0.0.1", "test")
 		Expect(err).NotTo(HaveOccurred())
 		Expect(session).NotTo(BeNil())
 		Expect(session.ID).NotTo(BeZero())
 
-		retrievedSession, err := tokenClient.GetSession(session.ID)
+		retrievedSession, err := tokenClient.GetSession(ctx, session.ID)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(retrievedSession).NotTo(BeNil())
 		Expect(retrievedSession.ID).To(Equal(session.ID))
 		Expect(retrievedSession.UserID).NotTo(BeZero())
 
-		event, err := tokenClient.CreateEvent(session.ID, "test", "test", "{}")
+		event, err := tokenClient.CreateEvent(ctx, session.ID, "test", "test", "{}")
 		Expect(err).NotTo(HaveOccurred())
 		Expect(event).NotTo(BeNil())
 	})
 
-	It("should be able to get the multiplayer server configs with a secret key", func() {
-		mpServerConfigs, err := secretKeyClient.GetMultiplayerServerConfigs(MultiplayerServerConfigParams{
+	It("can get the multiplayer server configs with a secret key", func() {
+		mpServerConfigs, err := secretKeyClient.GetMultiplayerServerConfigs(ctx, MultiplayerServerConfigParams{
 			OrgID:    1,
 			ModuleID: 1,
 		})
@@ -64,8 +75,8 @@ var _ = Describe("GraphQL API", func() {
 		Expect(mpServerConfigs).NotTo(BeEmpty())
 	})
 
-	It("should be able to get the multiplayer server versions with a secret key", func() {
-		mpServerVersions, err := secretKeyClient.GetMultiplayerServerVersions(MultiplayerServerVersionQueryParams{
+	It("can get the multiplayer server versions with a secret key", func() {
+		mpServerVersions, err := secretKeyClient.GetMultiplayerServerVersions(ctx, MultiplayerServerVersionQueryParams{
 			ModuleID:        1,
 			SemanticVersion: "1.00.00",
 		})
@@ -73,9 +84,9 @@ var _ = Describe("GraphQL API", func() {
 		Expect(mpServerVersions).NotTo(BeNil())
 	})
 
-	It("should be able to create a multiplayer server version with a secret key", func() {
+	It("can create a multiplayer server version with a secret key", func() {
 		randVersion := fmt.Sprintf("1.%d.%d", rand.Intn(100), rand.Intn(100))
-		err := secretKeyClient.CreateMultiplayerServerVersion(1, agones.SimpleGameServerImage, randVersion)
+		err := secretKeyClient.CreateMultiplayerServerVersion(ctx, 1, agones.SimpleGameServerImage, randVersion)
 		Expect(err).NotTo(HaveOccurred())
 	})
 
