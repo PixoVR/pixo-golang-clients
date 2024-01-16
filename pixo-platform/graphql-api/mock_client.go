@@ -17,30 +17,25 @@ type MockGraphQLClient struct {
 	CalledCreateEvent   bool
 }
 
-func (m *MockGraphQLClient) CreateUser(ctx context.Context, username, password string, orgID int) (*platform.User, error) {
+func (m *MockGraphQLClient) CreateUser(ctx context.Context, user platform.User) (*platform.User, error) {
 
 	m.CalledCreateUser = true
 
-	if username == "" {
+	if user.Username == "" {
 		return nil, commonerrors.ErrorRequired("username")
 	}
 
-	if password == "" {
+	if user.Password == "" {
 		return nil, commonerrors.ErrorRequired("password")
 	}
 
-	if orgID <= 0 {
+	if user.OrgID <= 0 {
 		return nil, errors.New("invalid org id")
 	}
 
-	return &platform.User{
-		ID:        1,
-		Username:  username,
-		Password:  password,
-		OrgID:     orgID,
-		CreatedAt: time.Now().UTC(),
-		UpdatedAt: time.Now().UTC(),
-	}, nil
+	user.CreatedAt = time.Now().UTC()
+	user.UpdatedAt = time.Now().UTC()
+	return &user, nil
 }
 
 func (m *MockGraphQLClient) GetSession(ctx context.Context, id int) (*Session, error) {
