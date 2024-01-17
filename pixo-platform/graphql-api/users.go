@@ -31,7 +31,7 @@ type DeleteUserResponse struct {
 }
 
 func (g *GraphQLAPIClient) CreateUser(ctx context.Context, user platform.User) (*platform.User, error) {
-	query := `mutation createUser($input: UserInput!) { createUser(input: $input) { id } }`
+	query := `mutation createUser($input: UserInput!) { createUser(input: $input) { id firstName lastName username role } }`
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{
@@ -40,6 +40,7 @@ func (g *GraphQLAPIClient) CreateUser(ctx context.Context, user platform.User) (
 			"username":  user.Username,
 			"password":  user.Password,
 			"orgId":     user.OrgID,
+			"role":      user.Role,
 		},
 	}
 

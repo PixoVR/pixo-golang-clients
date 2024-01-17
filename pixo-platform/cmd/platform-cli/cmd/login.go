@@ -6,10 +6,10 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
 
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/config"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
-	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -42,7 +42,7 @@ var loginCmd = &cobra.Command{
 			viper.Set("password", password)
 			log.Debug().Msgf("Attempting to login with password: %s", password)
 
-			client, err := platform.NewClientWithBasicAuth(
+			client, err := graphql_api.NewClientWithBasicAuth(
 				username,
 				password,
 				input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),

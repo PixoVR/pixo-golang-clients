@@ -89,6 +89,18 @@ pixo config set --lifecycle dev # Switch to dev environment
 pixo config set --key module-id --val 1 # Set default module id
 ```
 
+## Create a User
+```bash
+pixo users create \
+    --username testuser \
+    --password testpassword \
+    --first-name Test \
+    --last-name User \
+    --org-id 1 \
+    --role developer
+    
+```
+
 ## Deploy a Module Game Server Version
 ```bash
 # Check if server version with semantic version already exists
