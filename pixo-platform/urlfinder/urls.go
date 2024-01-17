@@ -15,23 +15,31 @@ type ServiceConfig struct {
 func (s ServiceConfig) FormatURL() string {
 
 	if s.Lifecycle == "local" {
-		if s.Service == "match" {
+		if s.Service == "matchmaking" {
 			return fmt.Sprintf("ws://localhost:%d", s.Port)
 		}
 
-		return fmt.Sprintf("http://localhost:%d", s.Port)
+		if s.Port == 0 {
+			s.Port = 8000
+		}
+
+		if s.Service == "" {
+			s.Service = "v2"
+		}
+
+		return fmt.Sprintf("http://localhost:%d/%s", s.Port, s.Service)
 	}
 
 	if s.Service == "" {
-		s.Service = DefaultAPIService
+		s.Service = DefaultService
 	}
 
 	if s.Tenant == "" {
-		s.Tenant = DefaultAPITenant
+		s.Tenant = DefaultTenant
 	}
 
 	if s.Region == "" {
-		s.Region = DefaultAPIRegion
+		s.Region = DefaultRegion
 	}
 
 	var prefix string
@@ -49,15 +57,15 @@ func (s ServiceConfig) FormatURL() string {
 	}
 
 	protocol := "https"
-	if s.Service == "match" {
+	if s.Service == "matchmaking" {
 		protocol = "wss"
 	}
 
 	if prefix != "" {
-		s.Service = fmt.Sprintf("%s.%s", prefix, s.Service)
+		s.Tenant = fmt.Sprintf("%s.%s", prefix, s.Tenant)
 	}
 
-	return fmt.Sprintf("%s://%s.%s.%s", protocol, s.Service, s.Tenant, s.GetBaseDomain())
+	return fmt.Sprintf("%s://%s.%s/%s", protocol, s.Tenant, s.GetBaseDomain(), s.Service)
 }
 
 func (s ServiceConfig) GetBaseDomain() string {

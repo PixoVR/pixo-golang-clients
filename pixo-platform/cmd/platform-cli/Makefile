@@ -6,6 +6,8 @@ SERVER_VERSION ?= "1.03.01"
 
 all: lint test build cp
 
+new: build cp
+
 cp:
 	sudo cp $(EXECUTABLE) /usr/local/bin/$(NAME)
 

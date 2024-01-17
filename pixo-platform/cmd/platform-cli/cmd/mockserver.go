@@ -65,7 +65,7 @@ var mockserverCmd = &cobra.Command{
 			mode = gin.DebugMode
 		}
 
-		mockserver.Run(mode, matchmaker.MatchmakingEndpoint, response)
+		mockserver.Run(cmd, mode, matchmaker.MatchmakingEndpoint, response)
 	},
 }
 

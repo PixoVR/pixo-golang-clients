@@ -26,7 +26,7 @@ func TestCLI(t *testing.T) {
 	RegisterFailHandler(Fail)
 
 	root := GetProjectRoot()
-	envPath := filepath.Join(root, ".env")
+	envPath := filepath.Join(root, "../../../../.env")
 
 	if err := godotenv.Load(envPath); err != nil {
 		log.Warn().Msgf("Failed to load .env file at %s", envPath)

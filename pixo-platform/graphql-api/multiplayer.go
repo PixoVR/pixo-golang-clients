@@ -1,25 +1,25 @@
 package graphql_api
 
 import (
+	"context"
 	"errors"
-	"github.com/rs/zerolog/log"
 )
 
-func (g *GraphQLAPIClient) GetMultiplayerServerConfigs(params MultiplayerServerConfigParams) ([]*MultiplayerServerConfigQueryParams, error) {
+func (g *GraphQLAPIClient) GetMultiplayerServerConfigs(ctx context.Context, params MultiplayerServerConfigParams) ([]*MultiplayerServerConfigQueryParams, error) {
 	var query MultiplayerServerConfigQuery
 
 	variables := map[string]interface{}{
 		"params": params,
 	}
 
-	if err := g.Query(&query, variables); err != nil {
+	if err := g.gqlClient.Query(ctx, &query, variables); err != nil {
 		return nil, err
 	}
 
 	return query.MultiplayerServerConfigs, nil
 }
 
-func (g *GraphQLAPIClient) CreateMultiplayerServerVersion(moduleID int, image, semanticVersion string) error {
+func (g *GraphQLAPIClient) CreateMultiplayerServerVersion(ctx context.Context, moduleID int, image, semanticVersion string) error {
 	query := `mutation createMultiplayerServerVersion($input: MultiplayerServerVersionInput!) { createMultiplayerServerVersion(input: $input) { id imageRegistry semanticVersion module { name } } }`
 
 	variables := map[string]interface{}{
@@ -32,18 +32,16 @@ func (g *GraphQLAPIClient) CreateMultiplayerServerVersion(moduleID int, image, s
 		},
 	}
 
-	if res, err := g.ExecRaw(query, variables); err != nil {
-		log.Debug().Err(err).Msgf("error deploying multiplayer server version: %s", res)
+	if _, err := g.gqlClient.ExecRaw(ctx, query, variables); err != nil {
 		return err
 	}
 
-	log.Debug().Msgf("created multiplayer server version")
 	return nil
 }
 
-func (g *GraphQLAPIClient) GetMultiplayerServerVersions(params MultiplayerServerVersionQueryParams) ([]*MultiplayerServerVersion, error) {
+func (g *GraphQLAPIClient) GetMultiplayerServerVersions(ctx context.Context, params MultiplayerServerVersionQueryParams) ([]*MultiplayerServerVersion, error) {
 
-	configs, err := g.GetMultiplayerServerConfigs(MultiplayerServerConfigParams{
+	configs, err := g.GetMultiplayerServerConfigs(ctx, MultiplayerServerConfigParams{
 		ModuleID:      params.ModuleID,
 		ServerVersion: params.SemanticVersion,
 	})

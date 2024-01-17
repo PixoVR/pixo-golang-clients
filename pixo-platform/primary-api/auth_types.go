@@ -1,5 +1,7 @@
 package primary_api
 
+import "time"
+
 type LoginRequest struct {
 	Login    string `json:"login"`
 	Password string `json:"password"`
@@ -17,8 +19,13 @@ type User struct {
 	Role       string `json:"role,omitempty"`
 	OrgID      int    `json:"orgId,omitempty"`
 	Org        Org    `json:"org,omitempty"`
-	First      string `json:"first,omitempty"`
-	Last       string `json:"last,omitempty"`
+	Username   string `json:"username,omitempty"`
+	Password   string `json:"-"`
+	FirstName  string `json:"firstName,omitempty"`
+	LastName   string `json:"lastName,omitempty"`
 	Email      string `json:"email,omitempty"`
 	ExternalID string `json:"externalId,omitempty"`
+
+	CreatedAt time.Time `json:"createdAt,omitempty"`
+	UpdatedAt time.Time `json:"updatedAt,omitempty"`
 }

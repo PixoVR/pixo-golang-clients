@@ -10,14 +10,9 @@ COPY . .
 RUN go build -o main cmd/platform-cli/main.go
 
 
-FROM debian:bookworm-20231218-slim
+FROM gcr.io/distroless/static-debian12
 
 WORKDIR /client
-
-RUN apt-get update \
-        && apt-get upgrade -y \
-        && apt-get install ca-certificates -y \
-        && update-ca-certificates 2>/dev/null
 
 COPY --from=builder /build/main /usr/bin/pixo
 

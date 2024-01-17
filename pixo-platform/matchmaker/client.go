@@ -5,7 +5,6 @@ import (
 	abstractClient "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
 	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
-	"github.com/rs/zerolog/log"
 	"net"
 )
 
@@ -18,7 +17,6 @@ type MultiplayerMatchmaker struct {
 func NewMatchmakerWithBasicAuth(username, password, lifecycle, region string, timeoutSeconds ...int) (*MultiplayerMatchmaker, error) {
 	primaryClient, err := primary_api.NewClientWithBasicAuth(username, password, lifecycle, region)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to create api client")
 		return nil, err
 	}
 

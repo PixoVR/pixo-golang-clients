@@ -1,8 +1,8 @@
 package urlfinder
 
 const (
-	Domain            = "pixovr.com"
-	DefaultAPIService = "primary"
-	DefaultAPITenant  = "apex"
-	DefaultAPIRegion  = "na"
+	Domain         = "pixovr.com"
+	DefaultService = "v2"
+	DefaultTenant  = "apex"
+	DefaultRegion  = "na"
 )

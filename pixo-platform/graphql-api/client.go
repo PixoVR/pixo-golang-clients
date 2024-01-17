@@ -2,7 +2,9 @@ package graphql_api
 
 import (
 	"context"
+	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
+	"github.com/rs/zerolog/log"
 	"net/http"
 	"os"
 
@@ -27,20 +29,44 @@ func NewClient(token, lifecycle, region string) *GraphQLAPIClient {
 
 	config := newServiceConfig(lifecycle, region)
 
-	url := getURL(config.FormatURL())
+	url := config.FormatURL()
 
 	c := http.Client{Transport: &transport{underlyingTransport: http.DefaultTransport, token: token}}
 
 	return &GraphQLAPIClient{
 		PixoAbstractAPIClient: *abstract_client.NewClient(token, url),
-		gqlClient:             graphql.NewClient(url, &c),
+		gqlClient:             graphql.NewClient(fmt.Sprintf("%s/query", url), &c),
 		defaultContext:        context.Background(),
 	}
 }
 
+// NewClientWithBasicAuth is a function that returns a GraphQLAPIClient with basic auth performed
+func NewClientWithBasicAuth(username, password, lifecycle, region string) (*GraphQLAPIClient, error) {
+
+	config := newServiceConfig(lifecycle, region)
+
+	url := config.FormatURL()
+
+	client := &GraphQLAPIClient{
+		PixoAbstractAPIClient: *abstract_client.NewClient("", config.FormatURL()),
+		defaultContext:        context.Background(),
+	}
+
+	if err := client.Login(username, password); err != nil {
+		log.Error().Err(err).Msg("Failed to login to the pixo platform")
+		return nil, err
+	}
+
+	c := http.Client{Transport: &transport{underlyingTransport: http.DefaultTransport, token: client.GetToken()}}
+
+	client.gqlClient = graphql.NewClient(fmt.Sprintf("%s/query", url), &c)
+
+	return client, nil
+}
+
 func newServiceConfig(lifecycle, region string) urlfinder.ServiceConfig {
 	return urlfinder.ServiceConfig{
-		Service:   "primary",
+		Service:   "v2",
 		Lifecycle: lifecycle,
 		Region:    region,
 		Port:      8000,

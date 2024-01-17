@@ -14,7 +14,11 @@ API Key or Username/Password are needed to authenticate with the Pixo Platform A
 ```bash
 brew tap PixoVR/pixo-golang-clients
 brew install pixo-cli
+
 pixo help
+
+# Update
+brew tap PixoVR/pixo-golang-clients
 ```
 
 ### Windows
@@ -83,6 +87,18 @@ module-id: 1
 pixo config set --region saudi # Switch to saudi environment
 pixo config set --lifecycle dev # Switch to dev environment
 pixo config set --key module-id --val 1 # Set default module id
+```
+
+## Create a User
+```bash
+pixo users create \
+    --username testuser \
+    --password testpassword \
+    --first-name Test \
+    --last-name User \
+    --org-id 1 \
+    --role developer
+    
 ```
 
 ## Deploy a Module Game Server Version
