@@ -14,6 +14,7 @@ import (
 type MockGraphQLClient struct {
 	CalledGetUser       bool
 	CalledCreateUser    bool
+	CalledUpdateUser    bool
 	CalledDeleteUser    bool
 	CalledGetSession    bool
 	CalledCreateSession bool
@@ -57,6 +58,26 @@ func (m *MockGraphQLClient) CreateUser(ctx context.Context, user platform.User) 
 	}
 
 	user.CreatedAt = time.Now().UTC()
+	user.UpdatedAt = time.Now().UTC()
+	return &user, nil
+}
+
+func (m *MockGraphQLClient) UpdateUser(ctx context.Context, user platform.User) (*platform.User, error) {
+
+	m.CalledUpdateUser = true
+
+	if user.ID <= 0 {
+		return nil, errors.New("invalid user id")
+	}
+
+	if user.Username == "" {
+		return nil, commonerrors.ErrorRequired("username")
+	}
+
+	if user.OrgID <= 0 {
+		return nil, errors.New("invalid org id")
+	}
+
 	user.UpdatedAt = time.Now().UTC()
 	return &user, nil
 }

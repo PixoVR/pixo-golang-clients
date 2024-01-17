@@ -66,6 +66,25 @@ var _ = Describe("GraphQL API", func() {
 		Expect(retrievedUser.LastName).To(Equal(user.LastName))
 		Expect(retrievedUser.OrgID).To(Equal(user.OrgID))
 
+		updatedUser, err := tokenClient.UpdateUser(ctx, user)
+		Expect(err).To(HaveOccurred())
+		Expect(updatedUser).To(BeNil())
+		Expect(err.Error()).To(ContainSubstring("user id is required"))
+
+		user.ID = serviceAccount.ID
+		user.Role = "superadmin"
+		user.FirstName = faker.FirstName()
+		user.LastName = faker.LastName()
+
+		updatedUser, err = tokenClient.UpdateUser(ctx, user)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(updatedUser).NotTo(BeNil())
+		Expect(updatedUser.ID).To(Equal(serviceAccount.ID))
+		Expect(updatedUser.Username).To(Equal(user.Username))
+		Expect(updatedUser.FirstName).To(Equal(user.FirstName))
+		Expect(updatedUser.LastName).To(Equal(user.LastName))
+		//Expect(updatedUser.Role).To(Equal(user.Role))
+
 		err = tokenClient.DeleteUser(ctx, serviceAccount.ID)
 		Expect(err).NotTo(HaveOccurred())
 

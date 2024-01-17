@@ -10,6 +10,7 @@ import (
 type UsersClient interface {
 	GetUserByUsername(ctx context.Context, username string) (*platform.User, error)
 	CreateUser(ctx context.Context, user platform.User) (*platform.User, error)
+	UpdateUser(ctx context.Context, user platform.User) (*platform.User, error)
 	DeleteUser(ctx context.Context, id int) error
 }
 
@@ -19,6 +20,10 @@ type GetUserResponse struct {
 
 type CreateUserResponse struct {
 	User platform.User `json:"createUser"`
+}
+
+type UpdateUserResponse struct {
+	User platform.User `json:"updateUser"`
 }
 
 type DeleteUserResponse struct {
@@ -44,6 +49,57 @@ func (g *GraphQLAPIClient) CreateUser(ctx context.Context, user platform.User) (
 	}
 
 	var userResponse CreateUserResponse
+	if err = json.Unmarshal(res, &userResponse); err != nil {
+		return nil, err
+	}
+
+	return &userResponse.User, nil
+}
+
+func (g *GraphQLAPIClient) UpdateUser(ctx context.Context, user platform.User) (*platform.User, error) {
+
+	if user.ID == 0 {
+		return nil, errors.New("user id is required")
+	}
+
+	query := `mutation updateUser($input: UserInput!) { updateUser(input: $input) { id firstName lastName username role orgId } }`
+
+	variables := map[string]interface{}{
+		"input": map[string]interface{}{
+			"id": user.ID,
+		},
+	}
+
+	if user.FirstName != "" {
+		variables["input"].(map[string]interface{})["firstName"] = user.FirstName
+	}
+
+	if user.LastName != "" {
+		variables["input"].(map[string]interface{})["lastName"] = user.LastName
+	}
+
+	if user.Username != "" {
+		variables["input"].(map[string]interface{})["username"] = user.Username
+	}
+
+	if user.Password != "" {
+		variables["input"].(map[string]interface{})["password"] = user.Password
+	}
+
+	if user.OrgID != 0 {
+		variables["input"].(map[string]interface{})["orgId"] = user.OrgID
+	}
+
+	if user.Role != "" {
+		variables["input"].(map[string]interface{})["role"] = user.Role
+	}
+
+	res, err := g.gqlClient.ExecRaw(ctx, query, variables)
+	if err != nil {
+		return nil, err
+	}
+
+	var userResponse UpdateUserResponse
 	if err = json.Unmarshal(res, &userResponse); err != nil {
 		return nil, err
 	}
