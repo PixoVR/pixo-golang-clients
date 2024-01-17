@@ -83,7 +83,7 @@ var _ = Describe("GraphQL API", func() {
 		Expect(updatedUser.Username).To(Equal(user.Username))
 		Expect(updatedUser.FirstName).To(Equal(user.FirstName))
 		Expect(updatedUser.LastName).To(Equal(user.LastName))
-		//Expect(updatedUser.Role).To(Equal(user.Role))
+		Expect(updatedUser.Role).To(Equal(user.Role))
 
 		err = tokenClient.DeleteUser(ctx, serviceAccount.ID)
 		Expect(err).NotTo(HaveOccurred())
