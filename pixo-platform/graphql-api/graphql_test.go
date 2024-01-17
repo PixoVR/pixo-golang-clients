@@ -57,6 +57,15 @@ var _ = Describe("GraphQL API", func() {
 		Expect(serviceAccount).NotTo(BeNil())
 		Expect(serviceAccount.ID).NotTo(BeZero())
 
+		retrievedUser, err := tokenClient.GetUserByUsername(ctx, user.Username)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(retrievedUser).NotTo(BeNil())
+		Expect(retrievedUser.ID).To(Equal(serviceAccount.ID))
+		Expect(retrievedUser.Username).To(Equal(user.Username))
+		Expect(retrievedUser.FirstName).To(Equal(user.FirstName))
+		Expect(retrievedUser.LastName).To(Equal(user.LastName))
+		Expect(retrievedUser.OrgID).To(Equal(user.OrgID))
+
 		err = tokenClient.DeleteUser(ctx, serviceAccount.ID)
 		Expect(err).NotTo(HaveOccurred())
 

@@ -14,7 +14,7 @@ type UsersClient interface {
 }
 
 type GetUserResponse struct {
-	User platform.User `json:"getUser"`
+	User platform.User `json:"user"`
 }
 
 type CreateUserResponse struct {
@@ -76,7 +76,7 @@ func (g *GraphQLAPIClient) DeleteUser(ctx context.Context, id int) error {
 }
 
 func (g *GraphQLAPIClient) GetUserByUsername(ctx context.Context, username string) (*platform.User, error) {
-	query := `query user($id: ID, $username: String) { user(id: $id, username: $username) { id username } }`
+	query := `query user($id: ID, $username: String) { user(id: $id, username: $username) { id username firstName lastName orgId role } }`
 
 	variables := map[string]interface{}{
 		"username": username,
