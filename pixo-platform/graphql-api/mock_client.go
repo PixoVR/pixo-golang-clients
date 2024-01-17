@@ -12,36 +12,36 @@ import (
 )
 
 type MockGraphQLClient struct {
-	CalledGetUser      bool
-	CalledGetUserError bool
+	CalledGetUser bool
+	GetUserError  bool
 
-	CalledCreateUser      bool
-	CalledCreateUserError bool
+	CalledCreateUser bool
+	CreateUserError  bool
 
-	CalledUpdateUser      bool
-	CalledUpdateUserError bool
+	CalledUpdateUser bool
+	UpdateUserError  bool
 
-	CalledDeleteUser      bool
-	CalledDeleteUserError bool
+	CalledDeleteUser bool
+	DeleteUserError  bool
 
-	CalledGetSession      bool
-	CalledGetSessionError bool
+	CalledGetSession bool
+	GetSessionError  bool
 
-	CalledCreateSession      bool
-	CalledCreateSessionError bool
+	CalledCreateSession bool
+	CreateSessionError  bool
 
-	CalledUpdateSession      bool
-	CalledUpdateSessionError bool
+	CalledUpdateSession bool
+	UpdateSessionError  bool
 
-	CalledCreateEvent      bool
-	CalledCreateEventError bool
+	CalledCreateEvent bool
+	CreateEventError  bool
 }
 
 func (m *MockGraphQLClient) GetUserByUsername(ctx context.Context, username string) (*platform.User, error) {
 
 	m.CalledGetUser = true
 
-	if m.CalledGetUserError {
+	if m.GetUserError {
 		return nil, errors.New("error getting user")
 	}
 
@@ -64,7 +64,7 @@ func (m *MockGraphQLClient) CreateUser(ctx context.Context, user platform.User) 
 
 	m.CalledCreateUser = true
 
-	if m.CalledCreateUserError {
+	if m.CreateUserError {
 		return nil, errors.New("error creating user")
 	}
 
@@ -89,7 +89,7 @@ func (m *MockGraphQLClient) UpdateUser(ctx context.Context, user platform.User) 
 
 	m.CalledUpdateUser = true
 
-	if m.CalledUpdateUserError {
+	if m.UpdateUserError {
 		return nil, errors.New("error updating user")
 	}
 
@@ -113,7 +113,7 @@ func (m *MockGraphQLClient) DeleteUser(ctx context.Context, id int) error {
 
 	m.CalledDeleteUser = true
 
-	if m.CalledDeleteUserError {
+	if m.DeleteUserError {
 		return errors.New("error deleting user")
 	}
 
@@ -128,7 +128,7 @@ func (m *MockGraphQLClient) GetSession(ctx context.Context, id int) (*Session, e
 
 	m.CalledGetSession = true
 
-	if m.CalledGetSessionError {
+	if m.GetSessionError {
 		return nil, errors.New("error getting session")
 	}
 
@@ -149,7 +149,7 @@ func (m *MockGraphQLClient) CreateSession(ctx context.Context, moduleID int, ipA
 
 	m.CalledCreateSession = true
 
-	if m.CalledCreateSessionError {
+	if m.CreateSessionError {
 		return nil, errors.New("error creating session")
 	}
 
@@ -174,7 +174,7 @@ func (m *MockGraphQLClient) UpdateSession(ctx context.Context, id int, status st
 
 	m.CalledUpdateSession = true
 
-	if m.CalledUpdateSessionError {
+	if m.UpdateSessionError {
 		return nil, errors.New("error updating session")
 	}
 
@@ -194,7 +194,7 @@ func (m *MockGraphQLClient) CreateEvent(ctx context.Context, sessionID int, uuid
 
 	m.CalledCreateEvent = true
 
-	if m.CalledCreateEventError {
+	if m.CreateEventError {
 		return nil, errors.New("error creating event")
 	}
 
