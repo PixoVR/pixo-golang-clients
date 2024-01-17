@@ -39,6 +39,15 @@ func (m *MockGraphQLClient) CreateUser(ctx context.Context, user platform.User) 
 	return &user, nil
 }
 
+func (m *MockGraphQLClient) DeleteUser(ctx context.Context, id int) error {
+
+	if id <= 0 {
+		return errors.New("invalid user id")
+	}
+
+	return nil
+}
+
 func (m *MockGraphQLClient) GetSession(ctx context.Context, id int) (*Session, error) {
 
 	m.CalledGetSession = true

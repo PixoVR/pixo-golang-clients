@@ -3,15 +3,21 @@ package graphql_api
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 )
 
 type UsersClient interface {
 	CreateUser(ctx context.Context, user platform.User) (*platform.User, error)
+	DeleteUser(ctx context.Context, id int) error
 }
 
 type CreateUserResponse struct {
 	User platform.User `json:"createUser"`
+}
+
+type DeleteUserResponse struct {
+	Success bool `json:"deleteUser"`
 }
 
 func (g *GraphQLAPIClient) CreateUser(ctx context.Context, user platform.User) (*platform.User, error) {
@@ -38,4 +44,28 @@ func (g *GraphQLAPIClient) CreateUser(ctx context.Context, user platform.User) (
 	}
 
 	return &userResponse.User, nil
+}
+
+func (g *GraphQLAPIClient) DeleteUser(ctx context.Context, id int) error {
+	query := `mutation deleteUser($id: ID!) { deleteUser(id: $id) }`
+
+	variables := map[string]interface{}{
+		"id": id,
+	}
+
+	res, err := g.gqlClient.ExecRaw(ctx, query, variables)
+	if err != nil {
+		return err
+	}
+
+	var deleteResponse DeleteUserResponse
+	if err = json.Unmarshal(res, &deleteResponse); err != nil {
+		return err
+	}
+
+	if !deleteResponse.Success {
+		return errors.New("failed to delete user")
+	}
+
+	return nil
 }
