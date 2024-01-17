@@ -5,6 +5,7 @@ go 1.21
 require (
 	github.com/PixoVR/pixo-golang-server-utilities/pixo-platform v0.0.0-20231128063312-d68e6e6b886d
 	github.com/gin-gonic/gin v1.9.1
+	github.com/go-faker/faker/v4 v4.2.0
 	github.com/go-resty/resty/v2 v2.11.0
 	github.com/gorilla/websocket v1.5.1
 	github.com/hasura/go-graphql-client v0.10.2

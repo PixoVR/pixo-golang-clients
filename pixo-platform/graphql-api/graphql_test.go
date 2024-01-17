@@ -6,6 +6,7 @@ import (
 	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/k8s/agones"
+	"github.com/go-faker/faker/v4"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"math/rand"
@@ -45,10 +46,10 @@ var _ = Describe("GraphQL API", func() {
 
 	It("can create a service account with a secret key and login with it", func() {
 		user := platform.User{
-			FirstName: "test",
-			LastName:  "test",
-			Username:  "test",
-			Password:  "SomePassword!",
+			FirstName: faker.FirstName(),
+			LastName:  faker.LastName(),
+			Username:  faker.Username(),
+			Password:  faker.Password(),
 			OrgID:     1,
 		}
 		serviceAccount, err := tokenClient.CreateUser(ctx, user)
@@ -57,7 +58,7 @@ var _ = Describe("GraphQL API", func() {
 		Expect(serviceAccount.ID).NotTo(BeZero())
 	})
 
-	It("can create and get a session, and then create an event with a secret key", func() {
+	It("can create get and update a session, and then create an event with a secret key", func() {
 		session, err := tokenClient.CreateSession(ctx, 1, "127.0.0.1", "test")
 		Expect(err).NotTo(HaveOccurred())
 		Expect(session).NotTo(BeNil())
@@ -68,6 +69,11 @@ var _ = Describe("GraphQL API", func() {
 		Expect(retrievedSession).NotTo(BeNil())
 		Expect(retrievedSession.ID).To(Equal(session.ID))
 		Expect(retrievedSession.UserID).NotTo(BeZero())
+
+		updatedSession, err := tokenClient.UpdateSession(ctx, session.ID, "TERMINATED", true)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(updatedSession).NotTo(BeNil())
+		Expect(updatedSession.ID).To(Equal(session.ID))
 
 		event, err := tokenClient.CreateEvent(ctx, session.ID, "test", "test", "{}")
 		Expect(err).NotTo(HaveOccurred())

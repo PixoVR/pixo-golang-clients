@@ -14,6 +14,7 @@ type MockGraphQLClient struct {
 	CalledCreateUser    bool
 	CalledGetSession    bool
 	CalledCreateSession bool
+	CalledUpdateSession bool
 	CalledCreateEvent   bool
 }
 
@@ -73,6 +74,22 @@ func (m *MockGraphQLClient) CreateSession(ctx context.Context, moduleID int, ipA
 		ModuleID:  moduleID,
 		IPAddress: ipAddress,
 		DeviceID:  deviceId,
+	}, nil
+}
+
+func (m *MockGraphQLClient) UpdateSession(ctx context.Context, id int, status string, completed bool) (*Session, error) {
+
+	m.CalledUpdateSession = true
+
+	if id <= 0 {
+		return nil, errors.New("invalid session id")
+	}
+
+	return &Session{
+		ID:        id,
+		UserID:    1,
+		ModuleID:  1,
+		IPAddress: "127.0.0.1",
 	}, nil
 }
 

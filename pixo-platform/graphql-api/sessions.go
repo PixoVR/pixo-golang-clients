@@ -10,6 +10,7 @@ import (
 type SessionsClient interface {
 	GetSession(ctx context.Context, id int) (*Session, error)
 	CreateSession(ctx context.Context, moduleID int, ipAddress, deviceId string) (*Session, error)
+	UpdateSession(ctx context.Context, id int, status string, completed bool) (*Session, error)
 	CreateEvent(ctx context.Context, sessionID int, uuid string, eventType string, data string) (*platform.Event, error)
 }
 
@@ -32,6 +33,10 @@ type Session struct {
 
 type CreateSessionResponse struct {
 	Session Session `json:"createSession"`
+}
+
+type UpdateSessionResponse struct {
+	Session Session `json:"updateSession"`
 }
 
 type SessionResponse struct {
@@ -79,6 +84,30 @@ func (g *GraphQLAPIClient) CreateSession(ctx context.Context, moduleID int, ipAd
 	}
 
 	var sessionResponse CreateSessionResponse
+	if err = json.Unmarshal(res, &sessionResponse); err != nil {
+		return nil, err
+	}
+
+	return &sessionResponse.Session, nil
+}
+
+func (g *GraphQLAPIClient) UpdateSession(ctx context.Context, id int, status string, completed bool) (*Session, error) {
+	query := `mutation updateSession($input: SessionInput!) { updateSession(input: $input) { id } }`
+
+	variables := map[string]interface{}{
+		"input": map[string]interface{}{
+			"id":        id,
+			"status":    status,
+			"completed": completed,
+		},
+	}
+
+	res, err := g.gqlClient.ExecRaw(ctx, query, variables)
+	if err != nil {
+		return nil, err
+	}
+
+	var sessionResponse UpdateSessionResponse
 	if err = json.Unmarshal(res, &sessionResponse); err != nil {
 		return nil, err
 	}
