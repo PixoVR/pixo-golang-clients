@@ -44,7 +44,7 @@ var _ = Describe("GraphQL API", func() {
 		Expect(client.IsAuthenticated()).To(BeTrue())
 	})
 
-	It("can create a service account with a secret key and login with it", func() {
+	It("can create a user then delete it", func() {
 		user := platform.User{
 			FirstName: faker.FirstName(),
 			LastName:  faker.LastName(),
@@ -56,6 +56,13 @@ var _ = Describe("GraphQL API", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(serviceAccount).NotTo(BeNil())
 		Expect(serviceAccount.ID).NotTo(BeZero())
+
+		err = tokenClient.DeleteUser(ctx, serviceAccount.ID)
+		Expect(err).NotTo(HaveOccurred())
+
+		deletedUser, err := tokenClient.GetUserByUsername(ctx, user.Username)
+		Expect(err).To(HaveOccurred())
+		Expect(deletedUser).To(BeNil())
 	})
 
 	It("can create get and update a session, and then create an event with a secret key", func() {

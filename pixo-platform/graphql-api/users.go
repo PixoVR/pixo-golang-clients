@@ -8,8 +8,13 @@ import (
 )
 
 type UsersClient interface {
+	GetUserByUsername(ctx context.Context, username string) (*platform.User, error)
 	CreateUser(ctx context.Context, user platform.User) (*platform.User, error)
 	DeleteUser(ctx context.Context, id int) error
+}
+
+type GetUserResponse struct {
+	User platform.User `json:"getUser"`
 }
 
 type CreateUserResponse struct {
@@ -68,4 +73,24 @@ func (g *GraphQLAPIClient) DeleteUser(ctx context.Context, id int) error {
 	}
 
 	return nil
+}
+
+func (g *GraphQLAPIClient) GetUserByUsername(ctx context.Context, username string) (*platform.User, error) {
+	query := `query user($id: ID, $username: String) { user(id: $id, username: $username) { id username } }`
+
+	variables := map[string]interface{}{
+		"username": username,
+	}
+
+	res, err := g.gqlClient.ExecRaw(ctx, query, variables)
+	if err != nil {
+		return nil, err
+	}
+
+	var userResponse GetUserResponse
+	if err = json.Unmarshal(res, &userResponse); err != nil {
+		return nil, err
+	}
+
+	return &userResponse.User, nil
 }

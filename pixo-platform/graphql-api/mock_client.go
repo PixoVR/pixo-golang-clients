@@ -6,16 +6,38 @@ import (
 	"errors"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	commonerrors "github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/commonerrors"
+	"github.com/go-faker/faker/v4"
 	"github.com/rs/zerolog/log"
 	"time"
 )
 
 type MockGraphQLClient struct {
+	CalledGetUser       bool
 	CalledCreateUser    bool
+	CalledDeleteUser    bool
 	CalledGetSession    bool
 	CalledCreateSession bool
 	CalledUpdateSession bool
 	CalledCreateEvent   bool
+}
+
+func (m *MockGraphQLClient) GetUserByUsername(ctx context.Context, username string) (*platform.User, error) {
+
+	m.CalledGetUser = true
+
+	if username == "" {
+		return nil, commonerrors.ErrorRequired("username")
+	}
+
+	return &platform.User{
+		ID:        1,
+		FirstName: faker.FirstName(),
+		LastName:  faker.LastName(),
+		Username:  username,
+		OrgID:     1,
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+	}, nil
 }
 
 func (m *MockGraphQLClient) CreateUser(ctx context.Context, user platform.User) (*platform.User, error) {
@@ -40,6 +62,8 @@ func (m *MockGraphQLClient) CreateUser(ctx context.Context, user platform.User) 
 }
 
 func (m *MockGraphQLClient) DeleteUser(ctx context.Context, id int) error {
+
+	m.CalledDeleteUser = true
 
 	if id <= 0 {
 		return errors.New("invalid user id")
