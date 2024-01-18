@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/config"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
@@ -42,11 +43,14 @@ var loginCmd = &cobra.Command{
 			viper.Set("password", password)
 			log.Debug().Msgf("Attempting to login with password: %s", password)
 
+			clientConfig := urlfinder.ClientConfig{
+				Lifecycle: input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
+				Region:    input.GetConfigValue("region", "PIXO_REGION"),
+			}
 			client, err := graphql_api.NewClientWithBasicAuth(
 				username,
 				password,
-				input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
-				input.GetConfigValue("region", "PIXO_REGION"),
+				clientConfig,
 			)
 			if err != nil {
 				log.Error().Err(err).Msg("Could not create platform client")
