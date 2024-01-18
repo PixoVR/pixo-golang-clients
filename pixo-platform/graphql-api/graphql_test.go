@@ -5,6 +5,7 @@ import (
 	"fmt"
 	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/k8s/agones"
 	"github.com/go-faker/faker/v4"
 	. "github.com/onsi/ginkgo/v2"
@@ -23,12 +24,13 @@ var _ = Describe("GraphQL API", func() {
 	)
 
 	BeforeEach(func() {
-		secretKeyClient = NewClient("", lifecycle, "")
+		config := urlfinder.ClientConfig{Lifecycle: lifecycle}
+		secretKeyClient = NewClient(config)
 		Expect(secretKeyClient).NotTo(BeNil())
 		Expect(secretKeyClient.IsAuthenticated()).To(BeTrue())
 
 		var err error
-		tokenClient, err = NewClientWithBasicAuth(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"), lifecycle, "")
+		tokenClient, err = NewClientWithBasicAuth(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"), config)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(tokenClient).NotTo(BeNil())
 		Expect(tokenClient.IsAuthenticated()).To(BeTrue())
@@ -38,7 +40,8 @@ var _ = Describe("GraphQL API", func() {
 	})
 
 	It("can login", func() {
-		client := NewClient("", lifecycle, "na")
+		config := urlfinder.ClientConfig{Lifecycle: lifecycle, Region: "na"}
+		client := NewClient(config)
 		err := client.Login(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(client.IsAuthenticated()).To(BeTrue())

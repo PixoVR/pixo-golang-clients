@@ -23,6 +23,17 @@ var _ = Describe("Urlfinder", func() {
 			Expect(domain).To(Equal("localhost"))
 		})
 
+		It("can use internal k8s dns", func() {
+			config := urlfinder.ServiceConfig{
+				Lifecycle:   "dev",
+				InternalDNS: true,
+				Namespace:   "dev-apex",
+				Service:     "primary-api",
+			}
+			domain := config.FormatURL()
+			Expect(domain).To(Equal("http://dev-apex-primary-api.dev-apex.svc"))
+		})
+
 		It("can find the dev domain", func() {
 			config := urlfinder.ServiceConfig{Lifecycle: "dev"}
 			domain := config.GetBaseDomain()

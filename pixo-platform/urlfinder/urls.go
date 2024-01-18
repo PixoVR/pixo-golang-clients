@@ -5,11 +5,21 @@ import (
 )
 
 type ServiceConfig struct {
-	Service   string
-	Port      int
-	Tenant    string
-	Region    string
+	Service     string
+	Port        int
+	Tenant      string
+	Region      string
+	Lifecycle   string
+	Namespace   string
+	InternalDNS bool
+}
+
+type ClientConfig struct {
+	Token     string
+	Internal  bool
 	Lifecycle string
+	Namespace string
+	Region    string
 }
 
 func (s ServiceConfig) FormatURL() string {
@@ -40,6 +50,10 @@ func (s ServiceConfig) FormatURL() string {
 
 	if s.Region == "" {
 		s.Region = DefaultRegion
+	}
+
+	if s.InternalDNS {
+		return fmt.Sprintf("http://%s-%s.%s.svc", s.Namespace, s.Service, s.Namespace)
 	}
 
 	var prefix string

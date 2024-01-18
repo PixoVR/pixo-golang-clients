@@ -21,34 +21,34 @@ type GraphQLAPIClient struct {
 }
 
 // NewClient is a function that returns a GraphQLAPIClient
-func NewClient(token, lifecycle, region string) *GraphQLAPIClient {
+func NewClient(config urlfinder.ClientConfig) *GraphQLAPIClient {
 
-	if token == "" {
-		token = os.Getenv("SECRET_KEY")
+	if config.Token == "" {
+		config.Token = os.Getenv("SECRET_KEY")
 	}
 
-	config := newServiceConfig(lifecycle, region)
+	serviceConfig := newServiceConfig(config)
 
-	url := config.FormatURL()
+	url := serviceConfig.FormatURL()
 
-	c := http.Client{Transport: &transport{underlyingTransport: http.DefaultTransport, token: token}}
+	c := http.Client{Transport: &transport{underlyingTransport: http.DefaultTransport, token: config.Token}}
 
 	return &GraphQLAPIClient{
-		PixoAbstractAPIClient: *abstract_client.NewClient(token, url),
+		PixoAbstractAPIClient: *abstract_client.NewClient(config.Token, url),
 		gqlClient:             graphql.NewClient(fmt.Sprintf("%s/query", url), &c),
 		defaultContext:        context.Background(),
 	}
 }
 
 // NewClientWithBasicAuth is a function that returns a GraphQLAPIClient with basic auth performed
-func NewClientWithBasicAuth(username, password, lifecycle, region string) (*GraphQLAPIClient, error) {
+func NewClientWithBasicAuth(username, password string, config urlfinder.ClientConfig) (*GraphQLAPIClient, error) {
 
-	config := newServiceConfig(lifecycle, region)
+	serviceConfig := newServiceConfig(config)
 
-	url := config.FormatURL()
+	url := serviceConfig.FormatURL()
 
 	client := &GraphQLAPIClient{
-		PixoAbstractAPIClient: *abstract_client.NewClient("", config.FormatURL()),
+		PixoAbstractAPIClient: *abstract_client.NewClient("", serviceConfig.FormatURL()),
 		defaultContext:        context.Background(),
 	}
 
@@ -64,11 +64,17 @@ func NewClientWithBasicAuth(username, password, lifecycle, region string) (*Grap
 	return client, nil
 }
 
-func newServiceConfig(lifecycle, region string) urlfinder.ServiceConfig {
+func newServiceConfig(config urlfinder.ClientConfig) urlfinder.ServiceConfig {
+	service := "v2"
+	if config.Internal {
+		service = "primary-api"
+	}
+
 	return urlfinder.ServiceConfig{
-		Service:   "v2",
-		Lifecycle: lifecycle,
-		Region:    region,
+		Service:   service,
+		Lifecycle: config.Lifecycle,
+		Region:    config.Region,
+		Namespace: fmt.Sprintf("%s-apex", config.Lifecycle),
 		Port:      8000,
 	}
 }
