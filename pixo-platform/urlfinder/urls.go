@@ -5,6 +5,7 @@ import (
 )
 
 type ServiceConfig struct {
+	ServiceName string
 	Service     string
 	Port        int
 	Tenant      string
@@ -53,7 +54,7 @@ func (s ServiceConfig) FormatURL() string {
 	}
 
 	if s.InternalDNS {
-		return fmt.Sprintf("http://%s-%s.%s.svc", s.Namespace, s.Service, s.Namespace)
+		return fmt.Sprintf("http://%s-%s.%s.svc", s.Namespace, s.ServiceName, s.Namespace)
 	}
 
 	var prefix string

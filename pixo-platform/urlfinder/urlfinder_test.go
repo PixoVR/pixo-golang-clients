@@ -28,7 +28,7 @@ var _ = Describe("Urlfinder", func() {
 				Lifecycle:   "dev",
 				InternalDNS: true,
 				Namespace:   "dev-apex",
-				Service:     "primary-api",
+				ServiceName: "primary-api",
 			}
 			domain := config.FormatURL()
 			Expect(domain).To(Equal("http://dev-apex-primary-api.dev-apex.svc"))

@@ -65,16 +65,12 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 }
 
 func newServiceConfig(config urlfinder.ClientConfig) urlfinder.ServiceConfig {
-	service := "v2"
-	if config.Internal {
-		service = "primary-api"
-	}
-
 	return urlfinder.ServiceConfig{
-		Service:   service,
-		Lifecycle: config.Lifecycle,
-		Region:    config.Region,
-		Namespace: fmt.Sprintf("%s-apex", config.Lifecycle),
-		Port:      8000,
+		Service:     "v2",
+		ServiceName: "primary-api",
+		Lifecycle:   config.Lifecycle,
+		Region:      config.Region,
+		Namespace:   fmt.Sprintf("%s-apex", config.Lifecycle),
+		Port:        8000,
 	}
 }
