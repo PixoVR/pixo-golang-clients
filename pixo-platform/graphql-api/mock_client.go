@@ -80,6 +80,7 @@ func (m *MockGraphQLClient) CreateUser(ctx context.Context, user platform.User) 
 		return nil, errors.New("invalid org id")
 	}
 
+	user.ID = 1
 	user.CreatedAt = time.Now().UTC()
 	user.UpdatedAt = time.Now().UTC()
 	return &user, nil
