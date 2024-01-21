@@ -10,6 +10,7 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/parser"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	platformAPI "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
 
@@ -75,6 +76,7 @@ var deployCmd = &cobra.Command{
 		}
 
 		cmd.Println("Successfully created multiplayer server version:", semanticVersion)
+		log.Info().Msgf("Successfully created multiplayer server version:", semanticVersion)
 		return nil
 	},
 }
