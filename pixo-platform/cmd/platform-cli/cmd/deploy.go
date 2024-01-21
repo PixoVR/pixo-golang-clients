@@ -76,7 +76,7 @@ var deployCmd = &cobra.Command{
 		}
 
 		cmd.Println("Successfully created multiplayer server version:", semanticVersion)
-		log.Info().Msgf("Successfully created multiplayer server version:", semanticVersion)
+		log.Info().Msgf("Successfully created multiplayer server version: %s", semanticVersion)
 		return nil
 	},
 }
