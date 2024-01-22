@@ -54,7 +54,7 @@ func (g *GraphQLAPIClient) GetSession(ctx context.Context, id int) (*Session, er
 		"id": id,
 	}
 
-	res, err := g.gqlClient.ExecRaw(ctx, query, variables)
+	res, err := g.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (g *GraphQLAPIClient) CreateSession(ctx context.Context, moduleID int, ipAd
 		},
 	}
 
-	res, err := g.gqlClient.ExecRaw(ctx, query, variables)
+	res, err := g.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +102,7 @@ func (g *GraphQLAPIClient) UpdateSession(ctx context.Context, id int, status str
 		},
 	}
 
-	res, err := g.gqlClient.ExecRaw(ctx, query, variables)
+	res, err := g.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +127,7 @@ func (g *GraphQLAPIClient) CreateEvent(ctx context.Context, sessionID int, uuid 
 		},
 	}
 
-	res, err := g.gqlClient.ExecRaw(ctx, query, variables)
+	res, err := g.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return nil, err
 	}

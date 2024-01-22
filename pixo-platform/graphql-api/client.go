@@ -14,9 +14,9 @@ import (
 
 // GraphQLAPIClient is a struct for the graphql API that contains an abstract client
 type GraphQLAPIClient struct {
-	abstract_client.PixoAbstractAPIClient
+	*abstract_client.PixoAbstractAPIClient
+	*graphql.Client
 	underlyingTransport http.RoundTripper
-	gqlClient           *graphql.Client
 	defaultContext      context.Context
 }
 
@@ -34,8 +34,8 @@ func NewClient(config urlfinder.ClientConfig) *GraphQLAPIClient {
 	c := http.Client{Transport: &transport{underlyingTransport: http.DefaultTransport, token: config.Token}}
 
 	return &GraphQLAPIClient{
-		PixoAbstractAPIClient: *abstract_client.NewClient(config.Token, url),
-		gqlClient:             graphql.NewClient(fmt.Sprintf("%s/query", url), &c),
+		PixoAbstractAPIClient: abstract_client.NewClient(config.Token, url),
+		Client:                graphql.NewClient(fmt.Sprintf("%s/query", url), &c),
 		defaultContext:        context.Background(),
 	}
 }
@@ -48,7 +48,7 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 	url := serviceConfig.FormatURL()
 
 	client := &GraphQLAPIClient{
-		PixoAbstractAPIClient: *abstract_client.NewClient("", serviceConfig.FormatURL()),
+		PixoAbstractAPIClient: abstract_client.NewClient("", serviceConfig.FormatURL()),
 		defaultContext:        context.Background(),
 	}
 
@@ -59,7 +59,7 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 
 	c := http.Client{Transport: &transport{underlyingTransport: http.DefaultTransport, token: client.GetToken()}}
 
-	client.gqlClient = graphql.NewClient(fmt.Sprintf("%s/query", url), &c)
+	client.Client = graphql.NewClient(fmt.Sprintf("%s/query", url), &c)
 
 	return client, nil
 }

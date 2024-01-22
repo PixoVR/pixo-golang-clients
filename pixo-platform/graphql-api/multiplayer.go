@@ -12,7 +12,7 @@ func (g *GraphQLAPIClient) GetMultiplayerServerConfigs(ctx context.Context, para
 		"params": params,
 	}
 
-	if err := g.gqlClient.Query(ctx, &query, variables); err != nil {
+	if err := g.Client.Query(ctx, &query, variables); err != nil {
 		return nil, err
 	}
 
@@ -32,7 +32,7 @@ func (g *GraphQLAPIClient) CreateMultiplayerServerVersion(ctx context.Context, m
 		},
 	}
 
-	if _, err := g.gqlClient.ExecRaw(ctx, query, variables); err != nil {
+	if _, err := g.Client.ExecRaw(ctx, query, variables); err != nil {
 		return err
 	}
 

@@ -44,7 +44,7 @@ func (g *GraphQLAPIClient) CreateUser(ctx context.Context, user platform.User) (
 		},
 	}
 
-	res, err := g.gqlClient.ExecRaw(ctx, query, variables)
+	res, err := g.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +95,7 @@ func (g *GraphQLAPIClient) UpdateUser(ctx context.Context, user platform.User) (
 		variables["input"].(map[string]interface{})["role"] = user.Role
 	}
 
-	res, err := g.gqlClient.ExecRaw(ctx, query, variables)
+	res, err := g.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func (g *GraphQLAPIClient) DeleteUser(ctx context.Context, id int) error {
 		"id": id,
 	}
 
-	res, err := g.gqlClient.ExecRaw(ctx, query, variables)
+	res, err := g.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return err
 	}
@@ -139,7 +139,7 @@ func (g *GraphQLAPIClient) GetUserByUsername(ctx context.Context, username strin
 		"username": username,
 	}
 
-	res, err := g.gqlClient.ExecRaw(ctx, query, variables)
+	res, err := g.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return nil, err
 	}
