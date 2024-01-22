@@ -23,8 +23,8 @@ build:
 image:
 	docker build ../.. -t ${NAME} -f ./Dockerfile
 
-container:
-	docker run -d --rm -it ${NAME}
+container: image
+	docker run -d --rm -it ${NAME} -- auth login
 
 clean:
 	rm -rf ${EXECUTABLE} || true
