@@ -14,41 +14,41 @@ import (
 
 // GraphQLAPIClient is a struct for the graphql API that contains an abstract client
 type GraphQLAPIClient struct {
-	abstract_client.PixoAbstractAPIClient
+	*abstract_client.PixoAbstractAPIClient
+	*graphql.Client
 	underlyingTransport http.RoundTripper
-	gqlClient           *graphql.Client
 	defaultContext      context.Context
 }
 
 // NewClient is a function that returns a GraphQLAPIClient
-func NewClient(token, lifecycle, region string) *GraphQLAPIClient {
+func NewClient(config urlfinder.ClientConfig) *GraphQLAPIClient {
 
-	if token == "" {
-		token = os.Getenv("SECRET_KEY")
+	if config.Token == "" {
+		config.Token = os.Getenv("SECRET_KEY")
 	}
 
-	config := newServiceConfig(lifecycle, region)
+	serviceConfig := newServiceConfig(config)
 
-	url := config.FormatURL()
+	url := serviceConfig.FormatURL()
 
-	c := http.Client{Transport: &transport{underlyingTransport: http.DefaultTransport, token: token}}
+	c := http.Client{Transport: &transport{underlyingTransport: http.DefaultTransport, token: config.Token}}
 
 	return &GraphQLAPIClient{
-		PixoAbstractAPIClient: *abstract_client.NewClient(token, url),
-		gqlClient:             graphql.NewClient(fmt.Sprintf("%s/query", url), &c),
+		PixoAbstractAPIClient: abstract_client.NewClient(config.Token, url),
+		Client:                graphql.NewClient(fmt.Sprintf("%s/query", url), &c),
 		defaultContext:        context.Background(),
 	}
 }
 
 // NewClientWithBasicAuth is a function that returns a GraphQLAPIClient with basic auth performed
-func NewClientWithBasicAuth(username, password, lifecycle, region string) (*GraphQLAPIClient, error) {
+func NewClientWithBasicAuth(username, password string, config urlfinder.ClientConfig) (*GraphQLAPIClient, error) {
 
-	config := newServiceConfig(lifecycle, region)
+	serviceConfig := newServiceConfig(config)
 
-	url := config.FormatURL()
+	url := serviceConfig.FormatURL()
 
 	client := &GraphQLAPIClient{
-		PixoAbstractAPIClient: *abstract_client.NewClient("", config.FormatURL()),
+		PixoAbstractAPIClient: abstract_client.NewClient("", serviceConfig.FormatURL()),
 		defaultContext:        context.Background(),
 	}
 
@@ -59,16 +59,18 @@ func NewClientWithBasicAuth(username, password, lifecycle, region string) (*Grap
 
 	c := http.Client{Transport: &transport{underlyingTransport: http.DefaultTransport, token: client.GetToken()}}
 
-	client.gqlClient = graphql.NewClient(fmt.Sprintf("%s/query", url), &c)
+	client.Client = graphql.NewClient(fmt.Sprintf("%s/query", url), &c)
 
 	return client, nil
 }
 
-func newServiceConfig(lifecycle, region string) urlfinder.ServiceConfig {
+func newServiceConfig(config urlfinder.ClientConfig) urlfinder.ServiceConfig {
 	return urlfinder.ServiceConfig{
-		Service:   "v2",
-		Lifecycle: lifecycle,
-		Region:    region,
-		Port:      8000,
+		Service:     "v2",
+		ServiceName: "primary-api",
+		Lifecycle:   config.Lifecycle,
+		Region:      config.Region,
+		Namespace:   fmt.Sprintf("%s-apex", config.Lifecycle),
+		Port:        8000,
 	}
 }

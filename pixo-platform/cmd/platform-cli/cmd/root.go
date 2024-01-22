@@ -8,6 +8,7 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/parser"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	platformAPI "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
@@ -34,7 +35,7 @@ func NewRootCmd() *cobra.Command {
 // rootCmd represents the base rootCmd when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:     "pixo",
-	Version: "0.0.120",
+	Version: "0.0.128",
 	Short:   "A CLI for the Pixo Platform",
 	Long:    `A CLI tool used to streamline interactions with the Pixo Platform`,
 }
@@ -66,11 +67,12 @@ func init() {
 		log.Error().Err(err).Msg("Failed to read config file")
 	}
 
-	apiClient = platformAPI.NewClient(
-		viper.GetString("token"),
-		input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
-		input.GetConfigValue("region", "PIXO_REGION"),
-	)
+	clientConfig := urlfinder.ClientConfig{
+		Token:     viper.GetString("token"),
+		Lifecycle: input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
+		Region:    input.GetConfigValue("region", "PIXO_REGION"),
+	}
+	apiClient = platformAPI.NewClient(clientConfig)
 
 	rootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
 		initLogger(cmd)

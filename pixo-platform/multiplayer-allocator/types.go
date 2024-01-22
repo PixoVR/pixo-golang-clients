@@ -32,20 +32,21 @@ type AllocationResponse struct {
 }
 
 type GameServer struct {
-	Name           string `json:"resource_name,omitempty"`
-	IP             string `json:"ipaddress,omitempty"`
-	Port           string `json:"port,omitempty"`
-	SessionName    string `json:"session_name,omitempty"`
-	SessionID      string `json:"session_id,omitempty"`
-	OwningUserName string `json:"owning_user_name,omitempty"`
-	OrgID          int    `json:"org_id,omitempty"`
-	ModuleID       int    `json:"module_id,omitempty"`
-	ServerVersion  string `json:"server_version,omitempty"`
-	MapName        string `json:"map_name,omitempty"`
-	State          string `json:"state,omitempty"`
-	NumPlaying     int    `json:"num_playing,omitempty"`
-	NumBackfill    int    `json:"num_backfill,omitempty"`
-	Capacity       int    `json:"capacity,omitempty"`
-	Logs           string `json:"logs,omitempty"`
-	SidecarLogs    string `json:"sidecar_logs,omitempty"`
+	Name           string   `json:"resource_name,omitempty"`
+	IP             string   `json:"ipaddress,omitempty"`
+	Port           string   `json:"port,omitempty"`
+	SessionName    string   `json:"session_name,omitempty"`
+	SessionID      string   `json:"session_id,omitempty"`
+	OwningUserName string   `json:"owning_user_name,omitempty"`
+	OrgID          int      `json:"org_id,omitempty"`
+	ModuleID       int      `json:"module_id,omitempty"`
+	ServerVersion  string   `json:"server_version,omitempty"`
+	MapName        string   `json:"map_name,omitempty"`
+	State          string   `json:"state,omitempty"`
+	NumPlaying     int      `json:"num_playing,omitempty"`
+	Players        []string `json:"players,omitempty"`
+	NumBackfill    int      `json:"num_backfill,omitempty"`
+	Capacity       int      `json:"capacity,omitempty"`
+	Logs           string   `json:"logs,omitempty"`
+	SidecarLogs    string   `json:"sidecar_logs,omitempty"`
 }

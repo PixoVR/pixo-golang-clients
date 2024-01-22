@@ -8,6 +8,7 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"strconv"
@@ -19,11 +20,14 @@ var createCmd = &cobra.Command{
 	Short: "Creating a user",
 	Long:  `Creating a user with the following command:`,
 	Run: func(cmd *cobra.Command, args []string) {
+		clientConfig := urlfinder.ClientConfig{
+			Lifecycle: input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
+			Region:    input.GetConfigValue("region", "PIXO_REGION"),
+		}
 		client, err := graphql_api.NewClientWithBasicAuth(
 			input.GetConfigValue("username", "PIXO_USERNAME"),
 			input.GetConfigValue("password", "PIXO_PASSWORD"),
-			input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
-			input.GetConfigValue("region", "PIXO_REGION"),
+			clientConfig,
 		)
 		if err != nil {
 			log.Error().Err(err).Msg("Could not create platform client")
