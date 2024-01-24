@@ -49,7 +49,12 @@ func NewClient(config urlfinder.ClientConfig) *GraphQLAPIClient {
 
 	url := serviceConfig.FormatURL()
 
-	c := http.Client{Transport: &transport{underlyingTransport: http.DefaultTransport, token: config.Token}}
+	t := &transport{
+		underlyingTransport: http.DefaultTransport,
+		token:               config.Token,
+		key:                 config.Key,
+	}
+	c := http.Client{Transport: t}
 
 	return &GraphQLAPIClient{
 		PixoAbstractAPIClient: abstract_client.NewClient(config.Token, url),
