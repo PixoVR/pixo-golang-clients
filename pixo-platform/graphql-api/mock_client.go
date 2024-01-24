@@ -141,6 +141,7 @@ func (m *MockGraphQLClient) CreateAPIKey(ctx context.Context, input platform.API
 		return nil, errors.New("error creating api key")
 	}
 
+	input.ID = 1
 	input.CreatedAt = time.Now().UTC()
 	input.UpdatedAt = time.Now().UTC()
 
