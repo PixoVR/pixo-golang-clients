@@ -9,6 +9,7 @@ import (
 type PixoAbstractAPIClient struct {
 	url            string
 	token          string
+	key            string
 	headers        map[string]string
 	restyClient    *resty.Client
 	conn           *websocket.Conn

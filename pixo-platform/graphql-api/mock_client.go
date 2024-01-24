@@ -11,6 +11,8 @@ import (
 	"time"
 )
 
+var _ PlatformClient = (*MockGraphQLClient)(nil)
+
 type MockGraphQLClient struct {
 	CalledGetUser bool
 	GetUserError  bool
@@ -23,6 +25,12 @@ type MockGraphQLClient struct {
 
 	CalledDeleteUser bool
 	DeleteUserError  bool
+
+	CalledCreateAPIKey bool
+	CreateAPIKeyError  bool
+
+	CalledDeleteAPIKey bool
+	DeleteAPIKeyError  bool
 
 	CalledGetSession bool
 	GetSessionError  bool
@@ -120,6 +128,35 @@ func (m *MockGraphQLClient) DeleteUser(ctx context.Context, id int) error {
 
 	if id <= 0 {
 		return errors.New("invalid user id")
+	}
+
+	return nil
+}
+
+func (m *MockGraphQLClient) CreateAPIKey(ctx context.Context, input platform.APIKey) (*platform.APIKey, error) {
+
+	m.CalledCreateAPIKey = true
+
+	if m.CreateAPIKeyError {
+		return nil, errors.New("error creating api key")
+	}
+
+	input.CreatedAt = time.Now().UTC()
+	input.UpdatedAt = time.Now().UTC()
+
+	return &input, nil
+}
+
+func (m *MockGraphQLClient) DeleteAPIKey(ctx context.Context, id int) error {
+
+	m.CalledDeleteAPIKey = true
+
+	if m.DeleteAPIKeyError {
+		return errors.New("error deleting api key")
+	}
+
+	if id <= 0 {
+		return errors.New("invalid api key id")
 	}
 
 	return nil

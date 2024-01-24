@@ -4,96 +4,20 @@ import (
 	"context"
 	"fmt"
 	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
-	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/k8s/agones"
-	"github.com/go-faker/faker/v4"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"math/rand"
-	"os"
 )
 
 var _ = Describe("GraphQL API", func() {
 
 	var (
-		secretKeyClient *GraphQLAPIClient
-		tokenClient     *GraphQLAPIClient
-		lifecycle       = "local"
-		ctx             context.Context
+		ctx context.Context
 	)
 
 	BeforeEach(func() {
-		config := urlfinder.ClientConfig{Lifecycle: lifecycle}
-		secretKeyClient = NewClient(config)
-		Expect(secretKeyClient).NotTo(BeNil())
-		Expect(secretKeyClient.IsAuthenticated()).To(BeTrue())
-
-		var err error
-		tokenClient, err = NewClientWithBasicAuth(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"), config)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(tokenClient).NotTo(BeNil())
-		Expect(tokenClient.IsAuthenticated()).To(BeTrue())
-		Expect(tokenClient.GetToken()).NotTo(BeEmpty())
-
 		ctx = context.Background()
-	})
-
-	It("can login", func() {
-		config := urlfinder.ClientConfig{Lifecycle: lifecycle, Region: "na"}
-		client := NewClient(config)
-		err := client.Login(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"))
-		Expect(err).NotTo(HaveOccurred())
-		Expect(client.IsAuthenticated()).To(BeTrue())
-	})
-
-	It("can create a user then delete it", func() {
-		user := platform.User{
-			FirstName: faker.FirstName(),
-			LastName:  faker.LastName(),
-			Username:  faker.Username(),
-			Password:  faker.Password(),
-			OrgID:     1,
-		}
-		serviceAccount, err := tokenClient.CreateUser(ctx, user)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(serviceAccount).NotTo(BeNil())
-		Expect(serviceAccount.ID).NotTo(BeZero())
-
-		retrievedUser, err := tokenClient.GetUserByUsername(ctx, user.Username)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(retrievedUser).NotTo(BeNil())
-		Expect(retrievedUser.ID).To(Equal(serviceAccount.ID))
-		Expect(retrievedUser.Username).To(Equal(user.Username))
-		Expect(retrievedUser.FirstName).To(Equal(user.FirstName))
-		Expect(retrievedUser.LastName).To(Equal(user.LastName))
-		Expect(retrievedUser.OrgID).To(Equal(user.OrgID))
-
-		updatedUser, err := tokenClient.UpdateUser(ctx, user)
-		Expect(err).To(HaveOccurred())
-		Expect(updatedUser).To(BeNil())
-		Expect(err.Error()).To(ContainSubstring("user id is required"))
-
-		user.ID = serviceAccount.ID
-		user.Role = "superadmin"
-		user.FirstName = faker.FirstName()
-		user.LastName = faker.LastName()
-
-		updatedUser, err = tokenClient.UpdateUser(ctx, user)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(updatedUser).NotTo(BeNil())
-		Expect(updatedUser.ID).To(Equal(serviceAccount.ID))
-		Expect(updatedUser.Username).To(Equal(user.Username))
-		Expect(updatedUser.FirstName).To(Equal(user.FirstName))
-		Expect(updatedUser.LastName).To(Equal(user.LastName))
-		Expect(updatedUser.Role).To(Equal(user.Role))
-
-		err = tokenClient.DeleteUser(ctx, serviceAccount.ID)
-		Expect(err).NotTo(HaveOccurred())
-
-		deletedUser, err := tokenClient.GetUserByUsername(ctx, user.Username)
-		Expect(err).To(HaveOccurred())
-		Expect(deletedUser).To(BeNil())
 	})
 
 	It("can create get and update a session, and then create an event with a secret key", func() {

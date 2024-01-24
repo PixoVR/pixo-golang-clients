@@ -4,7 +4,6 @@ Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/parser"
@@ -43,6 +42,13 @@ var deployCmd = &cobra.Command{
 
 		}
 
+		if err := apiClient.Login(
+			input.GetConfigValue("username", "PIXO_USERNAME"),
+			input.GetConfigValue("password", "PIXO_PASSWORD"),
+		); err != nil {
+			return err
+		}
+
 		isPrecheck := cmd.Flag("pre-check").Value.String()
 		if isPrecheck == "true" {
 
@@ -51,7 +57,7 @@ var deployCmd = &cobra.Command{
 				SemanticVersion: semanticVersion,
 			}
 
-			if versions, err := apiClient.GetMultiplayerServerVersions(context.Background(), params); err != nil {
+			if versions, err := apiClient.GetMultiplayerServerVersions(cmd.Context(), params); err != nil {
 				cmd.Println("unable to retrieve server versions from platform api")
 				return err
 
@@ -69,7 +75,7 @@ var deployCmd = &cobra.Command{
 			return errors.New("no gameserver image provided")
 		}
 
-		if err := apiClient.CreateMultiplayerServerVersion(context.Background(), moduleID, image, semanticVersion); err != nil {
+		if err := apiClient.CreateMultiplayerServerVersion(cmd.Context(), moduleID, image, semanticVersion); err != nil {
 			msg := fmt.Sprintf("Failed to create multiplayer server version: %s - %s", semanticVersion, err.Error())
 			return errors.New(msg)
 		}

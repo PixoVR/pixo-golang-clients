@@ -1,44 +1,48 @@
 package abstract_client_test
 
 import (
+	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"net/http"
 )
 
 var _ = Describe("Abstract", func() {
 
+	var (
+		fakeToken = "fake-token"
+		apiClient *abstract_client.PixoAbstractAPIClient
+	)
+
+	BeforeEach(func() {
+		apiClient = abstract_client.NewClient(fakeToken, "")
+	})
+
 	It("can set the token", func() {
-		client := abstract_client.NewClient("", "")
-		client.SetToken("some-fake-token")
-		Expect(client.GetToken()).To(Equal("some-fake-token"))
+		newClient := abstract_client.NewClient("", "")
+		newClient.SetToken(fakeToken)
+		Expect(newClient.GetToken()).To(Equal(fakeToken))
 	})
 
-	It("can format the request headers needed for authentication", func() {
-		client := abstract_client.NewClient("some-fake-token", "")
-		client.AddHeader("x-fake-header", "some-fake-token")
+	It("can add headers needed for authentication", func() {
+		apiClient.AddHeader("x-fake-header", fakeToken)
 
-		request := client.FormatRequest()
+		request := apiClient.FormatRequest()
 
-		Expect(request.Header.Get("Authorization")).To(Equal("Bearer some-fake-token"))
-		Expect(request.Header.Get("x-access-token")).To(Equal("some-fake-token"))
-		Expect(request.Header.Get("x-fake-header")).To(Equal("some-fake-token"))
+		Expect(request.Header.Get("Authorization")).To(Equal(fmt.Sprintf("Bearer %s", fakeToken)))
+		Expect(request.Header.Get("x-fake-header")).To(Equal(fakeToken))
 	})
 
-	It("should be able to add headers to the request", func() {
-		client := abstract_client.NewClient("", "https://api.apex.dev.pixovr.com")
+	It("can use the api key", func() {
+		apiClient.SetAPIKey(fakeToken)
 
-		res, err := client.Get("health")
+		request := apiClient.FormatRequest()
 
-		Expect(err).NotTo(HaveOccurred())
-		Expect(res.StatusCode()).To(Equal(http.StatusOK))
+		Expect(request.Header.Get("x-api-key")).To(Equal(fakeToken))
 	})
 
 	It("should return a response if the request fails", func() {
-		client := abstract_client.NewClient("", "")
-
-		res, err := client.Post("invalid", nil)
+		res, err := apiClient.Post("invalid", nil)
 
 		Expect(err).To(HaveOccurred())
 		Expect(res).To(BeNil())

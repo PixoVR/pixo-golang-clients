@@ -101,6 +101,14 @@ pixo users create \
     
 ```
 
+## Create an API Key
+```bash
+pixo create apiKey
+
+# Or for a specific user
+pixo create apiKey --user-id 1
+```
+
 ## Deploy a Module Game Server Version
 ```bash
 # Check if server version with semantic version already exists

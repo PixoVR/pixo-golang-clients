@@ -9,14 +9,17 @@ import (
 	"math/rand"
 )
 
-var _ = Describe("Deploy", func() {
+var _ = Describe("Deploy", Ordered, func() {
+
+	var (
+		semanticVersion string
+	)
+
+	BeforeAll(func() {
+		semanticVersion = fmt.Sprintf("%d.%d.%d", rand.Intn(100), rand.Intn(100), rand.Intn(100))
+	})
 
 	It("can deploy a server version", func() {
-		majorVersion := rand.Intn(100)
-		minorVersion := rand.Intn(100)
-		patchVersion := rand.Intn(100)
-		semanticVersion := fmt.Sprintf("%d.%d.%d", majorVersion, minorVersion, patchVersion)
-
 		rootCmd, output := GetRootCmd()
 		rootCmd.SetArgs([]string{
 			"mp",
@@ -47,7 +50,7 @@ var _ = Describe("Deploy", func() {
 			"--module-id",
 			"1",
 			"--server-version",
-			"1.00.00",
+			semanticVersion,
 		})
 		err := rootCmd.Execute()
 		Expect(err).To(HaveOccurred())

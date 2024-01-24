@@ -19,8 +19,8 @@ var _ = Describe("Users", func() {
 
 		rootCmd, output := GetRootCmd()
 		rootCmd.SetArgs([]string{
-			"users",
 			"create",
+			"user",
 			"--first-name",
 			firstName,
 			"--last-name",
@@ -39,7 +39,7 @@ var _ = Describe("Users", func() {
 
 		out, err := io.ReadAll(output)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(string(out)).To(ContainSubstring(fmt.Sprintf("created user %s", username)))
+		Expect(string(out)).To(ContainSubstring(fmt.Sprintf("Created user %s", username)))
 	})
 
 })

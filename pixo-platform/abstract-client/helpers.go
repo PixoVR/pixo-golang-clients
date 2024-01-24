@@ -25,6 +25,16 @@ func (p *PixoAbstractAPIClient) SetToken(token string) {
 	p.token = token
 }
 
+// GetAPIKey returns the token of the restClient
+func (p *PixoAbstractAPIClient) GetAPIKey() string {
+	return p.key
+}
+
+// SetAPIKey sets the token of the restClient
+func (p *PixoAbstractAPIClient) SetAPIKey(key string) {
+	p.key = key
+}
+
 // GetURLWithPath returns the url of the restClient with a path appended
 func (p *PixoAbstractAPIClient) GetURLWithPath(path string) string {
 	return fmt.Sprintf("%s/%s", p.url, path)
@@ -41,8 +51,11 @@ func (p *PixoAbstractAPIClient) FormatRequest() *resty.Request {
 		SetHeader("Content-Type", "application/json")
 
 	if p.token != "" {
-		req.SetHeader("x-access-token", p.token).
-			SetHeader("Authorization", fmt.Sprintf("Bearer %s", p.token))
+		req.SetHeader("Authorization", fmt.Sprintf("Bearer %s", p.token))
+	}
+
+	if p.key != "" {
+		req.SetHeader("x-api-key", p.key)
 	}
 
 	for key, value := range p.headers {

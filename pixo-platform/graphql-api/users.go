@@ -7,13 +7,6 @@ import (
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 )
 
-type UsersClient interface {
-	GetUserByUsername(ctx context.Context, username string) (*platform.User, error)
-	CreateUser(ctx context.Context, user platform.User) (*platform.User, error)
-	UpdateUser(ctx context.Context, user platform.User) (*platform.User, error)
-	DeleteUser(ctx context.Context, id int) error
-}
-
 type GetUserResponse struct {
 	User platform.User `json:"user"`
 }

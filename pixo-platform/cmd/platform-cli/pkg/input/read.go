@@ -74,6 +74,20 @@ func GetStringValueOrAskUser(cmd *cobra.Command, flagName, envVarName string, de
 	return cmd.Flag(flagName).DefValue
 }
 
+func GetIntValue(cmd *cobra.Command, flagName, envVarName string) int {
+	var val string
+	if cmd.Flag(flagName).Value.String() != "" {
+		return ToInt(cmd.Flag(flagName).Value.String())
+	}
+
+	val = GetConfigValue(flagName, envVarName)
+	if val != "" {
+		return ToInt(val)
+	}
+
+	return ToInt(cmd.Flag(flagName).DefValue)
+}
+
 func GetStringValue(cmd *cobra.Command, flagName, envVarName string) string {
 	if cmd.Flag(flagName).Value.String() != "" {
 		return cmd.Flag(flagName).Value.String()
@@ -90,11 +104,11 @@ func GetStringValue(cmd *cobra.Command, flagName, envVarName string) string {
 func GetConfigValue(flagName, envVarName string) string {
 	val, ok := os.LookupEnv(envVarName)
 	if ok {
-		return val
+		return strings.TrimSpace(val)
 	}
 
 	if val = viper.GetString(flagName); val != "" {
-		return val
+		return strings.TrimSpace(val)
 	}
 
 	return ""

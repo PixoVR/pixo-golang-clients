@@ -3,6 +3,7 @@ package graphql_api
 import (
 	"context"
 	"fmt"
+	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"github.com/rs/zerolog/log"
 	"net/http"
@@ -11,6 +12,23 @@ import (
 	abstract_client "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
 	"github.com/hasura/go-graphql-client"
 )
+
+type PlatformClient interface {
+	GetUserByUsername(ctx context.Context, username string) (*platform.User, error)
+	CreateUser(ctx context.Context, user platform.User) (*platform.User, error)
+	UpdateUser(ctx context.Context, user platform.User) (*platform.User, error)
+	DeleteUser(ctx context.Context, id int) error
+
+	CreateAPIKey(ctx context.Context, input platform.APIKey) (*platform.APIKey, error)
+	DeleteAPIKey(ctx context.Context, id int) error
+
+	GetSession(ctx context.Context, id int) (*Session, error)
+	CreateSession(ctx context.Context, moduleID int, ipAddress, deviceId string) (*Session, error)
+	UpdateSession(ctx context.Context, id int, status string, completed bool) (*Session, error)
+	CreateEvent(ctx context.Context, sessionID int, uuid string, eventType string, data string) (*platform.Event, error)
+}
+
+var _ PlatformClient = (*GraphQLAPIClient)(nil)
 
 // GraphQLAPIClient is a struct for the graphql API that contains an abstract client
 type GraphQLAPIClient struct {
