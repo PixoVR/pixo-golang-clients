@@ -142,6 +142,7 @@ func (m *MockGraphQLClient) CreateAPIKey(ctx context.Context, input platform.API
 	}
 
 	input.ID = 1
+	input.Key = faker.UUIDHyphenated()
 	input.CreatedAt = time.Now().UTC()
 	input.UpdatedAt = time.Now().UTC()
 
