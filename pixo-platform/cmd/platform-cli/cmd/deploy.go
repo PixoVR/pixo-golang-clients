@@ -59,7 +59,6 @@ var deployCmd = &cobra.Command{
 			}
 
 			spinner := loader.NewSpinner(cmd.OutOrStdout())
-			defer spinner.Stop()
 
 			if versions, err := apiClient.GetMultiplayerServerVersions(cmd.Context(), params); err != nil {
 				cmd.Println(emoji.Sprint(":negative_squared_cross_mark:Unable to retrieve server versions from platform api"))
@@ -72,6 +71,7 @@ var deployCmd = &cobra.Command{
 				return nil
 			}
 
+			spinner.Stop()
 			cmd.Println(emoji.Sprintf(":heavy_check_mark:Server version does not exist yet: %s", semanticVersion))
 			return nil
 		}

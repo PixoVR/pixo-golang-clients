@@ -85,10 +85,18 @@ func init() {
 }
 
 func getAuthenticatedClient() *platform.GraphQLAPIClient {
-	secretKey := input.GetConfigValue("secret-key", "SECRET_KEY")
-	if secretKey != "" {
-		apiClient.SetToken(secretKey)
-		return apiClient
+	token := input.GetConfigValue("token", "SECRET_KEY")
+	if token != "" {
+		oldAPIClient := primary_api.NewClient(urlfinder.ClientConfig{
+			Token:     token,
+			Lifecycle: input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
+			Region:    input.GetConfigValue("region", "PIXO_REGION"),
+		})
+		return platform.NewClient(urlfinder.ClientConfig{
+			Token:     oldAPIClient.GetToken(),
+			Lifecycle: input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
+			Region:    input.GetConfigValue("region", "PIXO_REGION"),
+		})
 	}
 
 	apiKey := input.GetConfigValue("api-key", "PIXO_API_KEY")
@@ -111,7 +119,11 @@ func getAuthenticatedClient() *platform.GraphQLAPIClient {
 		return nil
 	}
 
-	apiClient.SetToken(oldAPIClient.GetToken())
+	apiClient = platform.NewClient(urlfinder.ClientConfig{
+		Token:     oldAPIClient.GetToken(),
+		Lifecycle: input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
+		Region:    input.GetConfigValue("region", "PIXO_REGION"),
+	})
 
 	//if err = apiClient.Login(username, password); err != nil {
 	//	log.Error().Err(err).Msg("Failed to authenticate")
