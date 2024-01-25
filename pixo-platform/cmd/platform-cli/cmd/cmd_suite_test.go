@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/cmd"
 	"github.com/joho/godotenv"
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"io"
 	"os"
@@ -28,9 +27,7 @@ func TestCLI(t *testing.T) {
 	root := GetProjectRoot()
 	envPath := filepath.Join(root, "../../../../.env")
 
-	if err := godotenv.Load(envPath); err != nil {
-		log.Warn().Msgf("Failed to load .env file at %s", envPath)
-	}
+	_ = godotenv.Load(envPath)
 
 	RunSpecs(t, "Pixo Platform CLI Suite")
 }

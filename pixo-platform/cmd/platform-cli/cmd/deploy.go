@@ -8,7 +8,9 @@ import (
 	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/parser"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/loader"
 	platformAPI "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
+	"github.com/kyokomi/emoji"
 	"github.com/spf13/cobra"
 )
 
@@ -57,6 +59,8 @@ var deployCmd = &cobra.Command{
 				SemanticVersion: semanticVersion,
 			}
 
+			spinner := loader.NewSpinner(cmd.OutOrStdout())
+
 			if versions, err := apiClient.GetMultiplayerServerVersions(cmd.Context(), params); err != nil {
 				cmd.Println("unable to retrieve server versions from platform api")
 				return err
@@ -66,6 +70,7 @@ var deployCmd = &cobra.Command{
 				return errors.New(errMsg)
 			}
 
+			spinner.Stop()
 			cmd.Println("server version does not exist yet:", semanticVersion)
 			return nil
 		}
@@ -75,12 +80,15 @@ var deployCmd = &cobra.Command{
 			return errors.New("no gameserver image provided")
 		}
 
+		spinner := loader.NewSpinner(cmd.OutOrStdout())
+
 		if err := apiClient.CreateMultiplayerServerVersion(cmd.Context(), moduleID, image, semanticVersion); err != nil {
 			msg := fmt.Sprintf("Failed to create multiplayer server version: %s - %s", semanticVersion, err.Error())
 			return errors.New(msg)
 		}
 
-		cmd.Println("Successfully created multiplayer server version:", semanticVersion)
+		spinner.Stop()
+		cmd.Println(emoji.Sprint(":cruise_ship:Successfully created multiplayer server version: ", semanticVersion))
 		return nil
 	},
 }

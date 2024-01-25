@@ -38,7 +38,7 @@ var buildCmd = &cobra.Command{
 			cmd.Println(log)
 		}
 
-		cmd.Println("Done streaming logs")
+		cmd.Println("Stop streaming logs")
 	},
 }
 

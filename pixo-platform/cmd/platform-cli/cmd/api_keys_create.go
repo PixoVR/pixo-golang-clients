@@ -5,8 +5,12 @@ package cmd
 
 import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/loader"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
+	"github.com/kyokomi/emoji"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // apiKeyCmd represents the apiKey command
@@ -15,6 +19,10 @@ var createApiKeyCmd = &cobra.Command{
 	Short: "Creating API keys",
 	Long:  `Create API key with the following command:`,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		cmd.Println(emoji.Sprintf(":key:Creating API Key"))
+
+		spinner := loader.NewSpinner(cmd.OutOrStdout())
+
 		if err := apiClient.Login(
 			input.GetConfigValue("username", "PIXO_USERNAME"),
 			input.GetConfigValue("password", "PIXO_PASSWORD"),
@@ -32,7 +40,16 @@ var createApiKeyCmd = &cobra.Command{
 			return err
 		}
 
-		cmd.Println("Created API key: " + apiKey.Key)
+		viper.Set("api-key", apiKey.Key)
+
+		if err := viper.WriteConfigAs(cfgFile); err != nil {
+			log.Error().Err(err).Msg("Could not write config file")
+			return err
+		}
+
+		spinner.Stop()
+
+		cmd.Println(emoji.Sprintf(":heavy_check_mark:API key created: %s", apiKey.Key))
 		return nil
 	},
 }

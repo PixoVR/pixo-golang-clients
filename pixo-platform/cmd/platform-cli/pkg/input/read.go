@@ -3,6 +3,7 @@ package input
 import (
 	"bufio"
 	"fmt"
+	"github.com/kyokomi/emoji"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -130,7 +131,7 @@ func ReadSensitiveFromUser(cmd *cobra.Command, prompt string) string {
 }
 
 func ReadFromUser(cmd *cobra.Command, prompt string) string {
-	cmd.Print(prompt)
+	cmd.Print(emoji.Sprintf(":fountain_pen:%s", prompt))
 
 	reader := bufio.NewReader(cmd.InOrStdin())
 	message, _ := reader.ReadString('\n')

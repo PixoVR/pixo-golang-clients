@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/loader"
 	"github.com/spf13/cobra"
 )
 
@@ -14,6 +15,8 @@ var deleteApiKeyCmd = &cobra.Command{
 	Short: "Deleting API keys",
 	Long:  `Delete API key with the following command:`,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		spinner := loader.NewSpinner(cmd.OutOrStdout())
+
 		if err := apiClient.Login(
 			input.GetConfigValue("username", "PIXO_USERNAME"),
 			input.GetConfigValue("password", "PIXO_PASSWORD"),
@@ -28,6 +31,7 @@ var deleteApiKeyCmd = &cobra.Command{
 			return err
 		}
 
+		spinner.Stop()
 		cmd.Printf("Deleted API key: %d\n", apiKeyID)
 		return nil
 	},

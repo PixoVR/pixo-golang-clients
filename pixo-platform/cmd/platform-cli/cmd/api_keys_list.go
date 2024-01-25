@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/loader"
 	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
 	"github.com/spf13/cobra"
 )
@@ -15,6 +16,8 @@ var listApiKeyCmd = &cobra.Command{
 	Short: "List API keys",
 	Long:  `List API key with the following command:`,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		spinner := loader.NewSpinner(cmd.OutOrStdout())
+
 		if err := apiClient.Login(
 			input.GetConfigValue("username", "PIXO_USERNAME"),
 			input.GetConfigValue("password", "PIXO_PASSWORD"),
@@ -34,6 +37,7 @@ var listApiKeyCmd = &cobra.Command{
 			cmd.Printf("Key ID: %d\n", apiKey.ID)
 		}
 
+		spinner.Stop()
 		return nil
 	},
 }

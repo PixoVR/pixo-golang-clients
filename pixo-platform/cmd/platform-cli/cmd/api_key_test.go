@@ -20,7 +20,19 @@ var _ = Describe("API Keys", func() {
 		Expect(err).NotTo(HaveOccurred())
 		out, err := io.ReadAll(output)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(string(out)).To(ContainSubstring("Created API key"))
+		Expect(string(out)).To(ContainSubstring("API key created"))
+
+		rootCmd.SetArgs([]string{
+			"config",
+			"list",
+		})
+
+		err = rootCmd.Execute()
+
+		Expect(err).NotTo(HaveOccurred())
+		out, err = io.ReadAll(output)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(string(out)).To(ContainSubstring("api-key : "))
 	})
 
 	It("can list api keys", func() {

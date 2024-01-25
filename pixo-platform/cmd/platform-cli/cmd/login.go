@@ -5,9 +5,10 @@ package cmd
 
 import (
 	"errors"
-	"fmt"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/loader"
 	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
+	"github.com/kyokomi/emoji"
 
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/config"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
@@ -47,6 +48,9 @@ var loginCmd = &cobra.Command{
 				Lifecycle: input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
 				Region:    input.GetConfigValue("region", "PIXO_REGION"),
 			}
+
+			spinner := loader.NewSpinner(cmd.OutOrStdout())
+
 			client, err := graphql_api.NewClientWithBasicAuth(
 				username,
 				password,
@@ -60,7 +64,8 @@ var loginCmd = &cobra.Command{
 				return errors.New("could not create platform client")
 			}
 
-			cmd.Println(fmt.Sprintf("Login successful. Here is your API token: \n%s", client.GetToken()))
+			spinner.Stop()
+			cmd.Println(emoji.Sprintf(":rocket:Login successful. Here is your API token: \n%s", client.GetToken()))
 
 			viper.Set("token", client.GetToken())
 		}
