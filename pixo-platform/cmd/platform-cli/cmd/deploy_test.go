@@ -35,7 +35,7 @@ var _ = Describe("Deploy", Ordered, func() {
 	})
 
 	It("can check if a server version exists", func() {
-		output, err := RunCommand(
+		_, err := RunCommand(
 			"mp",
 			"serverVersions",
 			"deploy",
@@ -48,7 +48,7 @@ var _ = Describe("Deploy", Ordered, func() {
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("already exists"))
 
-		output, err = RunCommand(
+		output, err := RunCommand(
 			"mp",
 			"serverVersions",
 			"deploy",

@@ -2,6 +2,8 @@ package cmd_test
 
 import (
 	"fmt"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/cmd"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/editor"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"os"
@@ -66,6 +68,16 @@ var _ = Describe("Config", func() {
 		)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring("password : test"))
+	})
+
+	It("can open up the config file", func() {
+		fileOpener := &editor.MockFileOpener{}
+
+		cmd.FileOpener = fileOpener
+
+		output, err := RunCommand("--config", testConfigPath, "config", "--edit")
+		Expect(err).NotTo(HaveOccurred())
+		Expect(output).To(ContainSubstring("Opening config file"))
 	})
 
 })

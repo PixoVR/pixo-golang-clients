@@ -1,12 +1,30 @@
 # Pixo Platform CLI
-This is a CLI that allows you to interact with the Pixo Platform in various ways. It is likely to be most helpful to  
-developers building modules to be deployed on the Pixo Platform. It can be used for things like authenticating  
+This is a CLI that allows you to interact with the Pixo Platform in various ways. It is likely to be most helpful to 
+developers building modules to be deployed on the Pixo Platform. It can be used for things like authenticating 
 with the platform, deploying gameserver versions, and simplifying the testing of multiplayer components.
 
 ## Prerequisites
-- [Pixo Account](https://apex.pixovr.com)
+- [Pixo Account](https://apex.pixovr.com) with API Key or Username/Password
 
-API Key or Username/Password are needed to authenticate with the Pixo Platform APIs.
+## Table of Contents
+- [Installation](#installation)
+    - [MacOS - HomeBrew](#macos---homebrew)
+    - [Windows](#windows)
+    - [Build from Source](#build-from-source)
+- [Initialization](#initialization)
+- [Configuration](#configuration)
+    - [Sample Environment Variables](#sample-environment-variables)
+    - [Sample Configuration File](#sample-configuration-file)
+    - [Set via Command Line](#set-via-command-line)
+    - [Edit Configuration File](#edit-configuration-file)
+- [Create a User](#create-a-user)
+- [API Keys](#api-keys)
+    - [Create an API Key](#create-an-api-key)
+    - [List API Keys](#list-api-keys)
+    - [Delete an API Key](#delete-an-api-key)
+- [Deploy a Module Game Server Version](#deploy-a-module-game-server-version)
+- [Test Multiplayer Matchmaking](#test-multiplayer-matchmaking)
+- [Run Mock Matchmaking Server](#run-mock-matchmaking-server)
 
 
 ## Installation
@@ -27,6 +45,14 @@ The CLI can be installed by downloading the latest release from the [releases pa
 or building from source.
 ```
 git clone git@github.com:PixoVR/pixo-golang-clients.git
+cd pixo-golang-clients/pixo-platform/cmd/platform-cli
+make build
+./bin/pixo help
+```
+
+### Build from Source
+```bash
+git clone github.com/PixoVR/pixo-golang-clients.git
 cd pixo-golang-clients/pixo-platform/cmd/platform-cli
 make build
 ./bin/pixo help
@@ -63,6 +89,7 @@ export PIXO_REGION=na
 ```
 
 ### Sample Configuration File:
+
 ```yaml
 # ~/.pixo/config.yaml
 
@@ -88,6 +115,13 @@ pixo config set --region saudi # Switch to saudi environment
 pixo config set --lifecycle dev # Switch to dev environment
 pixo config set --key module-id --val 1 # Set default module id
 ```
+
+## Edit Configuration File
+Editor can be set via the `EDITOR` environment variable. Defaults to `vim`.
+```bash
+pixo config --edit
+```
+
 
 ## Create a User
 ```bash
@@ -137,11 +171,6 @@ pixo mp serverVersions deploy \
     --module-id 1 \
     --server-version 1.00.00 \
     --image gcr.io/pixo-bootstrap/multiplayer/gameservers/simple-server:latest
-```
-
-## Tail logs of a Game Server Build
-```bash
-pixo logs build --module-id 1
 ```
 
 ## Test Multiplayer Matchmaking

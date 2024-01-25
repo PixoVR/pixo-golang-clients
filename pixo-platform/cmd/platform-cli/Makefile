@@ -4,7 +4,7 @@ EXECUTABLE = ./bin/$(NAME)
 
 all: lint test build cp
 
-new: build cp
+dev: build cp
 
 cp:
 	sudo cp $(EXECUTABLE) /usr/local/bin/$(NAME)
