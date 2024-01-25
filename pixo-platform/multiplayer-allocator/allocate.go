@@ -13,7 +13,7 @@ func (a *AllocatorClient) AllocateGameserver(request AllocationRequest) Allocati
 		return AllocationResponse{Error: err}
 	}
 
-	path := "allocator/allocate"
+	path := "allocate"
 
 	res, err := a.Post(path, body)
 	if err != nil {

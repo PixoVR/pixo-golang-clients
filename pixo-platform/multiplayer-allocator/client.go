@@ -12,13 +12,13 @@ type AllocatorClient struct {
 }
 
 // NewClient is a function that returns a PixoAbstractAPIClient
-func NewClient(token, lifecycle, region string) *AllocatorClient {
+func NewClient(config urlfinder.ClientConfig) *AllocatorClient {
 
-	config := newServiceConfig(lifecycle, region)
+	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
 
 	abstractConfig := abstractClient.AbstractConfig{
-		URL:   config.FormatURL(),
-		Token: token,
+		URL:   serviceConfig.FormatURL(),
+		Token: config.Token,
 	}
 
 	return &AllocatorClient{
@@ -26,16 +26,16 @@ func NewClient(token, lifecycle, region string) *AllocatorClient {
 	}
 }
 
-func NewClientWithBasicAuth(username, password, lifecycle, region string) (*AllocatorClient, error) {
-	primaryClient, err := primary_api.NewClientWithBasicAuth(username, password, lifecycle, region)
+func NewClientWithBasicAuth(username, password string, config urlfinder.ClientConfig) (*AllocatorClient, error) {
+	primaryClient, err := primary_api.NewClientWithBasicAuth(username, password, config)
 	if err != nil {
 		return nil, err
 	}
 
-	config := newServiceConfig(lifecycle, region)
+	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
 
 	abstractConfig := abstractClient.AbstractConfig{
-		URL:   config.FormatURL(),
+		URL:   serviceConfig.FormatURL(),
 		Token: primaryClient.GetToken(),
 	}
 

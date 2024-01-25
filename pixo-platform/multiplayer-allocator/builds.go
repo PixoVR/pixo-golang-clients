@@ -23,7 +23,7 @@ type Workflow struct {
 }
 
 func (a *AllocatorClient) GetBuildWorkflows() ([]Workflow, error) {
-	path := "allocator/build/workflows"
+	path := "build/workflows"
 
 	res, err := a.Get(path)
 	if err != nil {
@@ -46,7 +46,7 @@ func (a *AllocatorClient) GetBuildWorkflows() ([]Workflow, error) {
 }
 
 func (a *AllocatorClient) GetBuildWorkflowLogs(workflowName string) (chan *argo.Log, error) {
-	path := fmt.Sprintf("allocator/build/workflows/%s/logs", workflowName)
+	path := fmt.Sprintf("build/workflows/%s/logs", workflowName)
 
 	req := a.FormatRequest()
 	req.SetHeader("Accept", "application/octet-stream")

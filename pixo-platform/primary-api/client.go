@@ -12,13 +12,13 @@ type PrimaryAPIClient struct {
 }
 
 // NewClient is a function that returns a PixoAbstractAPIClient
-func NewClient(token, lifecycle, region string) *PrimaryAPIClient {
+func NewClient(config urlfinder.ClientConfig) *PrimaryAPIClient {
 
-	config := newServiceConfig(lifecycle, region)
+	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
 
 	abstractConfig := abstractClient.AbstractConfig{
-		Token: token,
-		URL:   config.FormatURL(),
+		Token: config.Token,
+		URL:   serviceConfig.FormatURL(),
 	}
 
 	return &PrimaryAPIClient{
@@ -27,12 +27,12 @@ func NewClient(token, lifecycle, region string) *PrimaryAPIClient {
 }
 
 // NewClientWithBasicAuth is a function that returns a PixoAbstractAPIClient with basic auth performed
-func NewClientWithBasicAuth(username, password, lifecycle, region string) (*PrimaryAPIClient, error) {
+func NewClientWithBasicAuth(username, password string, config urlfinder.ClientConfig) (*PrimaryAPIClient, error) {
 
-	config := newServiceConfig(lifecycle, region)
+	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
 
 	abstractConfig := abstractClient.AbstractConfig{
-		URL: config.FormatURL(),
+		URL: serviceConfig.FormatURL(),
 	}
 
 	primaryClient := &PrimaryAPIClient{

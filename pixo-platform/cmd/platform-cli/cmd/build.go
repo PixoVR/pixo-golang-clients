@@ -6,6 +6,7 @@ package cmd
 import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	multiplayerAllocator "github.com/PixoVR/pixo-golang-clients/pixo-platform/multiplayer-allocator"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"github.com/spf13/cobra"
 )
 
@@ -16,11 +17,12 @@ var buildCmd = &cobra.Command{
 	Long:  `Retrieve logs for a specific build`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		allocatorClient := multiplayerAllocator.NewClient(
-			input.GetConfigValue("token", "PIXO_TOKEN"),
-			input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
-			input.GetConfigValue("region", "PIXO_REGION"),
-		)
+		config := urlfinder.ClientConfig{
+			Lifecycle: input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
+			Region:    input.GetConfigValue("region", "PIXO_REGION"),
+			Token:     input.GetConfigValue("token", "PIXO_TOKEN"),
+		}
+		allocatorClient := multiplayerAllocator.NewClient(config)
 
 		workflows, err := allocatorClient.GetBuildWorkflows()
 		if err != nil {

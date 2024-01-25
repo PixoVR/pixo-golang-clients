@@ -6,7 +6,8 @@ package cmd
 import (
 	"errors"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/loader"
-	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
+	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
+	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"github.com/kyokomi/emoji"
 
@@ -51,7 +52,7 @@ var loginCmd = &cobra.Command{
 
 			spinner := loader.NewSpinner(cmd.OutOrStdout())
 
-			client, err := graphql_api.NewClientWithBasicAuth(
+			client, err := platform.NewClientWithBasicAuth(
 				username,
 				password,
 				clientConfig,
@@ -81,4 +82,41 @@ var loginCmd = &cobra.Command{
 
 func init() {
 	authCmd.AddCommand(loginCmd)
+}
+
+func getAuthenticatedClient() *platform.GraphQLAPIClient {
+	secretKey := input.GetConfigValue("secret-key", "SECRET_KEY")
+	if secretKey != "" {
+		apiClient.SetToken(secretKey)
+		return apiClient
+	}
+
+	apiKey := input.GetConfigValue("api-key", "PIXO_API_KEY")
+	if apiKey != "" {
+		apiClient.SetAPIKey(apiKey)
+		return apiClient
+	}
+
+	username := input.GetConfigValue("username", "PIXO_USERNAME")
+	password := input.GetConfigValue("password", "PIXO_PASSWORD")
+
+	clientConfig := urlfinder.ClientConfig{
+		Lifecycle: input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
+		Region:    input.GetConfigValue("region", "PIXO_REGION"),
+	}
+
+	oldAPIClient, err := primary_api.NewClientWithBasicAuth(username, password, clientConfig)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to authenticate")
+		return nil
+	}
+
+	apiClient.SetToken(oldAPIClient.GetToken())
+
+	//if err = apiClient.Login(username, password); err != nil {
+	//	log.Error().Err(err).Msg("Failed to authenticate")
+	//	return nil
+	//}
+
+	return apiClient
 }

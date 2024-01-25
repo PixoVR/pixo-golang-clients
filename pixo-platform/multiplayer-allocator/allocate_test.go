@@ -2,6 +2,7 @@ package multiplayer_allocator_test
 
 import (
 	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/multiplayer-allocator"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/k8s/agones"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -13,16 +14,21 @@ var _ = Describe("Allocate", Ordered, func() {
 
 	var (
 		allocatorClient *AllocatorClient
+		config          urlfinder.ClientConfig
 	)
 
 	BeforeEach(func() {
-		allocatorClient = NewClient(os.Getenv("SECRET_KEY"), "dev", "")
+		config = urlfinder.ClientConfig{
+			Token:     os.Getenv("SECRET_KEY"),
+			Lifecycle: "dev",
+		}
+		allocatorClient = NewClient(config)
 		Expect(allocatorClient.IsAuthenticated()).To(BeTrue())
 	})
 
 	It("should be able make a health check against the allocator", func() {
-		client := NewClient("", "dev", "")
-		res, err := client.Get("allocator/health")
+		client := NewClient(config)
+		res, err := client.Get("health")
 		Expect(err).NotTo(HaveOccurred())
 		Expect(res).NotTo(BeNil())
 		Expect(res.StatusCode()).To(Equal(http.StatusOK))

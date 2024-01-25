@@ -46,6 +46,8 @@ var deployCmd = &cobra.Command{
 
 		}
 
+		cmd.Println("Deploying server version: ", semanticVersion)
+
 		apiClient := getAuthenticatedClient()
 
 		isPrecheck := cmd.Flag("pre-check").Value.String()

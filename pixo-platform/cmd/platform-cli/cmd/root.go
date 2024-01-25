@@ -35,7 +35,7 @@ func NewRootCmd() *cobra.Command {
 // rootCmd represents the base rootCmd when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:     "pixo",
-	Version: "0.0.141",
+	Version: "0.0.142",
 	Short:   "A CLI for the Pixo Platform",
 	Long:    `A CLI tool used to streamline interactions with the Pixo Platform`,
 }
@@ -92,28 +92,4 @@ func initLogger(cmd *cobra.Command) {
 
 func isDebug(cmd *cobra.Command) bool {
 	return cmd.Flag("debug").Value.String() == "true"
-}
-
-func getAuthenticatedClient() *platformAPI.GraphQLAPIClient {
-	secretKey := input.GetConfigValue("secret-key", "SECRET_KEY")
-	if secretKey != "" {
-		apiClient.SetToken(secretKey)
-		return apiClient
-	}
-
-	apiKey := input.GetConfigValue("api-key", "PIXO_API_KEY")
-	if apiKey != "" {
-		apiClient.SetAPIKey(apiKey)
-		return apiClient
-	}
-
-	if err := apiClient.Login(
-		input.GetConfigValue("username", "PIXO_USERNAME"),
-		input.GetConfigValue("password", "PIXO_PASSWORD"),
-	); err != nil {
-		log.Error().Err(err).Msg("Failed to authenticate")
-		return nil
-	}
-
-	return apiClient
 }

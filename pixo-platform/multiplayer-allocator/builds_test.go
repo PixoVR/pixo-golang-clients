@@ -2,6 +2,7 @@ package multiplayer_allocator_test
 
 import (
 	multiplayerAllocator "github.com/PixoVR/pixo-golang-clients/pixo-platform/multiplayer-allocator"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"os"
@@ -15,7 +16,11 @@ var _ = Describe("Builds", func() {
 
 	BeforeEach(func() {
 		var err error
-		allocatorClient, err = multiplayerAllocator.NewClientWithBasicAuth(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"), "dev", "")
+		config := urlfinder.ClientConfig{
+			Lifecycle: "dev",
+			Token:     os.Getenv("SECRET_KEY"),
+		}
+		allocatorClient = multiplayerAllocator.NewClient(config)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(allocatorClient.IsAuthenticated()).To(BeTrue())
 	})
