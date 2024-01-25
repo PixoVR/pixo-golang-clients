@@ -65,6 +65,10 @@ func (s ServiceConfig) FormatURL() string {
 			prefix = "multi-central1"
 		}
 	case "saudi":
+		if (s.Lifecycle == "prod" || s.Lifecycle == "") && s.Tenant == "apex" && s.Service == "v2" {
+			return fmt.Sprintf("https://apisa.pixovr.com/v2")
+		}
+
 		if s.Tenant == "multiplayer" {
 			prefix = "multi-saudi"
 		} else {

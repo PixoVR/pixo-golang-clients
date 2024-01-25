@@ -73,6 +73,14 @@ var _ = Describe("Urlfinder", func() {
 			Expect(url).To(Equal("https://saudi.apex.dev.pixovr.com/v2"))
 		})
 
+		It("can find the url for the legacy saudi prod platform API", func() {
+			config := urlfinder.ServiceConfig{
+				Region: "saudi",
+			}
+			url := config.FormatURL()
+			Expect(url).To(Equal("https://apisa.pixovr.com/v2"))
+		})
+
 	})
 
 	Context("matchmaking", func() {
