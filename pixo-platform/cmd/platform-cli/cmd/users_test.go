@@ -5,7 +5,6 @@ import (
 	"github.com/go-faker/faker/v4"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"io"
 )
 
 var _ = Describe("Users", func() {
@@ -17,10 +16,9 @@ var _ = Describe("Users", func() {
 		orgID := "1"
 		role := "developer"
 
-		rootCmd, output := GetRootCmd()
-		rootCmd.SetArgs([]string{
+		output, err := RunCommand(
+			"users",
 			"create",
-			"user",
 			"--first-name",
 			firstName,
 			"--last-name",
@@ -33,13 +31,9 @@ var _ = Describe("Users", func() {
 			orgID,
 			"--role",
 			role,
-		})
-		err := rootCmd.Execute()
+		)
 		Expect(err).NotTo(HaveOccurred())
-
-		out, err := io.ReadAll(output)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(string(out)).To(ContainSubstring(fmt.Sprintf("Created user %s", username)))
+		Expect(output).To(ContainSubstring(fmt.Sprintf("Created user %s", username)))
 	})
 
 })

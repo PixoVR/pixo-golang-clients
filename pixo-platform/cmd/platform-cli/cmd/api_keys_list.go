@@ -26,10 +26,23 @@ var listApiKeyCmd = &cobra.Command{
 		}
 
 		apiKeyParams := &graphql_api.APIKeyQueryParams{}
+
+		userID := input.GetIntValue(cmd, "user-id", "PIXO_USER_ID")
+		if userID != 0 {
+			apiKeyParams.UserID = &userID
+		}
+
 		apiKeys, err := apiClient.GetAPIKeys(cmd.Context(), apiKeyParams)
 		if err != nil {
 			cmd.Println("Error listing API keys: ", err.Error())
 			return err
+		}
+
+		spinner.Stop()
+
+		if len(apiKeys) == 0 {
+			cmd.Println("No API Keys found")
+			return nil
 		}
 
 		cmd.Println("API Keys:")
@@ -37,7 +50,6 @@ var listApiKeyCmd = &cobra.Command{
 			cmd.Printf("Key ID: %d\n", apiKey.ID)
 		}
 
-		spinner.Stop()
 		return nil
 	},
 }

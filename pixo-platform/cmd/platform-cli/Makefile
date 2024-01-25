@@ -21,8 +21,13 @@ build:
 image:
 	docker build ../.. -t ${NAME} -f ./Dockerfile
 
-container: image
-	docker run -d --rm -it ${NAME} -- auth login
+container:
+	docker run --rm -it ${NAME} --version
+
+container-debug:
+	docker run --rm -it --entrypoint /bin/bash ${NAME}
+
+docker: image container
 
 clean:
 	rm -rf ${EXECUTABLE} || true

@@ -114,6 +114,9 @@ pixo apiKeys create --user-id 1
 ### List API Keys
 ```bash
 pixo apiKeys list
+
+# Or for a specific user
+pixo apiKeys list --user-id 1
 ```
 
 ### Delete an API Key
@@ -138,7 +141,6 @@ pixo mp serverVersions deploy \
 
 ## Tail logs of a Game Server Build
 ```bash
-# Check if server version with semantic version already exists
 pixo logs build --module-id 1
 ```
 

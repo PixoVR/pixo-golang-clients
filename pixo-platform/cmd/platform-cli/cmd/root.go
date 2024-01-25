@@ -64,7 +64,7 @@ func init() {
 	viper.SetConfigType("yaml")
 
 	if err := viper.ReadInConfig(); err != nil {
-		log.Error().Err(err).Msg("Failed to read config file")
+		log.Error().Err(err).Msg("Unable to read config file")
 	}
 
 	clientConfig := urlfinder.ClientConfig{

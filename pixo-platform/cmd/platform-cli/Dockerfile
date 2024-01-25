@@ -7,7 +7,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o main cmd/platform-cli/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o main cmd/platform-cli/main.go
 
 
 FROM gcr.io/distroless/static-debian12

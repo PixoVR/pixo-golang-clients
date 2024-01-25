@@ -41,6 +41,15 @@ func GetRootCmd() (*cobra.Command, *bytes.Buffer) {
 	return rootCmd, output
 }
 
+func RunCommand(args ...string) (string, error) {
+	rootCmd, output := GetRootCmd()
+	rootCmd.SetArgs(args)
+	err := rootCmd.Execute()
+
+	out, _ := io.ReadAll(output)
+	return string(out), err
+}
+
 var _ = BeforeSuite(func() {
 	assertLogin()
 })
@@ -49,19 +58,7 @@ func assertLogin() {
 	username := os.Getenv("PIXO_USERNAME")
 	password := os.Getenv("PIXO_PASSWORD")
 
-	rootCmd, output := GetRootCmd()
-	rootCmd.SetArgs([]string{
-		"auth",
-		"login",
-		"--username",
-		username,
-		"--password",
-		password,
-	})
-	err := rootCmd.Execute()
+	output, err := RunCommand("auth", "login", "--username", username, "--password", password)
 	Expect(err).NotTo(HaveOccurred())
-
-	out, err := io.ReadAll(output)
-	Expect(err).NotTo(HaveOccurred())
-	Expect(string(out)).To(ContainSubstring("Login successful. Here is your API token:"))
+	Expect(output).To(ContainSubstring("Login successful. Here is your API token:"))
 }

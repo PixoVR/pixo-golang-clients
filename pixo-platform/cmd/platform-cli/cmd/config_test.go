@@ -21,62 +21,27 @@ var _ = Describe("Config", func() {
 	})
 
 	It("can set the lifecycle", func() {
-		command, output := GetRootCmd()
-		command.SetArgs([]string{
-			"--config",
-			testConfigPath,
-			"config",
-			"set",
-			"-l",
-			"dev",
-		})
-		err := command.Execute()
+		output, err := RunCommand("config", "set", "-l", "dev")
 		Expect(err).NotTo(HaveOccurred())
-		Expect(output.String()).To(ContainSubstring("lifecycle : dev"))
+		Expect(output).To(ContainSubstring("lifecycle : dev"))
 
-		command.SetArgs([]string{
-			"--config",
-			testConfigPath,
-			"config",
-			"set",
-			"-l",
-			"stage",
-		})
-		err = command.Execute()
+		output, err = RunCommand("--config", testConfigPath, "config", "set", "-l", "stage")
 		Expect(err).NotTo(HaveOccurred())
-		Expect(output.String()).To(ContainSubstring("lifecycle : stage"))
+		Expect(output).To(ContainSubstring("lifecycle : stage"))
 	})
 
 	It("can set the region", func() {
-		command, output := GetRootCmd()
-		command.SetArgs([]string{
-			"--config",
-			testConfigPath,
-			"config",
-			"set",
-			"-r",
-			"saudi",
-		})
-		err := command.Execute()
+		output, err := RunCommand("--config", testConfigPath, "config", "set", "-r", "saudi")
 		Expect(err).NotTo(HaveOccurred())
-		Expect(output.String()).To(ContainSubstring("region : saudi"))
+		Expect(output).To(ContainSubstring("region : saudi"))
 
-		command.SetArgs([]string{
-			"--config",
-			testConfigPath,
-			"config",
-			"set",
-			"-r",
-			"na",
-		})
-		err = command.Execute()
+		output, err = RunCommand("--config", testConfigPath, "config", "set", "-r", "na")
 		Expect(err).NotTo(HaveOccurred())
-		Expect(output.String()).To(ContainSubstring("region : na"))
+		Expect(output).To(ContainSubstring("region : na"))
 	})
 
 	It("can set the username and password", func() {
-		command, output := GetRootCmd()
-		command.SetArgs([]string{
+		output, err := RunCommand(
 			"--config",
 			testConfigPath,
 			"config",
@@ -85,12 +50,11 @@ var _ = Describe("Config", func() {
 			"username",
 			"--val",
 			"test",
-		})
-		err := command.Execute()
+		)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(output.String()).To(ContainSubstring("username : test"))
+		Expect(output).To(ContainSubstring("username : test"))
 
-		command.SetArgs([]string{
+		output, err = RunCommand(
 			"--config",
 			testConfigPath,
 			"config",
@@ -99,10 +63,9 @@ var _ = Describe("Config", func() {
 			"password",
 			"--val",
 			"test",
-		})
-		err = command.Execute()
+		)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(output.String()).To(ContainSubstring("password : test"))
+		Expect(output).To(ContainSubstring("password : test"))
 	})
 
 })

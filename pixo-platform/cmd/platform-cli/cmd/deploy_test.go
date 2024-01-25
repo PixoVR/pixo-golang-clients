@@ -5,7 +5,6 @@ import (
 	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/k8s/agones"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"io"
 	"math/rand"
 )
 
@@ -20,8 +19,7 @@ var _ = Describe("Deploy", Ordered, func() {
 	})
 
 	It("can deploy a server version", func() {
-		rootCmd, output := GetRootCmd()
-		rootCmd.SetArgs([]string{
+		output, err := RunCommand(
 			"mp",
 			"serverVersions",
 			"deploy",
@@ -31,18 +29,13 @@ var _ = Describe("Deploy", Ordered, func() {
 			semanticVersion,
 			"--image",
 			agones.SimpleGameServerImage,
-		})
-		err := rootCmd.Execute()
+		)
 		Expect(err).NotTo(HaveOccurred())
-
-		out, err := io.ReadAll(output)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(string(out)).To(ContainSubstring(fmt.Sprintf("created multiplayer server version: %s", semanticVersion)))
+		Expect(output).To(ContainSubstring(fmt.Sprintf("created multiplayer server version: %s", semanticVersion)))
 	})
 
 	It("can check if a server version exists", func() {
-		rootCmd, output := GetRootCmd()
-		rootCmd.SetArgs([]string{
+		output, err := RunCommand(
 			"mp",
 			"serverVersions",
 			"deploy",
@@ -51,12 +44,11 @@ var _ = Describe("Deploy", Ordered, func() {
 			"1",
 			"--server-version",
 			semanticVersion,
-		})
-		err := rootCmd.Execute()
+		)
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("already exists"))
 
-		rootCmd.SetArgs([]string{
+		output, err = RunCommand(
 			"mp",
 			"serverVersions",
 			"deploy",
@@ -65,13 +57,9 @@ var _ = Describe("Deploy", Ordered, func() {
 			"1",
 			"--server-version",
 			"99.99.99",
-		})
-		err = rootCmd.Execute()
+		)
 		Expect(err).NotTo(HaveOccurred())
-
-		out, err := io.ReadAll(output)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(string(out)).To(ContainSubstring("does not exist"))
+		Expect(output).To(ContainSubstring("does not exist"))
 	})
 
 })
