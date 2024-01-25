@@ -17,6 +17,7 @@ func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
 		req.Header.Add(auth.APIKeyHeader, t.key)
 	} else if t.token != "" {
 		req.Header.Add(auth.AuthorizationHeader, fmt.Sprintf("Bearer %s", t.token))
+		req.Header.Add(auth.SecretKeyHeader, t.token)
 	}
 
 	return t.underlyingTransport.RoundTrip(req)

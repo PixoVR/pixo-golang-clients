@@ -12,6 +12,7 @@ import (
 	platformAPI "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
 	"github.com/kyokomi/emoji"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 // deployCmd represents the deploy rootCmd
@@ -23,7 +24,8 @@ var deployCmd = &cobra.Command{
 
 		moduleID := input.GetIntValueOrAskUser(cmd, "module-id", "MODULE_ID")
 		if moduleID == 0 {
-			return errors.New("no module id provided")
+			cmd.Println(emoji.Sprint(":exclamation_mark:No module id provided"))
+			return nil
 		}
 
 		semanticVersion := input.GetStringValueOrAskUser(cmd, "server-version", "SERVER_VERSION")
@@ -32,24 +34,19 @@ var deployCmd = &cobra.Command{
 
 			iniParser, err := parser.NewIniParser(&iniPath)
 			if err != nil {
-				msg := fmt.Sprintf("failed to parse ini file %s", iniPath)
+				msg := emoji.Sprintf(":exclamation_mark:failed to parse ini file %s", iniPath)
 				return errors.New(msg)
 			}
 
 			semanticVersion, err = iniParser.ParseSemanticVersion()
 			if err != nil {
-				msg := fmt.Sprintf("no semantic version given and failed to parse server version from ini file %s", iniPath)
+				msg := emoji.Sprintf(":exclamation_mark:No semantic version given and failed to parse server version from ini file %s", iniPath)
 				return errors.New(msg)
 			}
 
 		}
 
-		if err := apiClient.Login(
-			input.GetConfigValue("username", "PIXO_USERNAME"),
-			input.GetConfigValue("password", "PIXO_PASSWORD"),
-		); err != nil {
-			return err
-		}
+		apiClient := getAuthenticatedClient()
 
 		isPrecheck := cmd.Flag("pre-check").Value.String()
 		if isPrecheck == "true" {
@@ -60,18 +57,20 @@ var deployCmd = &cobra.Command{
 			}
 
 			spinner := loader.NewSpinner(cmd.OutOrStdout())
+			defer spinner.Stop()
 
 			if versions, err := apiClient.GetMultiplayerServerVersions(cmd.Context(), params); err != nil {
-				cmd.Println("unable to retrieve server versions from platform api")
+				cmd.Println(emoji.Sprint(":negative_squared_cross_mark:Unable to retrieve server versions from platform api"))
 				return err
 
 			} else if len(versions) > 0 {
-				errMsg := fmt.Sprintf("server version %s already exists\n", semanticVersion)
-				return errors.New(errMsg)
+				spinner.Stop()
+				cmd.Println(emoji.Sprintf(":red_square:Server version %s already exists\n", semanticVersion))
+				os.Exit(1)
+				return nil
 			}
 
-			spinner.Stop()
-			cmd.Println("server version does not exist yet:", semanticVersion)
+			cmd.Println(emoji.Sprintf(":heavy_check_mark:Server version does not exist yet: %s", semanticVersion))
 			return nil
 		}
 

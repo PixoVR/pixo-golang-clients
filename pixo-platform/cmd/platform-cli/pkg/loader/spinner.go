@@ -44,7 +44,7 @@ func (s *Spinner) Start() {
 }
 
 func (s *Spinner) Stop() {
-	s.writer.Write([]byte("\r")) // nolint: errcheck
+	s.writer.Write([]byte("\b")) // nolint: errcheck
 	s.doneChan <- true
 	close(s.doneChan)
 }

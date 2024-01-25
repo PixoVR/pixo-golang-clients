@@ -18,12 +18,7 @@ var listApiKeyCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		spinner := loader.NewSpinner(cmd.OutOrStdout())
 
-		if err := apiClient.Login(
-			input.GetConfigValue("username", "PIXO_USERNAME"),
-			input.GetConfigValue("password", "PIXO_PASSWORD"),
-		); err != nil {
-			return err
-		}
+		apiClient := getAuthenticatedClient()
 
 		apiKeyParams := &graphql_api.APIKeyQueryParams{}
 
