@@ -2,6 +2,7 @@ package graphql_api
 
 import (
 	"fmt"
+	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/middleware/auth"
 	"net/http"
 )
 
@@ -12,12 +13,10 @@ type transport struct {
 }
 
 func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
-	if t.token != "" {
-		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", t.token))
-	}
-
 	if t.key != "" {
-		req.Header.Add("X-Api-Key", t.key)
+		req.Header.Add(auth.APIKeyHeader, t.key)
+	} else if t.token != "" {
+		req.Header.Add(auth.AuthorizationHeader, fmt.Sprintf("Bearer %s", t.token))
 	}
 
 	return t.underlyingTransport.RoundTrip(req)

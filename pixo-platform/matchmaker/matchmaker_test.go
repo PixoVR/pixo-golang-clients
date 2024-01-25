@@ -46,7 +46,7 @@ var _ = Describe("Multiplayer", func() {
 	It("can retrieve a game server address using the matchmaker and send a message to it", func() {
 		req := matchmaker.MatchRequest{
 			ModuleID:      271,
-			ServerVersion: "1.03.01",
+			ServerVersion: "2.00.01",
 		}
 
 		addr, err := m.FindMatch(req)

@@ -15,11 +15,15 @@ var _ = Describe("Abstract", func() {
 	)
 
 	BeforeEach(func() {
-		apiClient = abstract_client.NewClient(fakeToken, "")
+		config := abstract_client.AbstractConfig{
+			Token: fakeToken,
+		}
+		apiClient = abstract_client.NewClient(config)
 	})
 
 	It("can set the token", func() {
-		newClient := abstract_client.NewClient("", "")
+		config := abstract_client.AbstractConfig{}
+		newClient := abstract_client.NewClient(config)
 		newClient.SetToken(fakeToken)
 		Expect(newClient.GetToken()).To(Equal(fakeToken))
 	})
@@ -35,6 +39,8 @@ var _ = Describe("Abstract", func() {
 
 	It("can use the api key", func() {
 		apiClient.SetAPIKey(fakeToken)
+		Expect(apiClient.IsAuthenticated()).To(BeTrue())
+		Expect(apiClient.GetAPIKey()).To(Equal(fakeToken))
 
 		request := apiClient.FormatRequest()
 

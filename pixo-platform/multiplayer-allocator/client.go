@@ -16,8 +16,13 @@ func NewClient(token, lifecycle, region string) *AllocatorClient {
 
 	config := newServiceConfig(lifecycle, region)
 
+	abstractConfig := abstractClient.AbstractConfig{
+		URL:   config.FormatURL(),
+		Token: token,
+	}
+
 	return &AllocatorClient{
-		PixoAbstractAPIClient: *abstractClient.NewClient(token, config.FormatURL()),
+		PixoAbstractAPIClient: *abstractClient.NewClient(abstractConfig),
 	}
 }
 
@@ -29,8 +34,13 @@ func NewClientWithBasicAuth(username, password, lifecycle, region string) (*Allo
 
 	config := newServiceConfig(lifecycle, region)
 
+	abstractConfig := abstractClient.AbstractConfig{
+		URL:   config.FormatURL(),
+		Token: primaryClient.GetToken(),
+	}
+
 	return &AllocatorClient{
-		PixoAbstractAPIClient: *abstractClient.NewClient(primaryClient.GetToken(), config.FormatURL()),
+		PixoAbstractAPIClient: *abstractClient.NewClient(abstractConfig),
 	}, nil
 }
 

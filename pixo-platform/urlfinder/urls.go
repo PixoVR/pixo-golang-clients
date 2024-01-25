@@ -16,7 +16,7 @@ type ServiceConfig struct {
 }
 
 type ClientConfig struct {
-	Key       string
+	APIKey    string
 	Token     string
 	Internal  bool
 	Lifecycle string

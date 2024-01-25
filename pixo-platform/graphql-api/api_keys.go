@@ -7,6 +7,14 @@ import (
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 )
 
+type APIKeyQueryParams struct {
+	UserID *int `json:"userId" graphql:"userId"`
+}
+
+type GetAPIKeysResponse struct {
+	APIKeys []*platform.APIKey `json:"apiKeys"`
+}
+
 type CreateAPIKeyResponse struct {
 	APIKey platform.APIKey `json:"createApiKey"`
 }
@@ -39,6 +47,32 @@ func (g *GraphQLAPIClient) CreateAPIKey(ctx context.Context, input platform.APIK
 	}
 
 	return &apiKeyResponse.APIKey, nil
+}
+
+func (g *GraphQLAPIClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) ([]*platform.APIKey, error) {
+	query := `query apiKeys($params: ApiKeyParams) { apiKeys(params: $params) { id key userId user { role } } }`
+
+	variables := map[string]interface{}{
+		"params": map[string]interface{}{},
+	}
+
+	if params.UserID != nil {
+		variables["params"] = map[string]interface{}{
+			"userId": *params.UserID,
+		}
+	}
+
+	res, err := g.Client.ExecRaw(ctx, query, variables)
+	if err != nil {
+		return nil, err
+	}
+
+	var apiKeysResponse GetAPIKeysResponse
+	if err = json.Unmarshal(res, &apiKeysResponse); err != nil {
+		return nil, err
+	}
+
+	return apiKeysResponse.APIKeys, nil
 }
 
 func (g *GraphQLAPIClient) DeleteAPIKey(ctx context.Context, id int) error {

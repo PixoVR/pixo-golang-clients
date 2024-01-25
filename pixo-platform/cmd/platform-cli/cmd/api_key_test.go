@@ -11,15 +11,31 @@ var _ = Describe("API Keys", func() {
 	It("can create an api key", func() {
 		rootCmd, output := GetRootCmd()
 		rootCmd.SetArgs([]string{
+			"apiKeys",
 			"create",
-			"apiKey",
 		})
-		err := rootCmd.Execute()
-		Expect(err).NotTo(HaveOccurred())
 
+		err := rootCmd.Execute()
+
+		Expect(err).NotTo(HaveOccurred())
 		out, err := io.ReadAll(output)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(string(out)).To(ContainSubstring("Created API key"))
+	})
+
+	It("can list api keys", func() {
+		rootCmd, output := GetRootCmd()
+		rootCmd.SetArgs([]string{
+			"apiKeys",
+			"list",
+		})
+
+		err := rootCmd.Execute()
+
+		Expect(err).NotTo(HaveOccurred())
+		out, err := io.ReadAll(output)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(string(out)).To(ContainSubstring("API Keys:"))
 	})
 
 })

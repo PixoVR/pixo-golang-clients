@@ -42,7 +42,7 @@ func (p *PixoAbstractAPIClient) GetURLWithPath(path string) string {
 
 // IsAuthenticated returns true if the client is authenticated
 func (p *PixoAbstractAPIClient) IsAuthenticated() bool {
-	return p.token != ""
+	return p.token != "" || p.key != ""
 }
 
 // FormatRequest formats the request headers needed for authentication

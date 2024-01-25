@@ -19,6 +19,7 @@ type PlatformClient interface {
 	UpdateUser(ctx context.Context, user platform.User) (*platform.User, error)
 	DeleteUser(ctx context.Context, id int) error
 
+	GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) ([]*platform.APIKey, error)
 	CreateAPIKey(ctx context.Context, input platform.APIKey) (*platform.APIKey, error)
 	DeleteAPIKey(ctx context.Context, id int) error
 
@@ -41,7 +42,7 @@ type GraphQLAPIClient struct {
 // NewClient is a function that returns a GraphQLAPIClient
 func NewClient(config urlfinder.ClientConfig) *GraphQLAPIClient {
 
-	if config.Token == "" {
+	if config.Token == "" && config.APIKey == "" {
 		config.Token = os.Getenv("SECRET_KEY")
 	}
 
@@ -52,12 +53,18 @@ func NewClient(config urlfinder.ClientConfig) *GraphQLAPIClient {
 	t := &transport{
 		underlyingTransport: http.DefaultTransport,
 		token:               config.Token,
-		key:                 config.Key,
+		key:                 config.APIKey,
 	}
 	c := http.Client{Transport: t}
 
+	abstractConfig := abstract_client.AbstractConfig{
+		Token:  config.Token,
+		APIKey: config.APIKey,
+		URL:    url,
+	}
+
 	return &GraphQLAPIClient{
-		PixoAbstractAPIClient: abstract_client.NewClient(config.Token, url),
+		PixoAbstractAPIClient: abstract_client.NewClient(abstractConfig),
 		Client:                graphql.NewClient(fmt.Sprintf("%s/query", url), &c),
 		defaultContext:        context.Background(),
 	}
@@ -70,8 +77,10 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 
 	url := serviceConfig.FormatURL()
 
+	abstractConfig := abstract_client.AbstractConfig{URL: url}
+
 	client := &GraphQLAPIClient{
-		PixoAbstractAPIClient: abstract_client.NewClient("", serviceConfig.FormatURL()),
+		PixoAbstractAPIClient: abstract_client.NewClient(abstractConfig),
 		defaultContext:        context.Background(),
 	}
 

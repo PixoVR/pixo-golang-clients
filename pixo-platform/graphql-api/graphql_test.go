@@ -42,8 +42,8 @@ var _ = Describe("GraphQL API", func() {
 		Expect(event).NotTo(BeNil())
 	})
 
-	It("can get the multiplayer server configs with a secret key", func() {
-		mpServerConfigs, err := secretKeyClient.GetMultiplayerServerConfigs(ctx, MultiplayerServerConfigParams{
+	It("can get the multiplayer server configs", func() {
+		mpServerConfigs, err := tokenClient.GetMultiplayerServerConfigs(ctx, MultiplayerServerConfigParams{
 			OrgID:    1,
 			ModuleID: 1,
 		})
@@ -51,8 +51,8 @@ var _ = Describe("GraphQL API", func() {
 		Expect(mpServerConfigs).NotTo(BeEmpty())
 	})
 
-	It("can get the multiplayer server versions with a secret key", func() {
-		mpServerVersions, err := secretKeyClient.GetMultiplayerServerVersions(ctx, MultiplayerServerVersionQueryParams{
+	It("can get the multiplayer server versions", func() {
+		mpServerVersions, err := tokenClient.GetMultiplayerServerVersions(ctx, MultiplayerServerVersionQueryParams{
 			ModuleID:        1,
 			SemanticVersion: "1.00.00",
 		})
@@ -60,9 +60,9 @@ var _ = Describe("GraphQL API", func() {
 		Expect(mpServerVersions).NotTo(BeNil())
 	})
 
-	It("can create a multiplayer server version with a secret key", func() {
+	It("can create a multiplayer server version", func() {
 		randVersion := fmt.Sprintf("1.%d.%d", rand.Intn(100), rand.Intn(100))
-		err := secretKeyClient.CreateMultiplayerServerVersion(ctx, 1, agones.SimpleGameServerImage, randVersion)
+		err := tokenClient.CreateMultiplayerServerVersion(ctx, 1, agones.SimpleGameServerImage, randVersion)
 		Expect(err).NotTo(HaveOccurred())
 	})
 

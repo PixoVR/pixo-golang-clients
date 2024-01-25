@@ -76,7 +76,8 @@ func GetStringValueOrAskUser(cmd *cobra.Command, flagName, envVarName string, de
 
 func GetIntValue(cmd *cobra.Command, flagName, envVarName string) int {
 	var val string
-	if cmd.Flag(flagName).Value.String() != "" {
+	flag := cmd.Flag(flagName)
+	if flag != nil && flag.Value != nil && flag.Value.String() != "" {
 		return ToInt(cmd.Flag(flagName).Value.String())
 	}
 
@@ -85,7 +86,11 @@ func GetIntValue(cmd *cobra.Command, flagName, envVarName string) int {
 		return ToInt(val)
 	}
 
-	return ToInt(cmd.Flag(flagName).DefValue)
+	if flag != nil && flag.DefValue != "" {
+		return ToInt(cmd.Flag(flagName).DefValue)
+	}
+
+	return 0
 }
 
 func GetStringValue(cmd *cobra.Command, flagName, envVarName string) string {

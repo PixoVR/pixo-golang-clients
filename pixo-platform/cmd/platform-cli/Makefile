@@ -1,8 +1,6 @@
 
 NAME = pixo-dev
 EXECUTABLE = ./bin/$(NAME)
-MODULE_ID ?= 271
-SERVER_VERSION ?= "1.03.01"
 
 all: lint test build cp
 

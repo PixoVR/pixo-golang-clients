@@ -16,8 +16,13 @@ func NewClient(token, lifecycle, region string) *PrimaryAPIClient {
 
 	config := newServiceConfig(lifecycle, region)
 
+	abstractConfig := abstractClient.AbstractConfig{
+		Token: token,
+		URL:   config.FormatURL(),
+	}
+
 	return &PrimaryAPIClient{
-		PixoAbstractAPIClient: *abstractClient.NewClient(token, config.FormatURL()),
+		PixoAbstractAPIClient: *abstractClient.NewClient(abstractConfig),
 	}
 }
 
@@ -26,8 +31,12 @@ func NewClientWithBasicAuth(username, password, lifecycle, region string) (*Prim
 
 	config := newServiceConfig(lifecycle, region)
 
+	abstractConfig := abstractClient.AbstractConfig{
+		URL: config.FormatURL(),
+	}
+
 	primaryClient := &PrimaryAPIClient{
-		PixoAbstractAPIClient: *abstractClient.NewClient("", config.FormatURL()),
+		PixoAbstractAPIClient: *abstractClient.NewClient(abstractConfig),
 	}
 
 	if err := primaryClient.Login(username, password); err != nil {

@@ -51,6 +51,6 @@ func init() {
 
 	setCmd.Flags().StringP("lifecycle", "l", "", "Lifecycle of Pixo Platform to use (dev, stage, prod)")
 	setCmd.Flags().StringP("region", "r", "", "Region of Pixo Platform to use (na, saudi)")
-	setCmd.Flags().StringP("key", "k", "", "Key of the config value to set")
+	setCmd.Flags().StringP("key", "k", "", "APIKey of the config value to set")
 	setCmd.Flags().StringP("val", "v", "", "Value of the config value to set")
 }

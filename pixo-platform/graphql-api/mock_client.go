@@ -149,6 +149,29 @@ func (m *MockGraphQLClient) CreateAPIKey(ctx context.Context, input platform.API
 	return &input, nil
 }
 
+func (m *MockGraphQLClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) ([]*platform.APIKey, error) {
+
+	m.CalledGetUser = true
+
+	if m.GetUserError {
+		return nil, errors.New("error getting user")
+	}
+
+	if params.UserID == nil {
+		params.UserID = &[]int{1}[0]
+	}
+
+	return []*platform.APIKey{
+		{
+			ID:        1,
+			UserID:    *params.UserID,
+			Key:       faker.UUIDHyphenated(),
+			CreatedAt: time.Now().UTC(),
+			UpdatedAt: time.Now().UTC(),
+		},
+	}, nil
+}
+
 func (m *MockGraphQLClient) DeleteAPIKey(ctx context.Context, id int) error {
 
 	m.CalledDeleteAPIKey = true

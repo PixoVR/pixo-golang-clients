@@ -23,4 +23,5 @@ var listCmd = &cobra.Command{
 
 func init() {
 	configCmd.AddCommand(listCmd)
+	rootCmd.AddCommand(listCmd)
 }

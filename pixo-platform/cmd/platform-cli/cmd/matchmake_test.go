@@ -16,15 +16,14 @@ var _ = Describe("Matchmake", func() {
 			"--module-id",
 			"271",
 			"--server-version",
-			"1.03.01",
+			"2.00.01",
 		})
 		err := rootCmd.Execute()
 		Expect(err).NotTo(HaveOccurred())
 
 		out, err := io.ReadAll(output)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(string(out)).To(ContainSubstring("Attempting to find a match for module 271 with server version 1.03.01"))
-		//Expect(string(out)).To(ContainSubstring("Match found! Gameserver connection info: "))
+		Expect(string(out)).To(ContainSubstring("Attempting to find a match for module 271 with server version 2.00.01"))
 	})
 
 })

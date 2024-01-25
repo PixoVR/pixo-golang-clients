@@ -16,18 +16,26 @@ type PixoAbstractAPIClient struct {
 	timeoutSeconds int
 }
 
-// NewClient is a function that returns a PixoAbstractAPIClient
-func NewClient(token, apiURL string, timeoutSeconds ...int) *PixoAbstractAPIClient {
+type AbstractConfig struct {
+	APIKey         string
+	Token          string
+	URL            string
+	TimeoutSeconds int
+}
 
-	if len(timeoutSeconds) == 0 {
-		timeoutSeconds = []int{30}
+// NewClient is a function that returns a PixoAbstractAPIClient
+func NewClient(config AbstractConfig) *PixoAbstractAPIClient {
+
+	if config.TimeoutSeconds == 0 {
+		config.TimeoutSeconds = 30
 	}
 
 	return &PixoAbstractAPIClient{
-		url:            apiURL,
+		url:            config.URL,
+		token:          config.Token,
+		key:            config.APIKey,
+		timeoutSeconds: config.TimeoutSeconds,
 		restyClient:    resty.New(),
-		token:          token,
 		headers:        make(map[string]string),
-		timeoutSeconds: timeoutSeconds[0],
 	}
 }

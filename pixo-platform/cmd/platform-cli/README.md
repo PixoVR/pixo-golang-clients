@@ -101,12 +101,24 @@ pixo users create \
     
 ```
 
-## Create an API Key
+## API Keys
+
+### Create an API Key
 ```bash
-pixo create apiKey
+pixo apiKeys create
 
 # Or for a specific user
-pixo create apiKey --user-id 1
+pixo apiKeys create --user-id 1
+```
+
+### List API Keys
+```bash
+pixo apiKeys list
+```
+
+### Delete an API Key
+```bash
+pixo apiKeys delete --key-id 1
 ```
 
 ## Deploy a Module Game Server Version

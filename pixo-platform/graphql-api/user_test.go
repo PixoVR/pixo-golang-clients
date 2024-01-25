@@ -121,10 +121,28 @@ var _ = Describe("Users API", func() {
 		})
 
 		It("can get a user with the api key", func() {
-			config := urlfinder.ClientConfig{Lifecycle: lifecycle, Region: "na"}
+			config := urlfinder.ClientConfig{
+				Lifecycle: lifecycle,
+				Region:    "na",
+				APIKey:    apiKey.Key,
+			}
 			client := NewClient(config)
-			client.SetAPIKey(apiKey.Key)
 			Expect(client.IsAuthenticated()).To(BeTrue())
+
+			retrievedUser, err := client.GetUserByUsername(ctx, userInput.Username)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(retrievedUser).NotTo(BeNil())
+		})
+
+		It("can get api keys", func() {
+			apiKeys, err := tokenClient.GetAPIKeys(ctx, &APIKeyQueryParams{
+				UserID: &testUser.ID,
+			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(apiKeys).NotTo(BeNil())
+			Expect(len(apiKeys)).To(Equal(1))
+			Expect(apiKeys[0].ID).To(Equal(apiKey.ID))
+			Expect(apiKeys[0].UserID).To(Equal(testUser.ID))
 		})
 
 	})
