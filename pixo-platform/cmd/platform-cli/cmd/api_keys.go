@@ -9,7 +9,7 @@ import (
 
 // apiKeyCmd represents the apiKey command
 var apiKeyCmd = &cobra.Command{
-	Use:   "apiKeys",
+	Use:   "keys",
 	Short: "Handling API keys",
 	Long:  `Manage API key with the following command:`,
 	RunE: func(cmd *cobra.Command, args []string) error {

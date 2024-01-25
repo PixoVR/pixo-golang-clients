@@ -10,7 +10,7 @@ import (
 var _ = Describe("API Keys", func() {
 
 	It("can create an api key", func() {
-		output, err := RunCommand("apiKeys", "create")
+		output, err := RunCommand("keys", "create")
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring("API key created"))
 
@@ -20,20 +20,20 @@ var _ = Describe("API Keys", func() {
 	})
 
 	It("can list and delete api keys", func() {
-		output, err := RunCommand("apiKeys", "list")
+		output, err := RunCommand("keys", "list")
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring("API Keys:"))
 		keyOne := strings.Split(output, "\n")[1]
 		keyOneAPIKey := strings.TrimSpace(strings.Split(keyOne, ":")[1])
 
-		output, err = RunCommand("apiKeys", "delete", "--key-id", keyOneAPIKey)
+		output, err = RunCommand("keys", "delete", "--key-id", keyOneAPIKey)
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring(fmt.Sprintf("Deleted API key: %s", keyOneAPIKey)))
 	})
 
 	It("can list api keys for a user", func() {
-		output, err := RunCommand("apiKeys", "list", "--user-id", "9999999")
+		output, err := RunCommand("keys", "list", "--user-id", "9999999")
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring("No API Keys found"))
 	})
