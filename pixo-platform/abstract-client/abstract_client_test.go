@@ -11,7 +11,7 @@ var _ = Describe("Abstract", func() {
 
 	var (
 		fakeToken = "fake-token"
-		apiClient *abstract_client.PixoAbstractAPIClient
+		apiClient *abstract_client.AbstractServiceClient
 	)
 
 	BeforeEach(func() {

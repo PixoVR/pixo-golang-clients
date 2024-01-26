@@ -8,10 +8,10 @@ import (
 
 // PrimaryAPIClient is a struct for the primary API that contains an abstract client
 type PrimaryAPIClient struct {
-	abstractClient.PixoAbstractAPIClient
+	abstractClient.AbstractServiceClient
 }
 
-// NewClient is a function that returns a PixoAbstractAPIClient
+// NewClient is a function that returns a AbstractServiceClient
 func NewClient(config urlfinder.ClientConfig) *PrimaryAPIClient {
 
 	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
@@ -22,11 +22,11 @@ func NewClient(config urlfinder.ClientConfig) *PrimaryAPIClient {
 	}
 
 	return &PrimaryAPIClient{
-		PixoAbstractAPIClient: *abstractClient.NewClient(abstractConfig),
+		AbstractServiceClient: *abstractClient.NewClient(abstractConfig),
 	}
 }
 
-// NewClientWithBasicAuth is a function that returns a PixoAbstractAPIClient with basic auth performed
+// NewClientWithBasicAuth is a function that returns a AbstractServiceClient with basic auth performed
 func NewClientWithBasicAuth(username, password string, config urlfinder.ClientConfig) (*PrimaryAPIClient, error) {
 
 	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
@@ -36,7 +36,7 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 	}
 
 	primaryClient := &PrimaryAPIClient{
-		PixoAbstractAPIClient: *abstractClient.NewClient(abstractConfig),
+		AbstractServiceClient: *abstractClient.NewClient(abstractConfig),
 	}
 
 	if err := primaryClient.Login(username, password); err != nil {

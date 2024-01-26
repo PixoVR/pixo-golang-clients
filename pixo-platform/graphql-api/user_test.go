@@ -46,9 +46,10 @@ var _ = Describe("Users API", func() {
 	It("can login", func() {
 		config := urlfinder.ClientConfig{Lifecycle: lifecycle, Region: "na"}
 		client := NewClient(config)
-		err := client.Login(pixoUsername, pixoPassword)
+		err := client.Login(testUser.Username, userInput.Password)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(client.IsAuthenticated()).To(BeTrue())
+		Expect(client.ActiveUserID()).To(Equal(testUser.ID))
 	})
 
 	It("can get a user by username", func() {

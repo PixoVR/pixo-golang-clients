@@ -9,7 +9,7 @@ import (
 )
 
 type MultiplayerMatchmaker struct {
-	abstractClient.PixoAbstractAPIClient
+	abstractClient.AbstractServiceClient
 	gameserverAddress    *net.UDPAddr
 	gameserverConnection *net.UDPConn
 }
@@ -42,7 +42,7 @@ func NewMatchmaker(lifecycle, region, token string, timeoutSeconds ...int) *Mult
 	}
 
 	return &MultiplayerMatchmaker{
-		PixoAbstractAPIClient: *abstractClient.NewClient(abstractConfig),
+		AbstractServiceClient: *abstractClient.NewClient(abstractConfig),
 	}
 }
 

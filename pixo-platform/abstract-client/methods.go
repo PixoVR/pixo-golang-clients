@@ -7,10 +7,10 @@ import (
 )
 
 // Get makes a GET request to the API
-func (p *PixoAbstractAPIClient) Get(path string) (*resty.Response, error) {
-	url := p.GetURLWithPath(path)
+func (a *AbstractServiceClient) Get(path string) (*resty.Response, error) {
+	url := a.GetURLWithPath(path)
 
-	res, err := p.FormatRequest().Get(url)
+	res, err := a.FormatRequest().Get(url)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to perform get request")
 		return nil, err
@@ -25,10 +25,10 @@ func (p *PixoAbstractAPIClient) Get(path string) (*resty.Response, error) {
 }
 
 // Post makes a POST request to the API
-func (p *PixoAbstractAPIClient) Post(path string, body []byte) (*resty.Response, error) {
-	url := p.GetURLWithPath(path)
+func (a *AbstractServiceClient) Post(path string, body []byte) (*resty.Response, error) {
+	url := a.GetURLWithPath(path)
 
-	req := p.FormatRequest().SetBody(body)
+	req := a.FormatRequest().SetBody(body)
 	res, err := req.Post(url)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to perform post request")
@@ -44,10 +44,10 @@ func (p *PixoAbstractAPIClient) Post(path string, body []byte) (*resty.Response,
 }
 
 // Patch makes a PATCH request to the API
-func (p *PixoAbstractAPIClient) Patch(path string, body []byte) (*resty.Response, error) {
-	url := p.GetURLWithPath(path)
+func (a *AbstractServiceClient) Patch(path string, body []byte) (*resty.Response, error) {
+	url := a.GetURLWithPath(path)
 
-	res, err := p.FormatRequest().SetBody(body).Patch(url)
+	res, err := a.FormatRequest().SetBody(body).Patch(url)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to perform patch request")
 		return nil, err
@@ -62,10 +62,10 @@ func (p *PixoAbstractAPIClient) Patch(path string, body []byte) (*resty.Response
 }
 
 // Put makes a PUT request to the API
-func (p *PixoAbstractAPIClient) Put(path string, body []byte) (*resty.Response, error) {
-	url := p.GetURLWithPath(path)
+func (a *AbstractServiceClient) Put(path string, body []byte) (*resty.Response, error) {
+	url := a.GetURLWithPath(path)
 
-	res, err := p.FormatRequest().SetBody(body).Put(url)
+	res, err := a.FormatRequest().SetBody(body).Put(url)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to perform put request")
 		return nil, err
@@ -80,10 +80,10 @@ func (p *PixoAbstractAPIClient) Put(path string, body []byte) (*resty.Response, 
 }
 
 // Delete makes a DELETE request to the API
-func (p *PixoAbstractAPIClient) Delete(path string) (*resty.Response, error) {
-	url := p.GetURLWithPath(path)
+func (a *AbstractServiceClient) Delete(path string) (*resty.Response, error) {
+	url := a.GetURLWithPath(path)
 
-	res, err := p.FormatRequest().Delete(url)
+	res, err := a.FormatRequest().Delete(url)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to perform delete request")
 		return nil, err

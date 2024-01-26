@@ -69,6 +69,7 @@ var loginCmd = &cobra.Command{
 			cmd.Println(emoji.Sprintf(":rocket:Login successful. Here is your API token: \n%s", client.GetToken()))
 
 			viper.Set("token", client.GetToken())
+			viper.Set("user-id", client.ActiveUserID())
 		}
 
 		if err := viper.WriteConfigAs(cfgFile); err != nil {
@@ -102,7 +103,11 @@ func getAuthenticatedClient() *platform.GraphQLAPIClient {
 	apiKey := input.GetConfigValue("api-key", "PIXO_API_KEY")
 	if apiKey != "" {
 		apiClient.SetAPIKey(apiKey)
-		return apiClient
+		return platform.NewClient(urlfinder.ClientConfig{
+			APIKey:    apiKey,
+			Lifecycle: input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
+			Region:    input.GetConfigValue("region", "PIXO_REGION"),
+		})
 	}
 
 	username := input.GetConfigValue("username", "PIXO_USERNAME")

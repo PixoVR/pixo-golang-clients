@@ -19,6 +19,16 @@ var _ = Describe("API Keys", func() {
 		Expect(output).To(ContainSubstring("api-key : "))
 	})
 
+	It("can create an api key for a user", func() {
+		output, err := RunCommand("keys", "create")
+		Expect(err).NotTo(HaveOccurred())
+		Expect(output).To(ContainSubstring("API key created"))
+
+		output, err = RunCommand("config", "list")
+		Expect(err).NotTo(HaveOccurred())
+		Expect(output).To(ContainSubstring("api-key : "))
+	})
+
 	It("can list and delete api keys", func() {
 		output, err := RunCommand("keys", "list")
 		Expect(err).NotTo(HaveOccurred())

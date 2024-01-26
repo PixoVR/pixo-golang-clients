@@ -8,10 +8,10 @@ import (
 
 // AllocatorClient is a struct for the primary API that contains an abstract client
 type AllocatorClient struct {
-	abstractClient.PixoAbstractAPIClient
+	abstractClient.AbstractServiceClient
 }
 
-// NewClient is a function that returns a PixoAbstractAPIClient
+// NewClient is a function that returns a AbstractServiceClient
 func NewClient(config urlfinder.ClientConfig) *AllocatorClient {
 
 	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
@@ -22,7 +22,7 @@ func NewClient(config urlfinder.ClientConfig) *AllocatorClient {
 	}
 
 	return &AllocatorClient{
-		PixoAbstractAPIClient: *abstractClient.NewClient(abstractConfig),
+		AbstractServiceClient: *abstractClient.NewClient(abstractConfig),
 	}
 }
 
@@ -40,7 +40,7 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 	}
 
 	return &AllocatorClient{
-		PixoAbstractAPIClient: *abstractClient.NewClient(abstractConfig),
+		AbstractServiceClient: *abstractClient.NewClient(abstractConfig),
 	}, nil
 }
 

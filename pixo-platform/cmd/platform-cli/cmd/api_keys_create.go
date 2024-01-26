@@ -4,7 +4,6 @@ Copyright © 2024 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/loader"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/kyokomi/emoji"
@@ -23,12 +22,7 @@ var createApiKeyCmd = &cobra.Command{
 
 		spinner := loader.NewSpinner(cmd.OutOrStdout())
 
-		if err := apiClient.Login(
-			input.GetConfigValue("username", "PIXO_USERNAME"),
-			input.GetConfigValue("password", "PIXO_PASSWORD"),
-		); err != nil {
-			return err
-		}
+		apiClient := getAuthenticatedClient()
 
 		input := platform.APIKey{
 			//UserID: input.GetIntValue(cmd, "user-id", "PIXO_USER_ID"),

@@ -5,8 +5,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// PixoAbstractAPIClient is a struct that contains the url of the Pixo Service and a restyClient to make requests
-type PixoAbstractAPIClient struct {
+// AbstractServiceClient is a struct that contains the url of the Pixo Service and a restyClient to make requests
+type AbstractServiceClient struct {
 	url            string
 	token          string
 	key            string
@@ -23,14 +23,14 @@ type AbstractConfig struct {
 	TimeoutSeconds int
 }
 
-// NewClient is a function that returns a PixoAbstractAPIClient
-func NewClient(config AbstractConfig) *PixoAbstractAPIClient {
+// NewClient is a function that returns a AbstractServiceClient
+func NewClient(config AbstractConfig) *AbstractServiceClient {
 
 	if config.TimeoutSeconds == 0 {
 		config.TimeoutSeconds = 30
 	}
 
-	return &PixoAbstractAPIClient{
+	return &AbstractServiceClient{
 		url:            config.URL,
 		token:          config.Token,
 		key:            config.APIKey,

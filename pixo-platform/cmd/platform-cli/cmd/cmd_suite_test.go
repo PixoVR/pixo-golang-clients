@@ -61,4 +61,8 @@ func assertLogin() {
 	output, err := RunCommand("auth", "login", "--username", username, "--password", password)
 	Expect(err).NotTo(HaveOccurred())
 	Expect(output).To(ContainSubstring("Login successful. Here is your API token:"))
+
+	output, err = RunCommand("config", "list")
+	Expect(err).NotTo(HaveOccurred())
+	Expect(output).To(ContainSubstring("user-id : "))
 }

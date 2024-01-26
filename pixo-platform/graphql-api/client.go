@@ -5,6 +5,7 @@ import (
 	"fmt"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
+	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/middleware/auth"
 	"github.com/rs/zerolog/log"
 	"net/http"
 	"os"
@@ -33,7 +34,7 @@ var _ PlatformClient = (*GraphQLAPIClient)(nil)
 
 // GraphQLAPIClient is a struct for the graphql API that contains an abstract client
 type GraphQLAPIClient struct {
-	*abstract_client.PixoAbstractAPIClient
+	*abstract_client.AbstractServiceClient
 	*graphql.Client
 	underlyingTransport http.RoundTripper
 	defaultContext      context.Context
@@ -64,7 +65,7 @@ func NewClient(config urlfinder.ClientConfig) *GraphQLAPIClient {
 	}
 
 	return &GraphQLAPIClient{
-		PixoAbstractAPIClient: abstract_client.NewClient(abstractConfig),
+		AbstractServiceClient: abstract_client.NewClient(abstractConfig),
 		Client:                graphql.NewClient(fmt.Sprintf("%s/query", url), &c),
 		defaultContext:        context.Background(),
 	}
@@ -80,7 +81,7 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 	abstractConfig := abstract_client.AbstractConfig{URL: url}
 
 	client := &GraphQLAPIClient{
-		PixoAbstractAPIClient: abstract_client.NewClient(abstractConfig),
+		AbstractServiceClient: abstract_client.NewClient(abstractConfig),
 		defaultContext:        context.Background(),
 	}
 
@@ -94,6 +95,23 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 	client.Client = graphql.NewClient(fmt.Sprintf("%s/query", url), &c)
 
 	return client, nil
+}
+
+func (g *GraphQLAPIClient) ActiveUserID() int {
+
+	if !g.IsAuthenticated() {
+		return 0
+	}
+
+	token := g.GetToken()
+
+	rawToken, err := auth.ParseJWT(token)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to parse JWT")
+		return 0
+	}
+
+	return rawToken.UserID
 }
 
 func newServiceConfig(config urlfinder.ClientConfig) urlfinder.ServiceConfig {
