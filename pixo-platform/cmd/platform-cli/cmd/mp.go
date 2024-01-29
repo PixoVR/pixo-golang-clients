@@ -7,6 +7,7 @@ import (
 	"errors"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"net"
 	"strconv"
 	"strings"
@@ -54,11 +55,11 @@ var mpCmd = &cobra.Command{
 }
 
 func init() {
-	mm = matchmaker.NewMatchmaker(
-		input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
-		input.GetConfigValue("region", "PIXO_REGION"),
-		input.GetConfigValue("token", "PIXO_TOKEN"),
-	)
+	mm = matchmaker.NewMatchmaker(urlfinder.ClientConfig{
+		Lifecycle: input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
+		Region:    input.GetConfigValue("region", "PIXO_REGION"),
+		Token:     input.GetConfigValue("token", "PIXO_TOKEN"),
+	})
 
 	rootCmd.AddCommand(mpCmd)
 

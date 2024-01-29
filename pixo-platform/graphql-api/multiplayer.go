@@ -5,13 +5,13 @@ import (
 	"errors"
 )
 
-func (g *GraphQLAPIClient) GetMultiplayerServerConfigs(ctx context.Context, params MultiplayerServerConfigParams) ([]*MultiplayerServerConfigQueryParams, error) {
-	var query MultiplayerServerConfigQuery
+func (g *GraphQLAPIClient) GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]*MultiplayerServerConfigQueryParams, error) {
 
 	variables := map[string]interface{}{
 		"params": params,
 	}
 
+	var query MultiplayerServerConfigQuery
 	if err := g.Client.Query(ctx, &query, variables); err != nil {
 		return nil, err
 	}
@@ -39,9 +39,9 @@ func (g *GraphQLAPIClient) CreateMultiplayerServerVersion(ctx context.Context, m
 	return nil
 }
 
-func (g *GraphQLAPIClient) GetMultiplayerServerVersions(ctx context.Context, params MultiplayerServerVersionQueryParams) ([]*MultiplayerServerVersion, error) {
+func (g *GraphQLAPIClient) GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionQueryParams) ([]*MultiplayerServerVersion, error) {
 
-	configs, err := g.GetMultiplayerServerConfigs(ctx, MultiplayerServerConfigParams{
+	configs, err := g.GetMultiplayerServerConfigs(ctx, &MultiplayerServerConfigParams{
 		ModuleID:      params.ModuleID,
 		ServerVersion: params.SemanticVersion,
 	})
@@ -53,5 +53,15 @@ func (g *GraphQLAPIClient) GetMultiplayerServerVersions(ctx context.Context, par
 		return nil, errors.New("no multiplayer server configurations found")
 	}
 
-	return configs[0].ServerVersions, nil
+	res := make([]*MultiplayerServerVersion, len(configs[0].ServerVersions))
+
+	for i, _ := range configs[0].ServerVersions {
+		res[i] = &MultiplayerServerVersion{
+			ModuleID:        configs[0].ModuleID,
+			ImageRegistry:   configs[0].ServerVersions[i].ImageRegistry,
+			SemanticVersion: configs[0].ServerVersions[i].SemanticVersion,
+		}
+	}
+
+	return res, nil
 }

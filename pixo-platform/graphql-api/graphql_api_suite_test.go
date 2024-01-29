@@ -16,18 +16,19 @@ func TestGraphQLAPISuite(t *testing.T) {
 }
 
 var (
-	secretKeyClient *GraphQLAPIClient
-	tokenClient     *GraphQLAPIClient
-	lifecycle       = "local"
-	pixoUsername    = os.Getenv("PIXO_USERNAME")
-	pixoPassword    = os.Getenv("PIXO_PASSWORD")
+	apiKeyClient *GraphQLAPIClient
+	tokenClient  *GraphQLAPIClient
+	lifecycle    = "dev"
+	pixoUsername = os.Getenv("PIXO_USERNAME")
+	pixoPassword = os.Getenv("PIXO_PASSWORD")
+	pixoAPIKey   = os.Getenv("PIXO_API_KEY")
 )
 
 var _ = BeforeSuite(func() {
-	config := urlfinder.ClientConfig{Lifecycle: lifecycle}
-	secretKeyClient = NewClient(config)
-	Expect(secretKeyClient).NotTo(BeNil())
-	Expect(secretKeyClient.IsAuthenticated()).To(BeTrue())
+	config := urlfinder.ClientConfig{Lifecycle: lifecycle, APIKey: pixoAPIKey}
+	apiKeyClient = NewClient(config)
+	Expect(apiKeyClient).NotTo(BeNil())
+	Expect(apiKeyClient.IsAuthenticated()).To(BeTrue())
 
 	var err error
 	tokenClient, err = NewClientWithBasicAuth(pixoUsername, pixoPassword, config)

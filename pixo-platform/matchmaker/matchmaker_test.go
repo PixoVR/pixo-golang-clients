@@ -2,6 +2,7 @@ package matchmaker_test
 
 import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"os"
@@ -15,7 +16,11 @@ var _ = Describe("Multiplayer", func() {
 
 	BeforeEach(func() {
 		var err error
-		m, err = matchmaker.NewMatchmakerWithBasicAuth(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"), "dev", "na")
+		config := urlfinder.ClientConfig{
+			Lifecycle: "dev",
+			Region:    "na",
+		}
+		m, err = matchmaker.NewMatchmakerWithBasicAuth(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"), config)
 		Expect(err).NotTo(HaveOccurred())
 	})
 

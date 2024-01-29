@@ -14,30 +14,28 @@ type MultiplayerMatchmaker struct {
 	gameserverConnection *net.UDPConn
 }
 
-func NewMatchmakerWithBasicAuth(username, password, lifecycle, region string, timeoutSeconds ...int) (*MultiplayerMatchmaker, error) {
-	config := urlfinder.ClientConfig{
-		Lifecycle: lifecycle,
-		Region:    region,
-	}
+func NewMatchmakerWithBasicAuth(username, password string, config urlfinder.ClientConfig, timeoutSeconds ...int) (*MultiplayerMatchmaker, error) {
 	platformClient, err := graphql_api.NewClientWithBasicAuth(username, password, config)
 	if err != nil {
 		return nil, err
 	}
 
-	return NewMatchmaker(lifecycle, region, platformClient.GetToken(), timeoutSeconds...), nil
+	config.Token = platformClient.GetToken()
+
+	return NewMatchmaker(config, timeoutSeconds...), nil
 }
 
-func NewMatchmaker(lifecycle, region, token string, timeoutSeconds ...int) *MultiplayerMatchmaker {
+func NewMatchmaker(config urlfinder.ClientConfig, timeoutSeconds ...int) *MultiplayerMatchmaker {
 
 	if len(timeoutSeconds) == 0 {
 		timeoutSeconds = []int{60}
 	}
 
-	config := newServiceConfig(lifecycle, region)
-	url := getURL(config.FormatURL())
+	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
+	url := getURL(serviceConfig.FormatURL())
 	abstractConfig := abstractClient.AbstractConfig{
 		URL:            url,
-		Token:          token,
+		Token:          config.Token,
 		TimeoutSeconds: timeoutSeconds[0],
 	}
 

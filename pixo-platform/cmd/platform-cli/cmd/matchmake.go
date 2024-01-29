@@ -7,6 +7,7 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/loader"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"github.com/kyokomi/emoji"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
@@ -23,11 +24,11 @@ var matchmakeCmd = &cobra.Command{
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		mm = matchmaker.NewMatchmaker(
-			input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
-			input.GetConfigValue("region", "PIXO_REGION"),
-			input.GetConfigValue("token", "PIXO_TOKEN"),
-		)
+		mm = matchmaker.NewMatchmaker(urlfinder.ClientConfig{
+			Lifecycle: input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
+			Region:    input.GetConfigValue("region", "PIXO_REGION"),
+			Token:     input.GetConfigValue("token", "PIXO_TOKEN"),
+		})
 
 		moduleID := input.GetIntValueOrAskUser(cmd, "module-id", "PIXO_MODULE_ID")
 		semanticVersion := input.GetStringValueOrAskUser(cmd, "server-version", "PIXO_SERVER_VERSION")

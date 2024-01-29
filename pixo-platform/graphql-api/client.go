@@ -28,6 +28,9 @@ type PlatformClient interface {
 	CreateSession(ctx context.Context, moduleID int, ipAddress, deviceId string) (*Session, error)
 	UpdateSession(ctx context.Context, id int, status string, completed bool) (*Session, error)
 	CreateEvent(ctx context.Context, sessionID int, uuid string, eventType string, data string) (*platform.Event, error)
+
+	GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]*MultiplayerServerConfigQueryParams, error)
+	GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionQueryParams) ([]*MultiplayerServerVersion, error)
 }
 
 var _ PlatformClient = (*GraphQLAPIClient)(nil)
@@ -43,8 +46,8 @@ type GraphQLAPIClient struct {
 // NewClient is a function that returns a GraphQLAPIClient
 func NewClient(config urlfinder.ClientConfig) *GraphQLAPIClient {
 
-	if config.Token == "" && config.APIKey == "" {
-		config.Token = os.Getenv("SECRET_KEY")
+	if config.APIKey == "" {
+		config.APIKey = os.Getenv("PIXO_API_KEY")
 	}
 
 	serviceConfig := newServiceConfig(config)

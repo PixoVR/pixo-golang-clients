@@ -53,7 +53,7 @@ var deployCmd = &cobra.Command{
 		isPrecheck := cmd.Flag("pre-check").Value.String()
 		if isPrecheck == "true" {
 
-			params := platformAPI.MultiplayerServerVersionQueryParams{
+			params := &platformAPI.MultiplayerServerVersionQueryParams{
 				ModuleID:        moduleID,
 				SemanticVersion: semanticVersion,
 			}
