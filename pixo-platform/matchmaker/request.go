@@ -1,6 +1,8 @@
 package matchmaker
 
 import (
+	"errors"
+	"github.com/rs/zerolog/log"
 	"strconv"
 )
 
@@ -33,6 +35,7 @@ type MatchDetails struct {
 
 func (m MatchResponse) IsValid() bool {
 	if m.Error {
+		log.Error().Err(errors.New(m.Message))
 		return false
 	}
 
