@@ -6,10 +6,7 @@ package cmd
 import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/loader"
-	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
-	"github.com/rs/zerolog/log"
 	"strconv"
 
 	"github.com/spf13/cobra"
@@ -21,20 +18,6 @@ var createUserCmd = &cobra.Command{
 	Short: "Create a new user",
 	Long:  `Create a new user with the following command:`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		clientConfig := urlfinder.ClientConfig{
-			Lifecycle: input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
-			Region:    input.GetConfigValue("region", "PIXO_REGION"),
-		}
-		client, err := graphql_api.NewClientWithBasicAuth(
-			input.GetConfigValue("username", "PIXO_USERNAME"),
-			input.GetConfigValue("password", "PIXO_PASSWORD"),
-			clientConfig,
-		)
-		if err != nil {
-			log.Error().Err(err).Msg("Could not create platform client")
-			return err
-		}
-
 		firstName := input.GetStringValueOrAskUser(cmd, "first-name", "FIRST_NAME")
 		lastName := input.GetStringValueOrAskUser(cmd, "last-name", "LAST_NAME")
 		username := input.GetStringValueOrAskUser(cmd, "username", "USERNAME")
@@ -59,7 +42,7 @@ var createUserCmd = &cobra.Command{
 
 		spinner := loader.NewSpinner(cmd.OutOrStdout())
 
-		user, err := client.CreateUser(cmd.Context(), input)
+		user, err := PlatformCtx.PlatformClient.CreateUser(cmd.Context(), input)
 		if err != nil {
 			cmd.Println("Could not create user: ", err.Error())
 			return err

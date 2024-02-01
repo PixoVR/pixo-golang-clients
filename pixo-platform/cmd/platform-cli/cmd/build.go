@@ -4,7 +4,6 @@ Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	multiplayerAllocator "github.com/PixoVR/pixo-golang-clients/pixo-platform/multiplayer-allocator"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"github.com/spf13/cobra"
@@ -18,9 +17,9 @@ var buildCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		config := urlfinder.ClientConfig{
-			Lifecycle: input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
-			Region:    input.GetConfigValue("region", "PIXO_REGION"),
-			Token:     input.GetConfigValue("token", "PIXO_TOKEN"),
+			Lifecycle: PlatformCtx.ConfigManager.Lifecycle(),
+			Region:    PlatformCtx.ConfigManager.Region(),
+			Token:     PlatformCtx.ConfigManager.Token(),
 		}
 		allocatorClient := multiplayerAllocator.NewClient(config)
 

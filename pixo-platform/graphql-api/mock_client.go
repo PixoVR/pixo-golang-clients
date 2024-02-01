@@ -15,6 +15,8 @@ import (
 var _ PlatformClient = (*MockGraphQLClient)(nil)
 
 type MockGraphQLClient struct {
+	isAuthenticated bool
+
 	CalledGetUser bool
 	GetUserError  bool
 
@@ -26,6 +28,10 @@ type MockGraphQLClient struct {
 
 	CalledDeleteUser bool
 	DeleteUserError  bool
+
+	CalledGetAPIKeys bool
+	GetAPIKeysEmpty  bool
+	GetAPIKeysError  bool
 
 	CalledCreateAPIKey bool
 	CreateAPIKeyError  bool
@@ -46,6 +52,41 @@ type MockGraphQLClient struct {
 	CreateEventError  bool
 
 	CalledGetMultiplayerServerConfigs bool
+	GetMultiplayerServerConfigsError  bool
+
+	CalledGetMultiplayerServerVersions bool
+	GetMultiplayerServerVersionsError  bool
+	GetMultiplayerServerVersionsEmpty  bool
+
+	CalledCreateMultiplayerServerVersion bool
+	CreateMultiplayerServerVersionError  bool
+}
+
+func (m *MockGraphQLClient) Login(username, password string) error {
+	m.isAuthenticated = true
+	return nil
+}
+
+func (m *MockGraphQLClient) ActiveUserID() int {
+	return 1
+}
+
+func (m *MockGraphQLClient) GetToken() string {
+	return faker.UUIDHyphenated()
+}
+
+func (m *MockGraphQLClient) SetToken(token string) {
+	m.isAuthenticated = true
+	return
+}
+
+func (m *MockGraphQLClient) SetAPIKey(apiKey string) {
+	m.isAuthenticated = true
+	return
+}
+
+func (m *MockGraphQLClient) IsAuthenticated() bool {
+	return m.isAuthenticated
 }
 
 func (m *MockGraphQLClient) GetUserByUsername(ctx context.Context, username string) (*platform.User, error) {
@@ -141,7 +182,7 @@ func (m *MockGraphQLClient) CreateAPIKey(ctx context.Context, input platform.API
 	m.CalledCreateAPIKey = true
 
 	if m.CreateAPIKeyError {
-		return nil, errors.New("error creating api key")
+		return nil, errors.New("error creating api apiKey")
 	}
 
 	input.ID = 1
@@ -154,9 +195,13 @@ func (m *MockGraphQLClient) CreateAPIKey(ctx context.Context, input platform.API
 
 func (m *MockGraphQLClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) ([]*platform.APIKey, error) {
 
-	m.CalledGetUser = true
+	m.CalledGetAPIKeys = true
 
-	if m.GetUserError {
+	if m.GetAPIKeysEmpty {
+		return []*platform.APIKey{}, nil
+	}
+
+	if m.GetAPIKeysError {
 		return nil, errors.New("error getting user")
 	}
 
@@ -180,11 +225,11 @@ func (m *MockGraphQLClient) DeleteAPIKey(ctx context.Context, id int) error {
 	m.CalledDeleteAPIKey = true
 
 	if m.DeleteAPIKeyError {
-		return errors.New("error deleting api key")
+		return errors.New("error deleting api apiKey")
 	}
 
 	if id <= 0 {
-		return errors.New("invalid api key id")
+		return errors.New("invalid api apiKey id")
 	}
 
 	return nil
@@ -307,6 +352,25 @@ func (m *MockGraphQLClient) GetMultiplayerServerConfigs(ctx context.Context, par
 }
 
 func (m *MockGraphQLClient) GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionQueryParams) ([]*MultiplayerServerVersion, error) {
+
+	m.CalledGetMultiplayerServerVersions = true
+
+	if m.GetMultiplayerServerVersionsEmpty {
+		return []*MultiplayerServerVersion{}, nil
+	}
+
+	if m.GetMultiplayerServerVersionsError {
+		return nil, errors.New("error getting multiplayer server versions")
+	}
+
+	if params.ModuleID == 0 {
+		return nil, errors.New("invalid module id")
+	}
+
+	if params.SemanticVersion == "" {
+		return nil, errors.New("invalid semantic version")
+	}
+
 	return []*MultiplayerServerVersion{
 		{
 			ModuleID:        1,
@@ -315,4 +379,26 @@ func (m *MockGraphQLClient) GetMultiplayerServerVersions(ctx context.Context, pa
 			Engine:          "unreal",
 		},
 	}, nil
+}
+
+func (m *MockGraphQLClient) CreateMultiplayerServerVersion(ctx context.Context, moduleID int, image, semanticVersion string) error {
+	m.CalledCreateMultiplayerServerVersion = true
+
+	if moduleID == 0 {
+		return errors.New("invalid module id")
+	}
+
+	if image == "" {
+		return errors.New("invalid image")
+	}
+
+	if semanticVersion == "" {
+		return errors.New("invalid semantic version")
+	}
+
+	if m.CreateMultiplayerServerVersionError {
+		return errors.New("error creating multiplayer server version")
+	}
+
+	return nil
 }

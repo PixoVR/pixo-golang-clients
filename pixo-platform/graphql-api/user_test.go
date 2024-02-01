@@ -98,7 +98,7 @@ var _ = Describe("Users API", func() {
 		Expect(updatedUser.Role).To(Equal(userToUpdateInput.Role))
 	})
 
-	Context("using an api key", func() {
+	Context("using an api apiKey", func() {
 
 		var (
 			apiKey *platform.APIKey
@@ -121,7 +121,7 @@ var _ = Describe("Users API", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("can get a user with the api key", func() {
+		It("can get a user with the api apiKey", func() {
 			config := urlfinder.ClientConfig{
 				Lifecycle: lifecycle,
 				Region:    "na",

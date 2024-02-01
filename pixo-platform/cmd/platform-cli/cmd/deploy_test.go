@@ -11,15 +11,23 @@ import (
 var _ = Describe("Deploy", Ordered, func() {
 
 	var (
+		executor        *TestExecutor
 		semanticVersion string
 	)
 
 	BeforeAll(func() {
 		semanticVersion = fmt.Sprintf("%d.%d.%d", rand.Intn(100), rand.Intn(100), rand.Intn(100))
+		executor = NewTestExecutor()
+		Expect(executor).NotTo(BeNil())
+		Expect(semanticVersion).NotTo(BeEmpty())
+	})
+
+	AfterAll(func() {
+		executor.Cleanup()
 	})
 
 	It("can deploy a server version", func() {
-		output, err := RunCommand(
+		output, err := executor.RunCommand(
 			"mp",
 			"serverVersions",
 			"deploy",
@@ -34,8 +42,8 @@ var _ = Describe("Deploy", Ordered, func() {
 		Expect(output).To(ContainSubstring(fmt.Sprintf("created multiplayer server version: %s", semanticVersion)))
 	})
 
-	It("can check if a server version exists", func() {
-		_, err := RunCommand(
+	It("can tell if a server version exists", func() {
+		_, err := executor.RunCommand(
 			"mp",
 			"serverVersions",
 			"deploy",
@@ -47,8 +55,11 @@ var _ = Describe("Deploy", Ordered, func() {
 		)
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("already exists"))
+	})
 
-		output, err := RunCommand(
+	It("can tell if a server version does not exist", func() {
+		executor.MockPlatformClient.GetMultiplayerServerVersionsEmpty = true
+		output, err := executor.RunCommand(
 			"mp",
 			"serverVersions",
 			"deploy",

@@ -47,6 +47,10 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 	return primaryClient, nil
 }
 
+func (p *PrimaryAPIClient) ActiveUserID() int {
+	return 0
+}
+
 func newServiceConfig(lifecycle, region string) urlfinder.ServiceConfig {
 	return urlfinder.ServiceConfig{
 		Service:   "api",

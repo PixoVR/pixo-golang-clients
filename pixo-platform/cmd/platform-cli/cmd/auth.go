@@ -14,7 +14,6 @@ var authCmd = &cobra.Command{
 	Short: "Authenticate with the Pixo Platform",
 	Long:  `Manage authentication and authorization with the Pixo Platform.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		initLogger(cmd)
 		if err := cmd.Help(); err != nil {
 			log.Debug().Err(err).Msg("Could not display auth help")
 			return

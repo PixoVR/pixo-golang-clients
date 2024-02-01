@@ -9,14 +9,28 @@ import (
 
 var _ = Describe("Users", func() {
 
-	It("can create a user", func() {
+	var (
+		executor *TestExecutor
+	)
+
+	BeforeEach(func() {
+		executor = NewTestExecutor()
+
+	})
+
+	AfterEach(func() {
+		executor.Cleanup()
+	})
+
+	It("can create a user and login", func() {
 		firstName := faker.FirstName()
 		lastName := faker.LastName()
 		username := faker.Username()
 		orgID := "1"
 		role := "developer"
+		password := faker.Password() + "!"
 
-		output, err := RunCommand(
+		output, err := executor.RunCommand(
 			"users",
 			"create",
 			"--first-name",
@@ -26,7 +40,7 @@ var _ = Describe("Users", func() {
 			"--username",
 			username,
 			"--password",
-			"SomePassword123!",
+			password,
 			"--org-id",
 			orgID,
 			"--role",
@@ -34,6 +48,8 @@ var _ = Describe("Users", func() {
 		)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring(fmt.Sprintf("Created user %s", username)))
+
+		executor.ExpectLoginToSucceed(username, password)
 	})
 
 })

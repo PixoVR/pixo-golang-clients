@@ -17,16 +17,9 @@ var deleteApiKeyCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		spinner := loader.NewSpinner(cmd.OutOrStdout())
 
-		if err := apiClient.Login(
-			input.GetConfigValue("username", "PIXO_USERNAME"),
-			input.GetConfigValue("password", "PIXO_PASSWORD"),
-		); err != nil {
-			return err
-		}
-
 		apiKeyID := input.GetIntValueOrAskUser(cmd, "key-id", "PIXO_API_KEY_ID")
 
-		if err := apiClient.DeleteAPIKey(cmd.Context(), apiKeyID); err != nil {
+		if err := PlatformCtx.PlatformClient.DeleteAPIKey(cmd.Context(), apiKeyID); err != nil {
 			cmd.Println("Error creating API key: ", err.Error())
 			return err
 		}

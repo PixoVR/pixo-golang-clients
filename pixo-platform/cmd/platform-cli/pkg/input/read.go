@@ -6,8 +6,8 @@ import (
 	"github.com/kyokomi/emoji"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"gitlab.com/david_mbuvi/go_asterisks"
+	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -22,10 +22,10 @@ func GetSensitiveStringValueOrAskUser(cmd *cobra.Command, flagName, envVarName s
 		return cmd.Flag(flagName).Value.String()
 	}
 
-	val := GetConfigValue(flagName, envVarName)
-	if val != "" {
-		return val
-	}
+	//val := GetConfigValue(flagName, envVarName)
+	//if val != "" {
+	//	return val
+	//}
 
 	prompt := fmt.Sprintf("Enter %s", strings.ReplaceAll(flagName, "-", " "))
 	if len(defaultVal) > 0 {
@@ -34,7 +34,7 @@ func GetSensitiveStringValueOrAskUser(cmd *cobra.Command, flagName, envVarName s
 		prompt = fmt.Sprintf("%s: ", prompt)
 	}
 
-	val = ReadSensitiveFromUser(cmd, prompt)
+	val := ReadSensitiveFromUser(cmd.OutOrStdout(), prompt)
 	if val != "" {
 		return val
 	}
@@ -51,10 +51,10 @@ func GetStringValueOrAskUser(cmd *cobra.Command, flagName, envVarName string, de
 		return cmd.Flag(flagName).Value.String()
 	}
 
-	val := GetConfigValue(flagName, envVarName)
-	if val != "" {
-		return val
-	}
+	//val := GetConfigValue(flagName, envVarName)
+	//if val != "" {
+	//	return val
+	//}
 
 	prompt := fmt.Sprintf("Enter %s", strings.ReplaceAll(flagName, "-", " "))
 	if len(defaultVal) > 0 {
@@ -63,7 +63,7 @@ func GetStringValueOrAskUser(cmd *cobra.Command, flagName, envVarName string, de
 		prompt = fmt.Sprintf("%s: ", prompt)
 	}
 
-	val = ReadFromUser(cmd, prompt)
+	val := ReadFromUser(cmd.InOrStdin(), cmd.OutOrStdout(), prompt)
 	if val != "" {
 		return val
 	}
@@ -76,16 +76,14 @@ func GetStringValueOrAskUser(cmd *cobra.Command, flagName, envVarName string, de
 }
 
 func GetIntValue(cmd *cobra.Command, flagName, envVarName string) int {
-	var val string
 	flag := cmd.Flag(flagName)
 	if flag != nil && flag.Value != nil && flag.Value.String() != "" {
 		return ToInt(cmd.Flag(flagName).Value.String())
 	}
 
-	val = GetConfigValue(flagName, envVarName)
-	if val != "" {
-		return ToInt(val)
-	}
+	//if val := GetConfigValue(flagName, envVarName); val != "" {
+	//	return ToInt(val)
+	//}
 
 	if flag != nil && flag.DefValue != "" {
 		return ToInt(cmd.Flag(flagName).DefValue)
@@ -99,29 +97,20 @@ func GetStringValue(cmd *cobra.Command, flagName, envVarName string) string {
 		return cmd.Flag(flagName).Value.String()
 	}
 
-	val := GetConfigValue(flagName, envVarName)
-	if val != "" {
-		return val
-	}
+	//if val := GetConfigValue(flagName, envVarName); val != "" {
+	//	return val
+	//}
 
 	return cmd.Flag(flagName).DefValue
 }
 
-func GetConfigValue(flagName, envVarName string) string {
-	val, ok := os.LookupEnv(envVarName)
-	if ok {
-		return strings.TrimSpace(val)
+func ReadSensitiveFromUser(writer io.Writer, prompt string) string {
+	if writer == nil {
+		return ""
 	}
 
-	if val = viper.GetString(flagName); val != "" {
-		return strings.TrimSpace(val)
-	}
-
-	return ""
-}
-
-func ReadSensitiveFromUser(cmd *cobra.Command, prompt string) string {
-	val, err := go_asterisks.GetUsersPassword(prompt, true, os.Stdin, cmd.OutOrStdout())
+	prompt = emoji.Sprintf(":lock: %s", prompt)
+	val, err := go_asterisks.GetUsersPassword(prompt, true, os.Stdin, writer)
 	if err != nil {
 		log.Error().Err(err).Msg("unable to read password")
 		return ""
@@ -130,11 +119,18 @@ func ReadSensitiveFromUser(cmd *cobra.Command, prompt string) string {
 	return strings.Trim(string(val), "\r\n")
 }
 
-func ReadFromUser(cmd *cobra.Command, prompt string) string {
-	cmd.Print(emoji.Sprintf(":fountain_pen:%s", prompt))
+func ReadFromUser(reader io.Reader, writer io.Writer, prompt string) string {
+	if writer == nil || reader == nil {
+		return ""
+	}
 
-	reader := bufio.NewReader(cmd.InOrStdin())
-	message, _ := reader.ReadString('\n')
+	if _, err := writer.Write([]byte(emoji.Sprintf(":fountain_pen: Enter %s: ", prompt))); err != nil {
+		log.Error().Err(err).Msg("unable to write to writer")
+		return ""
+	}
+
+	bytesReader := bufio.NewReader(reader)
+	message, _ := bytesReader.ReadString('\n')
 
 	return strings.Trim(message, "\r\n")
 }

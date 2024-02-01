@@ -2,47 +2,106 @@ package cmd_test
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/cmd"
-	"github.com/joho/godotenv"
-	"github.com/spf13/cobra"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/clients"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/config"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/editor"
+	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
+	"github.com/rs/zerolog/log"
 	"io"
+	"math/rand"
 	"os"
-	"path/filepath"
-	"runtime"
 	"testing"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
-func GetProjectRoot() (root string) {
-	_, b, _, _ := runtime.Caller(0)
-	root = filepath.Dir(b)
-	return root
-}
-
 func TestCLI(t *testing.T) {
 	RegisterFailHandler(Fail)
 
-	root := GetProjectRoot()
-	envPath := filepath.Join(root, "../../../../.env")
-
-	_ = godotenv.Load(envPath)
+	//root := GetProjectRoot()
+	//envPath := filepath.Join(root, "../../../../.env")
+	//
+	//_ = godotenv.Load(envPath)
 
 	RunSpecs(t, "Pixo Platform CLI Suite")
 }
 
-func GetRootCmd() (*cobra.Command, *bytes.Buffer) {
-	rootCmd := cmd.NewRootCmd()
+type TestExecutor struct {
+	ConfigManager         *config.fileManagerImpl
+	MockPlatformClient    *graphql_api.MockGraphQLClient
+	MockMatchmakingClient *matchmaker.MockMatchmaker
+	MockOldAPIClient      *graphql_api.MockGraphQLClient
+	MockFileOpener        *editor.MockFileOpener
+	configFile            string
+}
+
+func NewTestExecutor() *TestExecutor {
+	randomID := rand.Intn(1000000000)
+	testConfigPath := fmt.Sprintf("%s/.pixo/.test-config-%d.yaml", os.Getenv("HOME"), randomID)
+	if _, err := os.Stat(testConfigPath); err == nil {
+		if err = os.Remove(testConfigPath); err != nil {
+			log.Warn().Msgf("unable to remove test config file: %s", err)
+		} else {
+			log.Info().Msgf("removed existing test config file: %s", testConfigPath)
+		}
+	} else {
+		log.Info().Msgf("test config file does not exist: %s", testConfigPath)
+	}
+
+	configManager := config.NewFileManager("")
+	err := configManager.ReadConfigFile(testConfigPath)
+	Expect(err).NotTo(HaveOccurred())
+
+	mockOldAPIClient := &graphql_api.MockGraphQLClient{}
+	mockPlatformClient := &graphql_api.MockGraphQLClient{}
+	mockMatchmaker := &matchmaker.MockMatchmaker{}
+	mockFileOpener := &editor.MockFileOpener{}
+
+	mockPlatformCtx := &clients.PlatformContext{
+		ConfigManager:     configManager,
+		PlatformClient:    mockPlatformClient,
+		MatchmakingClient: mockMatchmaker,
+		OldAPIClient:      mockOldAPIClient,
+		FileOpener:        mockFileOpener,
+	}
+	cmd.PlatformCtx = mockPlatformCtx
+
+	executor := &TestExecutor{
+		ConfigManager:         configManager,
+		MockPlatformClient:    mockPlatformClient,
+		MockMatchmakingClient: mockMatchmaker,
+		MockOldAPIClient:      mockOldAPIClient,
+		MockFileOpener:        mockFileOpener,
+		configFile:            testConfigPath,
+	}
+
+	return executor
+}
+
+func (t *TestExecutor) Cleanup() {
+	log.Debug().Msgf("Cleaning up test config file: %s", t.configFile)
+	_ = os.Remove(t.configFile)
+}
+
+func (t *TestExecutor) RunCommand(args ...string) (string, error) {
+	mockPlatformCtx := &clients.PlatformContext{
+		ConfigManager:     t.ConfigManager,
+		PlatformClient:    t.MockPlatformClient,
+		MatchmakingClient: t.MockMatchmakingClient,
+		OldAPIClient:      t.MockOldAPIClient,
+		FileOpener:        t.MockFileOpener,
+	}
+	rootCmd := cmd.NewRootCmd(mockPlatformCtx)
 	Expect(rootCmd).NotTo(BeNil())
 
 	output := bytes.NewBufferString("")
 	rootCmd.SetOut(output)
-	return rootCmd, output
-}
 
-func RunCommand(args ...string) (string, error) {
-	rootCmd, output := GetRootCmd()
+	args = append([]string{"--config", t.configFile}, args...)
 	rootCmd.SetArgs(args)
 	err := rootCmd.Execute()
 
@@ -50,19 +109,19 @@ func RunCommand(args ...string) (string, error) {
 	return string(out), err
 }
 
-var _ = BeforeSuite(func() {
-	assertLogin()
-})
+func (t *TestExecutor) ExpectLoginToSucceed(username, password string) {
 
-func assertLogin() {
-	username := os.Getenv("PIXO_USERNAME")
-	password := os.Getenv("PIXO_PASSWORD")
+	output, err := t.RunCommand(
+		"auth",
+		"login",
+		"--username",
+		username,
+		"--password",
+		password,
+	)
 
-	output, err := RunCommand("auth", "login", "--username", username, "--password", password)
 	Expect(err).NotTo(HaveOccurred())
 	Expect(output).To(ContainSubstring("Login successful. Here is your API token:"))
-
-	output, err = RunCommand("config", "list")
-	Expect(err).NotTo(HaveOccurred())
-	Expect(output).To(ContainSubstring("user-id : "))
+	userID := t.ConfigManager.UserID()
+	Expect(userID).To(BeNumerically(">", 0))
 }

@@ -9,7 +9,6 @@ import (
 	"github.com/kyokomi/emoji"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // apiKeyCmd represents the apiKey command
@@ -18,32 +17,28 @@ var createApiKeyCmd = &cobra.Command{
 	Short: "Creating API keys",
 	Long:  `Create API key with the following command:`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		cmd.Println(emoji.Sprintf(":key:Creating API Key"))
+		cmd.Println(emoji.Sprintf(":key: Creating API Key"))
 
 		spinner := loader.NewSpinner(cmd.OutOrStdout())
-
-		apiClient := getAuthenticatedClient()
 
 		input := platform.APIKey{
 			//UserID: input.GetIntValue(cmd, "user-id", "PIXO_USER_ID"),
 		}
 
-		apiKey, err := apiClient.CreateAPIKey(cmd.Context(), input)
+		apiKey, err := PlatformCtx.PlatformClient.CreateAPIKey(cmd.Context(), input)
 		if err != nil {
 			cmd.Println("Error creating API key: ", err.Error())
 			return err
 		}
 
-		viper.Set("api-key", apiKey.Key)
-
-		if err := viper.WriteConfigAs(cfgFile); err != nil {
-			log.Error().Err(err).Msg("Could not write config file")
+		if err := PlatformCtx.ConfigManager.SetAPIKey(apiKey.Key); err != nil {
+			log.Error().Err(err).Msg("Could not set API key")
 			return err
 		}
 
 		spinner.Stop()
 
-		cmd.Println(emoji.Sprintf(":heavy_check_mark:API key created: %s", apiKey.Key))
+		cmd.Println(emoji.Sprintf(":heavy_check_mark: API key created: %s", apiKey.Key))
 		return nil
 	},
 }

@@ -27,13 +27,13 @@ package multiplayer_allocator_test
 //			Revision:   "dev",
 //			Dockerfile: "Dockerfile",
 //			Context:    "simple-server",
-//			Config:     "version.ini",
+//			GetConfig:     "version.ini",
 //		}
 //	)
 //
 //	BeforeEach(func() {
 //		allocatorClient = NewClient(os.Getenv("SECRET_KEY"), "dev", "")
-//		Expect(allocatorClient.IsAuthenticated()).To(BeTrue())
+//		Expect(allocatorClient.isAuthenticated()).To(BeTrue())
 //	})
 //
 //	It("can register a multiplayer server trigger", func() {

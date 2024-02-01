@@ -15,6 +15,8 @@ import (
 )
 
 type PlatformClient interface {
+	abstract_client.AuthClient
+
 	GetUserByUsername(ctx context.Context, username string) (*platform.User, error)
 	CreateUser(ctx context.Context, user platform.User) (*platform.User, error)
 	UpdateUser(ctx context.Context, user platform.User) (*platform.User, error)
@@ -31,6 +33,7 @@ type PlatformClient interface {
 
 	GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]*MultiplayerServerConfigQueryParams, error)
 	GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionQueryParams) ([]*MultiplayerServerVersion, error)
+	CreateMultiplayerServerVersion(ctx context.Context, moduleID int, image, semanticVersion string) error
 }
 
 var _ PlatformClient = (*GraphQLAPIClient)(nil)
@@ -98,6 +101,10 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 	client.Client = graphql.NewClient(fmt.Sprintf("%s/query", url), &c)
 
 	return client, nil
+}
+
+func (g *GraphQLAPIClient) SetAPIKey(key string) {
+	g.AbstractServiceClient.SetAPIKey(key)
 }
 
 func (g *GraphQLAPIClient) ActiveUserID() int {

@@ -1,6 +1,7 @@
 
 NAME = pixo-dev
 EXECUTABLE = ./bin/$(NAME)
+GO_BIN ?= $$(go env GOPATH)/bin
 
 all: lint test build cp
 
@@ -10,10 +11,21 @@ cp:
 	sudo cp $(EXECUTABLE) /usr/local/bin/$(NAME)
 
 lint:
-	golangci-lint run
+	golangci-lint run --timeout 5m
 
 test:
-	ginkgo -r -v --cover ./...
+	@echo "🧪 Running tests with coverage..."
+	@go test ./... -coverprofile=./cover.out -covermode=atomic -coverpkg=./...
+
+coverage: test
+	@echo "🧪 Checking test coverage threshold..."
+	@${GO_BIN}/go-test-coverage --config=./.coverage.yaml
+
+report:
+	@echo "📊 Generating coverage report..."
+	@IS_LOCAL=true go test -cover -v -coverprofile=prof.out ./...
+	@go tool cover -html=prof.out
+
 
 build:
 	go build -o $(EXECUTABLE) main.go

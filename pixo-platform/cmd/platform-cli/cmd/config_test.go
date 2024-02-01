@@ -1,83 +1,72 @@
 package cmd_test
 
 import (
-	"fmt"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/cmd"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/editor"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"os"
 )
 
-var _ = Describe("Config", func() {
+var _ = Describe("ConfigFile", func() {
 
 	var (
-		testConfigPath string
+		executor *TestExecutor
 	)
 
 	BeforeEach(func() {
-		testConfigPath = fmt.Sprintf("%s/.pixo/test-config.yaml", os.Getenv("HOME"))
-		if _, err := os.Stat(testConfigPath); err == nil {
-			_ = os.Remove(testConfigPath)
-		}
+		executor = NewTestExecutor()
+	})
+
+	AfterEach(func() {
+		executor.Cleanup()
 	})
 
 	It("can set the lifecycle", func() {
-		output, err := RunCommand("config", "set", "-l", "dev")
+		output, err := executor.RunCommand("config", "set", "-l", "dev")
 		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring("lifecycle : dev"))
+		Expect(output).NotTo(BeEmpty())
+		Expect(executor.ConfigManager.Lifecycle()).To(Equal("dev"))
+		Expect(executor.ConfigManager.Region()).To(Equal("na"))
 
-		output, err = RunCommand("--config", testConfigPath, "config", "set", "-l", "stage")
+		output, err = executor.RunCommand("config", "set", "-l", "stage")
 		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring("lifecycle : stage"))
+		Expect(output).NotTo(BeEmpty())
+		Expect(executor.ConfigManager.Lifecycle()).To(Equal("stage"))
+		Expect(executor.ConfigManager.Region()).To(Equal("na"))
 	})
 
 	It("can set the region", func() {
-		output, err := RunCommand("--config", testConfigPath, "config", "set", "-r", "saudi")
+		output, err := executor.RunCommand("config", "set", "-r", "saudi", "-l", "prod")
 		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring("region : saudi"))
+		Expect(output).NotTo(BeEmpty())
+		Expect(executor.ConfigManager.Lifecycle()).To(Equal("prod"))
+		Expect(executor.ConfigManager.Region()).To(Equal("saudi"))
 
-		output, err = RunCommand("--config", testConfigPath, "config", "set", "-r", "na")
+		output, err = executor.RunCommand("config", "set", "-r", "na", "-l", "dev")
 		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring("region : na"))
+		Expect(output).NotTo(BeEmpty())
+		Expect(executor.ConfigManager.Lifecycle()).To(Equal("dev"))
+		Expect(executor.ConfigManager.Region()).To(Equal("na"))
 	})
 
 	It("can set the username and password", func() {
-		output, err := RunCommand(
-			"--config",
-			testConfigPath,
+		output, err := executor.RunCommand(
 			"config",
 			"set",
-			"--key",
-			"username",
-			"--val",
+			"--username",
 			"test",
+			"--password",
+			"testpassword",
 		)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring("username : test"))
-
-		output, err = RunCommand(
-			"--config",
-			testConfigPath,
-			"config",
-			"set",
-			"--key",
-			"password",
-			"--val",
-			"test",
-		)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring("password : test"))
+		Expect(output).NotTo(BeEmpty())
+		Expect(executor.ConfigManager.Username()).To(Equal("test"))
+		Expect(executor.ConfigManager.Password()).To(Equal("testpassword"))
 	})
 
 	It("can open up the config file", func() {
-		fileOpener := &editor.MockFileOpener{}
-
-		cmd.FileOpener = fileOpener
-
-		output, err := RunCommand("--config", testConfigPath, "config", "--edit")
+		output, err := executor.RunCommand("config", "--edit")
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring("Opening config file"))
+		Expect(executor.MockFileOpener.CalledOpenEditor).To(BeTrue())
 	})
 
 })

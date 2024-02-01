@@ -10,7 +10,6 @@ import (
 )
 
 func (m *MultiplayerMatchmaker) FindMatch(req MatchRequest) (*net.UDPAddr, error) {
-	log.Debug().Msg("Connecting to matchmaking server")
 
 	httpResponse, err := m.ConnectToWebsocket()
 	if err != nil {
@@ -26,12 +25,11 @@ func (m *MultiplayerMatchmaker) FindMatch(req MatchRequest) (*net.UDPAddr, error
 	if !req.IsValid() {
 		err = errors.New("match request is invalid")
 		log.Error().Err(err).Msg("Match request is invalid")
-		return nil, err
+		return nil, errors.New("match request is invalid")
 	}
 
 	message, err := json.Marshal(req)
 	if err != nil {
-		log.Error().Err(err).Msg("Error deserializing match request")
 		return nil, err
 	}
 
@@ -46,19 +44,15 @@ func (m *MultiplayerMatchmaker) FindMatch(req MatchRequest) (*net.UDPAddr, error
 
 	var matchResponse MatchResponse
 	if err = json.Unmarshal(response, &matchResponse); err != nil {
-		log.Error().Err(err).Msg("Error serializing match response")
 		return nil, err
 	}
 
 	if !matchResponse.IsValid() {
-		err = errors.New("match response is invalid")
-		log.Error().Err(err)
-		return nil, err
+		return nil, errors.New(matchResponse.Message)
 	}
 
 	port, err := strconv.Atoi(matchResponse.MatchDetails.Port)
 	if err != nil {
-		log.Error().Err(err).Msg("Error parsing port from match response")
 		return nil, err
 	}
 
@@ -70,17 +64,14 @@ func (m *MultiplayerMatchmaker) FindMatch(req MatchRequest) (*net.UDPAddr, error
 }
 
 func (m *MultiplayerMatchmaker) DialGameserver(addr *net.UDPAddr) error {
-	log.Debug().Msg("Connecting to gameserver")
 
 	udpServer, err := net.ResolveUDPAddr(addr.Network(), addr.String())
 	if err != nil {
-		log.Error().Err(err).Msg("unable to resolve address")
 		return err
 	}
 
 	conn, err := net.DialUDP(addr.Network(), nil, udpServer)
 	if err != nil {
-		log.Error().Err(err).Msg("unable to dial gameserver address")
 		return err
 	}
 
@@ -90,9 +81,7 @@ func (m *MultiplayerMatchmaker) DialGameserver(addr *net.UDPAddr) error {
 
 func (m *MultiplayerMatchmaker) SendAndReceiveMessage(message []byte) ([]byte, error) {
 	if m.gameserverConnection == nil {
-		err := errors.New("gameserver connection is nil")
-		log.Debug().Err(err).Msg("unable to send message to gameserver")
-		return nil, err
+		return nil, errors.New("gameserver connection is nil")
 	}
 
 	if err := m.sendGameServerMessage(message); err != nil {
@@ -109,21 +98,17 @@ func (m *MultiplayerMatchmaker) SendAndReceiveMessage(message []byte) ([]byte, e
 
 func (m *MultiplayerMatchmaker) CloseGameserverConnection() error {
 	if err := m.gameserverConnection.Close(); err != nil {
-		log.Error().Err(err).Msg("unable to close gameserver connection")
 		return err
 	}
 
-	log.Debug().Msg("Closed gameserver connection")
 	return nil
 }
 
 func (m *MultiplayerMatchmaker) sendGameServerMessage(message []byte) error {
 	if _, err := m.gameserverConnection.Write(message); err != nil {
-		log.Error().Err(err).Msg("unable to write to gameserver")
 		return err
 	}
 
-	log.Debug().Msgf("Sent message to gameserver: %s", message)
 	return nil
 }
 
@@ -131,12 +116,10 @@ func (m *MultiplayerMatchmaker) readGameServerMessage() ([]byte, error) {
 	received := make([]byte, 1024)
 	n, err := m.gameserverConnection.Read(received)
 	if err != nil {
-		log.Error().Err(err).Msg("unable to read from gameserver")
 		return nil, err
 	}
 
 	response := received[:n]
 
-	log.Debug().Msgf("Received message from gameserver: %s", response)
 	return response, nil
 }

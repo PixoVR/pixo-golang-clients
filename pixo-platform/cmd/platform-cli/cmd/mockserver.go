@@ -22,8 +22,6 @@ var mockserverCmd = &cobra.Command{
 	Long:  `Runs a mock matchmaking server that returns a static response determined by the server configuration or user input `,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		initLogger(cmd)
-
 		viper.AddConfigPath(".pixo")
 		viper.SetConfigName("server")
 		viper.SetDefault("module-id", 1)
@@ -31,9 +29,9 @@ var mockserverCmd = &cobra.Command{
 
 		if err := viper.ReadInConfig(); err != nil {
 			if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-				log.Debug().Msg("Config file not found")
+				log.Debug().Msg("ConfigFile file not found")
 			} else {
-				log.Debug().Err(err).Msg("Config file was found but another error was produced")
+				log.Debug().Err(err).Msg("ConfigFile file was found but another error was produced")
 			}
 		}
 
@@ -61,11 +59,11 @@ var mockserverCmd = &cobra.Command{
 
 		mode := gin.ReleaseMode
 
-		if isDebug(cmd) {
+		if isDebug {
 			mode = gin.DebugMode
 		}
 
-		mockserver.Run(cmd, mode, matchmaker.MatchmakingEndpoint, response)
+		mockserver.Run(cmd, PlatformCtx.ConfigManager, mode, matchmaker.MatchmakingEndpoint, response)
 	},
 }
 

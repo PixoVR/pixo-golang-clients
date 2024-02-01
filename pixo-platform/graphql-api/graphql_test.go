@@ -20,7 +20,7 @@ var _ = Describe("GraphQL API", func() {
 		ctx = context.Background()
 	})
 
-	It("can create get and update a session, and then create an event with a secret key", func() {
+	It("can create get and update a session, and then create an event with a secret apiKey", func() {
 		session, err := tokenClient.CreateSession(ctx, 1, "127.0.0.1", "test")
 		Expect(err).NotTo(HaveOccurred())
 		Expect(session).NotTo(BeNil())

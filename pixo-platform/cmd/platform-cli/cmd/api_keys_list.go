@@ -4,7 +4,6 @@ Copyright © 2024 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/loader"
 	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
 	"github.com/spf13/cobra"
@@ -18,16 +17,14 @@ var listApiKeyCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		spinner := loader.NewSpinner(cmd.OutOrStdout())
 
-		apiClient := getAuthenticatedClient()
-
 		apiKeyParams := &graphql_api.APIKeyQueryParams{}
 
-		userID := input.GetIntValue(cmd, "user-id", "PIXO_USER_ID")
+		userID := PlatformCtx.ConfigManager.UserID()
 		if userID != 0 {
 			apiKeyParams.UserID = &userID
 		}
 
-		apiKeys, err := apiClient.GetAPIKeys(cmd.Context(), apiKeyParams)
+		apiKeys, err := PlatformCtx.PlatformClient.GetAPIKeys(cmd.Context(), apiKeyParams)
 		if err != nil {
 			cmd.Println("Error listing API keys: ", err.Error())
 			return err
