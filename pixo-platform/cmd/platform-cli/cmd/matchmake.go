@@ -9,7 +9,6 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
 	"github.com/kyokomi/emoji"
 	"github.com/rs/zerolog/log"
-	"github.com/spf13/viper"
 	"net"
 
 	"github.com/spf13/cobra"
@@ -43,8 +42,7 @@ var matchmakeCmd = &cobra.Command{
 		spinner.Stop()
 		cmd.Println(emoji.Sprintf(":video_game: Match found! Gameserver address: %s", addr.String()))
 
-		viper.Set("gameserver", addr.String())
-		_ = viper.WriteConfigAs(cfgFile)
+		PlatformCtx.ConfigManager.SetConfigValue("gameserver", addr.String())
 
 		if connect {
 			gameserverReadLoop(cmd, PlatformCtx.MatchmakingClient, addr)
