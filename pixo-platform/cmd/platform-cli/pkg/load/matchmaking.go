@@ -9,7 +9,9 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/kyokomi/emoji"
 	"github.com/rs/zerolog/log"
+	"io"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -26,6 +28,8 @@ var (
 
 // Config contains the configuration for a load test.
 type Config struct {
+	Reader            io.Reader
+	Writer            io.Writer
 	MatchmakingClient matchmaker.Matchmaker
 	Request           matchmaker.MatchRequest
 	Connections       int
@@ -51,6 +55,8 @@ type Tester struct {
 	connectionErrors        []string
 	matchingErrors          []string
 	mu                      sync.Mutex
+	reader                  io.Reader
+	writer                  io.Writer
 }
 
 // NewLoadTester creates a new instance of Tester with the specified configuration.
@@ -67,10 +73,20 @@ func NewLoadTester(config Config) *Tester {
 		config.Duration = 600 * time.Second
 	}
 
+	if config.Reader == nil {
+		config.Reader = os.Stdin
+	}
+
+	if config.Writer == nil {
+		config.Writer = os.Stdout
+	}
+
 	return &Tester{
 		client:      config.MatchmakingClient,
 		connections: config.Connections,
 		duration:    config.Duration,
+		writer:      config.Writer,
+		reader:      config.Reader,
 	}
 }
 
@@ -94,7 +110,7 @@ func (lt *Tester) performRequest(wg *sync.WaitGroup, id int) {
 		return
 	}
 
-	fmt.Printf(emoji.Sprintf(":check_mark_button: Connection %d: %s\n", id, successColor.Sprintf("established")))
+	lt.print(emoji.Sprintf(":check_mark_button: Connection %d: %s\n", id, successColor.Sprintf("established")))
 
 	reqBytes, err := json.Marshal(lt.request)
 	if err != nil {
@@ -113,7 +129,6 @@ func (lt *Tester) performRequest(wg *sync.WaitGroup, id int) {
 	lt.recordLatency(time.Since(start))
 	lt.recordReceivedMessage()
 	if err != nil {
-		log.Debug().Err(err).Bytes("response", messageBytes).Msg("error reading message")
 		lt.recordConnectionError(id, "error reading message", err)
 		return
 	}
@@ -128,8 +143,8 @@ func (lt *Tester) performRequest(wg *sync.WaitGroup, id int) {
 
 // Run starts the load testing process.
 func (lt *Tester) Run() {
-	fmt.Println()
-	fmt.Println(emoji.Sprintf(":rocket: Starting load test with %d connections to %s...\n", lt.connections, cyanColor.Sprint(lt.client.GetURL())))
+	lt.println()
+	lt.println(emoji.Sprintf(":rocket: Starting load test with %d connections to %s...\n", lt.connections, cyanColor.Sprint(lt.client.GetURL())))
 
 	lt.start = time.Now()
 
@@ -150,7 +165,7 @@ func (lt *Tester) recordSuccessMessageReceived(id int, msg []byte) {
 	lt.mu.Lock()
 	defer lt.mu.Unlock()
 
-	fmt.Printf(emoji.Sprintf(":fountain_pen: Connection %d: %s: %s\n", id, successColor.Sprint("received match"), statColor.Sprint(string(msg))))
+	lt.print(emoji.Sprintf(":fountain_pen: Connection %d: %s: %s\n", id, successColor.Sprint("received match"), statColor.Sprint(string(msg))))
 	lt.successMessagesReceived++
 }
 
@@ -169,7 +184,7 @@ func (lt *Tester) recordFailure() {
 }
 
 func (lt *Tester) logError(id int, msg string, err error) {
-	fmt.Printf(emoji.Sprintf(":exclamation: Connection %d: %s - %s\n", id, errorColor.Sprint(msg), err))
+	lt.print(emoji.Sprintf(":exclamation: Connection %d: %s - %s\n", id, errorColor.Sprint(msg), err))
 }
 
 // recordConnectionError adds an error to the list of encountered connectionErrors.
@@ -231,25 +246,37 @@ func (lt *Tester) displayStats() {
 		messagesPerSecond = float64(lt.messagesSent) / totalDuration
 	}
 
-	headerColor.Println("\nMatchmaking Load Test Summary")
-	fmt.Println("================================")
+	lt.print(headerColor.Sprint("\nMatchmaking Load Test Summary"))
+	lt.print("================================")
 
-	fmt.Printf("Max Test Duration:       %s\n", lt.duration)
-	fmt.Printf("Actual Test Duration:    %s\n", lt.end.Sub(lt.start).Round(50*time.Millisecond))
-	fmt.Printf("Connections:             %d\n", lt.connections)
-	fmt.Printf("\nTotal Messages Sent:     %d\n", lt.messagesSent)
-	statColor.Printf("Total Messages Received: %d\n", lt.messagesReceived)
-	errorColor.Printf("Connection Errors:       %d\n", len(lt.connectionErrors))
-	errorColor.Printf("Matching Errors:         %d\n", len(lt.matchingErrors))
-	successColor.Printf("Matches Received:        %d\n", lt.successMessagesReceived)
+	lt.print("Max Test Duration:       %s\n", lt.duration)
+	lt.print("Actual Test Duration:    %s\n", lt.end.Sub(lt.start).Round(50*time.Millisecond))
+	lt.println("Connections:             %d\n", lt.connections)
+	lt.print("Total Messages Sent:     %d\n", lt.messagesSent)
 
-	fmt.Println()
-	lineColor.Println("┌─────────────┬────────────┐")
-	headerColor.Println("│ Stat        │ Value      │")
-	lineColor.Println("├─────────────┼────────────┤")
-	statColor.Printf("│ Avg Latency │ %.2f s    │\n", avgLatency)
-	statColor.Printf("│ Max Latency │ %.2f s    │\n", float64(lt.maxLatency)/float64(time.Second))
-	statColor.Printf("│ Msgs/Sec    │ %.2f       │\n", messagesPerSecond)
-	lineColor.Println("└─────────────┴────────────┘")
-	fmt.Println()
+	lt.print(statColor.Sprint("Total Messages Received: %d\n", lt.messagesReceived))
+	lt.print(errorColor.Sprint("Connection Errors:       %d\n", len(lt.connectionErrors)))
+	lt.print(errorColor.Sprint("Matching Errors:         %d\n", len(lt.matchingErrors)))
+	lt.print(successColor.Sprint("Matches Received:        %d\n", lt.successMessagesReceived))
+
+	lt.println()
+	lt.print(lineColor.Sprint("┌─────────────┬────────────┐"))
+	lt.print(headerColor.Sprint("│ Stat        │ Value      │"))
+	lt.print(lineColor.Sprint("├─────────────┼────────────┤"))
+	lt.print(statColor.Sprint("│ Avg Latency │ %.2f s    │\n", avgLatency))
+	lt.print(statColor.Sprint("│ Max Latency │ %.2f s    │\n", float64(lt.maxLatency)/float64(time.Second)))
+	lt.print(statColor.Sprint("│ Msgs/Sec    │ %.2f       │\n", messagesPerSecond))
+	lt.print(lineColor.Sprint("└─────────────┴────────────┘"))
+	lt.println()
+}
+
+func (lt *Tester) print(msgs ...interface{}) {
+	for _, msg := range msgs {
+		_, _ = lt.writer.Write([]byte(fmt.Sprint(msg)))
+	}
+}
+
+func (lt *Tester) println(msgs ...interface{}) {
+	lt.print(msgs...)
+	lt.print("\n")
 }

@@ -35,10 +35,12 @@ var matchmakeCmd = &cobra.Command{
 		if connections, _ := cmd.Flags().GetInt("load"); connections > 0 {
 			duration, _ := cmd.Flags().GetInt("timeout")
 			config := load.Config{
-				Request:           matchRequest,
 				MatchmakingClient: PlatformCtx.MatchmakingClient,
+				Request:           matchRequest,
 				Connections:       connections,
 				Duration:          time.Duration(duration) * time.Second,
+				Reader:            cmd.InOrStdin(),
+				Writer:            cmd.OutOrStdout(),
 			}
 
 			tester := load.NewLoadTester(config)
