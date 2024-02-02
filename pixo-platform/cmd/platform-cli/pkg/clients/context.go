@@ -15,7 +15,7 @@ import (
 
 type PlatformContext struct {
 	ConfigManager     config.Manager
-	OldAPIClient      abstract_client.AuthClient
+	OldAPIClient      abstract_client.AbstractClient
 	PlatformClient    platform.PlatformClient
 	MatchmakingClient matchmaker.Matchmaker
 	FileOpener        editor.FileOpener

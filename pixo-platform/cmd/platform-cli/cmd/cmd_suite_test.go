@@ -59,7 +59,7 @@ func NewTestExecutor() *TestExecutor {
 
 	mockOldAPIClient := &graphql_api.MockGraphQLClient{}
 	mockPlatformClient := &graphql_api.MockGraphQLClient{}
-	mockMatchmaker := &matchmaker.MockMatchmaker{}
+	mockMatchmaker := matchmaker.NewMockMatchmaker()
 	mockFileOpener := &editor.MockFileOpener{}
 
 	mockPlatformCtx := &clients.PlatformContext{

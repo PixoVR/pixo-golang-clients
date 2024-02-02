@@ -9,7 +9,7 @@ import (
 )
 
 type MultiplayerMatchmaker struct {
-	abstractClient.AbstractServiceClient
+	*abstractClient.AbstractServiceClient
 	gameserverAddress    *net.UDPAddr
 	gameserverConnection *net.UDPConn
 }
@@ -40,8 +40,16 @@ func NewMatchmaker(config urlfinder.ClientConfig, timeoutSeconds ...int) *Multip
 	}
 
 	return &MultiplayerMatchmaker{
-		AbstractServiceClient: *abstractClient.NewClient(abstractConfig),
+		AbstractServiceClient: abstractClient.NewClient(abstractConfig),
 	}
+}
+
+func (m *MultiplayerMatchmaker) Login(username, password string) error {
+	return nil
+}
+
+func (m *MultiplayerMatchmaker) ActiveUserID() int {
+	return 1
 }
 
 func newServiceConfig(lifecycle, region string) urlfinder.ServiceConfig {

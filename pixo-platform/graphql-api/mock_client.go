@@ -62,6 +62,10 @@ type MockGraphQLClient struct {
 	CreateMultiplayerServerVersionError  bool
 }
 
+func (m *MockGraphQLClient) GetURL() string {
+	return faker.URL()
+}
+
 func (m *MockGraphQLClient) Login(username, password string) error {
 	m.isAuthenticated = true
 	return nil

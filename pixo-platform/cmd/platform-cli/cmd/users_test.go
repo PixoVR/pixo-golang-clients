@@ -47,9 +47,16 @@ var _ = Describe("Users", func() {
 			role,
 		)
 		Expect(err).NotTo(HaveOccurred())
+		Expect(executor.MockPlatformClient.CalledCreateUser).To(BeTrue())
 		Expect(output).To(ContainSubstring(fmt.Sprintf("Created user %s", username)))
 
 		executor.ExpectLoginToSucceed(username, password)
+
+		output, err = executor.RunCommand("config", "list")
+		Expect(err).NotTo(HaveOccurred())
+		Expect(output).NotTo(ContainSubstring("password"))
+		Expect(output).NotTo(ContainSubstring("token"))
+		Expect(output).NotTo(ContainSubstring("api-key"))
 	})
 
 })

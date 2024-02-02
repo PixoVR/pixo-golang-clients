@@ -5,11 +5,13 @@ package cmd
 
 import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/load"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/loader"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
 	"github.com/kyokomi/emoji"
 	"github.com/rs/zerolog/log"
 	"net"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -25,12 +27,26 @@ var matchmakeCmd = &cobra.Command{
 		moduleID := input.GetIntValueOrAskUser(cmd, "module-id", "PIXO_MODULE_ID")
 		semanticVersion := input.GetStringValueOrAskUser(cmd, "server-version", "PIXO_SERVER_VERSION")
 
-		cmd.Println(emoji.Sprintf(":magnifying_glass_tilted_left: Attempting to find a match for module %d with server version %s...", moduleID, semanticVersion))
-
 		matchRequest := matchmaker.MatchRequest{
 			ModuleID:      moduleID,
 			ServerVersion: semanticVersion,
 		}
+
+		if connections, _ := cmd.Flags().GetInt("load"); connections > 0 {
+			duration, _ := cmd.Flags().GetInt("timeout")
+			config := load.Config{
+				Request:           matchRequest,
+				MatchmakingClient: PlatformCtx.MatchmakingClient,
+				Connections:       connections,
+				Duration:          time.Duration(duration) * time.Second,
+			}
+
+			tester := load.NewLoadTester(config)
+			tester.Run()
+			return
+		}
+
+		cmd.Println(emoji.Sprintf(":magnifying_glass_tilted_left: Attempting to find a match for module %d with server version %s...", moduleID, semanticVersion))
 
 		spinner := loader.NewSpinner(cmd.OutOrStdout())
 
@@ -80,4 +96,7 @@ func gameserverReadLoop(cmd *cobra.Command, mm matchmaker.Matchmaker, addr *net.
 
 func init() {
 	mpCmd.AddCommand(matchmakeCmd)
+
+	matchmakeCmd.Flags().IntP("load", "l", 0, "Number of connections in load test")
+	matchmakeCmd.Flags().IntP("timeout", "t", 600, "Timeout in seconds for load test")
 }

@@ -15,7 +15,7 @@ import (
 )
 
 type PlatformClient interface {
-	abstract_client.AuthClient
+	abstract_client.AbstractClient
 
 	GetUserByUsername(ctx context.Context, username string) (*platform.User, error)
 	CreateUser(ctx context.Context, user platform.User) (*platform.User, error)

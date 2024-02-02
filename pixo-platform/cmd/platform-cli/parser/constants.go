@@ -1,7 +1,7 @@
 package parser
 
 const (
-	DefaultConfigFilepath     = "GetConfig/DefaultGame.ini"
+	DefaultConfigFilepath     = "Config/DefaultGame.ini"
 	DefaultVersionSectionName = "/Script/PixoConfig.PixoConfigSettings"
 	DefaultVersionKey         = "ServerMatchVersion"
 )

@@ -40,7 +40,7 @@ func NewRootCmd(platformContext *clients.PlatformContext) *cobra.Command {
 // rootCmd represents the base rootCmd when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:     "pixo",
-	Version: "0.0.147",
+	Version: "0.0.148",
 	Short:   "A CLI for the Pixo Platform",
 	Long:    `A CLI tool used to streamline interactions with the Pixo Platform`,
 }
