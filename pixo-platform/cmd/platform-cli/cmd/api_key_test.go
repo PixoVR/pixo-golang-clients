@@ -23,9 +23,12 @@ var _ = Describe("API Keys", func() {
 
 	It("can create an api key", func() {
 		output, err := executor.RunCommand("keys", "create")
+		Expect(executor.MockPlatformClient.CalledCreateAPIKey).To(BeTrue())
 		Expect(err).NotTo(HaveOccurred())
-		Expect(output).NotTo(BeEmpty())
-		Expect(executor.ConfigManager.APIKey()).NotTo(BeEmpty())
+		Expect(output).To(ContainSubstring("API key created"))
+		val, ok := executor.ConfigManager.GetConfigValue("api-key")
+		Expect(val).NotTo(BeEmpty())
+		Expect(ok).To(BeTrue())
 	})
 
 	//It("can create an api key for a user", func() {
@@ -37,6 +40,7 @@ var _ = Describe("API Keys", func() {
 
 	It("can list and delete api keys", func() {
 		output, err := executor.RunCommand("keys", "list")
+		Expect(executor.MockPlatformClient.CalledGetAPIKeys).To(BeTrue())
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring("API Keys:"))
 		keyOne := strings.Split(output, "\n")[1]

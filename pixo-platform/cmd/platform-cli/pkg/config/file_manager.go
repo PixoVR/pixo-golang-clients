@@ -1,14 +1,19 @@
 package config
 
 import (
+	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
+	"io"
 	"os"
+	"strings"
 )
 
 type fileManagerImpl struct {
-	baseManagerImpl
+	configFile string
+	reader     io.Reader
+	writer     io.Writer
 }
 
 func NewFileManager(cfgDir string) Manager {
@@ -18,57 +23,79 @@ func NewFileManager(cfgDir string) Manager {
 
 	viper.SetConfigType("yaml")
 
-	m := &fileManagerImpl{}
-	m.SetActiveEnv(Env{Region: "na", Lifecycle: "prod"})
-
-	return m
+	return &fileManagerImpl{}
 }
 
-func (m *fileManagerImpl) ReadConfigFile(configFile string) error {
-	m.SetConfigFile(configFile)
-	return m.readConfigFile()
+func (f *fileManagerImpl) ReadConfigFile(configFile string) error {
+	f.SetConfigFile(configFile)
+	return f.readConfigFile()
 }
 
-func (m *fileManagerImpl) ConfigFile() string {
-	return m.configFile
+func (f *fileManagerImpl) ConfigFile() string {
+	return f.configFile
 }
 
-func (m *fileManagerImpl) SetConfigValue(key, value string) error {
-	viper.Set(key, value)
-	return m.readConfigFile()
+func (f *fileManagerImpl) SetConfigValue(key, value string) {
+	configObj := f.GetConfig()
+	activeEnv := configObj.ActiveEnv()
+	activeEnv.Set(key, value)
+	configObj.SetEnv(activeEnv)
+
+	f.SetConfig(configObj)
 }
 
-func (m *fileManagerImpl) GetConfigValue(key string) (string, bool) {
-	config := m.GetConfig()
+func (f *fileManagerImpl) UnsetConfigValue(key, value string) {
+	configObj := f.GetConfig()
+	activeEnv := configObj.ActiveEnv()
+	activeEnv.Unset(key)
+
+	f.SetConfig(configObj)
+}
+
+func (f *fileManagerImpl) GetConfigValue(key string) (string, bool) {
+	if val, ok := os.LookupEnv(f.formatEnvVar(key)); ok {
+		return val, true
+	}
+
+	config := f.GetConfig()
 	activeEnv := config.ActiveEnv()
 	return activeEnv.Get(key)
 }
 
-func (m *fileManagerImpl) GetConfig() Config {
+func (f *fileManagerImpl) GetConfig() Config {
 	var c Config
 	_ = viper.Unmarshal(&c)
+	if c.Envs == nil {
+		c.Envs = make(map[string]Env)
+	}
+
 	return c
 }
 
-func (m *fileManagerImpl) SetConfig(configObj Config) {
-	viper.Set("region", configObj.Region)
-	viper.Set("lifecycle", configObj.Lifecycle)
-	//viper.Set("envs", configObj.Envs)
-	//viper.Set("config", configObj)
+func (f *fileManagerImpl) SetConfig(configObj Config) {
+	if configObj.Region != "" {
+		viper.Set("region", configObj.Region)
+	}
+
+	if configObj.Lifecycle != "" {
+		viper.Set("lifecycle", configObj.Lifecycle)
+	}
+
+	if configObj.Envs != nil {
+		viper.Set("envs", configObj.Envs)
+	}
+
 	_ = viper.WriteConfig()
 }
 
-func (m *fileManagerImpl) readConfigFile() error {
-	m.createConfigFileIfNotExists(m.configFile)
-	viper.SetConfigFile(m.configFile)
+func (f *fileManagerImpl) readConfigFile() error {
+	f.createConfigFileIfNotExists(f.configFile)
+	viper.SetConfigFile(f.configFile)
 
-	if err := viper.ReadInConfig(); err != nil {
-		return err
-	}
-	return nil
+	return viper.ReadInConfig()
 }
 
-func (m *fileManagerImpl) createConfigFileIfNotExists(configFile string) {
+func (f *fileManagerImpl) createConfigFileIfNotExists(configFile string) {
 	if _, err := os.Stat(configFile); os.IsNotExist(err) {
 		if _, err = os.Create(configFile); err != nil {
 			log.Error().Err(err).Msgf("error creating config file: %s", configFile)
@@ -76,36 +103,78 @@ func (m *fileManagerImpl) createConfigFileIfNotExists(configFile string) {
 	}
 }
 
-func (m *fileManagerImpl) GetOrAsk(key string) string {
-	if m.Reader() == nil {
+func (f *fileManagerImpl) GetConfigValueOrAskUser(key, shortFlag string) string {
+	if f.Reader() == nil {
 		return ""
 	}
 
-	val, ok := m.GetConfigValue(key)
+	val, ok := f.GetConfigValue(key)
 	if ok {
 		return val
 	}
 
+	displayKey := strings.ReplaceAll(strings.ToUpper(key), "-", " ")
 	if key == "password" {
-		return input.ReadSensitiveFromUser(m.Writer(), key)
+		return input.ReadSensitiveFromUser(f.Writer(), displayKey)
 	}
 
-	return input.ReadFromUser(m.Reader(), m.Writer(), key)
+	return input.ReadFromUser(f.Reader(), f.Writer(), displayKey)
 }
 
-func (m *fileManagerImpl) SetActiveEnv(env Env) {
-	configObj := m.GetConfig()
+func (f *fileManagerImpl) SetActiveEnv(env Env) {
+	if env.Region != "" {
+		viper.Set("region", env.Region)
+	}
 
-	configObj.Region = env.Region
-	configObj.Lifecycle = env.Lifecycle
+	if env.Lifecycle != "" {
+		viper.Set("lifecycle", env.Lifecycle)
+	}
 
-	//configObj.SetEnv(env)
-
-	m.SetConfig(configObj)
+	_ = viper.WriteConfig()
 }
 
-func (m *fileManagerImpl) GetActiveEnv() Env {
-	config := m.GetConfig()
+func (f *fileManagerImpl) GetActiveEnv() Env {
+	config := f.GetConfig()
 
 	return config.ActiveEnv()
+}
+
+func (f *fileManagerImpl) formatEnvVar(key string) string {
+	return fmt.Sprintf("PIXO_%s", strings.ReplaceAll(strings.ToUpper(key), "-", "_"))
+}
+
+func (f *fileManagerImpl) SetReader(r io.Reader) {
+	f.reader = r
+}
+
+func (f *fileManagerImpl) Reader() io.Reader {
+	return f.reader
+}
+
+func (f *fileManagerImpl) SetWriter(w io.Writer) {
+	f.writer = w
+}
+
+func (f *fileManagerImpl) Writer() io.Writer {
+	return f.writer
+}
+
+func (f *fileManagerImpl) SetConfigFile(configFile string) {
+	f.configFile = configFile
+}
+
+func (f *fileManagerImpl) Lifecycle() string {
+	if lifecycle, ok := os.LookupEnv("PIXO_LIFECYCLE"); ok {
+		return lifecycle
+	}
+
+	return f.GetActiveEnv().Lifecycle
+}
+
+func (f *fileManagerImpl) Region() string {
+	if region, ok := os.LookupEnv("PIXO_REGION"); ok {
+		return region
+	}
+
+	return f.GetActiveEnv().Region
 }

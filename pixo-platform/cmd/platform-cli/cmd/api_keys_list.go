@@ -7,6 +7,7 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/loader"
 	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
 	"github.com/spf13/cobra"
+	"strconv"
 )
 
 // apiKeyCmd represents the apiKey command
@@ -19,8 +20,13 @@ var listApiKeyCmd = &cobra.Command{
 
 		apiKeyParams := &graphql_api.APIKeyQueryParams{}
 
-		userID := PlatformCtx.ConfigManager.UserID()
-		if userID != 0 {
+		userIDVal, ok := PlatformCtx.ConfigManager.GetConfigValue("userId")
+		if ok {
+			userID, err := strconv.Atoi(userIDVal)
+			if err != nil {
+				cmd.Println("Error parsing user ID: ", err.Error())
+				return nil
+			}
 			apiKeyParams.UserID = &userID
 		}
 

@@ -46,7 +46,7 @@ var matchmakeCmd = &cobra.Command{
 		viper.Set("gameserver", addr.String())
 		_ = viper.WriteConfigAs(cfgFile)
 
-		if cmd.Flag("connect").Value.String() == "true" {
+		if connect {
 			gameserverReadLoop(cmd, PlatformCtx.MatchmakingClient, addr)
 		}
 

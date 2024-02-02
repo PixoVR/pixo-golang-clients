@@ -5,7 +5,6 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/parser"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/clients"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/config"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/editor"
@@ -41,7 +40,7 @@ func NewRootCmd(platformContext *clients.PlatformContext) *cobra.Command {
 // rootCmd represents the base rootCmd when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:     "pixo",
-	Version: "0.0.146",
+	Version: "0.0.147",
 	Short:   "A CLI for the Pixo Platform",
 	Long:    `A CLI tool used to streamline interactions with the Pixo Platform`,
 }
@@ -52,8 +51,10 @@ func Execute() {
 		log.Error().Err(err).Msg("Could not read config file")
 	}
 
+	token, _ := configManager.GetConfigValue("token")
+
 	clientConfig := urlfinder.ClientConfig{
-		Token:     configManager.Token(),
+		Token:     token,
 		Lifecycle: configManager.Lifecycle(),
 		Region:    configManager.Region(),
 	}
@@ -82,7 +83,6 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&isDebug, "debug", "d", false, "Enable debug logging")
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", fmt.Sprintf("config file (default is %s)", globalConfigFile))
-	rootCmd.PersistentFlags().StringP("ini", "c", parser.DefaultConfigFilepath, "Path to the ini file to use for the rootCmd")
 	rootCmd.PersistentFlags().StringP("module-id", "m", "", "Module ID to use for the rootCmd")
 
 	if cfgFile == "" {

@@ -7,7 +7,6 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/loader"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/kyokomi/emoji"
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
 
@@ -31,10 +30,7 @@ var createApiKeyCmd = &cobra.Command{
 			return err
 		}
 
-		if err := PlatformCtx.ConfigManager.SetAPIKey(apiKey.Key); err != nil {
-			log.Error().Err(err).Msg("Could not set API key")
-			return err
-		}
+		PlatformCtx.ConfigManager.SetConfigValue("api-key", apiKey.Key)
 
 		spinner.Stop()
 

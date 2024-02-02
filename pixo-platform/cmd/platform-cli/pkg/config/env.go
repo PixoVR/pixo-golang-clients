@@ -24,3 +24,19 @@ func (e *Env) Get(key string) (string, bool) {
 	val, ok := e.EnvMap[key]
 	return val, ok
 }
+
+func (e *Env) Set(key, value string) {
+	if e.EnvMap == nil {
+		e.EnvMap = map[string]string{}
+	}
+
+	e.EnvMap[key] = value
+}
+
+func (e *Env) Unset(key string) {
+	if e.EnvMap == nil {
+		e.EnvMap = map[string]string{}
+	}
+
+	delete(e.EnvMap, key)
+}

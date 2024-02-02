@@ -16,9 +16,10 @@ type Manager interface {
 	GetConfig() Config
 	SetConfig(config Config)
 	GetConfigValue(key string) (string, bool)
-	SetConfigValue(key, value string) error
+	SetConfigValue(key, value string)
+	UnsetConfigValue(key, value string)
 
-	GetOrAsk(key string) string
+	GetConfigValueOrAskUser(key, shortFlag string) string
 
 	Lifecycle() string
 	Region() string

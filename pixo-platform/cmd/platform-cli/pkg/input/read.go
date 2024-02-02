@@ -109,7 +109,7 @@ func ReadSensitiveFromUser(writer io.Writer, prompt string) string {
 		return ""
 	}
 
-	prompt = emoji.Sprintf(":lock: %s", prompt)
+	prompt = emoji.Sprintf(":lock: Enter %s: ", prompt)
 	val, err := go_asterisks.GetUsersPassword(prompt, true, os.Stdin, writer)
 	if err != nil {
 		log.Error().Err(err).Msg("unable to read password")

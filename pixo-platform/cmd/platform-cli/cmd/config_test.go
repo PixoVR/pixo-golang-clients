@@ -39,12 +39,18 @@ var _ = Describe("ConfigFile", func() {
 		Expect(output).NotTo(BeEmpty())
 		Expect(executor.ConfigManager.Lifecycle()).To(Equal("prod"))
 		Expect(executor.ConfigManager.Region()).To(Equal("saudi"))
+		output, err = executor.RunCommand("config", "list")
+		Expect(err).NotTo(HaveOccurred())
+		Expect(output).To(ContainSubstring("region : saudi"))
+		Expect(output).To(ContainSubstring("lifecycle : prod"))
 
 		output, err = executor.RunCommand("config", "set", "-r", "na", "-l", "dev")
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).NotTo(BeEmpty())
 		Expect(executor.ConfigManager.Lifecycle()).To(Equal("dev"))
 		Expect(executor.ConfigManager.Region()).To(Equal("na"))
+		Expect(output).To(ContainSubstring("region : na"))
+		Expect(output).To(ContainSubstring("lifecycle : dev"))
 	})
 
 	It("can set the username and password", func() {
@@ -58,8 +64,12 @@ var _ = Describe("ConfigFile", func() {
 		)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).NotTo(BeEmpty())
-		Expect(executor.ConfigManager.Username()).To(Equal("test"))
-		Expect(executor.ConfigManager.Password()).To(Equal("testpassword"))
+		val, ok := executor.ConfigManager.GetConfigValue("username")
+		Expect(val).To(Equal("test"))
+		Expect(ok).To(BeTrue())
+		val, ok = executor.ConfigManager.GetConfigValue("password")
+		Expect(val).To(Equal("testpassword"))
+		Expect(ok).To(BeTrue())
 	})
 
 	It("can open up the config file", func() {

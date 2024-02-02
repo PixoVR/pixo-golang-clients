@@ -22,32 +22,36 @@ type PlatformContext struct {
 }
 
 func (p *PlatformContext) Authenticate(reader io.Reader, writer io.Writer) error {
-	token := p.ConfigManager.GetConfigValue("token")
-	if token != "" {
+	if p.PlatformClient.IsAuthenticated() {
+		return nil
+	}
+
+	token, ok := p.ConfigManager.GetConfigValue("token")
+	if ok {
 		p.PlatformClient.SetToken(token)
 		return nil
 	}
 
-	apiKey := p.ConfigManager.GetConfigValue("apiKey")
-	if apiKey != "" {
+	apiKey, ok := p.ConfigManager.GetConfigValue("api-key")
+	if ok {
 		p.PlatformClient.SetAPIKey(apiKey)
 		return nil
 	}
 
-	username := p.ConfigManager.GetConfigValue("username")
-	if username == "" {
+	username, ok := p.ConfigManager.GetConfigValue("username")
+	if !ok {
 		if writer == nil {
 			return nil
 		}
-		username = input.ReadFromUser(reader, writer, "Enter username: ")
+		username = input.ReadFromUser(reader, writer, "username")
 	}
 
-	password := p.ConfigManager.GetConfigValue("password")
-	if password == "" {
+	password, ok := p.ConfigManager.GetConfigValue("password")
+	if !ok {
 		if writer == nil {
 			return nil
 		}
-		password = input.ReadSensitiveFromUser(writer, "Enter password: ")
+		password = input.ReadSensitiveFromUser(writer, "password")
 	}
 
 	if writer != nil {
@@ -55,30 +59,16 @@ func (p *PlatformContext) Authenticate(reader io.Reader, writer io.Writer) error
 		defer spinner.Stop()
 	}
 
-	if err := p.ConfigManager.SetConfigValue("username", username); err != nil {
-		log.Error().Err(err).Msg("Could not set username")
-		return err
-	}
-
-	if err := p.ConfigManager.SetConfigValue("password", password); err != nil {
-		log.Error().Err(err).Msg("Could not set password")
-		return err
-	}
+	p.ConfigManager.SetConfigValue("username", username)
+	p.ConfigManager.SetConfigValue("password", password)
 
 	if err := p.PlatformClient.Login(username, password); err != nil {
 		log.Error().Err(err).Msg("Failed to authenticate")
 		return err
 	}
 
-	if err := p.ConfigManager.SetConfigValue("token", p.PlatformClient.GetToken()); err != nil {
-		log.Error().Err(err).Msg("Could not set userID")
-		return err
-	}
-
-	if err := p.ConfigManager.SetConfigValue("userId", fmt.Sprint(p.PlatformClient.ActiveUserID())); err != nil {
-		log.Error().Err(err).Msg("Could not set userID")
-		return err
-	}
+	p.ConfigManager.SetConfigValue("token", p.PlatformClient.GetToken())
+	p.ConfigManager.SetConfigValue("user-id", fmt.Sprint(p.PlatformClient.ActiveUserID()))
 
 	return nil
 }

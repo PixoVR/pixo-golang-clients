@@ -12,6 +12,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	connect bool
+)
+
 // mpCmd represents the mp rootCmd
 var mpCmd = &cobra.Command{
 	Use:   "mp",
@@ -19,10 +23,10 @@ var mpCmd = &cobra.Command{
 	Long:  `Manage resources like server configurations, versions, triggers. Test game servers and matchmaking.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		if cmd.Flag("connect").Value.String() == "true" {
+		if connect {
 
-			addr := PlatformCtx.ConfigManager.GetConfigValue("gameserveraddress")
-			if addr == "" {
+			addr, ok := PlatformCtx.ConfigManager.GetConfigValue("gameserveraddress")
+			if !ok {
 				return errors.New("no gameserver address provided")
 			}
 
@@ -51,5 +55,5 @@ func init() {
 	rootCmd.AddCommand(mpCmd)
 
 	mpCmd.PersistentFlags().StringP("server-version", "v", "", "Semantic Version of the multiplayer server version")
-	mpCmd.PersistentFlags().Bool("connect", false, "Whether to connect to the gameserver found from a match request")
+	mpCmd.Flags().BoolVarP(&connect, "connect", "c", false, "Whether to connect to the gameserver found from a match request")
 }

@@ -97,5 +97,6 @@ func init() {
 	serverVersionsCmd.AddCommand(deployCmd)
 
 	deployCmd.PersistentFlags().StringP("image", "i", "", "Docker image to deploy as the multiplayer server version")
+	deployCmd.Flags().StringP("ini", "c", parser.DefaultConfigFilepath, "Path to the ini file to use for the rootCmd")
 	deployCmd.Flags().BoolVarP(&isPrecheck, "pre-check", "p", false, "Check if server version exists already")
 }

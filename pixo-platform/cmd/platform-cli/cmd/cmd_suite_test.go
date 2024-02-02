@@ -10,6 +10,7 @@ import (
 	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
 	"github.com/rs/zerolog/log"
+	"github.com/spf13/viper"
 	"io"
 	"math/rand"
 	"os"
@@ -31,7 +32,7 @@ func TestCLI(t *testing.T) {
 }
 
 type TestExecutor struct {
-	ConfigManager         *config.fileManagerImpl
+	ConfigManager         config.Manager
 	MockPlatformClient    *graphql_api.MockGraphQLClient
 	MockMatchmakingClient *matchmaker.MockMatchmaker
 	MockOldAPIClient      *graphql_api.MockGraphQLClient
@@ -84,10 +85,11 @@ func NewTestExecutor() *TestExecutor {
 
 func (t *TestExecutor) Cleanup() {
 	log.Debug().Msgf("Cleaning up test config file: %s", t.configFile)
+	viper.Reset()
 	_ = os.Remove(t.configFile)
 }
 
-func (t *TestExecutor) RunCommand(args ...string) (string, error) {
+func (t *TestExecutor) RunCommandWithReadWriter(reader io.Reader, writer io.Writer, args ...string) (string, error) {
 	mockPlatformCtx := &clients.PlatformContext{
 		ConfigManager:     t.ConfigManager,
 		PlatformClient:    t.MockPlatformClient,
@@ -97,6 +99,8 @@ func (t *TestExecutor) RunCommand(args ...string) (string, error) {
 	}
 	rootCmd := cmd.NewRootCmd(mockPlatformCtx)
 	Expect(rootCmd).NotTo(BeNil())
+	rootCmd.SetOut(writer)
+	rootCmd.SetIn(reader)
 
 	output := bytes.NewBufferString("")
 	rootCmd.SetOut(output)
@@ -107,6 +111,9 @@ func (t *TestExecutor) RunCommand(args ...string) (string, error) {
 
 	out, _ := io.ReadAll(output)
 	return string(out), err
+}
+func (t *TestExecutor) RunCommand(args ...string) (string, error) {
+	return t.RunCommandWithReadWriter(os.Stdin, os.Stdout, args...)
 }
 
 func (t *TestExecutor) ExpectLoginToSucceed(username, password string) {
@@ -122,6 +129,7 @@ func (t *TestExecutor) ExpectLoginToSucceed(username, password string) {
 
 	Expect(err).NotTo(HaveOccurred())
 	Expect(output).To(ContainSubstring("Login successful. Here is your API token:"))
-	userID := t.ConfigManager.UserID()
-	Expect(userID).To(BeNumerically(">", 0))
+	userID, ok := t.ConfigManager.GetConfigValue("user-id")
+	Expect(ok).To(BeTrue())
+	Expect(userID).To(Equal(fmt.Sprint(t.MockPlatformClient.ActiveUserID())))
 }
