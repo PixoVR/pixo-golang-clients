@@ -3,7 +3,7 @@ NAME = pixo-dev
 EXECUTABLE = ./bin/$(NAME)
 GO_BIN ?= $$(go env GOPATH)/bin
 
-all: lint test build cp
+all: lint test build docker cp
 
 dev: build cp
 
