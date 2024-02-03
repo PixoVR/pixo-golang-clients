@@ -61,8 +61,6 @@ var _ = Describe("Config", func() {
 			env := configManager.GetActiveEnv()
 			Expect(env.Lifecycle).To(Equal("prod"))
 			Expect(env.Region).To(Equal("na"))
-
-			err = os.Remove(configFilePath)
 		})
 
 	})

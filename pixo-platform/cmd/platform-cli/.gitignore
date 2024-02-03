@@ -3,3 +3,4 @@ bin/pixo
 bin/pixo-dev
 dist
 **/.env*
+**/test-config*
