@@ -26,6 +26,6 @@ jobs:
           distribution: goreleaser
           version: latest
           args: release --clean
-          workdir: pixo-platform/cmd/platform-cli
+          workdir: pixo-platform/platform-cli
         env:
           GITHUB_TOKEN: ${{ secrets.GORELEASER_TOKEN }}

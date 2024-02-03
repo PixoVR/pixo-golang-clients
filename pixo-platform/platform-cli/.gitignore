@@ -1,0 +1,5 @@
+
+bin/pixo
+bin/pixo-dev
+dist
+**/.env*
