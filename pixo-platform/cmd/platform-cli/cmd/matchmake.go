@@ -4,12 +4,12 @@ Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
-	"fmt"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/load"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/loader"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
-	"github.com/rs/zerolog/log"
-	"github.com/spf13/viper"
+	"github.com/kyokomi/emoji"
 	"net"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -17,70 +17,106 @@ import (
 // matchmakeCmd represents the matchmake rootCmd
 var matchmakeCmd = &cobra.Command{
 	Use:   "matchmake",
-	Short: "Test multiplayer matchmaking",
-	Long: `Test multiplayer matchmaking.  This rootCmd will create a matchmake request and wait for a match to be found.
+	Short: "Connect to the matchmaking service to receive a gameserver",
+	Long: `Connect to the matchmaking service to receive a gameserver.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		mm = matchmaker.NewMatchmaker(
-			input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
-			input.GetConfigValue("region", "PIXO_REGION"),
-			input.GetConfigValue("token", "PIXO_TOKEN"),
-		)
+		moduleID, ok := Ctx.ConfigManager.GetIntConfigValueOrAskUser("module-id", cmd)
+		if !ok {
+			cmd.Println(emoji.Sprintf(":exclamation: Module ID not provided"))
+			return
+		}
 
-		moduleID := input.GetIntValueOrAskUser(cmd, "module-id", "PIXO_MODULE_ID")
-		semanticVersion := input.GetStringValueOrAskUser(cmd, "server-version", "PIXO_SERVER_VERSION")
-
-		cmd.Println(fmt.Sprintf("Attempting to find a match for module %d with server version %s...", moduleID, semanticVersion))
+		semanticVersion, ok := Ctx.ConfigManager.GetConfigValueOrAskUser("server-version", cmd)
+		if !ok {
+			cmd.Println(emoji.Sprintf(":exclamation: Server version not provided"))
+			return
+		}
 
 		matchRequest := matchmaker.MatchRequest{
 			ModuleID:      moduleID,
 			ServerVersion: semanticVersion,
 		}
-		addr, err := mm.FindMatch(matchRequest)
-		if err != nil {
+
+		if numRequests, ok := Ctx.ConfigManager.GetIntFlagOrConfigValue("load", cmd); ok {
+			timeout, _ := Ctx.ConfigManager.GetIntFlagOrConfigValue("timeout", cmd)
+			config := load.Config{
+				MatchmakingClient: Ctx.MatchmakingClient,
+				Request:           matchRequest,
+				Connections:       numRequests,
+				Duration:          time.Duration(timeout) * time.Second,
+				Reader:            cmd.InOrStdin(),
+				Writer:            cmd.OutOrStdout(),
+			}
+
+			tester, err := load.NewLoadTester(config)
+			if err != nil {
+				cmd.Println(emoji.Sprintf(":exclamation: Could not create load tester: %s", err))
+				return
+			}
+
+			tester.Run()
 			return
 		}
 
-		cmd.Println("Match found! Gameserver connection info:", addr.String())
+		cmd.Println(emoji.Sprintf(":magnifying_glass_tilted_left:Attempting to find a match for module %d with server version %s...", matchRequest.ModuleID, matchRequest.ServerVersion))
 
-		viper.Set("gameserver", addr.String())
-		_ = viper.WriteConfigAs(cfgFile)
+		spinner := loader.NewSpinner(cmd.OutOrStdout())
 
-		if cmd.Flag("connect").Value.String() == "true" {
-			gameserverReadLoop(cmd, mm, addr)
+		addr, err := Ctx.MatchmakingClient.FindMatch(matchRequest)
+		if err != nil {
+			spinner.Stop()
+			cmd.Println(emoji.Sprintf(":exclamation:Could not find match: %s", err))
+			return
+		}
+
+		spinner.Stop()
+		cmd.Println(emoji.Sprintf(":video_game:Match found! Gameserver address: %s", addr.String()))
+
+		Ctx.ConfigManager.SetConfigValue("gameserver", addr.String())
+
+		if connect {
+			gameserverReadLoop(cmd, Ctx.MatchmakingClient, addr)
 		}
 
 	},
 }
 
 func gameserverReadLoop(cmd *cobra.Command, mm matchmaker.Matchmaker, addr *net.UDPAddr) {
-	log.Debug().Msg("Connecting to gameserver")
+	cmd.Println(emoji.Sprintf(":satellite:Connecting to gameserver at %s", addr.String()))
 	if err := mm.DialGameserver(addr); err != nil {
-		log.Error().Err(err).Msg("Could not connect to gameserver")
+		cmd.Println(emoji.Sprintf(":warning:Could not connect to gameserver at %s", addr.String()))
+		return
 	}
 
+	Ctx.ConfigManager.SetWriter(cmd.OutOrStdout())
 	for {
-		userInput := input.ReadFromUser(cmd, "Enter message to send to gameserver: ")
+		Ctx.ConfigManager.ReadFromUser("Press enter to send a message to gameserver: ")
+		userInput := Ctx.ConfigManager.ReadFromUser("Message to gameserver: ")
 		if userInput == "" || userInput == "exit" {
 			break
 		}
 
 		response, err := mm.SendAndReceiveMessage([]byte(userInput))
 		if err != nil {
-			log.Error().Err(err).Msg("Could not send and receive message from gameserver")
+			cmd.Println(emoji.Sprintf(":warning:Could not send message to gameserver: %s", err))
+			continue
 		}
 
-		cmd.Println(string(response))
+		cmd.Print(emoji.Sprintf(":arrow_right:Response: %s", response))
 	}
 
-	log.Debug().Msg("Closing connection to gameserver")
+	cmd.Println(emoji.Sprintf("\n:stop_sign:Closing connection to gameserver at %s", addr.String()))
 	if err := mm.CloseGameserverConnection(); err != nil {
-		log.Error().Err(err).Msg("Could not close connection to gameserver")
+		cmd.Println(emoji.Sprintf(":warning:Could not close connection to gameserver at %s", addr.String()))
 	}
 
 }
 
 func init() {
 	mpCmd.AddCommand(matchmakeCmd)
+
+	matchmakeCmd.Flags().IntP("load", "l", 0, "Number of connections in load test")
+	matchmakeCmd.Flags().IntP("timeout", "t", 600, "Timeout in seconds for load test")
 }

@@ -3,7 +3,7 @@ package mockserver
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/config"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/rs/zerolog"
@@ -19,7 +19,7 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func Run(cmd *cobra.Command, mode string, endpoint string, mockResponse []byte) {
+func Run(cmd *cobra.Command, configManager config.Manager, mode string, endpoint string, mockResponse []byte) {
 	gin.SetMode(mode)
 	router := gin.Default()
 	_ = router.SetTrustedProxies(nil)
@@ -28,7 +28,7 @@ func Run(cmd *cobra.Command, mode string, endpoint string, mockResponse []byte) 
 		requestHandler(c.Writer, c.Request, mockResponse)
 	})
 
-	port := input.GetConfigValue("server-port", "SERVER_PORT")
+	port, _ := configManager.GetConfigValue("serverport")
 	cmd.Printf("Starting mock server serving endpoint %s on port %s", endpoint, port)
 
 	if err := router.Run(fmt.Sprintf(":%s", port)); err != nil {

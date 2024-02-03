@@ -1,21 +1,31 @@
 
 NAME = pixo-dev
 EXECUTABLE = ./bin/$(NAME)
-MODULE_ID ?= 271
-SERVER_VERSION ?= "1.03.01"
+GO_BIN ?= $$(go env GOPATH)/bin
 
 all: lint test build cp
 
-new: build cp
+dev: build cp
 
 cp:
 	sudo cp $(EXECUTABLE) /usr/local/bin/$(NAME)
 
 lint:
-	golangci-lint run
+	golangci-lint run --timeout 5m
 
 test:
-	ginkgo -r -v --cover ./...
+	@echo "🧪 Running tests with coverage..."
+	@go test ./... -coverprofile=./cover.out -covermode=atomic -coverpkg=./...
+
+coverage: test
+	@echo "🧪 Checking test coverage threshold..."
+	@${GO_BIN}/go-test-coverage --config=./.coverage.yaml
+
+report:
+	@echo "📊 Generating coverage report..."
+	@IS_LOCAL=true go test -cover -v -coverprofile=prof.out ./...
+	@go tool cover -html=prof.out
+
 
 build:
 	go build -o $(EXECUTABLE) main.go
@@ -23,8 +33,13 @@ build:
 image:
 	docker build ../.. -t ${NAME} -f ./Dockerfile
 
-container: image
-	docker run -d --rm -it ${NAME} -- auth login
+container:
+	docker run --rm -it ${NAME} --version
+
+container-debug:
+	docker run --rm -it --entrypoint /bin/bash ${NAME}
+
+docker: image container
 
 clean:
 	rm -rf ${EXECUTABLE} || true

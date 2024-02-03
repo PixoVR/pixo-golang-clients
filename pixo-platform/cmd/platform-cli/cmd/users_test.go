@@ -5,20 +5,32 @@ import (
 	"github.com/go-faker/faker/v4"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"io"
 )
 
 var _ = Describe("Users", func() {
 
-	It("can create a user", func() {
+	var (
+		executor *TestExecutor
+	)
+
+	BeforeEach(func() {
+		executor = NewTestExecutor()
+
+	})
+
+	AfterEach(func() {
+		executor.Cleanup()
+	})
+
+	It("can create a user and login", func() {
 		firstName := faker.FirstName()
 		lastName := faker.LastName()
 		username := faker.Username()
 		orgID := "1"
 		role := "developer"
+		password := faker.Password() + "!"
 
-		rootCmd, output := GetRootCmd()
-		rootCmd.SetArgs([]string{
+		output, err := executor.RunCommand(
 			"users",
 			"create",
 			"--first-name",
@@ -28,18 +40,23 @@ var _ = Describe("Users", func() {
 			"--username",
 			username,
 			"--password",
-			"SomePassword123!",
+			password,
 			"--org-id",
 			orgID,
 			"--role",
 			role,
-		})
-		err := rootCmd.Execute()
+		)
 		Expect(err).NotTo(HaveOccurred())
+		Expect(executor.MockPlatformClient.CalledCreateUser).To(BeTrue())
+		Expect(output).To(ContainSubstring(fmt.Sprintf("Created user %s", username)))
 
-		out, err := io.ReadAll(output)
+		executor.ExpectLoginToSucceed(username, password)
+
+		output, err = executor.RunCommand("config")
 		Expect(err).NotTo(HaveOccurred())
-		Expect(string(out)).To(ContainSubstring(fmt.Sprintf("created user %s", username)))
+		Expect(output).NotTo(ContainSubstring("password"))
+		Expect(output).NotTo(ContainSubstring("token"))
+		Expect(output).NotTo(ContainSubstring("api-key"))
 	})
 
 })

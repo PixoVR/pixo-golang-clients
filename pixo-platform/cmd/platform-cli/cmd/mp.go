@@ -5,8 +5,6 @@ package cmd
 
 import (
 	"errors"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
 	"net"
 	"strconv"
 	"strings"
@@ -15,7 +13,7 @@ import (
 )
 
 var (
-	mm matchmaker.Matchmaker
+	connect bool
 )
 
 // mpCmd represents the mp rootCmd
@@ -25,10 +23,10 @@ var mpCmd = &cobra.Command{
 	Long:  `Manage resources like server configurations, versions, triggers. Test game servers and matchmaking.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		if cmd.Flag("connect").Value.String() == "true" {
+		if connect {
 
-			addr := input.GetConfigValue("gameserver", "PIXO_GAMESERVER")
-			if addr == "" {
+			addr, ok := Ctx.ConfigManager.GetConfigValueOrAskUser("gameserver address (IP:PORT)", cmd)
+			if !ok {
 				return errors.New("no gameserver address provided")
 			}
 
@@ -44,7 +42,7 @@ var mpCmd = &cobra.Command{
 			}
 
 			udpAddr := &net.UDPAddr{IP: net.ParseIP(gameserverHost), Port: gameserverPort}
-			gameserverReadLoop(cmd, mm, udpAddr)
+			gameserverReadLoop(cmd, Ctx.MatchmakingClient, udpAddr)
 		} else {
 			_ = cmd.Help()
 		}
@@ -54,14 +52,8 @@ var mpCmd = &cobra.Command{
 }
 
 func init() {
-	mm = matchmaker.NewMatchmaker(
-		input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
-		input.GetConfigValue("region", "PIXO_REGION"),
-		input.GetConfigValue("token", "PIXO_TOKEN"),
-	)
-
 	rootCmd.AddCommand(mpCmd)
 
 	mpCmd.PersistentFlags().StringP("server-version", "v", "", "Semantic Version of the multiplayer server version")
-	mpCmd.PersistentFlags().Bool("connect", false, "Whether to connect to the gameserver found from a match request")
+	mpCmd.PersistentFlags().BoolVarP(&connect, "connect", "c", false, "Whether to connect to the gameserver found from a match request")
 }

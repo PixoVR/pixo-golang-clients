@@ -16,6 +16,7 @@ type ServiceConfig struct {
 }
 
 type ClientConfig struct {
+	APIKey    string
 	Token     string
 	Internal  bool
 	Lifecycle string
@@ -24,6 +25,10 @@ type ClientConfig struct {
 }
 
 func (s ServiceConfig) FormatURL() string {
+
+	if s.Service == "" {
+		s.Service = DefaultService
+	}
 
 	if s.Lifecycle == "local" {
 		if s.Service == "matchmaking" {
@@ -34,15 +39,7 @@ func (s ServiceConfig) FormatURL() string {
 			s.Port = 8000
 		}
 
-		if s.Service == "" {
-			s.Service = "v2"
-		}
-
 		return fmt.Sprintf("http://localhost:%d/%s", s.Port, s.Service)
-	}
-
-	if s.Service == "" {
-		s.Service = DefaultService
 	}
 
 	if s.Tenant == "" {
@@ -64,6 +61,14 @@ func (s ServiceConfig) FormatURL() string {
 			prefix = "multi-central1"
 		}
 	case "saudi":
+		if s.Lifecycle == "prod" || s.Lifecycle == "" {
+			if s.Tenant == "apex" && s.Service == "v2" {
+				return fmt.Sprintf("https://apisa.pixovr.com/v2")
+			} else if s.Service == "api" {
+				return fmt.Sprintf("https://apisa.pixovr.com")
+			}
+		}
+
 		if s.Tenant == "multiplayer" {
 			prefix = "multi-saudi"
 		} else {
@@ -71,13 +76,17 @@ func (s ServiceConfig) FormatURL() string {
 		}
 	}
 
+	if prefix != "" {
+		s.Tenant = fmt.Sprintf("%s.%s", prefix, s.Tenant)
+	}
+
+	if s.Service == "api" {
+		return fmt.Sprintf("https://%s.%s.%s", s.Service, s.Tenant, s.GetBaseDomain())
+	}
+
 	protocol := "https"
 	if s.Service == "matchmaking" {
 		protocol = "wss"
-	}
-
-	if prefix != "" {
-		s.Tenant = fmt.Sprintf("%s.%s", prefix, s.Tenant)
 	}
 
 	return fmt.Sprintf("%s://%s.%s/%s", protocol, s.Tenant, s.GetBaseDomain(), s.Service)

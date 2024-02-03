@@ -5,20 +5,29 @@ import (
 	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/k8s/agones"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"io"
 	"math/rand"
 )
 
-var _ = Describe("Deploy", func() {
+var _ = Describe("Deploy", Ordered, func() {
+
+	var (
+		executor        *TestExecutor
+		semanticVersion string
+	)
+
+	BeforeAll(func() {
+		semanticVersion = fmt.Sprintf("%d.%d.%d", rand.Intn(100), rand.Intn(100), rand.Intn(100))
+		executor = NewTestExecutor()
+		Expect(executor).NotTo(BeNil())
+		Expect(semanticVersion).NotTo(BeEmpty())
+	})
+
+	AfterAll(func() {
+		executor.Cleanup()
+	})
 
 	It("can deploy a server version", func() {
-		majorVersion := rand.Intn(100)
-		minorVersion := rand.Intn(100)
-		patchVersion := rand.Intn(100)
-		semanticVersion := fmt.Sprintf("%d.%d.%d", majorVersion, minorVersion, patchVersion)
-
-		rootCmd, output := GetRootCmd()
-		rootCmd.SetArgs([]string{
+		output, err := executor.RunCommand(
 			"mp",
 			"serverVersions",
 			"deploy",
@@ -28,18 +37,13 @@ var _ = Describe("Deploy", func() {
 			semanticVersion,
 			"--image",
 			agones.SimpleGameServerImage,
-		})
-		err := rootCmd.Execute()
+		)
 		Expect(err).NotTo(HaveOccurred())
-
-		out, err := io.ReadAll(output)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(string(out)).To(ContainSubstring(fmt.Sprintf("created multiplayer server version: %s", semanticVersion)))
+		Expect(output).To(ContainSubstring(fmt.Sprintf("created multiplayer server version: %s", semanticVersion)))
 	})
 
-	It("can check if a server version exists", func() {
-		rootCmd, output := GetRootCmd()
-		rootCmd.SetArgs([]string{
+	It("can tell if a server version exists", func() {
+		_, err := executor.RunCommand(
 			"mp",
 			"serverVersions",
 			"deploy",
@@ -47,13 +51,15 @@ var _ = Describe("Deploy", func() {
 			"--module-id",
 			"1",
 			"--server-version",
-			"1.00.00",
-		})
-		err := rootCmd.Execute()
+			semanticVersion,
+		)
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("already exists"))
+	})
 
-		rootCmd.SetArgs([]string{
+	It("can tell if a server version does not exist", func() {
+		executor.MockPlatformClient.GetMultiplayerServerVersionsEmpty = true
+		output, err := executor.RunCommand(
 			"mp",
 			"serverVersions",
 			"deploy",
@@ -62,13 +68,9 @@ var _ = Describe("Deploy", func() {
 			"1",
 			"--server-version",
 			"99.99.99",
-		})
-		err = rootCmd.Execute()
+		)
 		Expect(err).NotTo(HaveOccurred())
-
-		out, err := io.ReadAll(output)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(string(out)).To(ContainSubstring("does not exist"))
+		Expect(output).To(ContainSubstring("does not exist"))
 	})
 
 })

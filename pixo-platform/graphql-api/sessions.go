@@ -7,13 +7,6 @@ import (
 	"time"
 )
 
-type SessionsClient interface {
-	GetSession(ctx context.Context, id int) (*Session, error)
-	CreateSession(ctx context.Context, moduleID int, ipAddress, deviceId string) (*Session, error)
-	UpdateSession(ctx context.Context, id int, status string, completed bool) (*Session, error)
-	CreateEvent(ctx context.Context, sessionID int, uuid string, eventType string, data string) (*platform.Event, error)
-}
-
 type Session struct {
 	ID       int `json:"id"`
 	UserID   int `json:"userId"`

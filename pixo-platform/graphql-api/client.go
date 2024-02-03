@@ -3,7 +3,9 @@ package graphql_api
 import (
 	"context"
 	"fmt"
+	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
+	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/middleware/auth"
 	"github.com/rs/zerolog/log"
 	"net/http"
 	"os"
@@ -12,9 +14,33 @@ import (
 	"github.com/hasura/go-graphql-client"
 )
 
+type PlatformClient interface {
+	abstract_client.AbstractClient
+
+	GetUserByUsername(ctx context.Context, username string) (*platform.User, error)
+	CreateUser(ctx context.Context, user platform.User) (*platform.User, error)
+	UpdateUser(ctx context.Context, user platform.User) (*platform.User, error)
+	DeleteUser(ctx context.Context, id int) error
+
+	GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) ([]*platform.APIKey, error)
+	CreateAPIKey(ctx context.Context, input platform.APIKey) (*platform.APIKey, error)
+	DeleteAPIKey(ctx context.Context, id int) error
+
+	GetSession(ctx context.Context, id int) (*Session, error)
+	CreateSession(ctx context.Context, moduleID int, ipAddress, deviceId string) (*Session, error)
+	UpdateSession(ctx context.Context, id int, status string, completed bool) (*Session, error)
+	CreateEvent(ctx context.Context, sessionID int, uuid string, eventType string, data string) (*platform.Event, error)
+
+	GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]*MultiplayerServerConfigQueryParams, error)
+	GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionQueryParams) ([]*MultiplayerServerVersion, error)
+	CreateMultiplayerServerVersion(ctx context.Context, moduleID int, image, semanticVersion string) error
+}
+
+var _ PlatformClient = (*GraphQLAPIClient)(nil)
+
 // GraphQLAPIClient is a struct for the graphql API that contains an abstract client
 type GraphQLAPIClient struct {
-	*abstract_client.PixoAbstractAPIClient
+	*abstract_client.AbstractServiceClient
 	*graphql.Client
 	underlyingTransport http.RoundTripper
 	defaultContext      context.Context
@@ -23,18 +49,29 @@ type GraphQLAPIClient struct {
 // NewClient is a function that returns a GraphQLAPIClient
 func NewClient(config urlfinder.ClientConfig) *GraphQLAPIClient {
 
-	if config.Token == "" {
-		config.Token = os.Getenv("SECRET_KEY")
+	if config.APIKey == "" {
+		config.APIKey = os.Getenv("PIXO_API_KEY")
 	}
 
 	serviceConfig := newServiceConfig(config)
 
 	url := serviceConfig.FormatURL()
 
-	c := http.Client{Transport: &transport{underlyingTransport: http.DefaultTransport, token: config.Token}}
+	t := &transport{
+		underlyingTransport: http.DefaultTransport,
+		token:               config.Token,
+		key:                 config.APIKey,
+	}
+	c := http.Client{Transport: t}
+
+	abstractConfig := abstract_client.AbstractConfig{
+		Token:  config.Token,
+		APIKey: config.APIKey,
+		URL:    url,
+	}
 
 	return &GraphQLAPIClient{
-		PixoAbstractAPIClient: abstract_client.NewClient(config.Token, url),
+		AbstractServiceClient: abstract_client.NewClient(abstractConfig),
 		Client:                graphql.NewClient(fmt.Sprintf("%s/query", url), &c),
 		defaultContext:        context.Background(),
 	}
@@ -47,8 +84,10 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 
 	url := serviceConfig.FormatURL()
 
+	abstractConfig := abstract_client.AbstractConfig{URL: url}
+
 	client := &GraphQLAPIClient{
-		PixoAbstractAPIClient: abstract_client.NewClient("", serviceConfig.FormatURL()),
+		AbstractServiceClient: abstract_client.NewClient(abstractConfig),
 		defaultContext:        context.Background(),
 	}
 
@@ -62,6 +101,27 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 	client.Client = graphql.NewClient(fmt.Sprintf("%s/query", url), &c)
 
 	return client, nil
+}
+
+func (g *GraphQLAPIClient) SetAPIKey(key string) {
+	g.AbstractServiceClient.SetAPIKey(key)
+}
+
+func (g *GraphQLAPIClient) ActiveUserID() int {
+
+	if !g.IsAuthenticated() {
+		return 0
+	}
+
+	token := g.GetToken()
+
+	rawToken, err := auth.ParseJWT(token)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to parse JWT")
+		return 0
+	}
+
+	return rawToken.UserID
 }
 
 func newServiceConfig(config urlfinder.ClientConfig) urlfinder.ServiceConfig {

@@ -25,7 +25,7 @@ func (p *PrimaryAPIClient) Login(username, password string) error {
 	}
 
 	if res.IsError() {
-		log.Error().Err(err).Msg("Login attempt failed")
+		log.Error().Bytes("body", res.Body()).Msg("Login attempt failed")
 		return errors.New(string(res.Body()))
 	}
 

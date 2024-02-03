@@ -6,52 +6,65 @@ import (
 )
 
 // Client returns the resty client
-func (p *PixoAbstractAPIClient) Client() *resty.Client {
-	return p.restyClient
+func (a *AbstractServiceClient) Client() *resty.Client {
+	return a.restyClient
 }
 
 // GetURL returns the url of the restClient
-func (p *PixoAbstractAPIClient) GetURL() string {
-	return p.url
+func (a *AbstractServiceClient) GetURL() string {
+	return a.url
 }
 
 // GetToken returns the token of the restClient
-func (p *PixoAbstractAPIClient) GetToken() string {
-	return p.token
+func (a *AbstractServiceClient) GetToken() string {
+	return a.token
 }
 
 // SetToken sets the token of the restClient
-func (p *PixoAbstractAPIClient) SetToken(token string) {
-	p.token = token
+func (a *AbstractServiceClient) SetToken(token string) {
+	a.token = token
+}
+
+// GetAPIKey returns the token of the restClient
+func (a *AbstractServiceClient) GetAPIKey() string {
+	return a.key
+}
+
+// SetAPIKey sets the token of the restClient
+func (a *AbstractServiceClient) SetAPIKey(key string) {
+	a.key = key
 }
 
 // GetURLWithPath returns the url of the restClient with a path appended
-func (p *PixoAbstractAPIClient) GetURLWithPath(path string) string {
-	return fmt.Sprintf("%s/%s", p.url, path)
+func (a *AbstractServiceClient) GetURLWithPath(path string) string {
+	return fmt.Sprintf("%s/%s", a.url, path)
 }
 
 // IsAuthenticated returns true if the client is authenticated
-func (p *PixoAbstractAPIClient) IsAuthenticated() bool {
-	return p.token != ""
+func (a *AbstractServiceClient) IsAuthenticated() bool {
+	return a.token != "" || a.key != ""
 }
 
 // FormatRequest formats the request headers needed for authentication
-func (p *PixoAbstractAPIClient) FormatRequest() *resty.Request {
-	req := p.restyClient.R().
+func (a *AbstractServiceClient) FormatRequest() *resty.Request {
+	req := a.restyClient.R().
 		SetHeader("Content-Type", "application/json")
 
-	if p.token != "" {
-		req.SetHeader("x-access-token", p.token).
-			SetHeader("Authorization", fmt.Sprintf("Bearer %s", p.token))
+	if a.token != "" {
+		req.SetHeader("Authorization", fmt.Sprintf("Bearer %s", a.token))
 	}
 
-	for key, value := range p.headers {
+	if a.key != "" {
+		req.SetHeader("x-api-key", a.key)
+	}
+
+	for key, value := range a.headers {
 		req.SetHeader(key, value)
 	}
 
 	return req
 }
 
-func (p *PixoAbstractAPIClient) AddHeader(key string, value string) {
-	p.headers[key] = value
+func (a *AbstractServiceClient) AddHeader(key string, value string) {
+	a.headers[key] = value
 }

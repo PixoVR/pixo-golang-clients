@@ -2,6 +2,7 @@ package matchmaker_test
 
 import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"os"
@@ -15,8 +16,16 @@ var _ = Describe("Multiplayer", func() {
 
 	BeforeEach(func() {
 		var err error
-		m, err = matchmaker.NewMatchmakerWithBasicAuth(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"), "dev", "na")
+		config := urlfinder.ClientConfig{
+			Lifecycle: "dev",
+			Region:    "na",
+		}
+		m, err = matchmaker.NewMatchmakerWithBasicAuth(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"), config)
 		Expect(err).NotTo(HaveOccurred())
+	})
+
+	It("can get the base url for the matchmaker", func() {
+		Expect(m.GetURL()).To(Equal("wss://apex.dev.pixovr.com/matchmaking"))
 	})
 
 	It("can return an error message if the module ID is invalid", func() {
@@ -46,7 +55,7 @@ var _ = Describe("Multiplayer", func() {
 	It("can retrieve a game server address using the matchmaker and send a message to it", func() {
 		req := matchmaker.MatchRequest{
 			ModuleID:      271,
-			ServerVersion: "1.03.01",
+			ServerVersion: "2.00.01",
 		}
 
 		addr, err := m.FindMatch(req)

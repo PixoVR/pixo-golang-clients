@@ -5,9 +5,12 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/parser"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
-	platformAPI "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/clients"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/config"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/editor"
+	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
+	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -22,8 +25,9 @@ var (
 	homeDir          = os.Getenv("HOME")
 	cfgDir           = fmt.Sprintf("%s/.pixo", homeDir)
 	globalConfigFile = fmt.Sprintf("%s/config.yaml", cfgDir)
+	isDebug          bool
 
-	apiClient *platformAPI.GraphQLAPIClient
+	Ctx *clients.CLIContext
 
 	cfgFile string
 )
@@ -32,15 +36,39 @@ func NewRootCmd() *cobra.Command {
 	return rootCmd
 }
 
-// rootCmd represents the base rootCmd when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:     "pixo",
-	Version: "0.0.128",
+	Version: "0.0.149",
 	Short:   "A CLI for the Pixo Platform",
 	Long:    `A CLI tool used to streamline interactions with the Pixo Platform`,
 }
 
 func Execute() {
+	configManager := config.NewFileManager(cfgDir)
+	if err := configManager.ReadConfigFile(cfgFile); err != nil {
+		log.Error().Err(err).Msg("Could not read config file")
+	}
+
+	token, _ := configManager.GetConfigValue("token")
+
+	clientConfig := urlfinder.ClientConfig{
+		Token:     token,
+		Lifecycle: configManager.Lifecycle(),
+		Region:    configManager.Region(),
+	}
+
+	Ctx = &clients.CLIContext{
+		ConfigManager:     configManager,
+		OldAPIClient:      primary_api.NewClient(clientConfig),
+		PlatformClient:    platform.NewClient(clientConfig),
+		MatchmakingClient: matchmaker.NewMatchmaker(clientConfig),
+		FileOpener:        editor.NewFileOpener(""),
+	}
+
+	if err := Ctx.Authenticate(nil); err != nil {
+		log.Error().Err(err).Msg("Failed to authenticate")
+	}
+
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
@@ -50,46 +78,32 @@ func init() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: rootCmd.OutOrStdout(), TimeFormat: time.RFC1123})
 
-	rootCmd.PersistentFlags().BoolP("debug", "d", false, "Enable debug logging")
-
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", fmt.Sprintf("config file (default is %s)", globalConfigFile))
-	rootCmd.PersistentFlags().StringP("ini", "c", parser.DefaultConfigFilepath, "Path to the ini file to use for the rootCmd")
-	rootCmd.PersistentFlags().StringP("module-id", "m", "", "Module ID to use for the rootCmd")
+	rootCmd.PersistentFlags().BoolVarP(&isDebug, "debug", "d", false, "Enable debug logging")
+
+	configCmd.PersistentFlags().StringP("lifecycle", "l", "", "Lifecycle of Pixo Platform to use (dev, stage, prod)")
+	configCmd.PersistentFlags().StringP("region", "r", "", "Region of Pixo Platform to use (na, saudi)")
+	rootCmd.PersistentFlags().IntP("module-id", "m", 0, "Module ID")
 
 	if cfgFile == "" {
 		cfgFile = globalConfigFile
 	}
-	viper.AddConfigPath(cfgDir)
+
 	viper.AddConfigPath(".pixo")
-	viper.SetConfigType("yaml")
-
-	if err := viper.ReadInConfig(); err != nil {
-		log.Error().Err(err).Msg("Failed to read config file")
-	}
-
-	clientConfig := urlfinder.ClientConfig{
-		Token:     viper.GetString("token"),
-		Lifecycle: input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
-		Region:    input.GetConfigValue("region", "PIXO_REGION"),
-	}
-	apiClient = platformAPI.NewClient(clientConfig)
 
 	rootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
-		initLogger(cmd)
+		initLogger()
+		Ctx.SetIO(cmd)
 	}
 }
 
-func initLogger(cmd *cobra.Command) {
+func initLogger() {
 
-	if isDebug(cmd) {
+	if isDebug {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 		log.Debug().Msg("Debug logging enabled")
 	} else {
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	}
 
-}
-
-func isDebug(cmd *cobra.Command) bool {
-	return cmd.Flag("debug").Value.String() == "true"
 }

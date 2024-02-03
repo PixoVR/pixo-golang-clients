@@ -8,26 +8,35 @@ import (
 
 // PrimaryAPIClient is a struct for the primary API that contains an abstract client
 type PrimaryAPIClient struct {
-	abstractClient.PixoAbstractAPIClient
+	abstractClient.AbstractServiceClient
 }
 
-// NewClient is a function that returns a PixoAbstractAPIClient
-func NewClient(token, lifecycle, region string) *PrimaryAPIClient {
+// NewClient is a function that returns a AbstractServiceClient
+func NewClient(config urlfinder.ClientConfig) *PrimaryAPIClient {
 
-	config := newServiceConfig(lifecycle, region)
+	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
+
+	abstractConfig := abstractClient.AbstractConfig{
+		Token: config.Token,
+		URL:   serviceConfig.FormatURL(),
+	}
 
 	return &PrimaryAPIClient{
-		PixoAbstractAPIClient: *abstractClient.NewClient(token, config.FormatURL()),
+		AbstractServiceClient: *abstractClient.NewClient(abstractConfig),
 	}
 }
 
-// NewClientWithBasicAuth is a function that returns a PixoAbstractAPIClient with basic auth performed
-func NewClientWithBasicAuth(username, password, lifecycle, region string) (*PrimaryAPIClient, error) {
+// NewClientWithBasicAuth is a function that returns a AbstractServiceClient with basic auth performed
+func NewClientWithBasicAuth(username, password string, config urlfinder.ClientConfig) (*PrimaryAPIClient, error) {
 
-	config := newServiceConfig(lifecycle, region)
+	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
+
+	abstractConfig := abstractClient.AbstractConfig{
+		URL: serviceConfig.FormatURL(),
+	}
 
 	primaryClient := &PrimaryAPIClient{
-		PixoAbstractAPIClient: *abstractClient.NewClient("", config.FormatURL()),
+		AbstractServiceClient: *abstractClient.NewClient(abstractConfig),
 	}
 
 	if err := primaryClient.Login(username, password); err != nil {
@@ -36,6 +45,10 @@ func NewClientWithBasicAuth(username, password, lifecycle, region string) (*Prim
 	}
 
 	return primaryClient, nil
+}
+
+func (p *PrimaryAPIClient) ActiveUserID() int {
+	return 0
 }
 
 func newServiceConfig(lifecycle, region string) urlfinder.ServiceConfig {

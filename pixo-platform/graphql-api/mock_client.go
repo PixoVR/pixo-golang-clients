@@ -4,14 +4,21 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	abstract_client "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	commonerrors "github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/commonerrors"
+	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/k8s/agones"
 	"github.com/go-faker/faker/v4"
 	"github.com/rs/zerolog/log"
 	"time"
 )
 
+var _ PlatformClient = (*MockGraphQLClient)(nil)
+
 type MockGraphQLClient struct {
+	abstract_client.MockAbstractClient
+	isAuthenticated bool
+
 	CalledGetUser bool
 	GetUserError  bool
 
@@ -24,6 +31,16 @@ type MockGraphQLClient struct {
 	CalledDeleteUser bool
 	DeleteUserError  bool
 
+	CalledGetAPIKeys bool
+	GetAPIKeysEmpty  bool
+	GetAPIKeysError  bool
+
+	CalledCreateAPIKey bool
+	CreateAPIKeyError  bool
+
+	CalledDeleteAPIKey bool
+	DeleteAPIKeyError  bool
+
 	CalledGetSession bool
 	GetSessionError  bool
 
@@ -35,6 +52,47 @@ type MockGraphQLClient struct {
 
 	CalledCreateEvent bool
 	CreateEventError  bool
+
+	CalledGetMultiplayerServerConfigs bool
+	GetMultiplayerServerConfigsError  bool
+
+	CalledGetMultiplayerServerVersions bool
+	GetMultiplayerServerVersionsError  bool
+	GetMultiplayerServerVersionsEmpty  bool
+
+	CalledCreateMultiplayerServerVersion bool
+	CreateMultiplayerServerVersionError  bool
+}
+
+func (m *MockGraphQLClient) GetURL() string {
+	return faker.URL()
+}
+
+func (m *MockGraphQLClient) Login(username, password string) error {
+	m.isAuthenticated = true
+	return nil
+}
+
+func (m *MockGraphQLClient) ActiveUserID() int {
+	return 1
+}
+
+func (m *MockGraphQLClient) GetToken() string {
+	return faker.UUIDHyphenated()
+}
+
+func (m *MockGraphQLClient) SetToken(token string) {
+	m.isAuthenticated = true
+	return
+}
+
+func (m *MockGraphQLClient) SetAPIKey(apiKey string) {
+	m.isAuthenticated = true
+	return
+}
+
+func (m *MockGraphQLClient) IsAuthenticated() bool {
+	return m.isAuthenticated
 }
 
 func (m *MockGraphQLClient) GetUserByUsername(ctx context.Context, username string) (*platform.User, error) {
@@ -120,6 +178,64 @@ func (m *MockGraphQLClient) DeleteUser(ctx context.Context, id int) error {
 
 	if id <= 0 {
 		return errors.New("invalid user id")
+	}
+
+	return nil
+}
+
+func (m *MockGraphQLClient) CreateAPIKey(ctx context.Context, input platform.APIKey) (*platform.APIKey, error) {
+
+	m.CalledCreateAPIKey = true
+
+	if m.CreateAPIKeyError {
+		return nil, errors.New("error creating api apiKey")
+	}
+
+	input.ID = 1
+	input.Key = faker.UUIDHyphenated()
+	input.CreatedAt = time.Now().UTC()
+	input.UpdatedAt = time.Now().UTC()
+
+	return &input, nil
+}
+
+func (m *MockGraphQLClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) ([]*platform.APIKey, error) {
+
+	m.CalledGetAPIKeys = true
+
+	if m.GetAPIKeysEmpty {
+		return []*platform.APIKey{}, nil
+	}
+
+	if m.GetAPIKeysError {
+		return nil, errors.New("error getting user")
+	}
+
+	if params.UserID == nil {
+		params.UserID = &[]int{1}[0]
+	}
+
+	return []*platform.APIKey{
+		{
+			ID:        1,
+			UserID:    *params.UserID,
+			Key:       faker.UUIDHyphenated(),
+			CreatedAt: time.Now().UTC(),
+			UpdatedAt: time.Now().UTC(),
+		},
+	}, nil
+}
+
+func (m *MockGraphQLClient) DeleteAPIKey(ctx context.Context, id int) error {
+
+	m.CalledDeleteAPIKey = true
+
+	if m.DeleteAPIKeyError {
+		return errors.New("error deleting api apiKey")
+	}
+
+	if id <= 0 {
+		return errors.New("invalid api apiKey id")
 	}
 
 	return nil
@@ -220,4 +336,75 @@ func (m *MockGraphQLClient) CreateEvent(ctx context.Context, sessionID int, uuid
 		Data:      jsonData,
 		CreatedAt: time.Now().UTC(),
 	}, nil
+}
+
+func (m *MockGraphQLClient) GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]*MultiplayerServerConfigQueryParams, error) {
+	m.CalledGetMultiplayerServerConfigs = true
+
+	return []*MultiplayerServerConfigQueryParams{
+		{
+			ModuleID: 1,
+			Capacity: 5,
+			ServerVersions: []*MultiplayerServerVersion{
+				{
+					Engine:          "unreal",
+					ImageRegistry:   agones.SimpleGameServerImage,
+					Status:          "enabled",
+					SemanticVersion: "1.0.0",
+				},
+			},
+		},
+	}, nil
+}
+
+func (m *MockGraphQLClient) GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionQueryParams) ([]*MultiplayerServerVersion, error) {
+
+	m.CalledGetMultiplayerServerVersions = true
+
+	if m.GetMultiplayerServerVersionsEmpty {
+		return []*MultiplayerServerVersion{}, nil
+	}
+
+	if m.GetMultiplayerServerVersionsError {
+		return nil, errors.New("error getting multiplayer server versions")
+	}
+
+	if params.ModuleID == 0 {
+		return nil, errors.New("invalid module id")
+	}
+
+	if params.SemanticVersion == "" {
+		return nil, errors.New("invalid semantic version")
+	}
+
+	return []*MultiplayerServerVersion{
+		{
+			ModuleID:        1,
+			SemanticVersion: "1.0.0",
+			Status:          "enabled",
+			Engine:          "unreal",
+		},
+	}, nil
+}
+
+func (m *MockGraphQLClient) CreateMultiplayerServerVersion(ctx context.Context, moduleID int, image, semanticVersion string) error {
+	m.CalledCreateMultiplayerServerVersion = true
+
+	if moduleID == 0 {
+		return errors.New("invalid module id")
+	}
+
+	if image == "" {
+		return errors.New("invalid image")
+	}
+
+	if semanticVersion == "" {
+		return errors.New("invalid semantic version")
+	}
+
+	if m.CreateMultiplayerServerVersionError {
+		return errors.New("error creating multiplayer server version")
+	}
+
+	return nil
 }

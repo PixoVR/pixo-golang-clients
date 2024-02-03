@@ -1,12 +1,37 @@
 # Pixo Platform CLI
-This is a CLI that allows you to interact with the Pixo Platform in various ways. It is likely to be most helpful to  
-developers building modules to be deployed on the Pixo Platform. It can be used for things like authenticating  
+This is a CLI that allows you to interact with the Pixo Platform in various ways. It is likely to be most helpful to 
+developers building modules to be deployed on the Pixo Platform. It can be used for things like authenticating 
 with the platform, deploying gameserver versions, and simplifying the testing of multiplayer components.
 
 ## Prerequisites
-- [Pixo Account](https://apex.pixovr.com)
+- [Pixo Account](https://apex.pixovr.com) with API Key or Username/Password
 
-API Key or Username/Password are needed to authenticate with the Pixo Platform APIs.
+## Table of Contents
+- [Installation](#installation)
+    - [MacOS - HomeBrew](#macos---homebrew)
+    - [Windows](#windows)
+    - [Build from Source](#build-from-source)
+- [Configuration](#configuration)
+    - [Set via Environment Variables](#set-via-environment-variables)
+    - [Set via Command Line](#set-via-command-line)
+    - [Show Configuration File](#show-configuration-file)
+    - [Edit Configuration File](#edit-configuration-file)
+- [Login to the Pixo Platform](#login-to-the-pixo-platform)
+- [Users](#users)
+    - [Create](#create)
+- [API Keys](#api-keys)
+    - [Create](#create)
+    - [List](#list)
+    - [Delete](#delete)
+- [Run Mock Matchmaking Server](#run-mock-matchmaking-server)
+- [Deploy a Module Game Server Version](#deploy-a-module-game-server-version)
+    - [Gameserver Build Pipeline (e.g. Cloud Build)](#gameserver-build-pipeline-eg-cloud-build)
+        - [Sample Ini Configuration](#sample-ini-configuration)
+        - [Sample `cloudbuild.yaml`](#sample-cloudbuildyaml)
+- [Test Multiplayer Matchmaking](#test-multiplayer-matchmaking)
+    - [Request a Match](#request-a-match)
+    - [Connect to the Game Server](#connect-to-the-game-server)
+    - [Load Testing](#load-testing)
 
 
 ## Installation
@@ -16,13 +41,10 @@ brew tap PixoVR/pixo-golang-clients
 brew install pixo-cli
 
 pixo help
-
-# Update
-brew tap PixoVR/pixo-golang-clients
 ```
 
 ### Windows
-Unfortunately the Pixo CLI is not yet available on Windows via a package manager.
+Unfortunately the Pixo CLI is not yet available on Windows via package manager.
 The CLI can be installed by downloading the latest release from the [releases page](https://github.com/PixoVR/pixo-golang-clients/releases)
 or building from source.
 ```
@@ -32,12 +54,14 @@ make build
 ./bin/pixo help
 ```
 
-
-## Initialization
+### Build from Source
 ```bash
-pixo init # Initialize the configuration file
-pixo auth login # Authenticate with the Pixo Platform API
+git clone github.com/PixoVR/pixo-golang-clients.git
+cd pixo-golang-clients/pixo-platform/cmd/platform-cli
+make build
+./bin/pixo help
 ```
+
 
 ## Configuration
 Configurations can be set using flags, environment variables or a config file.
@@ -48,48 +72,60 @@ Configurations are prioritized in the following order:
 3. Local Configuration File `./.pixo/config.yaml`
 4. Global Configuration File `~/.pixo/config.yaml`
 
-### Sample Environment Variables:
+### Set via Environment Variables:
 ```bash
 # API Key
-export SECRET_KEY=secretkey
+export PIXO_API_KEY=<api-key>
 
 # Username/Password
-export PIXO_USERNAME=username
-export PIXO_PASSWORD=password
+export PIXO_USERNAME=<username>
+export PIXO_PASSWORD=<password>
 
-# Pixo Platform Used - if not set, defaults to na and prod
+# Pixo Platform Environment Used - if not set, defaults to na and prod
 export PIXO_LIFECYCLE=stage
-export PIXO_REGION=na
+export PIXO_REGION=saudi
 ```
 
-### Sample Configuration File:
-```yaml
-# ~/.pixo/config.yaml
-
-# API Key
-secret-key: secretkey
-
-# Username/Password
-username: username
-password: password
-
-# Platform Used - if not set, defaults to na and prod
-lifecycle: stage
-region: na
-
-# Default Module ID
-module-id: 1
-```
-
-## Set via Command Line
+### Set via Command Line
 ```bash
-# Requires logging in again after switching environments
-pixo config set --region saudi # Switch to saudi environment
-pixo config set --lifecycle dev # Switch to dev environment
-pixo config set --key module-id --val 1 # Set default module id
+pixo config set --region saudi
+pixo config set --lifecycle dev
+pixo config set --key module-id --val 1
 ```
 
-## Create a User
+### Show Configuration File
+```bash
+pixo config
+
+# Example output:
+🌎 Region: na
+⚙️ Lifecycle: prod
+👤 Username: <username>
+````
+
+### Edit Configuration File
+Editor can be set via the `EDITOR` environment variable. Defaults to `vim`.
+```bash
+pixo config --edit
+```
+
+
+## Login to the Pixo Platform
+```bash
+pixo auth login
+
+# Or with username and password
+pixo auth login --username <username> --password <password>
+
+# Example output:
+🚀 Login successful. Here is your API token: 
+<jwt-token>
+```
+
+
+## Users
+
+### Create
 ```bash
 pixo users create \
     --username testuser \
@@ -98,49 +134,31 @@ pixo users create \
     --last-name User \
     --org-id 1 \
     --role developer
-    
 ```
 
-## Deploy a Module Game Server Version
+## API Keys
+
+### Create
 ```bash
-# Check if server version with semantic version already exists
-pixo mp serverVersions deploy \
-    --pre-check \
-    --module-id 1 \
-    --server-version 1.00.00
+pixo keys create
 
-# Deploy a new version - used in CI/CD pipelines or to test with a simple server like below
-pixo mp serverVersions deploy \
-    --module-id 1 \
-    --server-version 1.00.00 \
-    --image gcr.io/pixo-bootstrap/multiplayer/gameservers/simple-server:latest
+# Or for a specific user
+pixo keys create --user-id 1
 ```
 
-## Tail logs of a Game Server Build
+### List
 ```bash
-# Check if server version with semantic version already exists
-pixo logs build --module-id 1
+pixo keys list
+
+# Or for a specific user
+pixo keys list --user-id 1
 ```
 
-## Test Multiplayer Matchmaking
+### Delete
 ```bash
-# Request a match
-pixo mp matchmake \
-    --module-id 1 \
-    --server-version 1.00.00
-
-# Request a match and connect to the game server
-pixo mp matchmake \
-    --module-id 1 \
-    --server-version 1.00.00 \
-    --connect
-
-# If a match was previously found, the gameserver connection will be saved and can be used to reconnect
-pixo mp --connect
-
-# Enter message to send to gameserver: hello
-# ACK: hello
+pixo keys delete --key-id 1
 ```
+
 
 ## Run Mock Matchmaking Server
 
@@ -172,7 +190,7 @@ module-id: 1
 org-id: 1
 ```
 
-You can even use the Pixo CLI to test the mock server (run [simple agones server](https://github.com/PixoVR/multiplayer-gameservers/tree/dev/simple-server) locally to test the example below):
+You could even use the Pixo CLI to test the mock server (run [simple agones server](https://github.com/PixoVR/multiplayer-gameservers/tree/dev/simple-server) locally to test the example below):
 ```bash
 # In one terminal, run the mock server
 pixo mp mockserver
@@ -183,4 +201,147 @@ pixo mp matchmake \
     --module-id 1 \
     --server-version 1.00.00 \
     --connect
+```
+
+## Deploy a Module Game Server Version
+```bash
+# Check if version with matching semantic version already exists
+pixo mp serverVersions deploy \
+    --pre-check \
+    --module-id 1 \
+    --server-version 1.00.00
+```
+
+```bash
+# Deploy a new version
+pixo mp serverVersions deploy \
+    --module-id 1 \
+    --server-version 1.00.00 \
+    --image gcr.io/pixo-bootstrap/multiplayer/gameservers/simple-server:latest
+```
+
+### Gameserver Build Pipeline (e.g. Cloud Build)
+If no `server-version` configuration value is found, it will search for an ini file  
+The ini used file can be set with the flag `--ini` and defaults to `Config/DefaultGame.ini`
+
+#### Sample Ini Configuration
+```ini
+[/Script/PixoConfig.PixoConfigSettings]
+ServerMatchVersion=1.00.00
+```
+
+#### Sample `cloudbuild.yaml`
+```yaml
+steps:
+  - name: "gcr.io/pixo-bootstrap/pixo-platform-cli:0.0.148"
+    id: "Version Pre-Check"
+    args:
+      - mp
+      - serverVersions
+      - deploy
+      - --module-id
+      - ${_MODULE_ID}
+      - --pre-check
+    env:
+      - "PIXO_REGION=${_PIXO_REGION}"
+      - "PIXO_LIFECYCLE=${_PIXO_LIFECYCLE}"
+    secretEnv:
+      - "PIXO_API_KEY"
+
+  - name: "gcr.io/cloud-builders/docker"
+    id: "Build and Push Game Server Image"
+    args:
+      - build
+      - -t
+      - gcr.io/${PROJECT_ID}/${_LIFECYCLE}/${_PROJECT_NAME}:latest
+
+  - name: "gcr.io/pixo-bootstrap/pixo-platform-cli:0.0.148"
+    id: "Deploy MP Server Version"
+    args:
+      - mp
+      - serverVersions
+      - deploy
+      - --module-id
+      - ${_MP_MODULE_ID}
+      - --image
+      - gcr.io/${PROJECT_ID}/${_LIFECYCLE}/${_PROJECT_NAME}:${COMMIT_SHA}
+    env:
+      - "PIXO_REGION=${_PIXO_REGION}"
+      - "PIXO_LIFECYCLE=${_PIXO_LIFECYCLE}"
+    secretEnv:
+      - "PIXO_API_KEY"
+
+availableSecrets:
+  secretManager:
+    - versionName: projects/$PROJECT_ID/secrets/$SECRET_NAME/versions/latest
+      env: PIXO_API_KEY
+```
+
+
+## Test Multiplayer Matchmaking
+
+### Request a Match
+```bash
+# Request a match
+pixo mp matchmake \
+    --module-id 1 \
+    --server-version 1.00.00
+```
+
+### Connect to the Game Server
+```bash
+# Request a match and connect to the game server
+pixo mp matchmake \
+    --module-id 1 \
+    --server-version 1.00.00 \
+    --connect
+    
+# If a match was previously found, the gameserver connection will be saved and can be used to reconnect
+pixo mp --connect
+
+# Enter message to send to gameserver: hello
+# ACK: hello
+```
+
+
+### Load Testing
+```
+pixo mp matchmake \
+    --module-id 1 \
+    --server-version 1.00.00 \
+    --load 5
+    
+# Example output
+🚀  Starting load test with 5 connections to wss://apex.dev.pixovr.com/matchmaking...
+
+✅  Connection 5: established
+✅  Connection 4: established
+✅  Connection 2: established
+✅  Connection 3: established
+✅  Connection 1: established
+🏁  Connection 1: Match found - gameserver -> 34.42.175.246:7566
+🏁  Connection 2: Match found - gameserver -> 34.42.175.246:7566
+🏁  Connection 4: Match found - gameserver -> 34.42.175.246:7566
+🏁  Connection 5: Match found - gameserver -> 34.42.175.246:7756
+🏁  Connection 3: Match found - gameserver -> 34.42.175.246:7756
+
+Matchmaking Load Test Summary
+==============================
+Max Test Duration:       10m0s
+Actual Test Duration:    13.6s
+Connections:             5
+Total Messages Sent:     5
+
+Total Messages Received: 5
+Connection Errors:       0
+Matching Errors:         0
+Matches Received:        5
+
+┌─────────────┬────────────┐
+│ Stat        │ Value      │
+├─────────────┼────────────┤
+│ Avg Latency │ 6.58 s     │
+│ Max Latency │ 13.52 s    │
+│ Msgs/Sec    │ 0.37       │
+└─────────────┴────────────┘
 ```

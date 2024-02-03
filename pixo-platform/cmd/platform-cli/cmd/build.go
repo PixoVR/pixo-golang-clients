@@ -4,8 +4,8 @@ Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	multiplayerAllocator "github.com/PixoVR/pixo-golang-clients/pixo-platform/multiplayer-allocator"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"github.com/spf13/cobra"
 )
 
@@ -16,11 +16,18 @@ var buildCmd = &cobra.Command{
 	Long:  `Retrieve logs for a specific build`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		allocatorClient := multiplayerAllocator.NewClient(
-			input.GetConfigValue("token", "PIXO_TOKEN"),
-			input.GetConfigValue("lifecycle", "PIXO_LIFECYCLE"),
-			input.GetConfigValue("region", "PIXO_REGION"),
-		)
+		token, ok := Ctx.ConfigManager.GetConfigValue("token")
+		if !ok {
+			cmd.Println("Token not found. Run 'pixo auth login' to login.")
+			return
+		}
+
+		config := urlfinder.ClientConfig{
+			Lifecycle: Ctx.ConfigManager.Lifecycle(),
+			Region:    Ctx.ConfigManager.Region(),
+			Token:     token,
+		}
+		allocatorClient := multiplayerAllocator.NewClient(config)
 
 		workflows, err := allocatorClient.GetBuildWorkflows()
 		if err != nil {
@@ -38,7 +45,7 @@ var buildCmd = &cobra.Command{
 			cmd.Println(log)
 		}
 
-		cmd.Println("Done streaming logs")
+		cmd.Println("Stop streaming logs")
 	},
 }
 

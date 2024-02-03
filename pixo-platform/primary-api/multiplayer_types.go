@@ -9,10 +9,13 @@ type MultiplayerServerConfig struct {
 	ModuleID int     `json:"moduleId,omitempty"`
 	Module   *Module `json:"module,omitempty"`
 
+	ServerVersions []*MultiplayerServerVersion `json:"serverVersions,omitempty"`
+
 	CreatedBy string `json:"createdBy,omitempty"`
 	UpdatedBy string `json:"updatedBy,omitempty"`
-	CreatedAt string `json:"createdAt,omitempty"`
-	UpdatedAt string `json:"updatedAt,omitempty"`
+
+	//CreatedAt time.Time `json:"createdAt,omitempty"`
+	//UpdatedAt time.Time `json:"updatedAt,omitempty"`
 }
 
 type MultiplayerServerTrigger struct {
@@ -27,6 +30,7 @@ type MultiplayerServerTrigger struct {
 
 	CreatedBy string `json:"createdBy,omitempty"`
 	UpdatedBy string `json:"updatedBy,omitempty"`
+
 	CreatedAt string `json:"createdAt,omitempty"`
 	UpdatedAt string `json:"updatedAt,omitempty"`
 }
@@ -45,8 +49,8 @@ type MultiplayerServerVersion struct {
 	CreatedBy string `json:"createdBy" graphql:"createdBy"`
 	UpdatedBy string `json:"updatedBy" graphql:"updatedBy"`
 
-	CreatedAt string `json:"createdAt" graphql:"createdAt"`
-	UpdatedAt string `json:"updatedAt" graphql:"updatedAt"`
+	//CreatedAt time.Time `json:"createdAt,omitempty" graphql:"createdAt"`
+	//UpdatedAt time.Time `json:"updatedAt,omitempty" graphql:"updatedAt"`
 }
 
 type GameProfileMetaDataResponse struct {

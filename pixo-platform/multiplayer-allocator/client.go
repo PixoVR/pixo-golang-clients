@@ -8,29 +8,39 @@ import (
 
 // AllocatorClient is a struct for the primary API that contains an abstract client
 type AllocatorClient struct {
-	abstractClient.PixoAbstractAPIClient
+	abstractClient.AbstractServiceClient
 }
 
-// NewClient is a function that returns a PixoAbstractAPIClient
-func NewClient(token, lifecycle, region string) *AllocatorClient {
+// NewClient is a function that returns a AbstractServiceClient
+func NewClient(config urlfinder.ClientConfig) *AllocatorClient {
 
-	config := newServiceConfig(lifecycle, region)
+	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
+
+	abstractConfig := abstractClient.AbstractConfig{
+		URL:   serviceConfig.FormatURL(),
+		Token: config.Token,
+	}
 
 	return &AllocatorClient{
-		PixoAbstractAPIClient: *abstractClient.NewClient(token, config.FormatURL()),
+		AbstractServiceClient: *abstractClient.NewClient(abstractConfig),
 	}
 }
 
-func NewClientWithBasicAuth(username, password, lifecycle, region string) (*AllocatorClient, error) {
-	primaryClient, err := primary_api.NewClientWithBasicAuth(username, password, lifecycle, region)
+func NewClientWithBasicAuth(username, password string, config urlfinder.ClientConfig) (*AllocatorClient, error) {
+	primaryClient, err := primary_api.NewClientWithBasicAuth(username, password, config)
 	if err != nil {
 		return nil, err
 	}
 
-	config := newServiceConfig(lifecycle, region)
+	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
+
+	abstractConfig := abstractClient.AbstractConfig{
+		URL:   serviceConfig.FormatURL(),
+		Token: primaryClient.GetToken(),
+	}
 
 	return &AllocatorClient{
-		PixoAbstractAPIClient: *abstractClient.NewClient(primaryClient.GetToken(), config.FormatURL()),
+		AbstractServiceClient: *abstractClient.NewClient(abstractConfig),
 	}, nil
 }
 
