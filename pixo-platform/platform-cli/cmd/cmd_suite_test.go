@@ -42,7 +42,7 @@ type TestExecutor struct {
 
 func NewTestExecutor() *TestExecutor {
 	randomID := rand.Intn(1000000000)
-	testConfigPath := fmt.Sprintf("%s/tmp/.pixo/.test-config-%d.yaml", os.Getenv("HOME"), randomID)
+	testConfigPath := fmt.Sprintf("%s/.pixo/.test-config-%d.yaml", os.Getenv("HOME"), randomID)
 	if _, err := os.Stat(testConfigPath); err == nil {
 		if err = os.Remove(testConfigPath); err != nil {
 			log.Warn().Msgf("unable to remove test config file: %s", err)

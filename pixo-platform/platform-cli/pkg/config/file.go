@@ -29,7 +29,9 @@ func (f *fileManagerImpl) ConfigFile() string {
 func (f *fileManagerImpl) createConfigFileIfNotExists(configFile string) {
 	if _, err := os.Stat(configFile); os.IsNotExist(err) {
 		if _, err = os.Create(configFile); err != nil {
-			_, _ = f.writer.Write([]byte("Error creating config file: " + err.Error()))
+			if f.writer != nil {
+				_, _ = f.writer.Write([]byte("Error creating config file: " + err.Error()))
+			}
 		}
 	}
 }
