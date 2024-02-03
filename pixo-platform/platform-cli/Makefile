@@ -31,7 +31,7 @@ build:
 	go build -o $(EXECUTABLE) main.go
 
 image:
-	docker build ../.. -t ${NAME} -f ./Dockerfile
+	docker build .. -t ${NAME} -f ./Dockerfile
 
 container:
 	docker run --rm -it ${NAME} --version
