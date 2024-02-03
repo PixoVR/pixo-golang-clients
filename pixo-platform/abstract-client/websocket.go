@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func (a *AbstractServiceClient) DialWebsocket(endpoint string) (*http.Response, error) {
+func (a *AbstractServiceClient) DialWebsocket(endpoint string) (*websocket.Conn, *http.Response, error) {
 
 	httpHeader := http.Header{}
 	if a.token != "" {
@@ -15,15 +15,15 @@ func (a *AbstractServiceClient) DialWebsocket(endpoint string) (*http.Response, 
 
 	conn, httpResponse, err := websocket.DefaultDialer.Dial(a.GetURLWithPath(endpoint), httpHeader)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	if err = conn.SetReadDeadline(time.Now().Add(a.timeoutDuration())); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	a.websocketConn = conn
-	return httpResponse, nil
+	return conn, httpResponse, nil
 }
 
 func (a *AbstractServiceClient) WriteToWebsocket(message []byte) error {

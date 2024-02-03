@@ -49,6 +49,7 @@ var _ = Describe("Matchmake", func() {
 		Expect(executor.MockMatchmakingClient.NumCalledDialWebsocket).To(Equal(0))
 		Expect(executor.MockMatchmakingClient.NumCalledWriteToWebsocket).To(Equal(0))
 		Expect(executor.MockMatchmakingClient.NumCalledReadFromWebsocket).To(Equal(0))
+		Expect(executor.MockMatchmakingClient.NumCalledCloseWebsocket).To(Equal(0))
 	})
 
 	It("can return an error if server version is missing", func() {
@@ -67,6 +68,7 @@ var _ = Describe("Matchmake", func() {
 		Expect(executor.MockMatchmakingClient.NumCalledDialWebsocket).To(Equal(0))
 		Expect(executor.MockMatchmakingClient.NumCalledWriteToWebsocket).To(Equal(0))
 		Expect(executor.MockMatchmakingClient.NumCalledReadFromWebsocket).To(Equal(0))
+		Expect(executor.MockMatchmakingClient.NumCalledCloseWebsocket).To(Equal(0))
 	})
 
 	It("can perform a single matchmaking request", func() {
@@ -100,6 +102,7 @@ var _ = Describe("Matchmake", func() {
 		Expect(executor.MockMatchmakingClient.NumCalledDialWebsocket).To(BeNumerically(">", 0))
 		Expect(executor.MockMatchmakingClient.NumCalledWriteToWebsocket).To(BeNumerically(">", 0))
 		Expect(executor.MockMatchmakingClient.NumCalledReadFromWebsocket).To(BeNumerically(">", 0))
+		Expect(executor.MockMatchmakingClient.NumCalledCloseWebsocket).To(BeNumerically(">", 0))
 	})
 
 })

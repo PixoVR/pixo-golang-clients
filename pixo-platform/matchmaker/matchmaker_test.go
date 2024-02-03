@@ -28,6 +28,28 @@ var _ = Describe("Multiplayer", func() {
 		Expect(m.GetURL()).To(Equal("wss://apex.dev.pixovr.com/matchmaking"))
 	})
 
+	It("can dial a the matchmaking service and request a match", func() {
+		req := matchmaker.MatchRequest{
+			ModuleID:      1,
+			ServerVersion: "1.00.00",
+		}
+
+		conn, _, err := m.DialMatchmaker()
+		Expect(err).NotTo(HaveOccurred())
+		Expect(conn).NotTo(BeNil())
+
+		err = m.SendRequest(conn, req)
+		Expect(err).NotTo(HaveOccurred())
+
+		resp, err := m.ReadResponse(conn)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(resp).NotTo(BeNil())
+		Expect(resp.Message).To(Equal("Match found"))
+
+		err = m.CloseMatchmakerConnection(conn)
+		Expect(err).NotTo(HaveOccurred())
+	})
+
 	It("can return an error message if the module ID is invalid", func() {
 		req := matchmaker.MatchRequest{
 			ModuleID:      0,

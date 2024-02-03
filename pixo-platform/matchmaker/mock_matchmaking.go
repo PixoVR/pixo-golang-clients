@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	abstract_client "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
+	"github.com/gorilla/websocket"
 	"net"
+	"net/http"
 )
 
 type MockMatchmaker struct {
@@ -41,6 +43,32 @@ func (m *MockMatchmaker) FindMatch(request MatchRequest) (*net.UDPAddr, error) {
 		IP:   net.ParseIP(Localhost),
 		Port: DefaultGameserverPort,
 	}, nil
+}
+
+func (m *MockMatchmaker) DialMatchmaker() (*websocket.Conn, *http.Response, error) {
+	m.NumCalledDialWebsocket++
+	return nil, nil, nil
+}
+
+func (m *MockMatchmaker) SendRequest(conn *websocket.Conn, req MatchRequest) error {
+	m.NumCalledWriteToWebsocket++
+	return nil
+}
+
+func (m *MockMatchmaker) ReadResponse(conn *websocket.Conn) (MatchResponse, error) {
+	m.NumCalledReadFromWebsocket++
+	response := MatchResponse{}
+	err := json.Unmarshal(m.response, &response)
+	if err != nil {
+		return MatchResponse{}, err
+	}
+
+	return response, nil
+}
+
+func (m *MockMatchmaker) CloseMatchmakerConnection(conn *websocket.Conn) error {
+	m.NumCalledCloseWebsocket++
+	return nil
 }
 
 func (m *MockMatchmaker) DialGameserver(addr *net.UDPAddr) error {
