@@ -27,20 +27,18 @@ var (
 	globalConfigFile = fmt.Sprintf("%s/config.yaml", cfgDir)
 	isDebug          bool
 
-	PlatformCtx *clients.PlatformContext
+	Ctx *clients.CLIContext
 
 	cfgFile string
 )
 
-func NewRootCmd(platformContext *clients.PlatformContext) *cobra.Command {
-	PlatformCtx = platformContext
+func NewRootCmd() *cobra.Command {
 	return rootCmd
 }
 
-// rootCmd represents the base rootCmd when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:     "pixo",
-	Version: "0.0.148",
+	Version: "0.0.149",
 	Short:   "A CLI for the Pixo Platform",
 	Long:    `A CLI tool used to streamline interactions with the Pixo Platform`,
 }
@@ -59,7 +57,7 @@ func Execute() {
 		Region:    configManager.Region(),
 	}
 
-	PlatformCtx = &clients.PlatformContext{
+	Ctx = &clients.CLIContext{
 		ConfigManager:     configManager,
 		OldAPIClient:      primary_api.NewClient(clientConfig),
 		PlatformClient:    platform.NewClient(clientConfig),
@@ -67,7 +65,7 @@ func Execute() {
 		FileOpener:        editor.NewFileOpener(""),
 	}
 
-	if err := PlatformCtx.Authenticate(nil, nil); err != nil {
+	if err := Ctx.Authenticate(nil); err != nil {
 		log.Error().Err(err).Msg("Failed to authenticate")
 	}
 
@@ -80,10 +78,12 @@ func init() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: rootCmd.OutOrStdout(), TimeFormat: time.RFC1123})
 
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", fmt.Sprintf("config file (default is %s)", globalConfigFile))
 	rootCmd.PersistentFlags().BoolVarP(&isDebug, "debug", "d", false, "Enable debug logging")
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", fmt.Sprintf("config file (default is %s)", globalConfigFile))
-	rootCmd.PersistentFlags().StringP("module-id", "m", "", "Module ID to use for the rootCmd")
+	configCmd.PersistentFlags().StringP("lifecycle", "l", "", "Lifecycle of Pixo Platform to use (dev, stage, prod)")
+	configCmd.PersistentFlags().StringP("region", "r", "", "Region of Pixo Platform to use (na, saudi)")
+	rootCmd.PersistentFlags().IntP("module-id", "m", 0, "Module ID")
 
 	if cfgFile == "" {
 		cfgFile = globalConfigFile
@@ -93,6 +93,7 @@ func init() {
 
 	rootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
 		initLogger()
+		Ctx.SetIO(cmd)
 	}
 }
 

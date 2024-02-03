@@ -12,7 +12,7 @@ type AbstractServiceClient struct {
 	key            string
 	headers        map[string]string
 	restyClient    *resty.Client
-	conn           *websocket.Conn
+	websocketConn  *websocket.Conn
 	timeoutSeconds int
 }
 

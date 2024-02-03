@@ -6,13 +6,10 @@ import (
 	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
 	"github.com/fatih/color"
-	"github.com/gorilla/websocket"
 	"github.com/kyokomi/emoji"
-	"github.com/rs/zerolog/log"
 	"io"
-	"net/http"
+	"net"
 	"os"
-	"strings"
 	"sync"
 	"time"
 )
@@ -60,9 +57,13 @@ type Tester struct {
 }
 
 // NewLoadTester creates a new instance of Tester with the specified configuration.
-func NewLoadTester(config Config) *Tester {
+func NewLoadTester(config Config) (*Tester, error) {
 	if config.MatchmakingClient == nil {
-		log.Fatal().Msg("matchmaking client is required")
+		return nil, errors.New("matchmaking client is required")
+	}
+
+	if !config.Request.IsValid() {
+		return nil, errors.New("match request is invalid")
 	}
 
 	if config.Connections <= 0 {
@@ -82,63 +83,63 @@ func NewLoadTester(config Config) *Tester {
 	}
 
 	return &Tester{
+		request:     config.Request,
 		client:      config.MatchmakingClient,
 		connections: config.Connections,
 		duration:    config.Duration,
 		writer:      config.Writer,
 		reader:      config.Reader,
-	}
+	}, nil
 }
 
 // performRequest establishes a single WebSocket connection and requests a match
 func (lt *Tester) performRequest(wg *sync.WaitGroup, id int) {
 	defer wg.Done()
 
-	httpHeader := http.Header{}
-	httpHeader.Add("Authorization", "Bearer "+lt.client.GetToken())
-
-	conn, _, err := websocket.DefaultDialer.Dial(lt.client.GetURL(), httpHeader)
+	message, err := json.Marshal(lt.request)
 	if err != nil {
+		return
+	}
+
+	if _, err = lt.client.DialWebsocket(matchmaker.MatchmakingEndpoint); err != nil {
 		lt.recordConnectionError(id, "failed to connect", err)
-		lt.recordFailure()
-		return
-	}
-	defer conn.Close()
-	lt.recordSuccess()
-
-	if err = conn.SetReadDeadline(time.Now().Add(30 * time.Second)); err != nil {
 		return
 	}
 
-	lt.print(emoji.Sprintf(":check_mark_button: Connection %d: %s\n", id, successColor.Sprintf("established")))
+	defer func() {
+		_ = lt.client.CloseWebsocketConnection()
+	}()
 
-	reqBytes, err := json.Marshal(lt.request)
-	if err != nil {
-		lt.recordConnectionError(id, "failed to marshal request", err)
-		return
-	}
+	lt.recordConnectionSuccess(id)
 
 	start := time.Now()
-	if err = conn.WriteMessage(websocket.TextMessage, reqBytes); err != nil {
+	if err = lt.client.WriteToWebsocket(message); err != nil {
 		lt.recordConnectionError(id, "failed to send message", err)
 		return
 	}
+
 	lt.recordSentMessage()
 
-	_, messageBytes, err := conn.ReadMessage()
+	_, msg, err := lt.client.ReadFromWebsocket()
 	lt.recordLatency(time.Since(start))
 	lt.recordReceivedMessage()
 	if err != nil {
-		lt.recordConnectionError(id, "error reading message", err)
+		lt.recordConnectionError(id, "failed to read message", err)
 		return
 	}
 
-	if !strings.Contains(string(messageBytes), "IPAddress") || !strings.Contains(string(messageBytes), "Port") {
-		lt.recordMatchingError(id, "matchmaking error", errors.New(string(messageBytes)))
+	var matchResponse matchmaker.MatchResponse
+	if err = json.Unmarshal(msg, &matchResponse); err != nil {
+		lt.recordMatchingError(id, "failed to unmarshal response", err)
 		return
 	}
 
-	lt.recordSuccessMessageReceived(id, messageBytes)
+	if !matchResponse.IsValid() {
+		lt.recordMatchingError(id, "received invalid match", errors.New(matchResponse.Message))
+		return
+	}
+
+	lt.recordSuccessMessageReceived(id, matchResponse)
 }
 
 // Run starts the load testing process.
@@ -161,26 +162,23 @@ func (lt *Tester) Run() {
 }
 
 // recordSuccessMessageReceived increments the count of successful messages received.
-func (lt *Tester) recordSuccessMessageReceived(id int, msg []byte) {
+func (lt *Tester) recordSuccessMessageReceived(id int, response matchmaker.MatchResponse) {
 	lt.mu.Lock()
 	defer lt.mu.Unlock()
 
-	lt.print(emoji.Sprintf(":fountain_pen: Connection %d: %s: %s\n", id, successColor.Sprint("received match"), statColor.Sprint(string(msg))))
+	addr := net.JoinHostPort(response.MatchDetails.IP, response.MatchDetails.Port)
+	msg := fmt.Sprintf("gameserver -> %s", addr)
+	lt.print(emoji.Sprintf(":checkered_flag:Connection %d: %s - %s\n", id, successColor.Sprint(response.Message), statColor.Sprint(msg)))
 	lt.successMessagesReceived++
 }
 
-// recordSuccess increments the count of successful connections.
-func (lt *Tester) recordSuccess() {
+// recordConnectionSuccess increments the count of successful connections.
+func (lt *Tester) recordConnectionSuccess(id int) {
 	lt.mu.Lock()
 	defer lt.mu.Unlock()
-	lt.connectionSuccesses++
-}
 
-// recordFailure increments the count of failed connections.
-func (lt *Tester) recordFailure() {
-	lt.mu.Lock()
-	defer lt.mu.Unlock()
-	lt.connectionFailures++
+	lt.print(emoji.Sprintf(":check_mark_button: Connection %d: %s\n", id, successColor.Sprint("established")))
+	lt.connectionSuccesses++
 }
 
 func (lt *Tester) logError(id int, msg string, err error) {
@@ -194,6 +192,7 @@ func (lt *Tester) recordConnectionError(id int, msg string, err error) {
 
 	lt.logError(id, msg, err)
 	lt.connectionErrors = append(lt.connectionErrors, fmt.Sprintf("%s - %s", msg, err.Error()))
+	lt.connectionFailures++
 }
 
 // recordMatchingError adds an error to the list of encountered matchingErrors.
@@ -246,27 +245,27 @@ func (lt *Tester) displayStats() {
 		messagesPerSecond = float64(lt.messagesSent) / totalDuration
 	}
 
-	lt.print(headerColor.Sprint("\nMatchmaking Load Test Summary"))
-	lt.print("================================")
+	lt.println(headerColor.Sprint("\nMatchmaking Load Test Summary"))
+	lt.println("==============================")
 
-	lt.print("Max Test Duration:       %s\n", lt.duration)
-	lt.print("Actual Test Duration:    %s\n", lt.end.Sub(lt.start).Round(50*time.Millisecond))
-	lt.println("Connections:             %d\n", lt.connections)
-	lt.print("Total Messages Sent:     %d\n", lt.messagesSent)
+	lt.printf("Max Test Duration:       %s", lt.duration)
+	lt.printf("Actual Test Duration:    %s", lt.end.Sub(lt.start).Round(50*time.Millisecond))
+	lt.printf("Connections:             %d", lt.connections)
+	lt.printf("Total Messages Sent:     %d", lt.messagesSent)
 
-	lt.print(statColor.Sprint("Total Messages Received: %d\n", lt.messagesReceived))
-	lt.print(errorColor.Sprint("Connection Errors:       %d\n", len(lt.connectionErrors)))
-	lt.print(errorColor.Sprint("Matching Errors:         %d\n", len(lt.matchingErrors)))
-	lt.print(successColor.Sprint("Matches Received:        %d\n", lt.successMessagesReceived))
+	lt.println(statColor.Sprintf("\nTotal Messages Received: %d", lt.messagesReceived))
+	lt.println(errorColor.Sprintf("Connection Errors:       %d", len(lt.connectionErrors)))
+	lt.println(errorColor.Sprintf("Matching Errors:         %d", len(lt.matchingErrors)))
+	lt.println(successColor.Sprintf("Matches Received:        %d", lt.successMessagesReceived))
 
 	lt.println()
-	lt.print(lineColor.Sprint("┌─────────────┬────────────┐"))
-	lt.print(headerColor.Sprint("│ Stat        │ Value      │"))
-	lt.print(lineColor.Sprint("├─────────────┼────────────┤"))
-	lt.print(statColor.Sprint("│ Avg Latency │ %.2f s    │\n", avgLatency))
-	lt.print(statColor.Sprint("│ Max Latency │ %.2f s    │\n", float64(lt.maxLatency)/float64(time.Second)))
-	lt.print(statColor.Sprint("│ Msgs/Sec    │ %.2f       │\n", messagesPerSecond))
-	lt.print(lineColor.Sprint("└─────────────┴────────────┘"))
+	lt.println(lineColor.Sprint("┌─────────────┬────────────┐"))
+	lt.println(headerColor.Sprint("│ Stat        │ Value      │"))
+	lt.println(lineColor.Sprint("├─────────────┼────────────┤"))
+	lt.println(statColor.Sprintf("│ Avg Latency │ %.2f s    │", avgLatency))
+	lt.println(statColor.Sprintf("│ Max Latency │ %.2f s    │", float64(lt.maxLatency)/float64(time.Second)))
+	lt.println(statColor.Sprintf("│ Msgs/Sec    │ %.2f       │", messagesPerSecond))
+	lt.println(lineColor.Sprint("└─────────────┴────────────┘"))
 	lt.println()
 }
 
@@ -274,6 +273,10 @@ func (lt *Tester) print(msgs ...interface{}) {
 	for _, msg := range msgs {
 		_, _ = lt.writer.Write([]byte(fmt.Sprint(msg)))
 	}
+}
+
+func (lt *Tester) printf(format string, msgs ...interface{}) {
+	lt.println(fmt.Sprintf(format, msgs...))
 }
 
 func (lt *Tester) println(msgs ...interface{}) {

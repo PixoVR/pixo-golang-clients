@@ -6,7 +6,6 @@ package cmd
 import (
 	"github.com/kyokomi/emoji"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var (
@@ -19,13 +18,30 @@ var configCmd = &cobra.Command{
 	Short: "Configure the CLI settings",
 	Long: `Manage settings like region, org, and module ID.  This commands will prompt you for the settings if they are not already set.
 `,
-	RunE: func(cmd *cobra.Command, args []string) error {
+	Run: func(cmd *cobra.Command, args []string) {
+
 		if edit {
 			cmd.Println(emoji.Sprint(":file_folder: Opening config file in editor"))
-			return PlatformCtx.FileOpener.OpenEditor(viper.ConfigFileUsed())
+			if err := Ctx.FileOpener.OpenEditor(Ctx.ConfigManager.ConfigFile()); err != nil {
+				cmd.Println(emoji.Sprintf(":warning: Unable to open editor: %s", err))
+			}
 		}
 
-		return cmd.Help()
+		region := Ctx.ConfigManager.Region()
+		if region != "" {
+			cmd.Println(emoji.Sprintf(":earth_americas: Region: %s", region))
+		}
+
+		lifecycle := Ctx.ConfigManager.Lifecycle()
+		if lifecycle != "" {
+			cmd.Println(emoji.Sprintf(":gear: Lifecycle: %s", lifecycle))
+		}
+
+		username, ok := Ctx.ConfigManager.GetConfigValue("username")
+		if ok {
+			cmd.Println(emoji.Sprintf(":bust_in_silhouette: Username: %s", username))
+		}
+
 	},
 }
 

@@ -1,7 +1,6 @@
 package matchmaker
 
 import (
-	"fmt"
 	abstractClient "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
 	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
@@ -66,5 +65,5 @@ func getURL(host string) string {
 		host = DefaultMatchmakingURL
 	}
 
-	return fmt.Sprintf("%s/%s", host, MatchmakingEndpoint)
+	return host
 }

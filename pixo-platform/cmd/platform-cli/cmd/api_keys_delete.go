@@ -4,7 +4,6 @@ Copyright © 2024 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/loader"
 	"github.com/spf13/cobra"
 )
@@ -12,14 +11,18 @@ import (
 // apiKeyCmd represents the apiKey command
 var deleteApiKeyCmd = &cobra.Command{
 	Use:   "delete",
-	Short: "Deleting API keys",
+	Short: "Deleting an API key",
 	Long:  `Delete API key with the following command:`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		spinner := loader.NewSpinner(cmd.OutOrStdout())
 
-		apiKeyID := input.GetIntValueOrAskUser(cmd, "key-id", "PIXO_API_KEY_ID")
+		apiKeyID, ok := Ctx.ConfigManager.GetIntFlagOrConfigValue("key-id", cmd)
+		if !ok {
+			cmd.Println("Error: API key ID is required")
+			return nil
+		}
 
-		if err := PlatformCtx.PlatformClient.DeleteAPIKey(cmd.Context(), apiKeyID); err != nil {
+		if err := Ctx.PlatformClient.DeleteAPIKey(cmd.Context(), apiKeyID); err != nil {
 			cmd.Println("Error creating API key: ", err.Error())
 			return err
 		}

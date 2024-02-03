@@ -6,13 +6,11 @@ package cmd
 import (
 	"encoding/json"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/mockserver"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
-	"github.com/spf13/viper"
-
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // mockserverCmd represents the mockserver rootCmd
@@ -35,19 +33,31 @@ var mockserverCmd = &cobra.Command{
 			}
 		}
 
+		address, _ := Ctx.ConfigManager.GetConfigValueOrAskUser("gameserver-ip", cmd)
+		port, _ := Ctx.ConfigManager.GetConfigValueOrAskUser("gameserver-port", cmd)
+
+		moduleID, _ := Ctx.ConfigManager.GetIntConfigValueOrAskUser("module-id", cmd)
+		orgID, _ := Ctx.ConfigManager.GetIntConfigValueOrAskUser("org-id", cmd)
+
+		sessionName, _ := Ctx.ConfigManager.GetConfigValueOrAskUser("session-name", cmd)
+		sessionID, _ := Ctx.ConfigManager.GetConfigValueOrAskUser("session-id", cmd)
+		owningUserName, _ := Ctx.ConfigManager.GetConfigValueOrAskUser("owning-user-name", cmd)
+		mapName, _ := Ctx.ConfigManager.GetConfigValueOrAskUser("map-name", cmd)
+		serverVersion, _ := Ctx.ConfigManager.GetConfigValueOrAskUser("server-version", cmd)
+
 		data := matchmaker.MatchResponse{
 			Error:   false,
 			Message: "Match found",
 			MatchDetails: matchmaker.MatchDetails{
-				IP:             input.GetStringValue(cmd, "gameserver-ip", "GAMESERVER_IP"),
-				Port:           input.GetStringValue(cmd, "gameserver-port", "GAMESERVER_PORT"),
-				SessionName:    input.GetStringValue(cmd, "session-name", "SESSION_NAME"),
-				SessionID:      input.GetStringValue(cmd, "session-id", "SESSION_ID"),
-				OwningUserName: input.GetStringValue(cmd, "owning-user-name", "OWNING_USER_NAME"),
-				MapName:        input.GetStringValue(cmd, "map-name", "MAP_NAME"),
-				ModuleVersion:  input.GetStringValue(cmd, "server-version", "SERVER_VERSION"),
-				ModuleID:       input.GetIntValueOrAskUser(cmd, "module-id", "MODULE_ID"),
-				OrgID:          input.GetIntValueOrAskUser(cmd, "org-id", "ORG_ID"),
+				IP:             address,
+				Port:           port,
+				SessionName:    sessionName,
+				SessionID:      sessionID,
+				OwningUserName: owningUserName,
+				MapName:        mapName,
+				ModuleVersion:  serverVersion,
+				ModuleID:       moduleID,
+				OrgID:          orgID,
 			},
 		}
 
@@ -63,7 +73,7 @@ var mockserverCmd = &cobra.Command{
 			mode = gin.DebugMode
 		}
 
-		mockserver.Run(cmd, PlatformCtx.ConfigManager, mode, matchmaker.MatchmakingEndpoint, response)
+		mockserver.Run(cmd, Ctx.ConfigManager, mode, matchmaker.MatchmakingEndpoint, response)
 	},
 }
 

@@ -1,19 +1,17 @@
 package clients
 
 import (
-	"fmt"
 	abstract_client "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/config"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/editor"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/loader"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
-	"github.com/rs/zerolog/log"
-	"io"
+	"github.com/kyokomi/emoji"
+	"github.com/spf13/cobra"
 )
 
-type PlatformContext struct {
+type CLIContext struct {
 	ConfigManager     config.Manager
 	OldAPIClient      abstract_client.AbstractClient
 	PlatformClient    platform.PlatformClient
@@ -21,41 +19,40 @@ type PlatformContext struct {
 	FileOpener        editor.FileOpener
 }
 
-func (p *PlatformContext) Authenticate(reader io.Reader, writer io.Writer) error {
+func (p *CLIContext) SetIO(cmd *cobra.Command) {
+	p.ConfigManager.SetReader(cmd.InOrStdin())
+	p.ConfigManager.SetWriter(cmd.OutOrStdout())
+}
+
+func (p *CLIContext) Authenticate(cmd *cobra.Command) error {
 	if p.PlatformClient.IsAuthenticated() {
 		return nil
 	}
 
-	token, ok := p.ConfigManager.GetConfigValue("token")
+	token, ok := p.ConfigManager.GetFlagOrConfigValue("token", cmd)
 	if ok {
 		p.PlatformClient.SetToken(token)
 		return nil
 	}
 
-	apiKey, ok := p.ConfigManager.GetConfigValue("api-key")
+	apiKey, ok := p.ConfigManager.GetFlagOrConfigValue("api-key", cmd)
 	if ok {
 		p.PlatformClient.SetAPIKey(apiKey)
 		return nil
 	}
 
-	username, ok := p.ConfigManager.GetConfigValue("username")
+	username, ok := p.ConfigManager.GetFlagOrConfigValueOrAskUser("username", cmd)
 	if !ok {
-		if writer == nil {
-			return nil
-		}
-		username = input.ReadFromUser(reader, writer, "username")
+		return nil
 	}
 
-	password, ok := p.ConfigManager.GetConfigValue("password")
+	password, ok := p.ConfigManager.GetSensitiveFlagOrConfigValueOrAskUser("password", cmd)
 	if !ok {
-		if writer == nil {
-			return nil
-		}
-		password = input.ReadSensitiveFromUser(writer, "password")
+		return nil
 	}
 
-	if writer != nil {
-		spinner := loader.NewSpinner(writer)
+	if p.ConfigManager.Writer() != nil {
+		spinner := loader.NewSpinner(p.ConfigManager.Writer())
 		defer spinner.Stop()
 	}
 
@@ -63,12 +60,12 @@ func (p *PlatformContext) Authenticate(reader io.Reader, writer io.Writer) error
 	p.ConfigManager.SetConfigValue("password", password)
 
 	if err := p.PlatformClient.Login(username, password); err != nil {
-		log.Error().Err(err).Msg("Failed to authenticate")
+		cmd.Println(emoji.Sprintf(":exclamation: Login failed. Please check your credentials and try again.\n%s", err))
 		return err
 	}
 
 	p.ConfigManager.SetConfigValue("token", p.PlatformClient.GetToken())
-	p.ConfigManager.SetConfigValue("user-id", fmt.Sprint(p.PlatformClient.ActiveUserID()))
+	p.ConfigManager.SetIntConfigValue("user-id", p.PlatformClient.ActiveUserID())
 
 	return nil
 }

@@ -25,7 +25,7 @@ var mpCmd = &cobra.Command{
 
 		if connect {
 
-			addr, ok := PlatformCtx.ConfigManager.GetConfigValue("gameserveraddress")
+			addr, ok := Ctx.ConfigManager.GetConfigValueOrAskUser("gameserver address (IP:PORT)", cmd)
 			if !ok {
 				return errors.New("no gameserver address provided")
 			}
@@ -42,7 +42,7 @@ var mpCmd = &cobra.Command{
 			}
 
 			udpAddr := &net.UDPAddr{IP: net.ParseIP(gameserverHost), Port: gameserverPort}
-			gameserverReadLoop(cmd, PlatformCtx.MatchmakingClient, udpAddr)
+			gameserverReadLoop(cmd, Ctx.MatchmakingClient, udpAddr)
 		} else {
 			_ = cmd.Help()
 		}
@@ -55,5 +55,5 @@ func init() {
 	rootCmd.AddCommand(mpCmd)
 
 	mpCmd.PersistentFlags().StringP("server-version", "v", "", "Semantic Version of the multiplayer server version")
-	mpCmd.Flags().BoolVarP(&connect, "connect", "c", false, "Whether to connect to the gameserver found from a match request")
+	mpCmd.PersistentFlags().BoolVarP(&connect, "connect", "c", false, "Whether to connect to the gameserver found from a match request")
 }

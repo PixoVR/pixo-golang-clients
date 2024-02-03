@@ -1,6 +1,8 @@
 package config
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Env struct {
 	EnvMap    map[string]string `mapstructure:"envmap"`

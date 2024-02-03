@@ -24,13 +24,13 @@ var createApiKeyCmd = &cobra.Command{
 			//UserID: input.GetIntValue(cmd, "user-id", "PIXO_USER_ID"),
 		}
 
-		apiKey, err := PlatformCtx.PlatformClient.CreateAPIKey(cmd.Context(), input)
+		apiKey, err := Ctx.PlatformClient.CreateAPIKey(cmd.Context(), input)
 		if err != nil {
 			cmd.Println("Error creating API key: ", err.Error())
 			return err
 		}
 
-		PlatformCtx.ConfigManager.SetConfigValue("api-key", apiKey.Key)
+		Ctx.ConfigManager.SetConfigValue("api-key", apiKey.Key)
 
 		spinner.Stop()
 

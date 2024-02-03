@@ -4,11 +4,9 @@ Copyright © 2024 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/input"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/loader"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
-	"strconv"
-
+	"github.com/kyokomi/emoji"
 	"github.com/spf13/cobra"
 )
 
@@ -18,17 +16,15 @@ var createUserCmd = &cobra.Command{
 	Short: "Create a new user",
 	Long:  `Create a new user with the following command:`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		firstName := input.GetStringValueOrAskUser(cmd, "first-name", "FIRST_NAME")
-		lastName := input.GetStringValueOrAskUser(cmd, "last-name", "LAST_NAME")
-		username := input.GetStringValueOrAskUser(cmd, "username", "USERNAME")
-		orgIDVal := input.GetStringValueOrAskUser(cmd, "org-id", "ORG_ID")
-		role := input.GetStringValueOrAskUser(cmd, "role", "ROLE")
-		password := input.GetStringValueOrAskUser(cmd, "password", "PASSWORD")
-
-		orgID, err := strconv.Atoi(orgIDVal)
-		if err != nil {
-			cmd.Println("Could not parse org id")
-			return err
+		firstName, _ := Ctx.ConfigManager.GetConfigValueOrAskUser("first-name", cmd)
+		lastName, _ := Ctx.ConfigManager.GetConfigValueOrAskUser("last-name", cmd)
+		username, _ := Ctx.ConfigManager.GetConfigValueOrAskUser("username", cmd)
+		orgID, _ := Ctx.ConfigManager.GetIntConfigValueOrAskUser("org-id", cmd)
+		role, _ := Ctx.ConfigManager.GetConfigValueOrAskUser("role", cmd)
+		password, ok := Ctx.ConfigManager.GetSensitiveConfigValueOrAskUser("password", cmd)
+		if !ok {
+			cmd.Println(emoji.Sprintf(":exclamation: Password not provided"))
+			return nil
 		}
 
 		input := platform.User{
@@ -42,7 +38,7 @@ var createUserCmd = &cobra.Command{
 
 		spinner := loader.NewSpinner(cmd.OutOrStdout())
 
-		user, err := PlatformCtx.PlatformClient.CreateUser(cmd.Context(), input)
+		user, err := Ctx.PlatformClient.CreateUser(cmd.Context(), input)
 		if err != nil {
 			cmd.Println("Could not create user: ", err.Error())
 			return err

@@ -6,6 +6,7 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/cmd/platform-cli/pkg/config"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"math/rand"
 	"os"
@@ -177,22 +178,98 @@ var _ = Describe("Config", func() {
 			outputWriter := bytes.NewBufferString("")
 			fileConfigManager.SetWriter(outputWriter)
 
-			val := fileConfigManager.GetConfigValueOrAskUser("username", "u")
-			Expect(outputWriter.String()).To(BeEmpty())
+			val, ok := fileConfigManager.GetConfigValueOrAskUser("username", nil)
+			Expect(ok).To(BeTrue())
 			Expect(val).To(Equal("na-prod-username"))
+			Expect(outputWriter.String()).To(BeEmpty())
 		})
 
 		It("can ask the user if the config doesnt exist", func() {
-			fileConfigManager.UnsetConfigValue("api-key", "")
+			fileConfigManager.UnsetConfigValue("api-key")
 			apiKey := "new-api-key"
 			inputReader := bytes.NewBufferString(apiKey + "\n")
 			fileConfigManager.SetReader(inputReader)
 			outputWriter := bytes.NewBufferString("")
 			fileConfigManager.SetWriter(outputWriter)
 
-			val := fileConfigManager.GetConfigValueOrAskUser("api-key", "a")
-			Expect(outputWriter.String()).To(ContainSubstring("Enter API KEY: "))
+			val, ok := fileConfigManager.GetConfigValueOrAskUser("api-key", nil)
+			Expect(ok).To(BeTrue())
 			Expect(val).To(Equal(apiKey))
+			Expect(outputWriter.String()).To(ContainSubstring("Enter API KEY: "))
+		})
+
+		It("can ask the user if the config doesnt exist for an int value", func() {
+			fileConfigManager.SetIntConfigValue("val", 1)
+			val, ok := fileConfigManager.GetIntConfigValueOrAskUser("val", nil)
+			Expect(ok).To(BeTrue())
+			Expect(val).To(Equal(1))
+		})
+
+		It("can set an int config value and get it", func() {
+			fileConfigManager.SetIntConfigValue("port", 8080)
+			val, ok := fileConfigManager.GetIntConfigValue("port")
+			Expect(ok).To(BeTrue())
+			Expect(val).To(Equal(8080))
+		})
+
+		It("can set a bool config value and get it", func() {
+			fileConfigManager.SetBoolConfigValue("is-active", true)
+			val, ok := fileConfigManager.GetBoolConfigValue("is-active")
+			Expect(ok).To(BeTrue())
+			Expect(val).To(Equal(true))
+		})
+
+		It("can prioritize the value from a flag over everything else", func() {
+			cmd := &cobra.Command{}
+			cmd.Flags().String("api-key", "flag", "api key")
+			_ = cmd.Flags().Set("api-key", "flag-api-key")
+
+			val, ok := fileConfigManager.GetFlagOrConfigValue("api-key", cmd)
+			Expect(ok).To(BeTrue())
+			Expect(val).To(Equal("flag-api-key"))
+		})
+
+		It("can get an int value from a flag", func() {
+			cmd := &cobra.Command{}
+			cmd.Flags().Int("port", 8080, "port")
+			_ = cmd.Flags().Set("port", "9090")
+
+			val, ok := fileConfigManager.GetIntFlagOrConfigValue("port", cmd)
+			Expect(ok).To(BeTrue())
+			Expect(val).To(Equal(9090))
+		})
+
+		It("can get a bool value from a flag", func() {
+			cmd := &cobra.Command{}
+			cmd.Flags().Bool("is-active", true, "is active")
+			_ = cmd.Flags().Set("is-active", "false")
+
+			val, ok := fileConfigManager.GetBoolFlagOrConfigValue("is-active", cmd)
+			Expect(ok).To(BeTrue())
+			Expect(val).To(Equal(false))
+		})
+
+		It("can read from the user", func() {
+			inputReader := bytes.NewBufferString("new-username\n")
+			outputWriter := bytes.NewBufferString("")
+			fileConfigManager.SetReader(inputReader)
+			fileConfigManager.SetWriter(outputWriter)
+
+			val := fileConfigManager.ReadFromUser("username")
+			Expect(val).To(Equal("new-username"))
+			Expect(outputWriter.String()).To(ContainSubstring("Enter username: "))
+		})
+
+		It("can read a sensitive value from the user", func() {
+			inputReader := bytes.NewBufferString("new-password\n")
+			outputWriter := bytes.NewBufferString("")
+			fileConfigManager.SetReader(inputReader)
+			fileConfigManager.SetWriter(outputWriter)
+
+			val := fileConfigManager.ReadSensitiveFromUser("password")
+			Expect(val).To(Equal("new-password"))
+			Expect(outputWriter.String()).To(ContainSubstring("Enter password: "))
+			Expect(outputWriter.String()).NotTo(ContainSubstring("new-password"))
 		})
 
 	})

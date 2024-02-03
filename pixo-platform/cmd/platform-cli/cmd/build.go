@@ -16,15 +16,15 @@ var buildCmd = &cobra.Command{
 	Long:  `Retrieve logs for a specific build`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		token, ok := PlatformCtx.ConfigManager.GetConfigValue("token")
+		token, ok := Ctx.ConfigManager.GetConfigValue("token")
 		if !ok {
 			cmd.Println("Token not found. Run 'pixo auth login' to login.")
 			return
 		}
 
 		config := urlfinder.ClientConfig{
-			Lifecycle: PlatformCtx.ConfigManager.Lifecycle(),
-			Region:    PlatformCtx.ConfigManager.Region(),
+			Lifecycle: Ctx.ConfigManager.Lifecycle(),
+			Region:    Ctx.ConfigManager.Region(),
 			Token:     token,
 		}
 		allocatorClient := multiplayerAllocator.NewClient(config)

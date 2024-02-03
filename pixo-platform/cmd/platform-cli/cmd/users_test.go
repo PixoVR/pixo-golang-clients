@@ -52,7 +52,7 @@ var _ = Describe("Users", func() {
 
 		executor.ExpectLoginToSucceed(username, password)
 
-		output, err = executor.RunCommand("config", "list")
+		output, err = executor.RunCommand("config")
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).NotTo(ContainSubstring("password"))
 		Expect(output).NotTo(ContainSubstring("token"))

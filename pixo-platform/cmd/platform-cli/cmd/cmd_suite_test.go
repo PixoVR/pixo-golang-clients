@@ -62,14 +62,14 @@ func NewTestExecutor() *TestExecutor {
 	mockMatchmaker := matchmaker.NewMockMatchmaker()
 	mockFileOpener := &editor.MockFileOpener{}
 
-	mockPlatformCtx := &clients.PlatformContext{
+	mockPlatformCtx := &clients.CLIContext{
 		ConfigManager:     configManager,
 		PlatformClient:    mockPlatformClient,
 		MatchmakingClient: mockMatchmaker,
 		OldAPIClient:      mockOldAPIClient,
 		FileOpener:        mockFileOpener,
 	}
-	cmd.PlatformCtx = mockPlatformCtx
+	cmd.Ctx = mockPlatformCtx
 
 	executor := &TestExecutor{
 		ConfigManager:         configManager,
@@ -89,31 +89,25 @@ func (t *TestExecutor) Cleanup() {
 	_ = os.Remove(t.configFile)
 }
 
-func (t *TestExecutor) RunCommandWithReadWriter(reader io.Reader, writer io.Writer, args ...string) (string, error) {
-	mockPlatformCtx := &clients.PlatformContext{
-		ConfigManager:     t.ConfigManager,
-		PlatformClient:    t.MockPlatformClient,
-		MatchmakingClient: t.MockMatchmakingClient,
-		OldAPIClient:      t.MockOldAPIClient,
-		FileOpener:        t.MockFileOpener,
-	}
-	rootCmd := cmd.NewRootCmd(mockPlatformCtx)
+func (t *TestExecutor) RunCommandWithInput(reader io.Reader, args ...string) (string, error) {
+	rootCmd := cmd.NewRootCmd()
 	Expect(rootCmd).NotTo(BeNil())
-	rootCmd.SetOut(writer)
 	rootCmd.SetIn(reader)
+	t.ConfigManager.SetReader(reader)
 
-	output := bytes.NewBufferString("")
-	rootCmd.SetOut(output)
+	writer := bytes.NewBufferString("")
+	rootCmd.SetOut(writer)
+	t.ConfigManager.SetWriter(writer)
 
 	args = append([]string{"--config", t.configFile}, args...)
 	rootCmd.SetArgs(args)
 	err := rootCmd.Execute()
 
-	out, _ := io.ReadAll(output)
-	return string(out), err
+	output, _ := io.ReadAll(writer)
+	return string(output), err
 }
 func (t *TestExecutor) RunCommand(args ...string) (string, error) {
-	return t.RunCommandWithReadWriter(os.Stdin, os.Stdout, args...)
+	return t.RunCommandWithInput(os.Stdin, args...)
 }
 
 func (t *TestExecutor) ExpectLoginToSucceed(username, password string) {

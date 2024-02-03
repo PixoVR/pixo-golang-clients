@@ -28,7 +28,7 @@ var setCmd = &cobra.Command{
 			env.Region = region
 		}
 
-		PlatformCtx.ConfigManager.SetActiveEnv(env)
+		Ctx.ConfigManager.SetActiveEnv(env)
 
 		key, err := cmd.Flags().GetString("key")
 		if err != nil {
@@ -41,11 +41,10 @@ var setCmd = &cobra.Command{
 				cmd.Println(emoji.Sprintf(":exclamation: Unable to get value flag"))
 				return
 			} else if val != "" {
-				PlatformCtx.ConfigManager.SetConfigValue(key, val)
+				Ctx.ConfigManager.SetConfigValue(key, val)
 				cmd.Printf(emoji.Sprintf(":rocket: Config value %s set to %s\n", key, val))
-				newCmd := NewRootCmd(nil)
-				newCmd.SetArgs([]string{"config", "list"})
-				_ = cmd.Execute()
+				rootCmd.SetArgs([]string{"config"})
+				_ = rootCmd.Execute()
 				return
 			} else {
 				cmd.Println("Value must be provided")
@@ -55,26 +54,25 @@ var setCmd = &cobra.Command{
 
 		username := cmd.Flag("username").Value.String()
 		if username != "" {
-			PlatformCtx.ConfigManager.SetConfigValue("username", username)
+			Ctx.ConfigManager.SetConfigValue("username", username)
 		}
 
 		password := cmd.Flag("password").Value.String()
 		if password != "" {
-			PlatformCtx.ConfigManager.SetConfigValue("password", password)
+			Ctx.ConfigManager.SetConfigValue("password", password)
 		}
 
 		cmd.Printf("Config updated successfully: %s\n", cfgFile)
-		newCmd := NewRootCmd(nil)
-		newCmd.SetArgs([]string{"config", "list"})
-		_ = cmd.Execute()
+		rootCmd.SetArgs([]string{"config"})
+		if cmd != nil {
+			_ = cmd.Execute()
+		}
 	},
 }
 
 func init() {
 	configCmd.AddCommand(setCmd)
 
-	setCmd.Flags().StringP("lifecycle", "l", "", "Lifecycle of Pixo Platform to use (dev, stage, prod)")
-	setCmd.Flags().StringP("region", "r", "", "Region of Pixo Platform to use (na, saudi)")
 	setCmd.Flags().StringP("username", "u", "", "Username to use for Pixo Platform")
 	setCmd.Flags().StringP("password", "p", "", "Password to use for Pixo Platform")
 	setCmd.Flags().StringP("key", "k", "", "Key of the config value to set")

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	abstract_client "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	commonerrors "github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/commonerrors"
 	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/k8s/agones"
@@ -15,6 +16,7 @@ import (
 var _ PlatformClient = (*MockGraphQLClient)(nil)
 
 type MockGraphQLClient struct {
+	abstract_client.MockAbstractClient
 	isAuthenticated bool
 
 	CalledGetUser bool

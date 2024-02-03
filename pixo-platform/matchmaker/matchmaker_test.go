@@ -25,7 +25,7 @@ var _ = Describe("Multiplayer", func() {
 	})
 
 	It("can get the base url for the matchmaker", func() {
-		Expect(m.GetURL()).To(Equal("wss://apex.dev.pixovr.com/matchmaking/matchmake"))
+		Expect(m.GetURL()).To(Equal("wss://apex.dev.pixovr.com/matchmaking"))
 	})
 
 	It("can return an error message if the module ID is invalid", func() {

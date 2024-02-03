@@ -21,13 +21,12 @@ var loginCmd = &cobra.Command{
 	Will prioritize in order of the above list, and will prompt the user if none is found.	
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
-
-		if err := PlatformCtx.Authenticate(cmd.InOrStdin(), cmd.OutOrStdout()); err != nil {
+		if err := Ctx.Authenticate(cmd); err != nil {
 			cmd.Println(emoji.Sprintf(":exclamation: Login failed. Please check your credentials and try again."))
 			return nil
 		}
 
-		cmd.Println(emoji.Sprintf(":rocket: Login successful. Here is your API token: \n%s", PlatformCtx.PlatformClient.GetToken()))
+		cmd.Println(emoji.Sprintf(":rocket: Login successful. Here is your API token: \n%s", Ctx.PlatformClient.GetToken()))
 		return nil
 	},
 }

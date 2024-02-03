@@ -39,18 +39,18 @@ var _ = Describe("ConfigFile", func() {
 		Expect(output).NotTo(BeEmpty())
 		Expect(executor.ConfigManager.Lifecycle()).To(Equal("prod"))
 		Expect(executor.ConfigManager.Region()).To(Equal("saudi"))
-		output, err = executor.RunCommand("config", "list")
+		output, err = executor.RunCommand("config")
 		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring("region : saudi"))
-		Expect(output).To(ContainSubstring("lifecycle : prod"))
+		Expect(output).To(ContainSubstring("Region: saudi"))
+		Expect(output).To(ContainSubstring("Lifecycle: prod"))
 
 		output, err = executor.RunCommand("config", "set", "-r", "na", "-l", "dev")
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).NotTo(BeEmpty())
 		Expect(executor.ConfigManager.Lifecycle()).To(Equal("dev"))
 		Expect(executor.ConfigManager.Region()).To(Equal("na"))
-		Expect(output).To(ContainSubstring("region : na"))
-		Expect(output).To(ContainSubstring("lifecycle : dev"))
+		Expect(output).To(ContainSubstring("Region: na"))
+		Expect(output).To(ContainSubstring("Lifecycle: dev"))
 	})
 
 	It("can set the username and password", func() {
