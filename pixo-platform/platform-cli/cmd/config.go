@@ -6,6 +6,7 @@ package cmd
 import (
 	"github.com/kyokomi/emoji"
 	"github.com/spf13/cobra"
+	"strings"
 )
 
 var (
@@ -27,6 +28,8 @@ var configCmd = &cobra.Command{
 			}
 		}
 
+		cmd.Println(emoji.Sprintf(":file_folder: Config file: %s", Ctx.ConfigManager.ConfigFile()))
+
 		region := Ctx.ConfigManager.Region()
 		if region != "" {
 			cmd.Println(emoji.Sprintf(":earth_americas: Region: %s", region))
@@ -37,9 +40,37 @@ var configCmd = &cobra.Command{
 			cmd.Println(emoji.Sprintf(":gear:  Lifecycle: %s", lifecycle))
 		}
 
-		username, ok := Ctx.ConfigManager.GetConfigValue("username")
-		if ok {
-			cmd.Println(emoji.Sprintf(":bust_in_silhouette: Username: %s", username))
+		cmd.Println()
+
+		activeEnv := Ctx.ConfigManager.GetActiveEnv()
+
+		sensitiveList := []string{
+			"password",
+			"token",
+			"api-key",
+		}
+		isSensitive := func(k string) bool {
+			for _, s := range sensitiveList {
+				if strings.Contains(k, s) {
+					return true
+				}
+			}
+
+			return false
+		}
+
+		cleanKey := func(k string) string {
+			k = strings.Replace(k, "id", "ID", -1)
+			k = strings.Replace(k, "api", "API", -1)
+			k = strings.Replace(k, "-", " ", -1)
+			return strings.Title(k)
+		}
+
+		for k, v := range activeEnv.EnvMap {
+			if isSensitive(k) {
+				v = "********"
+			}
+			cmd.Println(emoji.Sprintf(":arrow_right: %s: %s", cleanKey(k), v))
 		}
 
 	},

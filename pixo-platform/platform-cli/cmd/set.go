@@ -18,25 +18,32 @@ var setCmd = &cobra.Command{
 
 		var env config.Env
 
-		lifecycle := cmd.Flag("lifecycle").Value.String()
-		if lifecycle != "" {
+		lifecycle, ok := Ctx.ConfigManager.GetFlagValue("lifecycle", cmd)
+		if ok {
 			env.Lifecycle = lifecycle
 		}
 
-		region := cmd.Flag("region").Value.String()
+		region, ok := Ctx.ConfigManager.GetFlagValue("region", cmd)
 		if region != "" {
 			env.Region = region
 		}
 
 		Ctx.ConfigManager.SetActiveEnv(env)
 
-		key, err := cmd.Flags().GetString("key")
-		if err != nil {
-			cmd.Println(emoji.Sprintf(":exclamation: Unable to get key flag"))
-			return
+		username, ok := Ctx.ConfigManager.GetFlagValue("username", cmd)
+		if ok {
+			Ctx.ConfigManager.SetConfigValue("username", username)
 		}
 
-		if key != "" {
+		password, ok := Ctx.ConfigManager.GetFlagValue("password", cmd)
+		if ok {
+			Ctx.ConfigManager.SetConfigValue("password", password)
+		}
+
+		key, ok := Ctx.ConfigManager.GetFlagValue("key", cmd)
+		if !ok {
+			cmd.Println(emoji.Sprintf(":warning: No config to update"))
+		} else {
 			if val, err := cmd.Flags().GetString("val"); err != nil {
 				cmd.Println(emoji.Sprintf(":exclamation: Unable to get value flag"))
 				return
@@ -50,16 +57,6 @@ var setCmd = &cobra.Command{
 				cmd.Println("Value must be provided")
 				return
 			}
-		}
-
-		username := cmd.Flag("username").Value.String()
-		if username != "" {
-			Ctx.ConfigManager.SetConfigValue("username", username)
-		}
-
-		password := cmd.Flag("password").Value.String()
-		if password != "" {
-			Ctx.ConfigManager.SetConfigValue("password", password)
 		}
 
 		cmd.Printf("Config updated successfully: %s\n", cfgFileFlagInput)

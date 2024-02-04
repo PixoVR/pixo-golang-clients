@@ -110,6 +110,13 @@ func (t *TestExecutor) RunCommand(args ...string) (string, error) {
 	return t.RunCommandWithInput(os.Stdin, args...)
 }
 
+func (t *TestExecutor) RunCommandAndExpectSuccess(args ...string) string {
+	output, err := t.RunCommandWithInput(os.Stdin, args...)
+	Expect(err).NotTo(HaveOccurred())
+	Expect(output).NotTo(BeEmpty())
+	return output
+}
+
 func (t *TestExecutor) ExpectLoginToSucceed(username, password string) {
 
 	output, err := t.RunCommand(

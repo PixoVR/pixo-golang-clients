@@ -1,6 +1,8 @@
 package cmd_test
 
 import (
+	"fmt"
+	"github.com/go-faker/faker/v4"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -19,34 +21,52 @@ var _ = Describe("ConfigFile", func() {
 		executor.Cleanup()
 	})
 
+	It("can show the current config", func() {
+		username := faker.Username()
+		password := faker.Password()
+		executor.ExpectLoginToSucceed(username, password)
+		token, ok := executor.ConfigManager.GetConfigValue("token")
+		Expect(ok).To(BeTrue())
+		Expect(token).NotTo(BeEmpty())
+		userID, ok := executor.ConfigManager.GetIntConfigValue("user-id")
+		Expect(ok).To(BeTrue())
+		Expect(userID).NotTo(BeZero())
+		_ = executor.RunCommandAndExpectSuccess("config", "set", "-k", "test", "-v", "testvalue")
+		_ = executor.RunCommandAndExpectSuccess("config", "set", "-k", "api-key", "-v", "testapikey")
+
+		output := executor.RunCommandAndExpectSuccess("config")
+
+		Expect(output).NotTo(ContainSubstring(password))
+		Expect(output).NotTo(ContainSubstring(token))
+		Expect(output).To(ContainSubstring(fmt.Sprintf("User ID: %d", userID)))
+		Expect(output).To(ContainSubstring("Region: na"))
+		Expect(output).To(ContainSubstring("Lifecycle: prod"))
+		Expect(output).To(ContainSubstring("Username: " + username))
+		Expect(output).To(ContainSubstring("API Key:"))
+		Expect(output).NotTo(ContainSubstring("testapikey"))
+		Expect(output).To(ContainSubstring("Test: testvalue"))
+	})
+
 	It("can set the lifecycle", func() {
-		output, err := executor.RunCommand("config", "set", "-l", "dev")
-		Expect(err).NotTo(HaveOccurred())
-		Expect(output).NotTo(BeEmpty())
+		_ = executor.RunCommandAndExpectSuccess("config", "set", "-l", "dev")
 		Expect(executor.ConfigManager.Lifecycle()).To(Equal("dev"))
 		Expect(executor.ConfigManager.Region()).To(Equal("na"))
 
-		output, err = executor.RunCommand("config", "set", "-l", "stage")
-		Expect(err).NotTo(HaveOccurred())
-		Expect(output).NotTo(BeEmpty())
+		_ = executor.RunCommandAndExpectSuccess("config", "set", "-l", "stage")
 		Expect(executor.ConfigManager.Lifecycle()).To(Equal("stage"))
 		Expect(executor.ConfigManager.Region()).To(Equal("na"))
 	})
 
 	It("can set the region", func() {
-		output, err := executor.RunCommand("config", "set", "-r", "saudi", "-l", "prod")
-		Expect(err).NotTo(HaveOccurred())
-		Expect(output).NotTo(BeEmpty())
+		output := executor.RunCommandAndExpectSuccess("config", "set", "-r", "saudi", "-l", "prod")
 		Expect(executor.ConfigManager.Lifecycle()).To(Equal("prod"))
 		Expect(executor.ConfigManager.Region()).To(Equal("saudi"))
-		output, err = executor.RunCommand("config")
-		Expect(err).NotTo(HaveOccurred())
+		output = executor.RunCommandAndExpectSuccess("config")
 		Expect(output).To(ContainSubstring("Region: saudi"))
 		Expect(output).To(ContainSubstring("Lifecycle: prod"))
 
-		output, err = executor.RunCommand("config", "set", "-r", "na", "-l", "dev")
-		Expect(err).NotTo(HaveOccurred())
-		Expect(output).NotTo(BeEmpty())
+		output = executor.RunCommandAndExpectSuccess("config", "set", "-r", "na", "-l", "dev")
+
 		Expect(executor.ConfigManager.Lifecycle()).To(Equal("dev"))
 		Expect(executor.ConfigManager.Region()).To(Equal("na"))
 		Expect(output).To(ContainSubstring("Region: na"))
@@ -62,6 +82,7 @@ var _ = Describe("ConfigFile", func() {
 			"--password",
 			"testpassword",
 		)
+
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).NotTo(BeEmpty())
 		val, ok := executor.ConfigManager.GetConfigValue("username")
@@ -73,8 +94,7 @@ var _ = Describe("ConfigFile", func() {
 	})
 
 	It("can open up the config file", func() {
-		output, err := executor.RunCommand("config", "--edit")
-		Expect(err).NotTo(HaveOccurred())
+		output := executor.RunCommandAndExpectSuccess("config", "--edit")
 		Expect(output).To(ContainSubstring("Opening config file"))
 		Expect(executor.MockFileOpener.CalledOpenEditor).To(BeTrue())
 	})
