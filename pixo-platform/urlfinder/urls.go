@@ -32,7 +32,7 @@ func (s ServiceConfig) FormatURL() string {
 
 	if s.Lifecycle == "local" {
 		if s.Service == "matchmaking" {
-			return fmt.Sprintf("ws://localhost:%d", s.Port)
+			return fmt.Sprintf("ws://localhost:%d/matchmaking", s.Port)
 		}
 
 		if s.Port == 0 {

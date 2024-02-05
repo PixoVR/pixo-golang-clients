@@ -18,17 +18,14 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func Run(configManager config.Manager, mode string, endpoint string, mockResponse []byte) {
-	gin.SetMode(mode)
+func Run(port string, configManager config.Manager, endpoint string, mockResponse []byte) {
+	gin.SetMode(gin.DebugMode)
 	router := gin.Default()
 	_ = router.SetTrustedProxies(nil)
 
 	router.GET(endpoint, func(c *gin.Context) {
 		requestHandler(c.Writer, c.Request, mockResponse)
 	})
-
-	port, _ := configManager.GetConfigValue("serverport")
-	configManager.Printf("Starting mock server serving endpoint %s on port %s", endpoint, port)
 
 	if err := router.Run(fmt.Sprintf(":%s", port)); err != nil {
 		configManager.Printf("Failed to start mock server: %s", err.Error())

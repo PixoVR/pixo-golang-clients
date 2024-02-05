@@ -182,11 +182,15 @@ pixo mp mockserver
 Mon, 02 Jan 2006 15:04:05 MST INF Starting mock server serving endpoint matchmaking/matchmake on port 8080
 ```
 
-To customize the response, use the command line flags or create a yaml file at `./.pixo/server.yaml`.
+To customize the response, use the command line flags when starting the server
+```bash
+pixo mp mockserver \
+    --gameserver-port 7654
+```
 
-Defaults to the equivalent of the following config file:
+Defaults to the following values:
 ```yaml
-server-port: 8080
+matchmaker-port: 8080
 gameserver-ip: 127.0.0.1
 gameserver-port: 7777
 map-name: Default

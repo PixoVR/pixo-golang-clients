@@ -106,7 +106,7 @@ var _ = Describe("Urlfinder", func() {
 		It("can find the local matchmaking url", func() {
 			config := urlfinder.ServiceConfig{Service: "matchmaking", Lifecycle: "local", Port: 8080}
 			url := config.FormatURL()
-			Expect(url).To(Equal("ws://localhost:8080"))
+			Expect(url).To(Equal("ws://localhost:8080/matchmaking"))
 		})
 
 		It("can find the default matchmaking url", func() {

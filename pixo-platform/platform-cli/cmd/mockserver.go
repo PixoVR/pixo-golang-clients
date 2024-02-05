@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/mockserver"
-	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
 )
 
@@ -20,20 +19,20 @@ var mockserverCmd = &cobra.Command{
 
 		//viper.AddConfigPath(".pixo")
 		//viper.SetConfigName("server")
-		//viper.SetDefault("module-id", 1)
-		//viper.SetDefault("server-port", 8080)
 
-		address, _ := Ctx.ConfigManager.GetConfigValueOrAskUser("gameserver-ip", cmd)
-		port, _ := Ctx.ConfigManager.GetConfigValueOrAskUser("gameserver-port", cmd)
-
-		moduleID, _ := Ctx.ConfigManager.GetIntConfigValueOrAskUser("module-id", cmd)
-		orgID, _ := Ctx.ConfigManager.GetIntConfigValueOrAskUser("org-id", cmd)
-
-		sessionName, _ := Ctx.ConfigManager.GetConfigValueOrAskUser("session-name", cmd)
-		sessionID, _ := Ctx.ConfigManager.GetConfigValueOrAskUser("session-id", cmd)
-		owningUserName, _ := Ctx.ConfigManager.GetConfigValueOrAskUser("owning-user-name", cmd)
-		mapName, _ := Ctx.ConfigManager.GetConfigValueOrAskUser("map-name", cmd)
-		serverVersion, _ := Ctx.ConfigManager.GetConfigValueOrAskUser("server-version", cmd)
+		address, _ := Ctx.ConfigManager.GetFlagOrConfigValue("gameserver-ip", cmd)
+		port, _ := Ctx.ConfigManager.GetFlagOrConfigValue("gameserver-port", cmd)
+		serverPort, _ := Ctx.ConfigManager.GetFlagOrConfigValue("matchmaker-port", cmd)
+		moduleID, ok := Ctx.ConfigManager.GetIntFlagOrConfigValue("module-id", cmd)
+		if !ok {
+			moduleID = 1
+		}
+		serverVersion, _ := Ctx.ConfigManager.GetFlagOrConfigValue("server-version", cmd)
+		orgID, _ := Ctx.ConfigManager.GetIntFlagOrConfigValue("org-id", cmd)
+		sessionName, _ := Ctx.ConfigManager.GetFlagOrConfigValue("session-name", cmd)
+		sessionID, _ := Ctx.ConfigManager.GetFlagOrConfigValue("session-id", cmd)
+		owningUserName, _ := Ctx.ConfigManager.GetFlagOrConfigValue("owning-user-name", cmd)
+		mapName, _ := Ctx.ConfigManager.GetFlagOrConfigValue("map-name", cmd)
 
 		data := matchmaker.MatchResponse{
 			Error:   false,
@@ -57,22 +56,17 @@ var mockserverCmd = &cobra.Command{
 			return
 		}
 
-		mode := gin.ReleaseMode
-
-		if isDebug {
-			mode = gin.DebugMode
-		}
-
-		mockserver.Run(Ctx.ConfigManager, mode, matchmaker.MatchmakingEndpoint, response)
+		mockserver.Run(serverPort, Ctx.ConfigManager, "matchmaking/"+matchmaker.MatchmakingEndpoint, response)
 	},
 }
 
 func init() {
 	mpCmd.AddCommand(mockserverCmd)
 
-	mockserverCmd.Flags().StringP("server-port", "p", "8080", "Port to run the server on")
-	mockserverCmd.Flags().String("gameserver-ip", "127.0.0.1", "IP address of the game server to be returned in the response")
-	mockserverCmd.Flags().String("gameserver-port", "7777", "Port of the game server to be returned in the response")
+	mockserverCmd.Flags().String("gameserver-ip", matchmaker.Localhost, "IP address of the game server to be returned in the response")
+	mockserverCmd.Flags().String("server-version", "1.00.00", "Version of the server to be returned in the response")
+	mockserverCmd.Flags().Int("gameserver-port", matchmaker.DefaultGameserverPort, "Port of the game server to be returned in the response")
+	mockserverCmd.Flags().Int("matchmaker-port", 8080, "Port of the mock matchmaker server")
 	mockserverCmd.Flags().String("map-name", "Default", "Name of the map to be returned in the response")
 	mockserverCmd.Flags().StringP("session-name", "n", "Test", "Name of the session to be returned in the response")
 	mockserverCmd.Flags().StringP("session-id", "i", "FB0HIFBMY8NAME99IS7C3WALKERB4D76", "ID of the session to be returned in the response")
