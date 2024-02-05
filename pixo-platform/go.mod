@@ -9,7 +9,7 @@ require (
 	github.com/go-faker/faker/v4 v4.2.0
 	github.com/go-resty/resty/v2 v2.11.0
 	github.com/gorilla/websocket v1.5.1
-	github.com/hasura/go-graphql-client v0.10.2
+	github.com/hasura/go-graphql-client v0.11.0
 	github.com/kyokomi/emoji v2.2.4+incompatible
 	github.com/onsi/ginkgo/v2 v2.15.0
 	github.com/onsi/gomega v1.31.1
