@@ -13,7 +13,7 @@ require (
 	github.com/kyokomi/emoji v2.2.4+incompatible
 	github.com/onsi/ginkgo/v2 v2.15.0
 	github.com/onsi/gomega v1.31.1
-	github.com/rs/zerolog v1.31.0
+	github.com/rs/zerolog v1.32.0
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/viper v1.18.2
 	gitlab.com/david_mbuvi/go_asterisks v0.0.0-20221114073100-4669d8bedcbe
