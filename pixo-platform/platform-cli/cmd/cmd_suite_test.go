@@ -116,21 +116,3 @@ func (t *TestExecutor) RunCommandAndExpectSuccess(args ...string) string {
 	Expect(output).NotTo(BeEmpty())
 	return output
 }
-
-func (t *TestExecutor) ExpectLoginToSucceed(username, password string) {
-
-	output, err := t.RunCommand(
-		"auth",
-		"login",
-		"--username",
-		username,
-		"--password",
-		password,
-	)
-
-	Expect(err).NotTo(HaveOccurred())
-	Expect(output).To(ContainSubstring("Login successful. Here is your API token:"))
-	userID, ok := t.ConfigManager.GetConfigValue("user-id")
-	Expect(ok).To(BeTrue())
-	Expect(userID).To(Equal(fmt.Sprint(t.MockPlatformClient.ActiveUserID())))
-}

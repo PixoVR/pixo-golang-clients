@@ -5,7 +5,6 @@ package cmd
 
 import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/config"
-	"github.com/kyokomi/emoji"
 	"github.com/spf13/cobra"
 )
 
@@ -41,25 +40,25 @@ var setCmd = &cobra.Command{
 		}
 
 		key, ok := Ctx.ConfigManager.GetFlagValue("key", cmd)
-		if !ok {
-			cmd.Println(emoji.Sprintf(":warning: No config to update"))
-		} else {
+		if ok {
 			if val, err := cmd.Flags().GetString("val"); err != nil {
-				cmd.Println(emoji.Sprintf(":exclamation: Unable to get value flag"))
+				Ctx.ConfigManager.Println(":exclamation: Unable to get value flag")
 				return
 			} else if val != "" {
 				Ctx.ConfigManager.SetConfigValue(key, val)
-				cmd.Printf(emoji.Sprintf(":rocket: Config value %s set to %s\n", key, val))
+				Ctx.ConfigManager.Printf(":rocket: Config value %s set to %s\n", key, val)
 				rootCmd.SetArgs([]string{"config"})
 				_ = rootCmd.Execute()
 				return
 			} else {
-				cmd.Println("Value must be provided")
+				Ctx.ConfigManager.Println("Value must be provided")
 				return
 			}
 		}
 
-		cmd.Printf("Config updated successfully: %s\n", cfgFileFlagInput)
+		Ctx.ConfigManager.Println()
+		Ctx.ConfigManager.Println(":check_mark_button:Config updated successfully: ", Ctx.ConfigManager.ConfigFile())
+		Ctx.ConfigManager.Println()
 		rootCmd.SetArgs([]string{"config"})
 		if cmd != nil {
 			_ = cmd.Execute()

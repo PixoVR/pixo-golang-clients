@@ -6,7 +6,6 @@ package cmd
 import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/loader"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
-	"github.com/kyokomi/emoji"
 	"github.com/spf13/cobra"
 )
 
@@ -16,9 +15,10 @@ var createApiKeyCmd = &cobra.Command{
 	Short: "Creating API keys",
 	Long:  `Create API key with the following command:`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		cmd.Println(emoji.Sprintf(":key: Creating API Key"))
+		Ctx.ConfigManager.Println(":key: Creating API Key")
 
-		spinner := loader.NewSpinner(cmd.OutOrStdout())
+		spinner := loader.NewSpinner(Ctx.ConfigManager)
+		defer spinner.Stop()
 
 		input := platform.APIKey{
 			//UserID: input.GetIntValue(cmd, "user-id", "PIXO_USER_ID"),
@@ -26,15 +26,14 @@ var createApiKeyCmd = &cobra.Command{
 
 		apiKey, err := Ctx.PlatformClient.CreateAPIKey(cmd.Context(), input)
 		if err != nil {
-			cmd.Println("Error creating API key: ", err.Error())
+			Ctx.ConfigManager.Println("Error creating API key: ", err)
+
 			return err
 		}
 
 		Ctx.ConfigManager.SetConfigValue("api-key", apiKey.Key)
 
-		spinner.Stop()
-
-		cmd.Println(emoji.Sprintf(":heavy_check_mark: API key created: %s", apiKey.Key))
+		Ctx.ConfigManager.Println(":heavy_check_mark: API key created: ", apiKey.Key)
 		return nil
 	},
 }

@@ -4,7 +4,6 @@ Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
 
@@ -15,7 +14,7 @@ var authCmd = &cobra.Command{
 	Long:  `Manage authentication and authorization with the Pixo Platform.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := cmd.Help(); err != nil {
-			log.Debug().Err(err).Msg("Could not display auth help")
+			Ctx.ConfigManager.Println("error printing help: ", err)
 			return
 		}
 	},

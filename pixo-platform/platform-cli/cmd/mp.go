@@ -24,7 +24,6 @@ var mpCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 
 		if connect {
-
 			addr, ok := Ctx.ConfigManager.GetConfigValueOrAskUser("gameserver address (IP:PORT)", cmd)
 			if !ok {
 				return errors.New("no gameserver address provided")
@@ -42,7 +41,7 @@ var mpCmd = &cobra.Command{
 			}
 
 			udpAddr := &net.UDPAddr{IP: net.ParseIP(gameserverHost), Port: gameserverPort}
-			gameserverReadLoop(cmd, Ctx.MatchmakingClient, udpAddr)
+			gameserverReadLoop(udpAddr)
 		} else {
 			_ = cmd.Help()
 		}

@@ -18,7 +18,7 @@ var buildCmd = &cobra.Command{
 
 		token, ok := Ctx.ConfigManager.GetConfigValue("token")
 		if !ok {
-			cmd.Println("Token not found. Run 'pixo auth login' to login.")
+			Ctx.ConfigManager.Println("Token not found. Run 'pixo auth login' to login.")
 			return
 		}
 
@@ -31,21 +31,21 @@ var buildCmd = &cobra.Command{
 
 		workflows, err := allocatorClient.GetBuildWorkflows()
 		if err != nil {
-			cmd.Println("Error getting build workflows: ", err)
+			Ctx.ConfigManager.Println("Error getting build workflows: ", err)
 			return
 		}
 
 		logsCh, err := allocatorClient.GetBuildWorkflowLogs(workflows[0].Name)
 		if err != nil {
-			cmd.Println("Error getting build workflow logs: ", err)
+			Ctx.ConfigManager.Println("Error getting build workflow logs: ", err)
 			return
 		}
 
 		for log := range logsCh {
-			cmd.Println(log)
+			Ctx.ConfigManager.Println(log)
 		}
 
-		cmd.Println("Stop streaming logs")
+		Ctx.ConfigManager.Println("Done streaming logs")
 	},
 }
 

@@ -26,7 +26,7 @@ var deployCmd = &cobra.Command{
 
 		moduleID, ok := Ctx.ConfigManager.GetIntConfigValueOrAskUser("module-id", cmd)
 		if !ok {
-			cmd.Println(emoji.Sprintf(":warning: Module ID not provided"))
+			Ctx.ConfigManager.Println(":warning: Module ID not provided")
 			return errors.New("module ID not provided")
 		}
 
@@ -47,7 +47,7 @@ var deployCmd = &cobra.Command{
 
 		}
 
-		cmd.Println("Deploying server version: ", semanticVersion)
+		Ctx.ConfigManager.Println("Deploying server version: ", semanticVersion)
 
 		if isPrecheck {
 
@@ -56,20 +56,20 @@ var deployCmd = &cobra.Command{
 				SemanticVersion: semanticVersion,
 			}
 
-			spinner := loader.NewSpinner(cmd.OutOrStdout())
+			spinner := loader.NewSpinner(Ctx.ConfigManager)
 
 			if versions, err := Ctx.PlatformClient.GetMultiplayerServerVersions(cmd.Context(), params); err != nil {
-				cmd.Println(emoji.Sprint(":negative_squared_cross_mark: Unable to retrieve server versions from platform api"))
+				Ctx.ConfigManager.Println(":negative_squared_cross_mark: Unable to retrieve server versions from the Pixo Platform")
 				return err
 
 			} else if len(versions) > 0 {
 				spinner.Stop()
-				cmd.Println(emoji.Sprintf(":red_square: Server version %s already exists\n", semanticVersion))
+				Ctx.ConfigManager.Printf(":exclamation: Server version %s already exists\n", semanticVersion)
 				return errors.New("server version already exists")
 			}
 
 			spinner.Stop()
-			cmd.Println(emoji.Sprintf(":heavy_check_mark: Server version does not exist yet: %s", semanticVersion))
+			Ctx.ConfigManager.Println(":heavy_check_mark: Server version does not exist yet: ", semanticVersion)
 			return nil
 		}
 
@@ -78,7 +78,7 @@ var deployCmd = &cobra.Command{
 			return errors.New("no gameserver image provided")
 		}
 
-		spinner := loader.NewSpinner(cmd.OutOrStdout())
+		spinner := loader.NewSpinner(Ctx.ConfigManager)
 
 		if err := Ctx.PlatformClient.CreateMultiplayerServerVersion(cmd.Context(), moduleID, image, semanticVersion); err != nil {
 			msg := fmt.Sprintf("Failed to create multiplayer server version: %s - %s", semanticVersion, err.Error())
@@ -86,7 +86,7 @@ var deployCmd = &cobra.Command{
 		}
 
 		spinner.Stop()
-		cmd.Println(emoji.Sprint(":cruise_ship: Successfully created multiplayer server version: ", semanticVersion))
+		Ctx.ConfigManager.Println(":cruise_ship: Successfully created multiplayer server version: ", semanticVersion)
 		return nil
 	},
 }

@@ -14,21 +14,21 @@ var deleteApiKeyCmd = &cobra.Command{
 	Short: "Deleting an API key",
 	Long:  `Delete API key with the following command:`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		spinner := loader.NewSpinner(cmd.OutOrStdout())
+		spinner := loader.NewSpinner(Ctx.ConfigManager)
+		defer spinner.Stop()
 
 		apiKeyID, ok := Ctx.ConfigManager.GetIntFlagOrConfigValue("key-id", cmd)
 		if !ok {
-			cmd.Println("Error: API key ID is required")
+			Ctx.ConfigManager.Println("Error: API key ID is required")
 			return nil
 		}
 
 		if err := Ctx.PlatformClient.DeleteAPIKey(cmd.Context(), apiKeyID); err != nil {
-			cmd.Println("Error creating API key: ", err.Error())
+			Ctx.ConfigManager.Println("Error deleting API key: ", err)
 			return err
 		}
 
-		spinner.Stop()
-		cmd.Printf("Deleted API key: %d\n", apiKeyID)
+		Ctx.ConfigManager.Println(":check_mark: Deleted API key: ", apiKeyID)
 		return nil
 	},
 }

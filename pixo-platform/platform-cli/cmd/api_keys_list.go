@@ -15,7 +15,7 @@ var listApiKeyCmd = &cobra.Command{
 	Short: "List API keys",
 	Long:  `List API key with the following command:`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		spinner := loader.NewSpinner(cmd.OutOrStdout())
+		spinner := loader.NewSpinner(Ctx.ConfigManager)
 
 		apiKeyParams := &graphql_api.APIKeyQueryParams{}
 
@@ -25,21 +25,20 @@ var listApiKeyCmd = &cobra.Command{
 		}
 
 		apiKeys, err := Ctx.PlatformClient.GetAPIKeys(cmd.Context(), apiKeyParams)
+		spinner.Stop()
 		if err != nil {
-			cmd.Println("Error listing API keys: ", err.Error())
+			Ctx.ConfigManager.Println("Error getting API keys: ", err)
 			return err
 		}
 
-		spinner.Stop()
-
 		if len(apiKeys) == 0 {
-			cmd.Println("No API Keys found")
+			Ctx.ConfigManager.Println("No API keys found")
 			return nil
 		}
 
-		cmd.Println("API Keys:")
+		Ctx.ConfigManager.Println("API keys:")
 		for _, apiKey := range apiKeys {
-			cmd.Printf("Key ID: %d\n", apiKey.ID)
+			Ctx.ConfigManager.Println("Key ID: ", apiKey.ID)
 		}
 
 		return nil

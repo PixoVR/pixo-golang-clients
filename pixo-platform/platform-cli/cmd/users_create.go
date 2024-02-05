@@ -6,7 +6,6 @@ package cmd
 import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/loader"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
-	"github.com/kyokomi/emoji"
 	"github.com/spf13/cobra"
 )
 
@@ -23,7 +22,7 @@ var createUserCmd = &cobra.Command{
 		role, _ := Ctx.ConfigManager.GetConfigValueOrAskUser("role", cmd)
 		password, ok := Ctx.ConfigManager.GetSensitiveConfigValueOrAskUser("password", cmd)
 		if !ok {
-			cmd.Println(emoji.Sprintf(":exclamation: Password not provided"))
+			Ctx.ConfigManager.Print(":exclamation: Password not provided")
 			return nil
 		}
 
@@ -36,16 +35,16 @@ var createUserCmd = &cobra.Command{
 			Password:  password,
 		}
 
-		spinner := loader.NewSpinner(cmd.OutOrStdout())
+		spinner := loader.NewSpinner(Ctx.ConfigManager)
+		defer spinner.Stop()
 
 		user, err := Ctx.PlatformClient.CreateUser(cmd.Context(), input)
 		if err != nil {
-			cmd.Println("Could not create user: ", err.Error())
+			Ctx.ConfigManager.Println(":exclamation: Unable to create user: ", err)
 			return err
 		}
 
-		spinner.Stop()
-		cmd.Println("Created user " + user.Username)
+		Ctx.ConfigManager.Println(":rocket:User created: ", user.Username)
 		return nil
 	},
 }

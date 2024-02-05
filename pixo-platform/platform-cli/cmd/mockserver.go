@@ -8,9 +8,7 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/mockserver"
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // mockserverCmd represents the mockserver rootCmd
@@ -20,18 +18,10 @@ var mockserverCmd = &cobra.Command{
 	Long:  `Runs a mock matchmaking server that returns a static response determined by the server configuration or user input `,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		viper.AddConfigPath(".pixo")
-		viper.SetConfigName("server")
-		viper.SetDefault("module-id", 1)
-		viper.SetDefault("server-port", 8080)
-
-		if err := viper.ReadInConfig(); err != nil {
-			if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-				log.Debug().Msg("ConfigFile file not found")
-			} else {
-				log.Debug().Err(err).Msg("ConfigFile file was found but another error was produced")
-			}
-		}
+		//viper.AddConfigPath(".pixo")
+		//viper.SetConfigName("server")
+		//viper.SetDefault("module-id", 1)
+		//viper.SetDefault("server-port", 8080)
 
 		address, _ := Ctx.ConfigManager.GetConfigValueOrAskUser("gameserver-ip", cmd)
 		port, _ := Ctx.ConfigManager.GetConfigValueOrAskUser("gameserver-port", cmd)
@@ -63,7 +53,7 @@ var mockserverCmd = &cobra.Command{
 
 		response, err := json.Marshal(data)
 		if err != nil {
-			log.Debug().Err(err).Msg("Failed to marshal response")
+			Ctx.ConfigManager.Println(":exclamation: Could not marshal response: ", err)
 			return
 		}
 
@@ -73,7 +63,7 @@ var mockserverCmd = &cobra.Command{
 			mode = gin.DebugMode
 		}
 
-		mockserver.Run(cmd, Ctx.ConfigManager, mode, matchmaker.MatchmakingEndpoint, response)
+		mockserver.Run(Ctx.ConfigManager, mode, matchmaker.MatchmakingEndpoint, response)
 	},
 }
 

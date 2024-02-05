@@ -6,10 +6,13 @@ import (
 )
 
 type Manager interface {
+	io.ReadWriter
 	SetReader(r io.Reader)
-	Reader() io.Reader
 	SetWriter(w io.Writer)
-	Writer() io.Writer
+
+	Print(a ...interface{})
+	Printf(format string, a ...interface{})
+	Println(a ...interface{})
 
 	GetActiveEnv() Env
 	SetActiveEnv(env Env)

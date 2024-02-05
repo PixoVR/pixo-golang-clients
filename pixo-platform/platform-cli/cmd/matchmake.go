@@ -7,7 +7,6 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/load"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/loader"
-	"github.com/kyokomi/emoji"
 	"net"
 	"time"
 
@@ -24,13 +23,13 @@ var matchmakeCmd = &cobra.Command{
 
 		moduleID, ok := Ctx.ConfigManager.GetIntConfigValueOrAskUser("module-id", cmd)
 		if !ok {
-			cmd.Println(emoji.Sprintf(":exclamation: Module ID not provided"))
+			Ctx.ConfigManager.Println(":exclamation: Module ID not provided")
 			return
 		}
 
 		semanticVersion, ok := Ctx.ConfigManager.GetConfigValueOrAskUser("server-version", cmd)
 		if !ok {
-			cmd.Println(emoji.Sprintf(":exclamation: Server version not provided"))
+			Ctx.ConfigManager.Println(":exclamation: Server version not provided")
 			return
 		}
 
@@ -52,7 +51,7 @@ var matchmakeCmd = &cobra.Command{
 
 			tester, err := load.NewLoadTester(config)
 			if err != nil {
-				cmd.Println(emoji.Sprintf(":exclamation: Could not create load tester: %s", err))
+				Ctx.ConfigManager.Println(":exclamation: Could not create load tester: ", err)
 				return
 			}
 
@@ -60,37 +59,35 @@ var matchmakeCmd = &cobra.Command{
 			return
 		}
 
-		cmd.Println(emoji.Sprintf(":magnifying_glass_tilted_left:Attempting to find a match for module %d with server version %s...", matchRequest.ModuleID, matchRequest.ServerVersion))
+		Ctx.ConfigManager.Printf(":magnifying_glass_tilted_left:Attempting to find a match for module %d with server version %s...\n", matchRequest.ModuleID, matchRequest.ServerVersion)
 
-		spinner := loader.NewSpinner(cmd.OutOrStdout())
+		spinner := loader.NewSpinner(Ctx.ConfigManager)
 
 		addr, err := Ctx.MatchmakingClient.FindMatch(matchRequest)
+		spinner.Stop()
 		if err != nil {
-			spinner.Stop()
-			cmd.Println(emoji.Sprintf(":exclamation:Could not find match: %s", err))
+			Ctx.ConfigManager.Println(":exclamation:Could not find match: ", err)
 			return
 		}
 
-		spinner.Stop()
-		cmd.Println(emoji.Sprintf(":video_game:Match found! Gameserver address: %s", addr.String()))
+		Ctx.ConfigManager.Println(":video_game:Match found! Gameserver address: ", addr.String())
 
 		Ctx.ConfigManager.SetConfigValue("gameserver", addr.String())
 
 		if connect {
-			gameserverReadLoop(cmd, Ctx.MatchmakingClient, addr)
+			gameserverReadLoop(addr)
 		}
 
 	},
 }
 
-func gameserverReadLoop(cmd *cobra.Command, mm matchmaker.Matchmaker, addr *net.UDPAddr) {
-	cmd.Println(emoji.Sprintf(":satellite:Connecting to gameserver at %s", addr.String()))
-	if err := mm.DialGameserver(addr); err != nil {
-		cmd.Println(emoji.Sprintf(":warning:Could not connect to gameserver at %s", addr.String()))
+func gameserverReadLoop(addr *net.UDPAddr) {
+	Ctx.ConfigManager.Println(":satellite:Connecting to gameserver at ", addr.String())
+	if err := Ctx.MatchmakingClient.DialGameserver(addr); err != nil {
+		Ctx.ConfigManager.Println(":warning:Could not connect to gameserver at ", addr.String())
 		return
 	}
 
-	Ctx.ConfigManager.SetWriter(cmd.OutOrStdout())
 	for {
 		Ctx.ConfigManager.ReadFromUser("Press enter to send a message to gameserver: ")
 		userInput := Ctx.ConfigManager.ReadFromUser("Message to gameserver: ")
@@ -98,18 +95,18 @@ func gameserverReadLoop(cmd *cobra.Command, mm matchmaker.Matchmaker, addr *net.
 			break
 		}
 
-		response, err := mm.SendAndReceiveMessage([]byte(userInput))
+		response, err := Ctx.MatchmakingClient.SendAndReceiveMessage([]byte(userInput))
 		if err != nil {
-			cmd.Println(emoji.Sprintf(":warning:Could not send message to gameserver: %s", err))
+			Ctx.ConfigManager.Println(":warning:Could not send message to gameserver: ", err)
 			continue
 		}
 
-		cmd.Print(emoji.Sprintf(":arrow_right:Response: %s", response))
+		Ctx.ConfigManager.Println(":arrow_right:Response: ", string(response))
 	}
 
-	cmd.Println(emoji.Sprintf("\n:stop_sign:Closing connection to gameserver at %s", addr.String()))
-	if err := mm.CloseGameserverConnection(); err != nil {
-		cmd.Println(emoji.Sprintf(":warning:Could not close connection to gameserver at %s", addr.String()))
+	Ctx.ConfigManager.Println("\n:stop_sign:Closing connection to gameserver at ", addr.String())
+	if err := Ctx.MatchmakingClient.CloseGameserverConnection(); err != nil {
+		Ctx.ConfigManager.Println(":warning:Could not close connection to gameserver at ", addr.String())
 	}
 
 }

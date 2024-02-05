@@ -28,9 +28,16 @@ var _ = Describe("Config", func() {
 
 	Context("when the config file does not exist", func() {
 
-		It("can initialize the config manager when setting the active environment", func() {
-			configManager := config.NewFileManager("")
+		var (
+			configManager config.Manager
+		)
+
+		BeforeEach(func() {
+			configManager = config.NewFileManager("")
 			Expect(configManager).NotTo(BeNil())
+		})
+
+		It("can initialize the config manager when setting the active environment", func() {
 			env := config.Env{
 				Region:    "na",
 				Lifecycle: "stage",
@@ -42,20 +49,47 @@ var _ = Describe("Config", func() {
 			Expect(configManager.Lifecycle()).To(Equal(env.Lifecycle))
 		})
 
+		It("can use stdout and stdin by default", func() {
+			n, err := configManager.Write([]byte("hello"))
+			Expect(n).To(Equal(5))
+			Expect(err).NotTo(HaveOccurred())
+			n, err = configManager.Read([]byte{})
+			Expect(n).To(Equal(0))
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("can output a messages with emojis", func() {
+			outputWriter := bytes.NewBufferString("")
+			configManager.SetWriter(outputWriter)
+			msg := "hello world\n"
+
+			configManager.Print(msg)
+			Expect(outputWriter.String()).To(Equal(msg))
+			outputWriter.Reset()
+
+			configManager.Println(msg)
+			Expect(outputWriter.String()).To(Equal(msg + "\n"))
+			outputWriter.Reset()
+
+			msg = fmt.Sprintf(":rocket:hello %s", "world")
+			expectedMsg := "🚀 hello world"
+			configManager.Printf(msg)
+			Expect(outputWriter.String()).To(Equal(expectedMsg))
+		})
+
 		It("can initialize the config manager when setting a value", func() {
-			configManager := config.NewFileManager("")
-			Expect(configManager).NotTo(BeNil())
 			apiKey := "some-api-key"
+
 			configManager.SetConfigValue("api-key", apiKey)
+
 			ExpectConfigValueToEqual(configManager, "api-key", apiKey)
 		})
 
 		It("can create a new config file", func() {
-			configManager := config.NewFileManager("")
-			Expect(configManager).NotTo(BeNil())
 			configFilePath := fmt.Sprintf("./test-config-%d.yaml", rand.Intn(1000))
 
 			err := configManager.SetConfigFile(configFilePath)
+
 			Expect(err).NotTo(HaveOccurred())
 			Expect(configManager.ConfigFile()).To(Equal(configFilePath))
 			env := configManager.GetActiveEnv()

@@ -9,7 +9,6 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/loader"
 	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
-	"github.com/kyokomi/emoji"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -65,35 +64,36 @@ func (p *CLIContext) Authenticate(cmd *cobra.Command) error {
 	token, ok := p.ConfigManager.GetFlagOrConfigValue("token", cmd)
 	if ok {
 		p.PlatformClient.SetToken(token)
+		p.ConfigManager.SetConfigValue("token", token)
 		return nil
 	}
 
 	apiKey, ok := p.ConfigManager.GetFlagOrConfigValue("api-key", cmd)
 	if ok {
 		p.PlatformClient.SetAPIKey(apiKey)
+		p.ConfigManager.SetConfigValue("api-key", apiKey)
 		return nil
 	}
 
 	username, ok := p.ConfigManager.GetFlagOrConfigValueOrAskUser("username", cmd)
 	if !ok {
+		p.ConfigManager.Println(":exclamation: Login failed. Username is required.")
 		return nil
 	}
+	p.ConfigManager.SetConfigValue("username", username)
 
 	password, ok := p.ConfigManager.GetSensitiveFlagOrConfigValueOrAskUser("password", cmd)
 	if !ok {
+		p.ConfigManager.Println(":exclamation: Login failed. Password is required.")
 		return nil
 	}
-
-	if p.ConfigManager.Writer() != nil {
-		spinner := loader.NewSpinner(p.ConfigManager.Writer())
-		defer spinner.Stop()
-	}
-
-	p.ConfigManager.SetConfigValue("username", username)
 	p.ConfigManager.SetConfigValue("password", password)
 
+	spinner := loader.NewSpinner(p.ConfigManager)
+	defer spinner.Stop()
+
 	if err := p.PlatformClient.Login(username, password); err != nil {
-		cmd.Println(emoji.Sprintf(":exclamation: Login failed. Please check your credentials and try again.\n%s", err))
+		p.ConfigManager.Println(":exclamation: Login failed. Please check your credentials and try again.\nError: ", err)
 		return err
 	}
 

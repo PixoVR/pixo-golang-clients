@@ -4,7 +4,6 @@ Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
-	"github.com/kyokomi/emoji"
 	"github.com/spf13/cobra"
 	"strings"
 )
@@ -22,35 +21,61 @@ var configCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		if edit {
-			cmd.Println(emoji.Sprint(":file_folder: Opening config file in editor"))
+			Ctx.ConfigManager.Println(":file_folder: Opening config file in editor")
 			if err := Ctx.FileOpener.OpenEditor(Ctx.ConfigManager.ConfigFile()); err != nil {
-				cmd.Println(emoji.Sprintf(":warning: Unable to open editor: %s", err))
+				Ctx.ConfigManager.Println(":warning: Unable to open editor: ", err)
 			}
 		}
 
-		cmd.Println(emoji.Sprintf(":file_folder: Config file: %s", Ctx.ConfigManager.ConfigFile()))
+		Ctx.ConfigManager.Println(":file_folder: Config: ", Ctx.ConfigManager.ConfigFile())
 
-		region := Ctx.ConfigManager.Region()
-		if region != "" {
-			cmd.Println(emoji.Sprintf(":earth_americas: Region: %s", region))
+		if region := Ctx.ConfigManager.Region(); region != "" {
+			Ctx.ConfigManager.Println(":earth_americas: Region: ", region)
 		}
 
-		lifecycle := Ctx.ConfigManager.Lifecycle()
-		if lifecycle != "" {
-			cmd.Println(emoji.Sprintf(":gear:  Lifecycle: %s", lifecycle))
+		if lifecycle := Ctx.ConfigManager.Lifecycle(); lifecycle != "" {
+			Ctx.ConfigManager.Println(":gear:  Lifecycle: ", lifecycle)
 		}
 
-		cmd.Println()
+		Ctx.ConfigManager.Println()
+
+		if userID, ok := Ctx.ConfigManager.GetConfigValue("user-id"); ok {
+			Ctx.ConfigManager.Println(":id: User ID: ", userID)
+		}
+
+		if username, ok := Ctx.ConfigManager.GetConfigValue("username"); ok {
+			Ctx.ConfigManager.Println(":bust_in_silhouette: Username: ", username)
+		}
+
+		if _, ok := Ctx.ConfigManager.GetConfigValue("password"); ok {
+			Ctx.ConfigManager.Println(":lock: Password: ********")
+		}
+
+		if _, ok := Ctx.ConfigManager.GetConfigValue("api-key"); ok {
+			Ctx.ConfigManager.Println(":key: API Key: ********")
+		}
+
+		if _, ok := Ctx.ConfigManager.GetConfigValue("token"); ok {
+			Ctx.ConfigManager.Println(":key: Token: ********")
+		}
+
+		Ctx.ConfigManager.Println()
 
 		activeEnv := Ctx.ConfigManager.GetActiveEnv()
 
+		userInfoList := []string{
+			"username",
+			"user-id",
+			"api-key",
+		}
 		sensitiveList := []string{
 			"password",
 			"token",
 			"api-key",
 		}
-		isSensitive := func(k string) bool {
-			for _, s := range sensitiveList {
+		isSensitiveOrRepetitive := func(k string) bool {
+			list := append(userInfoList, sensitiveList...)
+			for _, s := range list {
 				if strings.Contains(k, s) {
 					return true
 				}
@@ -67,10 +92,10 @@ var configCmd = &cobra.Command{
 		}
 
 		for k, v := range activeEnv.EnvMap {
-			if isSensitive(k) {
-				v = "********"
+			if isSensitiveOrRepetitive(k) {
+				continue
 			}
-			cmd.Println(emoji.Sprintf(":arrow_right: %s: %s", cleanKey(k), v))
+			Ctx.ConfigManager.Println(":arrow_right: ", cleanKey(k), ": ", v)
 		}
 
 	},
