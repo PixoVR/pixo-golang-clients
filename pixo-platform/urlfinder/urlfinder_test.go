@@ -88,7 +88,7 @@ var _ = Describe("Urlfinder", func() {
 				Service: "api",
 			}
 			url := config.FormatURL()
-			Expect(url).To(Equal("https://apisa.pixovr.com"))
+			Expect(url).To(Equal("https://saudi.api.apex.pixovr.com"))
 		})
 
 		It("can find the url for the saudi prod platform API", func() {
@@ -96,7 +96,7 @@ var _ = Describe("Urlfinder", func() {
 				Region: "saudi",
 			}
 			url := config.FormatURL()
-			Expect(url).To(Equal("https://apisa.pixovr.com/v2"))
+			Expect(url).To(Equal("https://saudi.apex.pixovr.com/v2"))
 		})
 
 	})
@@ -113,6 +113,15 @@ var _ = Describe("Urlfinder", func() {
 			config := urlfinder.ServiceConfig{Service: "matchmaking"}
 			url := config.FormatURL()
 			Expect(url).To(Equal("wss://apex.pixovr.com/matchmaking"))
+		})
+
+		It("can find the saudi matchmaking url", func() {
+			config := urlfinder.ServiceConfig{
+				Service: "matchmaking",
+				Region:  "saudi",
+			}
+			url := config.FormatURL()
+			Expect(url).To(Equal("wss://saudi.apex.pixovr.com/matchmaking"))
 		})
 
 		It("can find the saudi matchmaking url", func() {
