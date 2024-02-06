@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/k8s/agones"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -18,6 +19,20 @@ var _ = Describe("GraphQL API", func() {
 
 	BeforeEach(func() {
 		ctx = context.Background()
+	})
+
+	It("can create a client, login, and interact with the api", func() {
+		config := urlfinder.ClientConfig{Lifecycle: lifecycle, APIKey: pixoAPIKey}
+		client := NewClient(config)
+		Expect(client).NotTo(BeNil())
+
+		Expect(client.Login(pixoUsername, pixoPassword)).To(Succeed())
+		Expect(client.IsAuthenticated()).To(BeTrue())
+		Expect(client.GetToken()).NotTo(BeEmpty())
+		session, err := client.CreateSession(ctx, 1, "127.0.0.1", "test")
+		Expect(err).NotTo(HaveOccurred())
+		Expect(session).NotTo(BeNil())
+		Expect(session.ID).NotTo(BeZero())
 	})
 
 	It("can create get and update a session, and then create an event with a secret apiKey", func() {
