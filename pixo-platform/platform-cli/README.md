@@ -98,8 +98,8 @@ pixo config set --key module-id --val 1
 pixo config
 
 # Example output:
-📁  Config file: /Users/username/.pixo/config.yaml
-🌎  Region: na
+📁 Config file: /Users/username/.pixo/config.yaml
+🌎 Region: na
 ⚙️  Lifecycle: dev
 
 ➡️  Username: <username>
