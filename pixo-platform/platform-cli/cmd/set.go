@@ -60,7 +60,7 @@ var setCmd = &cobra.Command{
 		}
 
 		Ctx.ConfigManager.Println()
-		Ctx.ConfigManager.Println(":check_mark_button:Config updated successfully: ", Ctx.ConfigManager.ConfigFile())
+		Ctx.ConfigManager.Println(":check_mark_button:Config updated successfully")
 		Ctx.ConfigManager.Println()
 		rootCmd.SetArgs([]string{"config"})
 		if cmd != nil {
