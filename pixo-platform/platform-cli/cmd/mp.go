@@ -24,7 +24,7 @@ var mpCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 
 		if connect {
-			addr, ok := Ctx.ConfigManager.GetConfigValueOrAskUser("gameserver address (IP:PORT)", cmd)
+			addr, ok := Ctx.ConfigManager.GetConfigValueOrAskUser("gameserver", cmd)
 			if !ok {
 				return errors.New("no gameserver address provided")
 			}

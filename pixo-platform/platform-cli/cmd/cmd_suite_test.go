@@ -106,6 +106,14 @@ func (t *TestExecutor) RunCommandWithInput(reader io.Reader, args ...string) (st
 	output, _ := io.ReadAll(writer)
 	return string(output), err
 }
+
+func (t *TestExecutor) RunCommandWithInputAndExpectSuccess(input io.Reader, args ...string) string {
+	output, err := t.RunCommandWithInput(input, args...)
+	Expect(err).NotTo(HaveOccurred())
+	Expect(output).NotTo(BeEmpty())
+	return output
+}
+
 func (t *TestExecutor) RunCommand(args ...string) (string, error) {
 	return t.RunCommandWithInput(os.Stdin, args...)
 }

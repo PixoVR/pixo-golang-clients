@@ -77,7 +77,6 @@ var matchmakeCmd = &cobra.Command{
 		if connect {
 			gameserverReadLoop(addr)
 		}
-
 	},
 }
 
@@ -89,8 +88,7 @@ func gameserverReadLoop(addr *net.UDPAddr) {
 	}
 
 	for {
-		Ctx.ConfigManager.ReadFromUser("Press enter to send a message to gameserver: ")
-		userInput := Ctx.ConfigManager.ReadFromUser("Message to gameserver: ")
+		userInput := Ctx.ConfigManager.ReadFromUser("message to gameserver")
 		if userInput == "" || userInput == "exit" {
 			break
 		}

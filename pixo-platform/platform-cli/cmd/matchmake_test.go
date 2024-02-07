@@ -71,8 +71,8 @@ var _ = Describe("Matchmake", func() {
 		Expect(executor.MockMatchmakingClient.NumCalledCloseWebsocket).To(Equal(0))
 	})
 
-	It("can perform a single matchmaking request", func() {
-		output, err := executor.RunCommand(
+	It("can perform a single matchmaking request and connect in a subsequent command", func() {
+		output := executor.RunCommandAndExpectSuccess(
 			"mp",
 			"matchmake",
 			"--module-id",
@@ -80,14 +80,25 @@ var _ = Describe("Matchmake", func() {
 			"--server-version",
 			"1.00.00",
 		)
-		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring("Attempting to find a match"))
 		Expect(executor.MockMatchmakingClient.NumCalledFindMatch).To(Equal(1))
+
+		input := bytes.NewReader([]byte("exit\n"))
+		output = executor.RunCommandWithInputAndExpectSuccess(
+			input,
+			"mp",
+			"--connect",
+		)
+		Expect(output).To(ContainSubstring("Connecting to gameserver at"))
+		Expect(executor.MockMatchmakingClient.NumCalledDialGameserver).To(Equal(1))
+		Expect(output).To(ContainSubstring("Enter message to gameserver:"))
+		Expect(output).To(ContainSubstring("Closing connection to gameserver at"))
+		Expect(executor.MockMatchmakingClient.NumCalledCloseGameserver).To(Equal(1))
 	})
 
 	It("can load test matchmaking", func() {
 		num := 1000
-		output, err := executor.RunCommand(
+		output := executor.RunCommandAndExpectSuccess(
 			"mp",
 			"matchmake",
 			"--load",
@@ -97,7 +108,6 @@ var _ = Describe("Matchmake", func() {
 			"--server-version",
 			"1.00.00",
 		)
-		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring(fmt.Sprintf("Starting load test with %d connections to", num)))
 		Expect(executor.MockMatchmakingClient.NumCalledDialWebsocket).To(BeNumerically(">", 0))
 		Expect(executor.MockMatchmakingClient.NumCalledWriteToWebsocket).To(BeNumerically(">", 0))
