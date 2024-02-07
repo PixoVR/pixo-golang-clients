@@ -21,7 +21,12 @@ func (f *fileManagerImpl) SetConfig(configObj Config) {
 	_ = viper.WriteConfig()
 }
 
-func (f *fileManagerImpl) SetActiveEnv(env Env) {
+func (f *fileManagerImpl) SetActiveEnv(env Env) error {
+
+	if err := env.Validate(); err != nil {
+		return err
+	}
+
 	if env.Region != "" {
 		viper.Set("region", env.Region)
 	}
@@ -30,7 +35,7 @@ func (f *fileManagerImpl) SetActiveEnv(env Env) {
 		viper.Set("lifecycle", env.Lifecycle)
 	}
 
-	_ = viper.WriteConfig()
+	return viper.WriteConfig()
 }
 
 func (f *fileManagerImpl) SetConfigValue(key, value string) {

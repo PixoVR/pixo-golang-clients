@@ -33,8 +33,14 @@ var _ = Describe("Config", func() {
 		)
 
 		BeforeEach(func() {
-			configManager = config.NewFileManager("")
+			configManager = config.NewFileManager("./test-config.yaml")
 			Expect(configManager).NotTo(BeNil())
+		})
+
+		AfterEach(func() {
+			viper.Reset()
+			err := os.Remove("./test-config.yaml")
+			Expect(err).NotTo(HaveOccurred())
 		})
 
 		It("can initialize the config manager when setting the active environment", func() {
@@ -43,7 +49,7 @@ var _ = Describe("Config", func() {
 				Lifecycle: "stage",
 			}
 
-			configManager.SetActiveEnv(env)
+			Expect(configManager.SetActiveEnv(env)).To(Succeed())
 
 			Expect(configManager.Region()).To(Equal(env.Region))
 			Expect(configManager.Lifecycle()).To(Equal(env.Lifecycle))
@@ -83,6 +89,18 @@ var _ = Describe("Config", func() {
 			configManager.SetConfigValue("api-key", apiKey)
 
 			ExpectConfigValueToEqual(configManager, "api-key", apiKey)
+		})
+
+		It("can return an error if the region does not exist", func() {
+			err := configManager.SetActiveEnv(config.Env{
+				Region: "non-existent",
+			})
+			Expect(err).To(HaveOccurred())
+
+			err = configManager.SetActiveEnv(config.Env{
+				Lifecycle: "non-existent",
+			})
+			Expect(err).To(HaveOccurred())
 		})
 
 		It("can create a new config file", func() {
@@ -171,10 +189,10 @@ var _ = Describe("Config", func() {
 		})
 
 		It("can set the active environment", func() {
-			fileConfigManager.SetActiveEnv(config.Env{
+			Expect(fileConfigManager.SetActiveEnv(config.Env{
 				Region:    "na",
 				Lifecycle: "stage",
-			})
+			})).To(Succeed())
 
 			env := fileConfigManager.GetActiveEnv()
 			Expect(env.Region).To(Equal("na"))
@@ -182,6 +200,20 @@ var _ = Describe("Config", func() {
 			ExpectConfigValueToEqual(fileConfigManager, "token", "na-stage-token")
 			ExpectConfigValueToEqual(fileConfigManager, "username", "na-stage-username")
 			ExpectConfigValueToEqual(fileConfigManager, "password", "na-stage-password")
+		})
+
+		It("can use the same local config regardless of region", func() {
+			Expect(fileConfigManager.SetActiveEnv(config.Env{
+				Region:    "na",
+				Lifecycle: "local",
+			})).To(Succeed())
+
+			fileConfigManager.SetConfigValue("api-key", "local-api-key")
+
+			Expect(fileConfigManager.SetActiveEnv(config.Env{
+				Region: "saudi",
+			})).To(Succeed())
+			ExpectConfigValueToEqual(fileConfigManager, "api-key", "local-api-key")
 		})
 
 		It("can set values in the active environment", func() {

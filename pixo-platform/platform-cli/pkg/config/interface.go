@@ -15,7 +15,7 @@ type Manager interface {
 	Println(a ...interface{})
 
 	GetActiveEnv() Env
-	SetActiveEnv(env Env)
+	SetActiveEnv(env Env) error
 	ConfigFile() string
 	SetConfigFile(configFile string) error
 

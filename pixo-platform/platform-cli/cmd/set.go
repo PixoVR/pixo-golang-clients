@@ -27,7 +27,10 @@ var setCmd = &cobra.Command{
 			env.Region = region
 		}
 
-		Ctx.ConfigManager.SetActiveEnv(env)
+		if err := Ctx.ConfigManager.SetActiveEnv(env); err != nil {
+			Ctx.ConfigManager.Println(":exclamation: Unable to set active environment: ", err)
+			return
+		}
 
 		username, ok := Ctx.ConfigManager.GetFlagValue("username", cmd)
 		if ok {
