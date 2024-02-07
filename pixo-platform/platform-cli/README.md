@@ -331,11 +331,11 @@ pixo mp matchmake \
 ✅  Connection 2: established
 ✅  Connection 3: established
 ✅  Connection 1: established
-🏁  Connection 1: Match found - gameserver -> 34.42.175.246:7566
-🏁  Connection 2: Match found - gameserver -> 34.42.175.246:7566
-🏁  Connection 4: Match found - gameserver -> 34.42.175.246:7566
-🏁  Connection 5: Match found - gameserver -> 34.42.175.246:7756
-🏁  Connection 3: Match found - gameserver -> 34.42.175.246:7756
+🏁  Connection 1: Match found - gameserver -> 34.1.2.3:7566
+🏁  Connection 2: Match found - gameserver -> 34.1.2.3:7566
+🏁  Connection 4: Match found - gameserver -> 34.1.2.3:7566
+🏁  Connection 5: Match found - gameserver -> 34.1.2.3:7756
+🏁  Connection 3: Match found - gameserver -> 34.1.2.3:7756
 
 Matchmaking Load Test Summary
 ==============================
