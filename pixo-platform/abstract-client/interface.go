@@ -1,6 +1,7 @@
 package abstract_client
 
 import (
+	"github.com/gorilla/websocket"
 	"net/http"
 )
 
@@ -13,7 +14,7 @@ type AbstractClient interface {
 	IsAuthenticated() bool
 	ActiveUserID() int
 
-	DialWebsocket(endpoint string) (*http.Response, error)
+	DialWebsocket(endpoint string) (*websocket.Conn, *http.Response, error)
 	WriteToWebsocket(message []byte) error
 	ReadFromWebsocket() (int, []byte, error)
 	CloseWebsocketConnection() error

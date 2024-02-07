@@ -32,7 +32,7 @@ func (s ServiceConfig) FormatURL() string {
 
 	if s.Lifecycle == "local" {
 		if s.Service == "matchmaking" {
-			return fmt.Sprintf("ws://localhost:%d", s.Port)
+			return fmt.Sprintf("ws://localhost:%d/matchmaking", s.Port)
 		}
 
 		if s.Port == 0 {
@@ -61,14 +61,6 @@ func (s ServiceConfig) FormatURL() string {
 			prefix = "multi-central1"
 		}
 	case "saudi":
-		if s.Lifecycle == "prod" || s.Lifecycle == "" {
-			if s.Tenant == "apex" && s.Service == "v2" {
-				return fmt.Sprintf("https://apisa.pixovr.com/v2")
-			} else if s.Service == "api" {
-				return fmt.Sprintf("https://apisa.pixovr.com")
-			}
-		}
-
 		if s.Tenant == "multiplayer" {
 			prefix = "multi-saudi"
 		} else {
@@ -77,11 +69,19 @@ func (s ServiceConfig) FormatURL() string {
 	}
 
 	if prefix != "" {
-		s.Tenant = fmt.Sprintf("%s.%s", prefix, s.Tenant)
+		if s.Service == "api" {
+			prefix = fmt.Sprintf("%s.%s", prefix, s.Service)
+		} else {
+			prefix = fmt.Sprintf("%s.%s", prefix, s.Tenant)
+		}
+	} else {
+		if s.Service == "api" {
+			prefix = s.Service
+		}
 	}
 
 	if s.Service == "api" {
-		return fmt.Sprintf("https://%s.%s.%s", s.Service, s.Tenant, s.GetBaseDomain())
+		return fmt.Sprintf("https://%s.%s.%s", prefix, s.Tenant, s.GetBaseDomain())
 	}
 
 	protocol := "https"
@@ -89,7 +89,11 @@ func (s ServiceConfig) FormatURL() string {
 		protocol = "wss"
 	}
 
-	return fmt.Sprintf("%s://%s.%s/%s", protocol, s.Tenant, s.GetBaseDomain(), s.Service)
+	if prefix == "" {
+		prefix = s.Tenant
+	}
+
+	return fmt.Sprintf("%s://%s.%s/%s", protocol, prefix, s.GetBaseDomain(), s.Service)
 }
 
 func (s ServiceConfig) GetBaseDomain() string {

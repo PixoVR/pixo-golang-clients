@@ -96,11 +96,17 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 		return nil, err
 	}
 
-	c := http.Client{Transport: &transport{underlyingTransport: http.DefaultTransport, token: client.GetToken()}}
+	httpClient := http.Client{Transport: &transport{underlyingTransport: http.DefaultTransport, token: client.GetToken()}}
 
-	client.Client = graphql.NewClient(fmt.Sprintf("%s/query", url), &c)
+	client.Client = graphql.NewClient(fmt.Sprintf("%s/query", url), &httpClient)
 
 	return client, nil
+}
+
+func (g *GraphQLAPIClient) SetToken(token string) {
+	g.AbstractServiceClient.SetToken(token)
+	httpClient := http.Client{Transport: &transport{underlyingTransport: http.DefaultTransport, token: token}}
+	g.Client = graphql.NewClient(fmt.Sprintf("%s/query", g.GetURL()), &httpClient)
 }
 
 func (g *GraphQLAPIClient) SetAPIKey(key string) {

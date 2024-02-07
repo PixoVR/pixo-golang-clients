@@ -1,6 +1,9 @@
 package abstract_client
 
-import "net/http"
+import (
+	"github.com/gorilla/websocket"
+	"net/http"
+)
 
 type MockAbstractClient struct {
 	NumCalledGetURL          int
@@ -52,9 +55,9 @@ func (m *MockAbstractClient) ActiveUserID() int {
 	return 1
 }
 
-func (m *MockAbstractClient) DialWebsocket(endpoint string) (*http.Response, error) {
+func (m *MockAbstractClient) DialWebsocket(endpoint string) (*websocket.Conn, *http.Response, error) {
 	m.NumCalledDialWebsocket++
-	return nil, nil
+	return nil, nil, nil
 }
 
 func (m *MockAbstractClient) WriteToWebsocket(message []byte) error {
