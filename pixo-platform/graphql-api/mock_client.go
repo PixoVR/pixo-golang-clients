@@ -231,11 +231,11 @@ func (m *MockGraphQLClient) DeleteAPIKey(ctx context.Context, id int) error {
 	m.CalledDeleteAPIKey = true
 
 	if m.DeleteAPIKeyError {
-		return errors.New("error deleting api apiKey")
+		return errors.New("error deleting api key")
 	}
 
 	if id <= 0 {
-		return errors.New("invalid api apiKey id")
+		return errors.New("invalid api key id")
 	}
 
 	return nil
