@@ -98,14 +98,16 @@ pixo config set --key module-id --val 1
 pixo config
 
 # Example output:
-📁 Config file: /Users/username/.pixo/config.yaml
-🌎 Region: na
-⚙️  Lifecycle: dev
+📁  Config file: ~/.pixo/config.yaml
+🌎  Region: na
+⚙️   Lifecycle: dev
 
-➡️  Username: <username>
-➡️  Password: ********
-➡️  Token: ********
-➡️  User ID: 1
+🆔  User ID: 1
+👤  Username: <username>
+🔒  Password: ********
+🔑  API Key: ********
+🔑  Token: ********
+
 ➡️  Module ID: 1
 ➡️  Server Version: 1.00.00
 ➡️  Gameserver: 127.0.0.1:7777
