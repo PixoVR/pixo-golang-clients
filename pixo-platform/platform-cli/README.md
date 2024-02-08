@@ -1,5 +1,10 @@
+![Pixo logo](assets/logo.png)
+
+[//]: # ([![]&#40;https://img.shields.io/github/actions/workflow/status/spf13/cobra/test.yml?branch=main&longCache=true&label=Test&logo=github%20actions&logoColor=fff&#41;]&#40;https://github.com/spf13/cobra/actions?query=workflow%3ATest&#41;)
+[//]: # ([![Go Report Card]&#40;https://goreportcard.com/badge/github.com/spf13/cobra&#41;]&#40;https://goreportcard.com/report/github.com/spf13/cobra&#41;)
+
 # Pixo Platform CLI
-This is a CLI that allows you to interact with the Pixo Platform in various ways. It is likely to be most helpful to 
+`pixo` is a CLI that allows you to interact with the Pixo Platform in various ways. It is likely to be most helpful to 
 developers building modules to be deployed on the Pixo Platform. It can be used for things like authenticating 
 with the platform, deploying gameserver versions, and simplifying the testing of multiplayer components.
 
