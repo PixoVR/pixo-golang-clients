@@ -38,11 +38,11 @@ to quickly create a Cobra application.`,
 		}
 		url := strings.Replace(client.FormatURL(), "/v2", "", 1)
 		Ctx.ConfigManager.Println(":link: Web: ", url)
-		Ctx.ConfigManager.Println(":link: Platform API: ", url, "/v2")
+		Ctx.ConfigManager.Println("\n:link: Platform API: ", url, "/v2")
 		Ctx.ConfigManager.Println(":link: Platform API Docs: ", url, "/v2/swagger/index.html")
-		Ctx.ConfigManager.Println(":link: Matchmaking API: ", url, "/matchmaking")
+		Ctx.ConfigManager.Println("\n:link: Matchmaking API: ", url, "/matchmaking")
 		Ctx.ConfigManager.Println(":link: Matchmaking API Docs: ", url, "/matchmaking/swagger/index.html")
-		Ctx.ConfigManager.Println(":link: Heartbeat API: ", url, "/heartbeat")
+		Ctx.ConfigManager.Println("\n:link: Heartbeat API: ", url, "/heartbeat")
 		Ctx.ConfigManager.Println(":link: Heartbeat API Docs: ", url, "/heartbeat/swagger/index.html")
 	},
 }
