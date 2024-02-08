@@ -121,15 +121,16 @@ pixo config urls
 🌎  Region: na
 ⚙️   Lifecycle: prod
 
-Web: https://apex.pixovr.com
-Platform API: https://apex.pixovr.com/v2
-Platform API Docs: https://apex.pixovr.com/v2/swagger/index.html
+🔗  Web: https://apex.pixovr.com
 
-Matchmaking API: https://apex.pixovr.com/matchmaking
-Matchmaking API Docs: https://apex.pixovr.com/matchmaking/swagger/index.html
+🔗  Platform API: https://apex.pixovr.com/v2
+🔗  Platform API Docs: https://apex.pixovr.com/v2/swagger/index.html
 
-Heartbeat API: https://apex.pixovr.com/heartbeat
-Heartbeat API Docs: https://apex.pixovr.com/heartbeat/swagger/index.html
+🔗  Matchmaking API: https://apex.pixovr.com/matchmaking
+🔗  Matchmaking API Docs: https://apex.pixovr.com/matchmaking/swagger/index.html
+
+🔗  Heartbeat API: https://apex.pixovr.com/heartbeat
+🔗  Heartbeat API Docs: https://apex.pixovr.com/heartbeat/swagger/index.html
 ```
 
 ### Edit Configuration File
