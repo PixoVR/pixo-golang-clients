@@ -21,6 +21,29 @@ var _ = Describe("ConfigFile", func() {
 		executor.Cleanup()
 	})
 
+	It("can show the platform urls", func() {
+		output := executor.RunCommandAndExpectSuccess("config", "urls")
+		Expect(output).To(ContainSubstring("Region: na"))
+		Expect(output).To(ContainSubstring("Lifecycle: prod"))
+		Expect(output).To(ContainSubstring("Web: https://apex.pixovr.com"))
+		Expect(output).To(ContainSubstring("Platform API: https://apex.pixovr.com/v2"))
+		Expect(output).To(ContainSubstring("Platform API Docs: https://apex.pixovr.com/v2/swagger/index.html"))
+		Expect(output).To(ContainSubstring("Heartbeat API: https://apex.pixovr.com/heartbeat"))
+		Expect(output).To(ContainSubstring("Matchmaking API Docs: https://apex.pixovr.com/matchmaking/swagger/index.html"))
+		Expect(output).To(ContainSubstring("Matchmaking API: https://apex.pixovr.com/matchmaking"))
+		Expect(output).To(ContainSubstring("Heartbeat API Docs: https://apex.pixovr.com/heartbeat/swagger/index.html"))
+
+		_ = executor.RunCommandAndExpectSuccess("config", "set", "-l", "dev")
+		output = executor.RunCommandAndExpectSuccess("config", "urls")
+		Expect(output).To(ContainSubstring("Web: https://apex.dev.pixovr.com"))
+		Expect(output).To(ContainSubstring("Platform API: https://apex.dev.pixovr.com/v2"))
+		Expect(output).To(ContainSubstring("Platform API Docs: https://apex.dev.pixovr.com/v2/swagger/index.html"))
+		Expect(output).To(ContainSubstring("Matchmaking API: https://apex.dev.pixovr.com/matchmaking"))
+		Expect(output).To(ContainSubstring("Matchmaking API Docs: https://apex.dev.pixovr.com/matchmaking/swagger/index.html"))
+		Expect(output).To(ContainSubstring("Heartbeat API: https://apex.dev.pixovr.com/heartbeat"))
+		Expect(output).To(ContainSubstring("Heartbeat API Docs: https://apex.dev.pixovr.com/heartbeat/swagger/index.html"))
+	})
+
 	It("can show the current config", func() {
 		username := faker.Username()
 		password := faker.Password()

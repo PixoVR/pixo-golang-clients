@@ -111,7 +111,26 @@ pixo config
 ➡️  Module ID: 1
 ➡️  Server Version: 1.00.00
 ➡️  Gameserver: 127.0.0.1:7777
-````
+```
+
+### Get Platform Service URLs
+```bash
+pixo config urls
+
+# Example output:
+🌎  Region: na
+⚙️   Lifecycle: prod
+
+Web: https://apex.pixovr.com
+Platform API: https://apex.pixovr.com/v2
+Platform API Docs: https://apex.pixovr.com/v2/swagger/index.html
+
+Matchmaking API: https://apex.pixovr.com/matchmaking
+Matchmaking API Docs: https://apex.pixovr.com/matchmaking/swagger/index.html
+
+Heartbeat API: https://apex.pixovr.com/heartbeat
+Heartbeat API Docs: https://apex.pixovr.com/heartbeat/swagger/index.html
+```
 
 ### Edit Configuration File
 Editor can be set via the `EDITOR` environment variable. Defaults to `vim`.
