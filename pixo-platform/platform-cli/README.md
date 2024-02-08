@@ -11,11 +11,13 @@ with the platform, deploying gameserver versions, and simplifying the testing of
     - [MacOS - HomeBrew](#macos---homebrew)
     - [Windows](#windows)
     - [Build from Source](#build-from-source)
+    - [Autocompletion](#autocompletion)
 - [Configuration](#configuration)
     - [Set via Environment Variables](#set-via-environment-variables)
     - [Set via Command Line](#set-via-command-line)
     - [Show Configuration File](#show-configuration-file)
     - [Edit Configuration File](#edit-configuration-file)
+    - [Get Platform Service URLs](#get-platform-service-urls)
 - [Login to the Pixo Platform](#login-to-the-pixo-platform)
 - [Users](#users)
     - [Create](#create)
@@ -60,6 +62,17 @@ git clone github.com/PixoVR/pixo-golang-clients.git
 cd pixo-golang-clients/pixo-platform/platform-cli
 make build
 ./bin/pixo help
+```
+
+### Autocompletion
+```bash
+# Zsh
+echo "source <(pixo completion zsh)" >> ~/.zshrc
+source ~/.zshrc
+
+# Bash
+echo "source <(pixo completion bash)" >> ~/.bashrc
+source ~/.bashrc
 ```
 
 
@@ -113,6 +126,12 @@ pixo config
 ➡️  Gameserver: 127.0.0.1:7777
 ```
 
+### Edit Configuration File
+Editor can be set via the `EDITOR` environment variable. Defaults to `vim`.
+```bash
+pixo config --edit
+```
+
 ### Get Platform Service URLs
 ```bash
 pixo config urls
@@ -131,12 +150,6 @@ pixo config urls
 
 🔗  Heartbeat API: https://apex.pixovr.com/heartbeat
 🔗  Heartbeat API Docs: https://apex.pixovr.com/heartbeat/swagger/index.html
-```
-
-### Edit Configuration File
-Editor can be set via the `EDITOR` environment variable. Defaults to `vim`.
-```bash
-pixo config --edit
 ```
 
 
