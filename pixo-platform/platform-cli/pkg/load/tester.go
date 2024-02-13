@@ -38,6 +38,7 @@ type Tester struct {
 	end                     time.Time
 	connectionErrors        []string
 	matchingErrors          []string
+	gameserversCount        map[string]int
 	mu                      sync.Mutex
 	reader                  io.Reader
 	writer                  io.Writer

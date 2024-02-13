@@ -29,6 +29,7 @@ func (lt *Tester) displayStats() {
 	lt.println(errorColor.Sprintf("Connection Errors:       %d", len(lt.connectionErrors)))
 	lt.println(errorColor.Sprintf("Matching Errors:         %d", len(lt.matchingErrors)))
 	lt.println(successColor.Sprintf("Matches Received:        %d", lt.successMessagesReceived))
+	lt.println(successColor.Sprintf("Gameservers Received:    %d", len(lt.gameserversCount)))
 
 	lt.println()
 	lt.println(lineColor.Sprint("┌─────────────┬────────────┐"))

@@ -109,6 +109,10 @@ var _ = Describe("Matchmake", func() {
 			"1.00.00",
 		)
 		Expect(output).To(ContainSubstring(fmt.Sprintf("Starting load test with %d connections to", num)))
+		Expect(output).To(ContainSubstring("Connection Errors:"))
+		Expect(output).To(ContainSubstring("Matching Errors:"))
+		Expect(output).To(ContainSubstring("Matches Received:"))
+		Expect(output).To(ContainSubstring("Unique Gameservers Received:"))
 		Expect(executor.MockMatchmakingClient.NumCalledDialWebsocket).To(BeNumerically(">", 0))
 		Expect(executor.MockMatchmakingClient.NumCalledWriteToWebsocket).To(BeNumerically(">", 0))
 		Expect(executor.MockMatchmakingClient.NumCalledReadFromWebsocket).To(BeNumerically(">", 0))

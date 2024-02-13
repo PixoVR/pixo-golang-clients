@@ -388,6 +388,7 @@ Total Messages Received: 5
 Connection Errors:       0
 Matching Errors:         0
 Matches Received:        5
+Gameservers Received:    2
 
 ┌─────────────┬────────────┐
 │ Stat        │ Value      │
