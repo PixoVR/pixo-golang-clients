@@ -1,6 +1,7 @@
 package abstract_client
 
 import (
+	"github.com/go-resty/resty/v2"
 	"github.com/gorilla/websocket"
 	"net/http"
 )
@@ -13,6 +14,12 @@ type MockAbstractClient struct {
 	NumCalledGetToken        int
 	NumCalledIsAuthenticated int
 	NumCalledActiveUserID    int
+
+	NumCalledGet    int
+	NumCalledPost   int
+	NumCalledPut    int
+	NumCalledPatch  int
+	NumCalledDelete int
 
 	NumCalledDialWebsocket     int
 	NumCalledWriteToWebsocket  int
@@ -53,6 +60,31 @@ func (m *MockAbstractClient) IsAuthenticated() bool {
 func (m *MockAbstractClient) ActiveUserID() int {
 	m.NumCalledActiveUserID++
 	return 1
+}
+
+func (m *MockAbstractClient) Get(path string) (*resty.Response, error) {
+	m.NumCalledGet++
+	return nil, nil
+}
+
+func (m *MockAbstractClient) Post(path string, body []byte) (*resty.Response, error) {
+	m.NumCalledPost++
+	return nil, nil
+}
+
+func (m *MockAbstractClient) Put(path string, body []byte) (*resty.Response, error) {
+	m.NumCalledPut++
+	return nil, nil
+}
+
+func (m *MockAbstractClient) Patch(path string, body []byte) (*resty.Response, error) {
+	m.NumCalledPatch++
+	return nil, nil
+}
+
+func (m *MockAbstractClient) Delete(path string) (*resty.Response, error) {
+	m.NumCalledDelete++
+	return nil, nil
 }
 
 func (m *MockAbstractClient) DialWebsocket(endpoint string) (*websocket.Conn, *http.Response, error) {

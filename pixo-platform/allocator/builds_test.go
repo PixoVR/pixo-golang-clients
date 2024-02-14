@@ -1,7 +1,7 @@
-package multiplayer_allocator_test
+package allocator_test
 
 import (
-	multiplayerAllocator "github.com/PixoVR/pixo-golang-clients/pixo-platform/multiplayer-allocator"
+	multiplayerAllocator "github.com/PixoVR/pixo-golang-clients/pixo-platform/allocator"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

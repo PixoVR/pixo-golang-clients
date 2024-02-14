@@ -1,4 +1,4 @@
-package multiplayer_allocator
+package allocator
 
 import (
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
@@ -26,9 +26,8 @@ type AllocationRequest struct {
 }
 
 type AllocationResponse struct {
-	HTTPResponse *resty.Response `json:"http_response"`
-	Results      GameServer      `json:"results"`
-	Error        error           `json:"error"`
+	Results GameServer `json:"results"`
+	Error   error      `json:"error"`
 }
 
 type GameServer struct {

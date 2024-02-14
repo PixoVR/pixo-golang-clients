@@ -2,7 +2,6 @@ package heartbeat
 
 import (
 	"encoding/json"
-	"errors"
 )
 
 type Pulse struct {
@@ -17,9 +16,6 @@ func (c *client) SendPulse(sessionID int) error {
 
 	path := "pulse"
 
-	if res, err := c.Post(path, body); err != nil {
-		return errors.New(res.String())
-	}
-
-	return nil
+	_, err = c.Post(path, body)
+	return err
 }

@@ -1,4 +1,4 @@
-package multiplayer_allocator
+package allocator
 
 import (
 	"encoding/json"

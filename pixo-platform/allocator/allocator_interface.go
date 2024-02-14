@@ -1,4 +1,4 @@
-package multiplayer_allocator
+package allocator
 
 import (
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"

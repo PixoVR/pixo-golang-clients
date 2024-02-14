@@ -37,7 +37,7 @@ func (a *AbstractServiceClient) Post(path string, body []byte) (*resty.Response,
 
 	if res.IsError() {
 		log.Error().Err(err).Msg("Failed to post data to API")
-		return res, errors.New("invalid HTTP response received")
+		return nil, errors.New(string(res.Body()))
 	}
 
 	return res, nil
