@@ -65,7 +65,7 @@ var _ = Describe("ConfigFile", func() {
 		Expect(output).To(ContainSubstring("Region: na"))
 		Expect(output).To(ContainSubstring("Lifecycle: prod"))
 		Expect(output).To(ContainSubstring("Username: " + username))
-		Expect(output).To(ContainSubstring("API Key:"))
+		Expect(output).To(ContainSubstring("API Key: ********"))
 		Expect(output).NotTo(ContainSubstring("testapikey"))
 		Expect(output).To(ContainSubstring("Test: testvalue"))
 	})

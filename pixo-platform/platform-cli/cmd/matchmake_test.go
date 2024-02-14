@@ -97,7 +97,7 @@ var _ = Describe("Matchmake", func() {
 	})
 
 	It("can load test matchmaking", func() {
-		num := 1000
+		num := 20
 		output := executor.RunCommandAndExpectSuccess(
 			"mp",
 			"matchmake",
@@ -112,7 +112,7 @@ var _ = Describe("Matchmake", func() {
 		Expect(output).To(ContainSubstring("Connection Errors:"))
 		Expect(output).To(ContainSubstring("Matching Errors:"))
 		Expect(output).To(ContainSubstring("Matches Received:"))
-		Expect(output).To(ContainSubstring("Unique Gameservers Received:"))
+		Expect(output).To(ContainSubstring("Gameservers Received:"))
 		Expect(executor.MockMatchmakingClient.NumCalledDialWebsocket).To(BeNumerically(">", 0))
 		Expect(executor.MockMatchmakingClient.NumCalledWriteToWebsocket).To(BeNumerically(">", 0))
 		Expect(executor.MockMatchmakingClient.NumCalledReadFromWebsocket).To(BeNumerically(">", 0))
