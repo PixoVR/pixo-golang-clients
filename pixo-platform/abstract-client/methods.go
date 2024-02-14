@@ -28,7 +28,11 @@ func (a *AbstractServiceClient) Get(path string) (*resty.Response, error) {
 func (a *AbstractServiceClient) Post(path string, body []byte) (*resty.Response, error) {
 	url := a.GetURLWithPath(path)
 
-	req := a.FormatRequest().SetBody(body)
+	req := a.FormatRequest()
+	if body != nil {
+		req = req.SetBody(body)
+	}
+
 	res, err := req.Post(url)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to perform post request")
