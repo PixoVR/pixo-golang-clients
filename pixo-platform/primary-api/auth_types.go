@@ -7,7 +7,7 @@ type LoginRequest struct {
 	Password string `json:"password"`
 }
 
-type AuthResponse struct {
+type LegacyAuthResponse struct {
 	User struct {
 		Token string `json:"authToken"`
 		Role  string `json:"role"`

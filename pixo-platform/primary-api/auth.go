@@ -29,7 +29,7 @@ func (p *PrimaryAPIClient) Login(username, password string) error {
 		return errors.New(string(res.Body()))
 	}
 
-	var loginResponse AuthResponse
+	var loginResponse LegacyAuthResponse
 	if err = json.Unmarshal(res.Body(), &loginResponse); err != nil {
 		log.Error().Err(err).Msg("Failed to login")
 		return errors.New(string(res.Body()))
