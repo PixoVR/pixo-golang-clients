@@ -60,6 +60,10 @@ type MockGraphQLClient struct {
 	GetMultiplayerServerVersionsError  bool
 	GetMultiplayerServerVersionsEmpty  bool
 
+	CalledGetMultiplayerServerVersion bool
+	GetMultiplayerServerVersionError  bool
+	GetMultiplayerServerVersionEmpty  bool
+
 	CalledCreateMultiplayerServerVersion bool
 	CreateMultiplayerServerVersionError  bool
 }
@@ -387,24 +391,49 @@ func (m *MockGraphQLClient) GetMultiplayerServerVersions(ctx context.Context, pa
 	}, nil
 }
 
-func (m *MockGraphQLClient) CreateMultiplayerServerVersion(ctx context.Context, moduleID int, image, semanticVersion string) error {
+func (m *MockGraphQLClient) GetMultiplayerServerVersion(ctx context.Context, versionID int) (*MultiplayerServerVersion, error) {
+
+	m.CalledGetMultiplayerServerVersion = true
+
+	if m.GetMultiplayerServerVersionEmpty {
+		return nil, nil
+	}
+
+	if m.GetMultiplayerServerVersionError {
+		return nil, errors.New("error getting multiplayer server version")
+	}
+
+	return &MultiplayerServerVersion{
+		ModuleID:        1,
+		SemanticVersion: "1.0.0",
+		Status:          "enabled",
+		Engine:          "unreal",
+	}, nil
+}
+
+func (m *MockGraphQLClient) CreateMultiplayerServerVersion(ctx context.Context, moduleID int, image, semanticVersion string) (*MultiplayerServerVersion, error) {
 	m.CalledCreateMultiplayerServerVersion = true
 
 	if moduleID == 0 {
-		return errors.New("invalid module id")
+		return nil, errors.New("invalid module id")
 	}
 
 	if image == "" {
-		return errors.New("invalid image")
+		return nil, errors.New("invalid image")
 	}
 
 	if semanticVersion == "" {
-		return errors.New("invalid semantic version")
+		return nil, errors.New("invalid semantic version")
 	}
 
 	if m.CreateMultiplayerServerVersionError {
-		return errors.New("error creating multiplayer server version")
+		return nil, errors.New("error creating multiplayer server version")
 	}
 
-	return nil
+	return &MultiplayerServerVersion{
+		ModuleID:        moduleID,
+		SemanticVersion: semanticVersion,
+		Status:          "enabled",
+		Engine:          "unreal",
+	}, nil
 }
