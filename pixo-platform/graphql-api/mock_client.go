@@ -404,6 +404,7 @@ func (m *MockGraphQLClient) GetMultiplayerServerVersion(ctx context.Context, ver
 	}
 
 	return &MultiplayerServerVersion{
+		ID:              versionID,
 		ModuleID:        1,
 		SemanticVersion: "1.0.0",
 		Status:          "enabled",
