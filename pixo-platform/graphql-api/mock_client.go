@@ -412,7 +412,7 @@ func (m *MockGraphQLClient) GetMultiplayerServerVersion(ctx context.Context, ver
 	}, nil
 }
 
-func (m *MockGraphQLClient) CreateMultiplayerServerVersion(ctx context.Context, moduleID int, image, semanticVersion string) (*MultiplayerServerVersion, error) {
+func (m *MockGraphQLClient) CreateMultiplayerServerVersion(ctx context.Context, moduleID int, image, semanticVersion, engine string) (*MultiplayerServerVersion, error) {
 	m.CalledCreateMultiplayerServerVersion = true
 
 	if moduleID == 0 {
@@ -435,6 +435,6 @@ func (m *MockGraphQLClient) CreateMultiplayerServerVersion(ctx context.Context, 
 		ModuleID:        moduleID,
 		SemanticVersion: semanticVersion,
 		Status:          "enabled",
-		Engine:          "unreal",
+		Engine:          engine,
 	}, nil
 }

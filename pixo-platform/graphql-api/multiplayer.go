@@ -20,16 +20,16 @@ func (g *GraphQLAPIClient) GetMultiplayerServerConfigs(ctx context.Context, para
 	return query.MultiplayerServerConfigs, nil
 }
 
-func (g *GraphQLAPIClient) CreateMultiplayerServerVersion(ctx context.Context, moduleID int, image, semanticVersion string) (*MultiplayerServerVersion, error) {
-	query := `mutation createMultiplayerServerVersion($input: MultiplayerServerVersionInput!) { createMultiplayerServerVersion(input: $input) { id imageRegistry semanticVersion module { name } } }`
+func (g *GraphQLAPIClient) CreateMultiplayerServerVersion(ctx context.Context, moduleID int, image, semanticVersion, engine string) (*MultiplayerServerVersion, error) {
+	query := `mutation createMultiplayerServerVersion($input: MultiplayerServerVersionInput!) { createMultiplayerServerVersion(input: $input) { id imageRegistry semanticVersion engine module { name } } }`
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{
 			"moduleId":        moduleID,
 			"imageRegistry":   image,
 			"semanticVersion": semanticVersion,
+			"engine":          engine,
 			"status":          "enabled",
-			"engine":          "unreal",
 		},
 	}
 
@@ -76,7 +76,7 @@ func (g *GraphQLAPIClient) GetMultiplayerServerVersions(ctx context.Context, par
 }
 
 func (g *GraphQLAPIClient) GetMultiplayerServerVersion(ctx context.Context, versionID int) (*MultiplayerServerVersion, error) {
-	query := `query multiplayerServerVersion($id: ID!) { multiplayerServerVersion(id: $id) { id imageRegistry engine semanticVersion module { name } } }`
+	query := `query multiplayerServerVersion($id: ID!) { multiplayerServerVersion(id: $id) { id moduleId imageRegistry engine semanticVersion module { name } } }`
 
 	variables := map[string]interface{}{
 		"id": versionID,
