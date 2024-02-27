@@ -1,6 +1,6 @@
 module github.com/PixoVR/pixo-golang-clients/pixo-platform
 
-go 1.21
+go 1.22
 
 require (
 	github.com/PixoVR/pixo-golang-server-utilities/pixo-platform v0.0.0-20240125065526-606fcb3d2761
