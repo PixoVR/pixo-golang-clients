@@ -1,4 +1,4 @@
-package multiplayer_allocator
+package allocator
 
 import (
 	"encoding/json"
@@ -24,14 +24,11 @@ func (a *AllocatorClient) AllocateGameserver(request AllocationRequest) Allocati
 	}
 
 	var response AllocationResponse
-	err = json.Unmarshal(res.Body(), &response)
-	if err != nil {
+	if err = json.Unmarshal(res.Body(), &response); err != nil {
 		log.Debug().Err(err).Msg("Failed to unmarshal allocate server response")
 		response.Error = err
 		return response
 	}
-
-	response.HTTPResponse = res
 
 	return response
 }

@@ -14,7 +14,6 @@ func (p *PrimaryAPIClient) DeployMultiplayerServerVersion(moduleID int, image, s
 		ImageRegistry:   image,
 		Engine:          "unreal",
 		SemanticVersion: semanticVersion,
-		Filename:        "nonexistent-file.exe",
 	}
 
 	body, err := json.Marshal(multiplayerServerVersion)

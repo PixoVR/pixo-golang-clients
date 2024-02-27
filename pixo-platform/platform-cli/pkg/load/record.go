@@ -13,7 +13,18 @@ func (lt *Tester) recordSuccessMessageReceived(id int, response matchmaker.Match
 	lt.mu.Lock()
 	defer lt.mu.Unlock()
 
+	if lt.gameserversCount == nil {
+		lt.gameserversCount = make(map[string]int)
+	}
+
 	addr := net.JoinHostPort(response.MatchDetails.IP, response.MatchDetails.Port)
+
+	if _, ok := lt.gameserversCount[addr]; !ok {
+		lt.gameserversCount[addr] = 0
+	}
+
+	lt.gameserversCount[addr]++
+
 	msg := fmt.Sprintf("gameserver -> %s", addr)
 	lt.print(emoji.Sprintf(":checkered_flag:Connection %d: %s - %s\n", id, successColor.Sprint(response.Message), statColor.Sprint(msg)))
 	lt.successMessagesReceived++

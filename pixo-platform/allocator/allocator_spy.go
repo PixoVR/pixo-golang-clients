@@ -1,4 +1,4 @@
-package multiplayer_allocator
+package allocator
 
 import (
 	"fmt"
@@ -29,11 +29,6 @@ func (a *AllocatorSpy) AllocateGameserver(request AllocationRequest) AllocationR
 	a.CalledAllocateGameserver = true
 
 	return AllocationResponse{
-		HTTPResponse: &resty.Response{
-			RawResponse: &http.Response{
-				StatusCode: http.StatusCreated,
-			},
-		},
 		Results: GameServer{
 			Name: "test-gameserver",
 			IP:   matchmaker.Localhost,
@@ -66,8 +61,8 @@ func (a *AllocatorSpy) DeregisterFleet(fleet FleetRequest) Response {
 	}
 }
 
-func (b *AllocatorSpy) RegisterTrigger(trigger platform.MultiplayerServerTrigger) Response {
-	b.CalledRegisterTrigger = true
+func (a *AllocatorSpy) RegisterTrigger(trigger platform.MultiplayerServerTrigger) Response {
+	a.CalledRegisterTrigger = true
 
 	return Response{
 		HTTPResponse: &resty.Response{
@@ -78,8 +73,8 @@ func (b *AllocatorSpy) RegisterTrigger(trigger platform.MultiplayerServerTrigger
 	}
 }
 
-func (b *AllocatorSpy) UpdateTrigger(trigger platform.MultiplayerServerTrigger) Response {
-	b.CalledUpdateTrigger = true
+func (a *AllocatorSpy) UpdateTrigger(trigger platform.MultiplayerServerTrigger) Response {
+	a.CalledUpdateTrigger = true
 
 	return Response{
 		HTTPResponse: &resty.Response{
@@ -90,8 +85,8 @@ func (b *AllocatorSpy) UpdateTrigger(trigger platform.MultiplayerServerTrigger) 
 	}
 }
 
-func (b *AllocatorSpy) DeleteTrigger(id int) Response {
-	b.CalledDeleteTrigger = true
+func (a *AllocatorSpy) DeleteTrigger(id int) Response {
+	a.CalledDeleteTrigger = true
 
 	return Response{
 		HTTPResponse: &resty.Response{

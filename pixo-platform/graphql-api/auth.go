@@ -3,6 +3,7 @@ package graphql_api
 import (
 	"encoding/json"
 	"errors"
+	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 )
 
 type LoginRequest struct {
@@ -11,10 +12,8 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	Token string `json:"token"`
-	User  struct {
-		Role string `json:"role"`
-	}
+	Token string           `json:"token"`
+	User  primary_api.User `json:"user"`
 }
 
 // Login performs a login request to the API

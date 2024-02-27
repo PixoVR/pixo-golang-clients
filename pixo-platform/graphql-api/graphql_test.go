@@ -79,10 +79,20 @@ var _ = Describe("GraphQL API", func() {
 		Expect(mpServerVersions).NotTo(BeEmpty())
 	})
 
-	It("can create a multiplayer server version", func() {
+	It("can create and get a multiplayer server version", func() {
 		randVersion := fmt.Sprintf("1.%d.%d", rand.Intn(100), rand.Intn(100))
-		err := tokenClient.CreateMultiplayerServerVersion(ctx, 1, agones.SimpleGameServerImage, randVersion)
+		serverVersion, err := tokenClient.CreateMultiplayerServerVersion(ctx, 1, agones.SimpleGameServerImage, randVersion, "unreal")
 		Expect(err).NotTo(HaveOccurred())
+		Expect(serverVersion).NotTo(BeNil())
+
+		mpServerVersion, err := tokenClient.GetMultiplayerServerVersion(ctx, serverVersion.ID)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(mpServerVersion).NotTo(BeNil())
+		Expect(mpServerVersion.ID).To(Equal(serverVersion.ID))
+		Expect(mpServerVersion.ModuleID).To(Equal(1))
+		Expect(mpServerVersion.SemanticVersion).To(Equal(randVersion))
+		Expect(mpServerVersion.ImageRegistry).To(Equal(agones.SimpleGameServerImage))
+		Expect(mpServerVersion.Engine).To(Equal("unreal"))
 	})
 
 })

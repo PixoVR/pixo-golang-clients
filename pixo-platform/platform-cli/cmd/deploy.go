@@ -80,13 +80,13 @@ var deployCmd = &cobra.Command{
 
 		spinner := loader.NewSpinner(Ctx.ConfigManager)
 
-		if err := Ctx.PlatformClient.CreateMultiplayerServerVersion(cmd.Context(), moduleID, image, semanticVersion); err != nil {
-			msg := fmt.Sprintf("Failed to create multiplayer server version: %s - %s", semanticVersion, err.Error())
+		if _, err := Ctx.PlatformClient.CreateMultiplayerServerVersion(cmd.Context(), moduleID, image, semanticVersion, "unreal"); err != nil {
+			msg := fmt.Sprintf("Failed to deploy multiplayer server version: %s - %s", semanticVersion, err.Error())
 			return errors.New(msg)
 		}
 
 		spinner.Stop()
-		Ctx.ConfigManager.Println(":cruise_ship: Successfully created multiplayer server version: ", semanticVersion)
+		Ctx.ConfigManager.Println(":cruise_ship: Deployed version: ", semanticVersion)
 		return nil
 	},
 }

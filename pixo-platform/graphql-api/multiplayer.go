@@ -2,6 +2,7 @@ package graphql_api
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 )
 
@@ -19,24 +20,32 @@ func (g *GraphQLAPIClient) GetMultiplayerServerConfigs(ctx context.Context, para
 	return query.MultiplayerServerConfigs, nil
 }
 
-func (g *GraphQLAPIClient) CreateMultiplayerServerVersion(ctx context.Context, moduleID int, image, semanticVersion string) error {
-	query := `mutation createMultiplayerServerVersion($input: MultiplayerServerVersionInput!) { createMultiplayerServerVersion(input: $input) { id imageRegistry semanticVersion module { name } } }`
+func (g *GraphQLAPIClient) CreateMultiplayerServerVersion(ctx context.Context, moduleID int, image, semanticVersion, engine string) (*MultiplayerServerVersion, error) {
+	query := `mutation createMultiplayerServerVersion($input: MultiplayerServerVersionInput!) { createMultiplayerServerVersion(input: $input) { id imageRegistry semanticVersion engine module { name } } }`
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{
 			"moduleId":        moduleID,
 			"imageRegistry":   image,
 			"semanticVersion": semanticVersion,
+			"engine":          engine,
 			"status":          "enabled",
-			"engine":          "unreal",
 		},
 	}
 
-	if _, err := g.Client.ExecRaw(ctx, query, variables); err != nil {
-		return err
+	res, err := g.Client.ExecRaw(ctx, query, variables)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil
+	var response struct {
+		ServerVersion *MultiplayerServerVersion `json:"createMultiplayerServerVersion"`
+	}
+	if err = json.Unmarshal(res, &response); err != nil {
+		return nil, err
+	}
+
+	return response.ServerVersion, nil
 }
 
 func (g *GraphQLAPIClient) GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionQueryParams) ([]*MultiplayerServerVersion, error) {
@@ -64,4 +73,26 @@ func (g *GraphQLAPIClient) GetMultiplayerServerVersions(ctx context.Context, par
 	}
 
 	return res, nil
+}
+
+func (g *GraphQLAPIClient) GetMultiplayerServerVersion(ctx context.Context, versionID int) (*MultiplayerServerVersion, error) {
+	query := `query multiplayerServerVersion($id: ID!) { multiplayerServerVersion(id: $id) { id moduleId imageRegistry engine semanticVersion module { name } } }`
+
+	variables := map[string]interface{}{
+		"id": versionID,
+	}
+
+	res, err := g.Client.ExecRaw(ctx, query, variables)
+	if err != nil {
+		return nil, err
+	}
+
+	var response struct {
+		MultiplayerServerVersion *MultiplayerServerVersion `json:"multiplayerServerVersion"`
+	}
+	if err = json.Unmarshal(res, &response); err != nil {
+		return nil, err
+	}
+
+	return response.MultiplayerServerVersion, nil
 }

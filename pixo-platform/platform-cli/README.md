@@ -1,5 +1,10 @@
+![Pixo logo](assets/logo.png)
+
+[//]: # ([![]&#40;https://img.shields.io/github/actions/workflow/status/spf13/cobra/test.yml?branch=main&longCache=true&label=Test&logo=github%20actions&logoColor=fff&#41;]&#40;https://github.com/spf13/cobra/actions?query=workflow%3ATest&#41;)
+[//]: # ([![Go Report Card]&#40;https://goreportcard.com/badge/github.com/spf13/cobra&#41;]&#40;https://goreportcard.com/report/github.com/spf13/cobra&#41;)
+
 # Pixo Platform CLI
-This is a CLI that allows you to interact with the Pixo Platform in various ways. It is likely to be most helpful to 
+`pixo` is a CLI that allows you to interact with the Pixo Platform in various ways. It is likely to be most helpful to 
 developers building modules to be deployed on the Pixo Platform. It can be used for things like authenticating 
 with the platform, deploying gameserver versions, and simplifying the testing of multiplayer components.
 
@@ -11,11 +16,13 @@ with the platform, deploying gameserver versions, and simplifying the testing of
     - [MacOS - HomeBrew](#macos---homebrew)
     - [Windows](#windows)
     - [Build from Source](#build-from-source)
+    - [Autocompletion](#autocompletion)
 - [Configuration](#configuration)
     - [Set via Environment Variables](#set-via-environment-variables)
     - [Set via Command Line](#set-via-command-line)
     - [Show Configuration File](#show-configuration-file)
     - [Edit Configuration File](#edit-configuration-file)
+    - [Get Platform Service URLs](#get-platform-service-urls)
 - [Login to the Pixo Platform](#login-to-the-pixo-platform)
 - [Users](#users)
     - [Create](#create)
@@ -60,6 +67,17 @@ git clone github.com/PixoVR/pixo-golang-clients.git
 cd pixo-golang-clients/pixo-platform/platform-cli
 make build
 ./bin/pixo help
+```
+
+### Autocompletion
+```bash
+# Zsh
+echo "source <(pixo completion zsh)" >> ~/.zshrc
+source ~/.zshrc
+
+# Bash
+echo "source <(pixo completion bash)" >> ~/.bashrc
+source ~/.bashrc
 ```
 
 
@@ -111,12 +129,32 @@ pixo config
 ➡️  Module ID: 1
 ➡️  Server Version: 1.00.00
 ➡️  Gameserver: 127.0.0.1:7777
-````
+```
 
 ### Edit Configuration File
 Editor can be set via the `EDITOR` environment variable. Defaults to `vim`.
 ```bash
 pixo config --edit
+```
+
+### Get Platform Service URLs
+```bash
+pixo config urls
+
+# Example output:
+🌎  Region: na
+⚙️   Lifecycle: prod
+
+🔗  Web: https://apex.pixovr.com
+
+🔗  Platform API: https://apex.pixovr.com/v2
+🔗  Platform API Docs: https://apex.pixovr.com/v2/swagger/index.html
+
+🔗  Matchmaking API: https://apex.pixovr.com/matchmaking
+🔗  Matchmaking API Docs: https://apex.pixovr.com/matchmaking/swagger/index.html
+
+🔗  Heartbeat API: https://apex.pixovr.com/heartbeat
+🔗  Heartbeat API Docs: https://apex.pixovr.com/heartbeat/swagger/index.html
 ```
 
 
@@ -247,7 +285,7 @@ ServerMatchVersion=1.00.00
 #### Sample `cloudbuild.yaml`
 ```yaml
 steps:
-  - name: "gcr.io/pixo-bootstrap/pixo-platform-cli:0.0.148"
+  - name: "gcr.io/pixo-bootstrap/pixo-platform-cli:0.0.164"
     id: "Version Pre-Check"
     args:
       - mp
@@ -269,7 +307,7 @@ steps:
       - -t
       - gcr.io/${PROJECT_ID}/${_LIFECYCLE}/${_PROJECT_NAME}:latest
 
-  - name: "gcr.io/pixo-bootstrap/pixo-platform-cli:0.0.148"
+  - name: "gcr.io/pixo-bootstrap/pixo-platform-cli:0.0.164"
     id: "Deploy MP Server Version"
     args:
       - mp
@@ -350,6 +388,7 @@ Total Messages Received: 5
 Connection Errors:       0
 Matching Errors:         0
 Matches Received:        5
+Gameservers Received:    2
 
 ┌─────────────┬────────────┐
 │ Stat        │ Value      │

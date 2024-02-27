@@ -1,4 +1,4 @@
-package multiplayer_allocator
+package allocator
 
 import (
 	abstractClient "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"

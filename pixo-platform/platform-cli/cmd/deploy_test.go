@@ -39,7 +39,7 @@ var _ = Describe("Deploy", Ordered, func() {
 			agones.SimpleGameServerImage,
 		)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring(fmt.Sprintf("created multiplayer server version: %s", semanticVersion)))
+		Expect(output).To(ContainSubstring(fmt.Sprintf("Deployed version: %s", semanticVersion)))
 	})
 
 	It("can tell if a server version exists", func() {

@@ -1,7 +1,7 @@
-package multiplayer_allocator_test
+package allocator_test
 
 import (
-	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/multiplayer-allocator"
+	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/allocator"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/k8s/agones"
 	. "github.com/onsi/ginkgo/v2"
@@ -46,7 +46,10 @@ var _ = Describe("Allocate", Ordered, func() {
 		res := allocatorClient.AllocateGameserver(req)
 
 		Expect(res.Error).NotTo(HaveOccurred())
-		Expect(res.HTTPResponse.StatusCode()).To(Equal(http.StatusOK))
+		Expect(res.Results.Name).NotTo(BeEmpty())
+		Expect(res.Results.IP).NotTo(BeEmpty())
+		Expect(res.Results.Port).NotTo(BeEmpty())
+		Expect(res.Results.CreatedAt).NotTo(BeEmpty())
 	})
 
 	It("should throw an error if the server allocation failed", func() {

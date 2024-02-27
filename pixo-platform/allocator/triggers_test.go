@@ -1,4 +1,4 @@
-package multiplayer_allocator_test
+package allocator_test
 
 //
 //import (

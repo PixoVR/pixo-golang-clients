@@ -41,7 +41,7 @@ type MultiplayerServerVersion struct {
 	Status          string `json:"status,omitempty" graphql:"status"`
 	ImageRegistry   string `json:"imageRegistry" graphql:"imageRegistry"`
 	SemanticVersion string `json:"semanticVersion,omitempty" graphql:"semanticVersion"`
-	Filename        string `json:"filename,omitempty" graphql:"filename"`
+	FileLink        string `json:"fileLink,omitempty" graphql:"fileLink"`
 
 	ModuleID int     `json:"moduleId,omitempty" graphql:"moduleId"`
 	Module   *Module `json:"module,omitempty" graphql:"module"`
