@@ -285,7 +285,7 @@ ServerMatchVersion=1.00.00
 #### Sample `cloudbuild.yaml`
 ```yaml
 steps:
-  - name: "gcr.io/pixo-bootstrap/pixo-platform-cli:0.0.164"
+  - name: "gcr.io/pixo-bootstrap/pixo-platform-cli:0.0.177"
     id: "Version Pre-Check"
     args:
       - mp
@@ -307,7 +307,7 @@ steps:
       - -t
       - gcr.io/${PROJECT_ID}/${_LIFECYCLE}/${_PROJECT_NAME}:latest
 
-  - name: "gcr.io/pixo-bootstrap/pixo-platform-cli:0.0.164"
+  - name: "gcr.io/pixo-bootstrap/pixo-platform-cli:0.0.177"
     id: "Deploy MP Server Version"
     args:
       - mp
