@@ -48,4 +48,5 @@ type GameServer struct {
 	Capacity       int      `json:"capacity,omitempty"`
 	Logs           string   `json:"logs,omitempty"`
 	SidecarLogs    string   `json:"sidecar_logs,omitempty"`
+	CreatedAt      string   `json:"created_at,omitempty"`
 }

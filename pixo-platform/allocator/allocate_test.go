@@ -49,6 +49,7 @@ var _ = Describe("Allocate", Ordered, func() {
 		Expect(res.Results.Name).NotTo(BeEmpty())
 		Expect(res.Results.IP).NotTo(BeEmpty())
 		Expect(res.Results.Port).NotTo(BeEmpty())
+		Expect(res.Results.CreatedAt).NotTo(BeEmpty())
 	})
 
 	It("should throw an error if the server allocation failed", func() {
