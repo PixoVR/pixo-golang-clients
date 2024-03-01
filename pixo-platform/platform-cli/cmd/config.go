@@ -56,7 +56,7 @@ var configCmd = &cobra.Command{
 		}
 
 		if _, ok := Ctx.ConfigManager.GetConfigValue("token"); ok {
-			Ctx.ConfigManager.Println(":key: Token: ********")
+			Ctx.ConfigManager.Println(":coin: Token: ********")
 		}
 
 		Ctx.ConfigManager.Println()

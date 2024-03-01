@@ -124,7 +124,8 @@ pixo config
 👤  Username: <username>
 🔒  Password: ********
 🔑  API Key: ********
-🔑  Token: ********
+🪙  Token: ********
+
 
 ➡️  Module ID: 1
 ➡️  Server Version: 1.00.00
