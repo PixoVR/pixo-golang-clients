@@ -192,7 +192,7 @@ func (m *MockGraphQLClient) CreateAPIKey(ctx context.Context, input platform.API
 	m.CalledCreateAPIKey = true
 
 	if m.CreateAPIKeyError {
-		return nil, errors.New("error creating api apiKey")
+		return nil, errors.New("error creating api key")
 	}
 
 	input.ID = 1

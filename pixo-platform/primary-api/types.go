@@ -51,6 +51,8 @@ type EventResult struct {
 type Org struct {
 	ID        int       `json:"id"`
 	Name      string    `json:"name"`
+	Type      string    `json:"type"`
+	Status    string    `json:"enabled"`
 	CreatedAt time.Time `json:"createdAt"`
 }
 
