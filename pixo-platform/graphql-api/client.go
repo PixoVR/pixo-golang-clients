@@ -34,7 +34,7 @@ type PlatformClient interface {
 	GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]*MultiplayerServerConfigQueryParams, error)
 	GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionQueryParams) ([]*MultiplayerServerVersion, error)
 	GetMultiplayerServerVersion(ctx context.Context, id int) (*MultiplayerServerVersion, error)
-	CreateMultiplayerServerVersion(ctx context.Context, moduleID int, image, semanticVersion, engine string) (*MultiplayerServerVersion, error)
+	CreateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error)
 }
 
 var _ PlatformClient = (*GraphQLAPIClient)(nil)

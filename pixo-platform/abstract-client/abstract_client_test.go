@@ -29,7 +29,7 @@ var _ = Describe("Abstract", func() {
 	})
 
 	It("can add headers needed for authentication", func() {
-		apiClient.AddHeader("x-fake-header", fakeToken)
+		apiClient.SetHeader("x-fake-header", fakeToken)
 
 		request := apiClient.FormatRequest()
 

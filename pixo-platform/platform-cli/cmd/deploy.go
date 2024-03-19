@@ -73,14 +73,25 @@ var deployCmd = &cobra.Command{
 			return nil
 		}
 
-		image, ok := Ctx.ConfigManager.GetConfigValueOrAskUser("image", cmd)
-		if !ok {
-			return errors.New("no gameserver image provided")
+		var filePath string
+		image, ok := Ctx.ConfigManager.GetFlagOrConfigValue("image", cmd)
+		if !ok || image == "" {
+			filePath, ok = Ctx.ConfigManager.GetFlagOrConfigValue("zip-file", cmd)
+			if !ok || filePath == "" {
+				return errors.New("no gameserver image or zip file provided")
+			}
 		}
 
 		spinner := loader.NewSpinner(Ctx.ConfigManager)
 
-		if _, err := Ctx.PlatformClient.CreateMultiplayerServerVersion(cmd.Context(), moduleID, image, semanticVersion, "unreal"); err != nil {
+		input := platformAPI.MultiplayerServerVersion{
+			ModuleID:        moduleID,
+			ImageRegistry:   image,
+			LocalFilePath:   filePath,
+			SemanticVersion: semanticVersion,
+			Engine:          "unreal",
+		}
+		if _, err := Ctx.PlatformClient.CreateMultiplayerServerVersion(cmd.Context(), input); err != nil {
 			msg := fmt.Sprintf("Failed to deploy multiplayer server version: %s - %s", semanticVersion, err.Error())
 			return errors.New(msg)
 		}
@@ -95,6 +106,7 @@ func init() {
 	serverVersionsCmd.AddCommand(deployCmd)
 
 	deployCmd.PersistentFlags().StringP("image", "i", "", "Docker image to deploy as the multiplayer server version")
-	deployCmd.Flags().StringP("ini", "f", parser.DefaultConfigFilepath, "Path to the ini file to use for the rootCmd")
+	deployCmd.Flags().StringP("ini", "f", parser.DefaultConfigFilepath, "Path to the ini file to use for the semantic version")
+	deployCmd.Flags().StringP("zip-file", "z", "", "Path to the zip file to use for the upload")
 	deployCmd.Flags().BoolVarP(&isPrecheck, "pre-check", "p", false, "Check if server version exists already")
 }

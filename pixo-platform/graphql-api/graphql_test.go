@@ -9,16 +9,22 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"math/rand"
+	"os"
 )
 
 var _ = Describe("GraphQL API", func() {
 
 	var (
-		ctx context.Context
+		ctx           context.Context
+		moduleID      = 43
+		orgID         = 20
+		serverVersion = "1.03.02"
+		randVersion   string
 	)
 
 	BeforeEach(func() {
 		ctx = context.Background()
+		randVersion = fmt.Sprintf("%d.%d.%d", rand.Intn(100), rand.Intn(100), rand.Intn(100))
 	})
 
 	It("can create a client, login, and interact with the api", func() {
@@ -29,14 +35,14 @@ var _ = Describe("GraphQL API", func() {
 		Expect(client.Login(pixoUsername, pixoPassword)).To(Succeed())
 		Expect(client.IsAuthenticated()).To(BeTrue())
 		Expect(client.GetToken()).NotTo(BeEmpty())
-		session, err := client.CreateSession(ctx, 1, "127.0.0.1", "test")
+		session, err := client.CreateSession(ctx, moduleID, "127.0.0.1", "test")
 		Expect(err).NotTo(HaveOccurred())
 		Expect(session).NotTo(BeNil())
 		Expect(session.ID).NotTo(BeZero())
 	})
 
 	It("can create get and update a session, and then create an event with a secret key", func() {
-		session, err := tokenClient.CreateSession(ctx, 1, "127.0.0.1", "test")
+		session, err := tokenClient.CreateSession(ctx, moduleID, "127.0.0.1", "test")
 		Expect(err).NotTo(HaveOccurred())
 		Expect(session).NotTo(BeNil())
 		Expect(session.ID).NotTo(BeZero())
@@ -60,9 +66,9 @@ var _ = Describe("GraphQL API", func() {
 
 	It("can get the multiplayer server configs", func() {
 		mpServerConfigs, err := tokenClient.GetMultiplayerServerConfigs(ctx, &MultiplayerServerConfigParams{
-			ModuleID:      271,
-			OrgID:         20,
-			ServerVersion: "2.00.01",
+			ModuleID:      moduleID,
+			OrgID:         orgID,
+			ServerVersion: serverVersion,
 		})
 		Expect(err).NotTo(HaveOccurred())
 		Expect(mpServerConfigs).NotTo(BeEmpty())
@@ -71,28 +77,71 @@ var _ = Describe("GraphQL API", func() {
 
 	It("can get the multiplayer server versions", func() {
 		mpServerVersions, err := tokenClient.GetMultiplayerServerVersions(ctx, &MultiplayerServerVersionQueryParams{
-			ModuleID:        271,
-			SemanticVersion: "2.00.01",
+			ModuleID:        moduleID,
+			SemanticVersion: serverVersion,
 		})
 		Expect(err).NotTo(HaveOccurred())
 		Expect(mpServerVersions).NotTo(BeNil())
 		Expect(mpServerVersions).NotTo(BeEmpty())
 	})
 
+	It("can return an error if no image or file are given", func() {
+		_, err := tokenClient.CreateMultiplayerServerVersion(ctx, MultiplayerServerVersion{})
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("image or file path must be provided"))
+	})
+
 	It("can create and get a multiplayer server version", func() {
-		randVersion := fmt.Sprintf("1.%d.%d", rand.Intn(100), rand.Intn(100))
-		serverVersion, err := tokenClient.CreateMultiplayerServerVersion(ctx, 1, agones.SimpleGameServerImage, randVersion, "unreal")
+		input := MultiplayerServerVersion{
+			ModuleID:        moduleID,
+			SemanticVersion: randVersion,
+			ImageRegistry:   agones.SimpleGameServerImage,
+			Engine:          "unreal",
+		}
+
+		serverVersion, err := tokenClient.CreateMultiplayerServerVersion(ctx, input)
+
 		Expect(err).NotTo(HaveOccurred())
 		Expect(serverVersion).NotTo(BeNil())
 
 		mpServerVersion, err := tokenClient.GetMultiplayerServerVersion(ctx, serverVersion.ID)
+
 		Expect(err).NotTo(HaveOccurred())
 		Expect(mpServerVersion).NotTo(BeNil())
 		Expect(mpServerVersion.ID).To(Equal(serverVersion.ID))
-		Expect(mpServerVersion.ModuleID).To(Equal(1))
+		Expect(mpServerVersion.ModuleID).To(Equal(moduleID))
 		Expect(mpServerVersion.SemanticVersion).To(Equal(randVersion))
 		Expect(mpServerVersion.ImageRegistry).To(Equal(agones.SimpleGameServerImage))
-		Expect(mpServerVersion.Engine).To(Equal("unreal"))
+		Expect(mpServerVersion.Engine).To(Equal(input.Engine))
+		Expect(mpServerVersion.Status).To(Equal("enabled"))
+	})
+
+	It("can upload a gameserver build", func() {
+		localFilePath := "./test.zip"
+		file, err := os.Create(localFilePath)
+		Expect(err).NotTo(HaveOccurred())
+		n, err := file.WriteString("test")
+		defer func() {
+			_ = file.Close()
+			_ = os.Remove(localFilePath)
+		}()
+		Expect(err).NotTo(HaveOccurred())
+		Expect(n).To(Equal(4))
+		serverVersionInput := MultiplayerServerVersion{
+			ModuleID:        moduleID,
+			SemanticVersion: randVersion,
+			Engine:          "unreal",
+			LocalFilePath:   localFilePath,
+		}
+
+		serverVersion, err := tokenClient.CreateMultiplayerServerVersion(ctx, serverVersionInput)
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(serverVersion).NotTo(BeNil())
+		Expect(serverVersion.ID).NotTo(BeZero())
+		Expect(serverVersion.FileLink).NotTo(BeEmpty())
+		Expect(serverVersion.FileLink).To(ContainSubstring("X-Goog-Algorithm"))
+		Expect(serverVersion.ImageRegistry).To(BeEmpty())
 	})
 
 })

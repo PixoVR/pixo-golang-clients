@@ -6,6 +6,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"math/rand"
+	"os"
 )
 
 var _ = Describe("Deploy", Ordered, func() {
@@ -71,6 +72,34 @@ var _ = Describe("Deploy", Ordered, func() {
 		)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring("does not exist"))
+	})
+
+	It("can upload a server version with a zip file", func() {
+		localFilePath := "./test.zip"
+		file, err := os.Create(localFilePath)
+		Expect(err).NotTo(HaveOccurred())
+		defer func() {
+			_ = file.Close()
+			_ = os.Remove(localFilePath)
+		}()
+		_, err = file.WriteString("test")
+		Expect(err).NotTo(HaveOccurred())
+
+		output, err := executor.RunCommand(
+			"mp",
+			"serverVersions",
+			"deploy",
+			"--module-id",
+			"1",
+			"--server-version",
+			semanticVersion,
+			"--zip-file",
+			localFilePath,
+		)
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(output).To(ContainSubstring(fmt.Sprintf("Deployed version: %s", semanticVersion)))
+		Expect(executor.MockPlatformClient.CalledCreateMultiplayerServerVersion).To(BeTrue())
 	})
 
 })

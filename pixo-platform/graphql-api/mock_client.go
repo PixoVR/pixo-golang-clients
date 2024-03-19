@@ -412,18 +412,18 @@ func (m *MockGraphQLClient) GetMultiplayerServerVersion(ctx context.Context, ver
 	}, nil
 }
 
-func (m *MockGraphQLClient) CreateMultiplayerServerVersion(ctx context.Context, moduleID int, image, semanticVersion, engine string) (*MultiplayerServerVersion, error) {
+func (m *MockGraphQLClient) CreateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error) {
 	m.CalledCreateMultiplayerServerVersion = true
 
-	if moduleID == 0 {
+	if input.ModuleID == 0 {
 		return nil, errors.New("invalid module id")
 	}
 
-	if image == "" {
-		return nil, errors.New("invalid image")
+	if input.ImageRegistry == "" && input.LocalFilePath == "" {
+		return nil, errors.New("image or file path required")
 	}
 
-	if semanticVersion == "" {
+	if input.SemanticVersion == "" {
 		return nil, errors.New("invalid semantic version")
 	}
 
@@ -432,9 +432,9 @@ func (m *MockGraphQLClient) CreateMultiplayerServerVersion(ctx context.Context, 
 	}
 
 	return &MultiplayerServerVersion{
-		ModuleID:        moduleID,
-		SemanticVersion: semanticVersion,
-		Status:          "enabled",
-		Engine:          engine,
+		ModuleID:        input.ModuleID,
+		SemanticVersion: input.SemanticVersion,
+		Status:          input.Status,
+		Engine:          input.Engine,
 	}, nil
 }

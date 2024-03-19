@@ -65,6 +65,6 @@ func (a *AbstractServiceClient) FormatRequest() *resty.Request {
 	return req
 }
 
-func (a *AbstractServiceClient) AddHeader(key string, value string) {
+func (a *AbstractServiceClient) SetHeader(key string, value string) {
 	a.headers[key] = value
 }

@@ -266,12 +266,21 @@ pixo mp serverVersions deploy \
 ```
 
 ```bash
-# Deploy a new version
+# Deploy a new version with image
 pixo mp serverVersions deploy \
     --module-id 1 \
     --server-version 1.00.00 \
     --image gcr.io/pixo-bootstrap/multiplayer/gameservers/simple-server:latest
 ```
+
+```bash
+# Deploy a new version with zipfile
+pixo mp serverVersions deploy \
+    --module-id 1 \
+    --server-version 1.00.00 \
+    --zip-file /path/to/zipfile
+```
+
 
 ### Gameserver Build Pipeline (e.g. Cloud Build)
 If no `server-version` configuration value is found, it will search for an ini file  
