@@ -78,7 +78,11 @@ var mpDeployCmd = &cobra.Command{
 		if !ok || image == "" {
 			filePath, ok = Ctx.ConfigManager.GetFlagOrConfigValue("zip-file", cmd)
 			if !ok || filePath == "" {
-				return errors.New("no gameserver image or zip file provided")
+				imageResponse := Ctx.ConfigManager.ReadFromUser("DOCKER IMAGE")
+				if imageResponse == "" {
+					return errors.New("no image or zip file provided")
+				}
+				image = imageResponse
 			}
 		}
 

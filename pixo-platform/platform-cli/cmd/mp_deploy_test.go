@@ -1,6 +1,7 @@
 package cmd_test
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/k8s/agones"
 	. "github.com/onsi/ginkgo/v2"
@@ -72,6 +73,25 @@ var _ = Describe("Deploy", Ordered, func() {
 		)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring("does not exist"))
+	})
+
+	It("can ask the user for the docker image to use if not provided", func() {
+		input := bytes.NewBufferString("test\n")
+
+		output, err := executor.RunCommandWithInput(
+			input,
+			"mp",
+			"serverVersions",
+			"deploy",
+			"--module-id",
+			"1",
+			"--server-version",
+			semanticVersion,
+		)
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(output).To(ContainSubstring("Enter DOCKER IMAGE:"))
+		Expect(output).To(ContainSubstring(fmt.Sprintf("Deployed version: %s", semanticVersion)))
 	})
 
 	It("can upload a server version with a zip file", func() {
