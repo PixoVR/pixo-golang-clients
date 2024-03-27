@@ -2,25 +2,37 @@ package config
 
 import (
 	"fmt"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/forms"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/forms/basic"
 	"io"
 	"os"
 	"strings"
 )
 
 type fileManagerImpl struct {
-	configFile string
-	reader     io.Reader
-	writer     io.Writer
+	configFile  string
+	reader      io.Reader
+	writer      io.Writer
+	formHandler forms.FormHandler
 }
 
-func NewFileManager(cfgFile string) Manager {
-	var m fileManagerImpl
+func NewFileManager(cfgFile string, formHandlers ...forms.FormHandler) Manager {
+	var formHandler forms.FormHandler
+	if len(formHandlers) > 0 {
+		formHandler = formHandlers[0]
+	} else {
+		formHandler = basic.NewFormHandler(os.Stdin, os.Stdout)
+	}
+
+	m := &fileManagerImpl{
+		formHandler: formHandler,
+	}
 
 	if cfgFile != "" {
 		_ = m.SetConfigFile(cfgFile)
 	}
 
-	return &m
+	return m
 }
 
 func (f *fileManagerImpl) Lifecycle() string {

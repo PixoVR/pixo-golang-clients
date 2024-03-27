@@ -8,6 +8,7 @@ import (
 
 func (f *fileManagerImpl) SetReader(r io.Reader) {
 	f.reader = r
+	f.formHandler.SetReader(r)
 }
 
 func (f *fileManagerImpl) readerOrStdin() io.Reader {
@@ -23,6 +24,7 @@ func (f *fileManagerImpl) Read(p []byte) (n int, err error) {
 
 func (f *fileManagerImpl) SetWriter(w io.Writer) {
 	f.writer = w
+	f.formHandler.SetWriter(w)
 }
 
 func (f *fileManagerImpl) writerOrStdout() io.Writer {

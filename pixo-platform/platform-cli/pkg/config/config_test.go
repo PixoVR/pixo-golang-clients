@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/config"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/forms/basic"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/spf13/cobra"
@@ -59,9 +60,13 @@ var _ = Describe("Config", func() {
 			n, err := configManager.Write([]byte("hello"))
 			Expect(n).To(Equal(5))
 			Expect(err).NotTo(HaveOccurred())
+
 			n, err = configManager.Read([]byte{})
 			Expect(n).To(Equal(0))
 			Expect(err).NotTo(HaveOccurred())
+
+			output := configManager.ReadFromUser("username")
+			Expect(output).To(BeEmpty())
 		})
 
 		It("can output a messages with emojis", func() {
@@ -113,6 +118,7 @@ var _ = Describe("Config", func() {
 			env := configManager.GetActiveEnv()
 			Expect(env.Lifecycle).To(Equal("prod"))
 			Expect(env.Region).To(Equal("na"))
+			Expect(os.Remove(configFilePath)).NotTo(HaveOccurred())
 		})
 
 	})
@@ -151,6 +157,8 @@ var _ = Describe("Config", func() {
 		var (
 			fileConfigManager config.Manager
 			configFilePath    string
+			input             *bytes.Buffer
+			output            *bytes.Buffer
 		)
 
 		BeforeEach(func() {
@@ -158,7 +166,10 @@ var _ = Describe("Config", func() {
 			err := config.WriteToFile(configFilePath, sampleConfig)
 			Expect(err).NotTo(HaveOccurred())
 
-			fileConfigManager = config.NewFileManager("")
+			input = bytes.NewBufferString("")
+			output = bytes.NewBufferString("")
+			formHandler := basic.NewFormHandler(input, output)
+			fileConfigManager = config.NewFileManager("", formHandler)
 			Expect(fileConfigManager).NotTo(BeNil())
 
 			err = fileConfigManager.SetConfigFile(configFilePath)
@@ -237,29 +248,27 @@ var _ = Describe("Config", func() {
 
 		It("can get a config value if it exists instead of asking the user", func() {
 			username := "new-username"
-			inputReader := bytes.NewBufferString(username + "\n")
-			fileConfigManager.SetReader(inputReader)
-			outputWriter := bytes.NewBufferString("")
-			fileConfigManager.SetWriter(outputWriter)
+			input.WriteString(username + "\n")
+			fileConfigManager.SetReader(input)
+			fileConfigManager.SetWriter(output)
 
 			val, ok := fileConfigManager.GetConfigValueOrAskUser("username", nil)
 			Expect(ok).To(BeTrue())
 			Expect(val).To(Equal("na-prod-username"))
-			Expect(outputWriter.String()).To(BeEmpty())
+			Expect(output.String()).To(BeEmpty())
 		})
 
 		It("can ask the user if the config doesnt exist", func() {
 			fileConfigManager.UnsetConfigValue("api-key")
 			apiKey := "new-api-key"
-			inputReader := bytes.NewBufferString(apiKey + "\n")
-			fileConfigManager.SetReader(inputReader)
-			outputWriter := bytes.NewBufferString("")
-			fileConfigManager.SetWriter(outputWriter)
+			input.WriteString(apiKey + "\n")
+			fileConfigManager.SetReader(input)
+			fileConfigManager.SetWriter(output)
 
 			val, ok := fileConfigManager.GetConfigValueOrAskUser("api-key", nil)
 			Expect(ok).To(BeTrue())
 			Expect(val).To(Equal(apiKey))
-			Expect(outputWriter.String()).To(ContainSubstring("Enter API KEY: "))
+			Expect(output.String()).To(ContainSubstring("Enter API KEY: "))
 		})
 
 		It("can ask the user if the config doesnt exist for an int value", func() {
@@ -314,26 +323,25 @@ var _ = Describe("Config", func() {
 		})
 
 		It("can read from the user", func() {
-			inputReader := bytes.NewBufferString("new-username\n")
-			outputWriter := bytes.NewBufferString("")
-			fileConfigManager.SetReader(inputReader)
-			fileConfigManager.SetWriter(outputWriter)
+			input.WriteString("new-username\n")
+			fileConfigManager.SetReader(input)
+			fileConfigManager.SetWriter(output)
 
 			val := fileConfigManager.ReadFromUser("username")
+
 			Expect(val).To(Equal("new-username"))
-			Expect(outputWriter.String()).To(ContainSubstring("Enter username: "))
+			Expect(output.String()).To(ContainSubstring("Enter username: "))
 		})
 
 		It("can read a sensitive value from the user", func() {
-			inputReader := bytes.NewBufferString("new-password\n")
-			outputWriter := bytes.NewBufferString("")
-			fileConfigManager.SetReader(inputReader)
-			fileConfigManager.SetWriter(outputWriter)
+			input.WriteString("new-password\n")
+			fileConfigManager.SetReader(input)
+			fileConfigManager.SetWriter(output)
 
 			val := fileConfigManager.ReadSensitiveFromUser("password")
 			Expect(val).To(Equal("new-password"))
-			Expect(outputWriter.String()).To(ContainSubstring("Enter password: "))
-			Expect(outputWriter.String()).NotTo(ContainSubstring("new-password"))
+			Expect(output.String()).To(ContainSubstring("Enter password: "))
+			Expect(output.String()).NotTo(ContainSubstring("new-password"))
 		})
 
 	})

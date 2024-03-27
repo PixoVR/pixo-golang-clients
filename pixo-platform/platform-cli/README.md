@@ -30,6 +30,8 @@ with the platform, deploying gameserver versions, and simplifying the testing of
     - [Create](#create)
     - [List](#list)
     - [Delete](#delete)
+- [Modules](#modules)
+  - [Create Module Version](#create-module-version)
 - [Run Mock Matchmaking Server](#run-mock-matchmaking-server)
 - [Deploy a Module Game Server Version](#deploy-a-module-game-server-version)
     - [Gameserver Build Pipeline (e.g. Cloud Build)](#gameserver-build-pipeline-eg-cloud-build)
@@ -168,7 +170,7 @@ pixo auth login --username <username> --password <password>
 
 # Example output:
 🚀 Login successful. Here is your API token: 
-<jwt-token>
+<token>
 ```
 
 
@@ -206,6 +208,17 @@ pixo keys list --user-id 1
 ### Delete
 ```bash
 pixo keys delete --key-id 1
+```
+
+## Modules
+
+### Create Module Version
+```bash
+pixo modules deploy \
+    --module-id 1 \
+    --server-version 1.00.00 \
+    --package com.pixovr.test \
+    --zip-file /path/to/zip
 ```
 
 

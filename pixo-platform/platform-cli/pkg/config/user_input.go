@@ -1,7 +1,6 @@
 package config
 
 import (
-	"bufio"
 	"fmt"
 	"github.com/kyokomi/emoji"
 	"gitlab.com/david_mbuvi/go_asterisks"
@@ -11,12 +10,14 @@ import (
 )
 
 func (f *fileManagerImpl) ReadFromUser(prompt string) string {
-	f.Printf(":fountain_pen: Enter %s: ", prompt)
+	msg := emoji.Sprintf(":fountain_pen: Enter %s: ", prompt)
 
-	bytesReader := bufio.NewReader(f.readerOrStdin())
-	message, _ := bytesReader.ReadString('\n')
+	answer, err := f.formHandler.GetResponseFromUser(msg)
+	if err != nil {
+		return ""
+	}
 
-	return strings.Trim(message, "\r\n")
+	return answer
 }
 
 func (f *fileManagerImpl) ReadSensitiveFromUser(prompt string) string {
