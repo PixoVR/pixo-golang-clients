@@ -9,6 +9,7 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/clients"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/config"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/editor"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/forms/basic"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 	"io"
@@ -53,7 +54,8 @@ func NewTestExecutor() *TestExecutor {
 		log.Info().Msgf("test config file does not exist: %s", testConfigPath)
 	}
 
-	configManager := config.NewFileManager("")
+	formHandler := basic.NewFormHandler(nil, nil)
+	configManager := config.NewFileManager("", formHandler)
 	err := configManager.SetConfigFile(testConfigPath)
 	Expect(err).NotTo(HaveOccurred())
 
@@ -63,6 +65,7 @@ func NewTestExecutor() *TestExecutor {
 	mockFileOpener := &editor.MockFileOpener{}
 
 	mockPlatformCtx := &clients.CLIContext{
+		FormHandler:       formHandler,
 		ConfigManager:     configManager,
 		PlatformClient:    mockPlatformClient,
 		MatchmakingClient: mockMatchmaker,

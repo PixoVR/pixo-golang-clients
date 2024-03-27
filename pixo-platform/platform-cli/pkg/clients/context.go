@@ -6,6 +6,8 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/config"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/editor"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/forms"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/forms/charm"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/loader"
 	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
@@ -14,6 +16,7 @@ import (
 )
 
 type CLIContext struct {
+	FormHandler       forms.FormHandler
 	ConfigManager     config.Manager
 	OldAPIClient      abstract_client.AbstractClient
 	PlatformClient    platform.PlatformClient
@@ -32,7 +35,9 @@ func NewCLIContextWithConfig(configFiles ...string) *CLIContext {
 		}
 	}
 
-	configManager := config.NewFileManager(configFile)
+	formHandler := charm.NewFormHandler()
+
+	configManager := config.NewFileManager(configFile, formHandler)
 
 	token, _ := configManager.GetConfigValue("token")
 
@@ -43,6 +48,7 @@ func NewCLIContextWithConfig(configFiles ...string) *CLIContext {
 	}
 
 	return &CLIContext{
+		FormHandler:       formHandler,
 		ConfigManager:     configManager,
 		OldAPIClient:      primary_api.NewClient(clientConfig),
 		PlatformClient:    platform.NewClient(clientConfig),

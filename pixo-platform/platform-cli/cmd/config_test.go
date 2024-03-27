@@ -82,6 +82,8 @@ var _ = Describe("ConfigFile", func() {
 
 	It("can set the region", func() {
 		output := executor.RunCommandAndExpectSuccess("config", "set", "-r", "saudi", "-l", "prod")
+		Expect(output).To(ContainSubstring("Region: saudi"))
+		Expect(output).To(ContainSubstring("Lifecycle: prod"))
 		Expect(executor.ConfigManager.Lifecycle()).To(Equal("prod"))
 		Expect(executor.ConfigManager.Region()).To(Equal("saudi"))
 		output = executor.RunCommandAndExpectSuccess("config")
