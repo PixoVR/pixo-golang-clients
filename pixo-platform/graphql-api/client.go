@@ -26,6 +26,11 @@ type PlatformClient interface {
 	CreateAPIKey(ctx context.Context, input platform.APIKey) (*platform.APIKey, error)
 	DeleteAPIKey(ctx context.Context, id int) error
 
+	GetPlatforms(ctx context.Context) ([]*Platform, error)
+	GetControlTypes(ctx context.Context) ([]*ControlType, error)
+
+	CreateModuleVersion(ctx context.Context, input ModuleVersion) (*ModuleVersion, error)
+
 	GetSession(ctx context.Context, id int) (*Session, error)
 	CreateSession(ctx context.Context, moduleID int, ipAddress, deviceId string) (*Session, error)
 	UpdateSession(ctx context.Context, id int, status string, completed bool) (*Session, error)

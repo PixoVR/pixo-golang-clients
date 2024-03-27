@@ -53,6 +53,15 @@ type MockGraphQLClient struct {
 	CalledCreateEvent bool
 	CreateEventError  bool
 
+	CalledGetPlatforms bool
+	GetPlatformsError  bool
+
+	CalledGetControlTypes bool
+	GetControlTypesError  bool
+
+	CalledCreateModuleVersion bool
+	CreateModuleVersionError  bool
+
 	CalledGetMultiplayerServerConfigs bool
 	GetMultiplayerServerConfigsError  bool
 
@@ -339,6 +348,59 @@ func (m *MockGraphQLClient) CreateEvent(ctx context.Context, sessionID int, uuid
 		EventType: eventType,
 		Data:      jsonData,
 		CreatedAt: time.Now().UTC(),
+	}, nil
+}
+
+func (m *MockGraphQLClient) GetPlatforms(ctx context.Context) ([]*Platform, error) {
+	m.CalledGetPlatforms = true
+
+	if m.GetPlatformsError {
+		return nil, errors.New("error getting platforms")
+	}
+
+	return []*Platform{{
+		ID:   1,
+		Name: "android",
+	}}, nil
+}
+
+func (m *MockGraphQLClient) GetControlTypes(ctx context.Context) ([]*ControlType, error) {
+	m.CalledGetControlTypes = true
+
+	if m.GetControlTypesError {
+		return nil, errors.New("error getting control types")
+	}
+
+	return []*ControlType{{
+		ID:   1,
+		Name: "keyboard/mouse",
+	}}, nil
+}
+
+func (m *MockGraphQLClient) CreateModuleVersion(ctx context.Context, input ModuleVersion) (*ModuleVersion, error) {
+
+	m.CalledCreateModuleVersion = true
+
+	if m.CreateModuleVersionError {
+		return nil, errors.New("error creating module version")
+	}
+
+	if input.ModuleID == 0 {
+		return nil, errors.New("invalid module id")
+	}
+
+	if input.LocalFilePath == "" {
+		return nil, errors.New("local file path required")
+	}
+
+	if input.SemanticVersion == "" {
+		return nil, errors.New("invalid version")
+	}
+
+	return &ModuleVersion{
+		ModuleID:        input.ModuleID,
+		SemanticVersion: input.SemanticVersion,
+		Package:         input.Package,
 	}, nil
 }
 

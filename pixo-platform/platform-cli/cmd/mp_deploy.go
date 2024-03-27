@@ -17,8 +17,8 @@ var (
 	isPrecheck bool
 )
 
-// deployCmd represents the deploy rootCmd
-var deployCmd = &cobra.Command{
+// mpDeployCmd represents the deploy rootCmd
+var mpDeployCmd = &cobra.Command{
 	Use:   "deploy",
 	Short: "Deploy a multiplayer server version",
 	Long:  `Deploy a docker image as a multiplayer server version on the Pixo Platform for a module`,
@@ -103,10 +103,10 @@ var deployCmd = &cobra.Command{
 }
 
 func init() {
-	serverVersionsCmd.AddCommand(deployCmd)
+	serverVersionsCmd.AddCommand(mpDeployCmd)
 
-	deployCmd.PersistentFlags().StringP("image", "i", "", "Docker image to deploy as the multiplayer server version")
-	deployCmd.Flags().StringP("ini", "f", parser.DefaultConfigFilepath, "Path to the ini file to use for the semantic version")
-	deployCmd.Flags().StringP("zip-file", "z", "", "Path to the zip file to use for the upload")
-	deployCmd.Flags().BoolVarP(&isPrecheck, "pre-check", "p", false, "Check if server version exists already")
+	mpDeployCmd.PersistentFlags().StringP("image", "i", "", "Docker image to deploy as the multiplayer server version")
+	mpDeployCmd.Flags().StringP("ini", "f", parser.DefaultConfigFilepath, "Path to the ini file to use for the semantic version")
+	mpDeployCmd.Flags().StringP("zip-file", "z", "", "Path to the zip file to use for the upload")
+	mpDeployCmd.Flags().BoolVarP(&isPrecheck, "pre-check", "p", false, "Check if server version exists already")
 }

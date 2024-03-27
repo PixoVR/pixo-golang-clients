@@ -30,8 +30,8 @@ var _ = Describe("Multiplayer", func() {
 
 	It("can dial a the matchmaking service and request a match", func() {
 		req := matchmaker.MatchRequest{
-			ModuleID:      1,
-			ServerVersion: "1.00.00",
+			ModuleID:      43,
+			ServerVersion: "1.03.02",
 		}
 
 		conn, _, err := m.DialMatchmaker()

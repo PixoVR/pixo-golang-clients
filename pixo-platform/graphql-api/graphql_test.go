@@ -8,6 +8,7 @@ import (
 	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/k8s/agones"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/rs/zerolog/log"
 	"math/rand"
 	"os"
 )
@@ -20,6 +21,7 @@ var _ = Describe("GraphQL API", func() {
 		orgID         = 20
 		serverVersion = "1.03.02"
 		randVersion   string
+		localFilePath = "./test.zip"
 	)
 
 	BeforeEach(func() {
@@ -144,4 +146,65 @@ var _ = Describe("GraphQL API", func() {
 		Expect(serverVersion.ImageRegistry).To(BeEmpty())
 	})
 
+	It("can return an error if a required field is missing", func() {
+		cleanup := makeTestFile(localFilePath)
+		defer cleanup()
+		_, err := tokenClient.CreateModuleVersion(ctx, ModuleVersion{
+			LocalFilePath: localFilePath,
+		})
+		Expect(err).To(HaveOccurred())
+	})
+
+	It("can get all platforms", func() {
+		platforms, err := tokenClient.GetPlatforms(ctx)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(platforms).NotTo(BeEmpty())
+	})
+
+	It("can get all control types", func() {
+		controlTypes, err := tokenClient.GetControlTypes(ctx)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(controlTypes).NotTo(BeEmpty())
+	})
+
+	It("can create a module version", func() {
+		cleanup := makeTestFile(localFilePath)
+		defer cleanup()
+		input := ModuleVersion{
+			ModuleID:        moduleID,
+			LocalFilePath:   "./test.zip",
+			SemanticVersion: "1.0.0",
+			Package:         "test",
+			PlatformIds:     []int{1},
+			ControlIds:      []int{1},
+		}
+
+		moduleVersion, err := tokenClient.CreateModuleVersion(ctx, input)
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(moduleVersion).NotTo(BeNil())
+		Expect(moduleVersion.ID).NotTo(BeZero())
+		Expect(moduleVersion.ModuleID).To(Equal(moduleID))
+		Expect(moduleVersion.SemanticVersion).To(Equal("1.0.0"))
+		Expect(moduleVersion.Package).To(Equal("test"))
+		Expect(moduleVersion.Status).To(Equal("disabled"))
+		Expect(moduleVersion.FileLink).NotTo(BeEmpty())
+	})
+
 })
+
+func makeTestFile(filePath string) func() {
+	file, err := os.Create(filePath)
+	if err != nil {
+		log.Panic().Err(err).Msg("failed to create file")
+	}
+
+	if _, err = file.WriteString("test"); err != nil {
+		log.Panic().Err(err).Msg("failed to write to file")
+	}
+
+	return func() {
+		_ = file.Close()
+		_ = os.Remove(filePath)
+	}
+}
