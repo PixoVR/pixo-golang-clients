@@ -17,7 +17,7 @@ var (
 	isPrecheck bool
 )
 
-// mpDeployCmd represents the deploy rootCmd
+// mpDeployCmd represents the mp server versions deploy command
 var mpDeployCmd = &cobra.Command{
 	Use:   "deploy",
 	Short: "Deploy a multiplayer server version",

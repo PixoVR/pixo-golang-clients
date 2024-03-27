@@ -36,15 +36,15 @@ var createUserCmd = &cobra.Command{
 		}
 
 		spinner := loader.NewSpinner(Ctx.ConfigManager)
-		defer spinner.Stop()
 
 		user, err := Ctx.PlatformClient.CreateUser(cmd.Context(), input)
+		spinner.Stop()
 		if err != nil {
 			Ctx.ConfigManager.Println(":exclamation: Unable to create user: ", err)
 			return err
 		}
 
-		Ctx.ConfigManager.Println(":rocket:User created: ", user.Username)
+		Ctx.ConfigManager.Println(":rocket: User created: ", user.Username)
 		return nil
 	},
 }
