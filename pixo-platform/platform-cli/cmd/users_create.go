@@ -35,8 +35,7 @@ var createUserCmd = &cobra.Command{
 			Password:  password,
 		}
 
-		spinner := loader.NewSpinner(Ctx.ConfigManager)
-
+		spinner := loader.NewLoader(cmd.Context(), "Creating user...", Ctx.ConfigManager)
 		user, err := Ctx.PlatformClient.CreateUser(cmd.Context(), input)
 		spinner.Stop()
 		if err != nil {

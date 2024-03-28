@@ -95,7 +95,7 @@ func (p *CLIContext) Authenticate(cmd *cobra.Command) error {
 	}
 	p.ConfigManager.SetConfigValue("password", password)
 
-	spinner := loader.NewSpinner(p.ConfigManager)
+	spinner := loader.NewLoader(cmd.Context(), "Logging into the Pixo Platform...", p.ConfigManager)
 	defer spinner.Stop()
 
 	if err := p.PlatformClient.Login(username, password); err != nil {

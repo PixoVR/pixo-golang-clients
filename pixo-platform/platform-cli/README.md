@@ -272,7 +272,7 @@ pixo mp matchmake \
 ## Deploy a Module Game Server Version
 ```bash
 # Check if version with matching semantic version already exists
-pixo mp serverVersions deploy \
+pixo mp servers deploy \
     --pre-check \
     --module-id 1 \
     --server-version 1.00.00
@@ -280,7 +280,7 @@ pixo mp serverVersions deploy \
 
 ```bash
 # Deploy a new version with image
-pixo mp serverVersions deploy \
+pixo mp servers deploy \
     --module-id 1 \
     --server-version 1.00.00 \
     --image gcr.io/pixo-bootstrap/multiplayer/gameservers/simple-server:latest
@@ -288,7 +288,7 @@ pixo mp serverVersions deploy \
 
 ```bash
 # Deploy a new version with zipfile
-pixo mp serverVersions deploy \
+pixo mp servers deploy \
     --module-id 1 \
     --server-version 1.00.00 \
     --zip-file /path/to/zipfile
@@ -312,7 +312,7 @@ steps:
     id: "Version Pre-Check"
     args:
       - mp
-      - serverVersions
+      - servers
       - deploy
       - --module-id
       - ${_MODULE_ID}
@@ -334,7 +334,7 @@ steps:
     id: "Deploy MP Server Version"
     args:
       - mp
-      - serverVersions
+      - servers
       - deploy
       - --module-id
       - ${_MP_MODULE_ID}

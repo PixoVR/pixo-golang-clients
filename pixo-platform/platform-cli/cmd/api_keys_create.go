@@ -15,9 +15,7 @@ var createApiKeyCmd = &cobra.Command{
 	Short: "Creating API keys",
 	Long:  `Create API key with the following command:`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		Ctx.ConfigManager.Println(":key: Creating API Key")
-
-		spinner := loader.NewSpinner(Ctx.ConfigManager)
+		spinner := loader.NewLoader(cmd.Context(), ":key: Creating API Key...", Ctx.ConfigManager)
 		defer spinner.Stop()
 
 		input := platform.APIKey{

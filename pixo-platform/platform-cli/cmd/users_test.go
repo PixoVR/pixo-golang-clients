@@ -15,7 +15,6 @@ var _ = Describe("Users", func() {
 
 	BeforeEach(func() {
 		executor = NewTestExecutor()
-
 	})
 
 	AfterEach(func() {

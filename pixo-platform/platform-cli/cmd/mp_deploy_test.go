@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-var _ = Describe("Deploy", Ordered, func() {
+var _ = Describe("Server Deploy", Ordered, func() {
 
 	var (
 		executor        *TestExecutor
@@ -31,7 +31,7 @@ var _ = Describe("Deploy", Ordered, func() {
 	It("can deploy a server version", func() {
 		output, err := executor.RunCommand(
 			"mp",
-			"serverVersions",
+			"servers",
 			"deploy",
 			"--module-id",
 			"1",
@@ -47,7 +47,7 @@ var _ = Describe("Deploy", Ordered, func() {
 	It("can tell if a server version exists", func() {
 		_, err := executor.RunCommand(
 			"mp",
-			"serverVersions",
+			"servers",
 			"deploy",
 			"--pre-check",
 			"--module-id",
@@ -63,7 +63,7 @@ var _ = Describe("Deploy", Ordered, func() {
 		executor.MockPlatformClient.GetMultiplayerServerVersionsEmpty = true
 		output, err := executor.RunCommand(
 			"mp",
-			"serverVersions",
+			"servers",
 			"deploy",
 			"--pre-check",
 			"--module-id",
@@ -81,7 +81,7 @@ var _ = Describe("Deploy", Ordered, func() {
 		output, err := executor.RunCommandWithInput(
 			input,
 			"mp",
-			"serverVersions",
+			"servers",
 			"deploy",
 			"--module-id",
 			"1",
@@ -107,7 +107,7 @@ var _ = Describe("Deploy", Ordered, func() {
 
 		output, err := executor.RunCommand(
 			"mp",
-			"serverVersions",
+			"servers",
 			"deploy",
 			"--module-id",
 			"1",

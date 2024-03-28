@@ -47,8 +47,6 @@ var mpDeployCmd = &cobra.Command{
 
 		}
 
-		Ctx.ConfigManager.Println("Deploying server version: ", semanticVersion)
-
 		if isPrecheck {
 
 			params := &platformAPI.MultiplayerServerVersionQueryParams{
@@ -56,7 +54,7 @@ var mpDeployCmd = &cobra.Command{
 				SemanticVersion: semanticVersion,
 			}
 
-			spinner := loader.NewSpinner(Ctx.ConfigManager)
+			spinner := loader.NewLoader(cmd.Context(), "Getting multiplayer server versions...", Ctx.ConfigManager)
 
 			if versions, err := Ctx.PlatformClient.GetMultiplayerServerVersions(cmd.Context(), params); err != nil {
 				Ctx.ConfigManager.Println(":negative_squared_cross_mark: Unable to retrieve server versions from the Pixo Platform")
@@ -86,7 +84,8 @@ var mpDeployCmd = &cobra.Command{
 			}
 		}
 
-		spinner := loader.NewSpinner(Ctx.ConfigManager)
+		msg := fmt.Sprint("Deploying server version: ", semanticVersion)
+		spinner := loader.NewLoader(cmd.Context(), msg, Ctx.ConfigManager)
 
 		input := platformAPI.MultiplayerServerVersion{
 			ModuleID:        moduleID,
@@ -107,7 +106,7 @@ var mpDeployCmd = &cobra.Command{
 }
 
 func init() {
-	serverVersionsCmd.AddCommand(mpDeployCmd)
+	serversCmd.AddCommand(mpDeployCmd)
 
 	mpDeployCmd.PersistentFlags().StringP("image", "i", "", "Docker image to deploy as the multiplayer server version")
 	mpDeployCmd.Flags().StringP("ini", "f", parser.DefaultConfigFilepath, "Path to the ini file to use for the semantic version")

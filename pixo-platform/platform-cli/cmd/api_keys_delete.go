@@ -14,7 +14,7 @@ var deleteApiKeyCmd = &cobra.Command{
 	Short: "Deleting an API key",
 	Long:  `Delete API key with the following command:`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		spinner := loader.NewSpinner(Ctx.ConfigManager)
+		spinner := loader.NewLoader(cmd.Context(), ":key: Deleting API Key...", Ctx.ConfigManager)
 		defer spinner.Stop()
 
 		apiKeyID, ok := Ctx.ConfigManager.GetIntFlagOrConfigValue("key-id", cmd)
