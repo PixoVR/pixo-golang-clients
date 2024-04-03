@@ -62,8 +62,10 @@ type MockGraphQLClient struct {
 	CalledCreateModuleVersion bool
 	CreateModuleVersionError  bool
 
-	CalledGetMultiplayerServerConfigs bool
-	GetMultiplayerServerConfigsError  bool
+	CalledGetMultiplayerServerConfigs        bool
+	GetMultiplayerServerConfigsError         bool
+	GetMultiplayerServerConfigsEmpty         bool
+	GetMultiplayerServerConfigsEmptyVersions bool
 
 	CalledGetMultiplayerServerVersions bool
 	GetMultiplayerServerVersionsError  bool
@@ -409,6 +411,19 @@ func (m *MockGraphQLClient) GetMultiplayerServerConfigs(ctx context.Context, par
 
 	if m.GetMultiplayerServerConfigsError {
 		return nil, errors.New("error getting multiplayer server configs")
+	}
+
+	if m.GetMultiplayerServerConfigsEmpty {
+		return []*MultiplayerServerConfigQueryParams{}, nil
+	}
+
+	if m.GetMultiplayerServerConfigsEmptyVersions {
+		return []*MultiplayerServerConfigQueryParams{
+			{
+				ModuleID: 1,
+				Capacity: 5,
+			},
+		}, nil
 	}
 
 	return []*MultiplayerServerConfigQueryParams{
