@@ -407,6 +407,10 @@ func (m *MockGraphQLClient) CreateModuleVersion(ctx context.Context, input Modul
 func (m *MockGraphQLClient) GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]*MultiplayerServerConfigQueryParams, error) {
 	m.CalledGetMultiplayerServerConfigs = true
 
+	if m.GetMultiplayerServerConfigsError {
+		return nil, errors.New("error getting multiplayer server configs")
+	}
+
 	return []*MultiplayerServerConfigQueryParams{
 		{
 			ModuleID: 1,
