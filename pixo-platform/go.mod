@@ -8,7 +8,7 @@ require (
 	github.com/charmbracelet/huh/spinner v0.0.0-20240327025511-ec643317aa10
 	github.com/fatih/color v1.16.0
 	github.com/gin-gonic/gin v1.9.1
-	github.com/go-faker/faker/v4 v4.4.0
+	github.com/go-faker/faker/v4 v4.4.1
 	github.com/go-resty/resty/v2 v2.12.0
 	github.com/gorilla/websocket v1.5.1
 	github.com/hasura/go-graphql-client v0.12.1
