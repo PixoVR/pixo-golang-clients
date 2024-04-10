@@ -302,7 +302,7 @@ func (m *MockGraphQLClient) CreateSession(ctx context.Context, moduleID int, ipA
 	}, nil
 }
 
-func (m *MockGraphQLClient) UpdateSession(ctx context.Context, id int, status string, completed bool) (*Session, error) {
+func (m *MockGraphQLClient) UpdateSession(ctx context.Context, session Session) (*Session, error) {
 
 	m.CalledUpdateSession = true
 
@@ -310,16 +310,11 @@ func (m *MockGraphQLClient) UpdateSession(ctx context.Context, id int, status st
 		return nil, errors.New("error updating session")
 	}
 
-	if id <= 0 {
+	if session.ID <= 0 {
 		return nil, errors.New("invalid session id")
 	}
 
-	return &Session{
-		ID:        id,
-		UserID:    1,
-		ModuleID:  1,
-		IPAddress: "127.0.0.1",
-	}, nil
+	return &session, nil
 }
 
 func (m *MockGraphQLClient) CreateEvent(ctx context.Context, sessionID int, uuid string, eventType string, data string) (*platform.Event, error) {

@@ -55,7 +55,15 @@ var _ = Describe("GraphQL API", func() {
 		Expect(retrievedSession.ID).To(Equal(session.ID))
 		Expect(retrievedSession.UserID).NotTo(BeZero())
 
-		updatedSession, err := tokenClient.UpdateSession(ctx, session.ID, "TERMINATED", true)
+		input := Session{
+			ID:        session.ID,
+			Status:    "TERMINATED",
+			Completed: true,
+			RawScore:  0.5,
+			MaxScore:  1.0,
+		}
+
+		updatedSession, err := tokenClient.UpdateSession(ctx, input)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(updatedSession).NotTo(BeNil())
 		Expect(updatedSession.ID).To(Equal(session.ID))

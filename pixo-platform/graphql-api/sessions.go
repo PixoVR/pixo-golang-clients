@@ -8,17 +8,25 @@ import (
 )
 
 type Session struct {
-	ID       int `json:"id"`
-	UserID   int `json:"userId"`
-	OrgID    int `json:"orgId"`
-	ModuleID int `json:"moduleId"`
+	ID int `json:"id"`
 
-	UUID      string `json:"uuid"`
-	IPAddress string `json:"ipAddress"`
-	DeviceID  string `json:"deviceId"`
+	UUID        string  `json:"uuid"`
+	IPAddress   string  `json:"ipAddress"`
+	DeviceID    string  `json:"deviceId"`
+	RawScore    float64 `json:"rawScore"`
+	MaxScore    float64 `json:"maxScore"`
+	ScaledScore float64 `json:"scaledScore"`
+	Status      string  `json:"status"`
+	Completed   bool    `json:"completed"`
+	CompletedAt string  `json:"completedAt"`
 
-	Module platform.Module  `json:"module"`
-	Events []platform.Event `json:"events"`
+	UserID   int              `json:"userId"`
+	User     platform.User    `json:"user"`
+	OrgID    int              `json:"orgId"`
+	Org      platform.Org     `json:"org"`
+	ModuleID int              `json:"moduleId"`
+	Module   platform.Module  `json:"module"`
+	Events   []platform.Event `json:"events"`
 
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
@@ -84,14 +92,16 @@ func (g *GraphQLAPIClient) CreateSession(ctx context.Context, moduleID int, ipAd
 	return &sessionResponse.Session, nil
 }
 
-func (g *GraphQLAPIClient) UpdateSession(ctx context.Context, id int, status string, completed bool) (*Session, error) {
+func (g *GraphQLAPIClient) UpdateSession(ctx context.Context, session Session) (*Session, error) {
 	query := `mutation updateSession($input: SessionInput!) { updateSession(input: $input) { id } }`
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{
-			"id":        id,
-			"status":    status,
-			"completed": completed,
+			"id":        session.ID,
+			"status":    session.Status,
+			"completed": session.Completed,
+			"rawScore":  session.RawScore,
+			"maxScore":  session.MaxScore,
 		},
 	}
 

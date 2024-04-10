@@ -54,4 +54,10 @@ var _ = Describe("Abstract", func() {
 		Expect(res).To(BeNil())
 	})
 
+	It("can return the current ip address", func() {
+		ip, err := apiClient.GetIPAddress()
+		Expect(err).NotTo(HaveOccurred())
+		Expect(ip).To(MatchRegexp(`\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}`))
+	})
+
 })

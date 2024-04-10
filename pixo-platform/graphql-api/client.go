@@ -33,7 +33,7 @@ type PlatformClient interface {
 
 	GetSession(ctx context.Context, id int) (*Session, error)
 	CreateSession(ctx context.Context, moduleID int, ipAddress, deviceId string) (*Session, error)
-	UpdateSession(ctx context.Context, id int, status string, completed bool) (*Session, error)
+	UpdateSession(ctx context.Context, session Session) (*Session, error)
 	CreateEvent(ctx context.Context, sessionID int, uuid string, eventType string, data string) (*platform.Event, error)
 
 	GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]*MultiplayerServerConfigQueryParams, error)

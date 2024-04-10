@@ -7,6 +7,9 @@ import (
 )
 
 type MockAbstractClient struct {
+	NumCalledGetIPAddress int
+	GetIPAddressError     error
+
 	NumCalledGetURL          int
 	NumCalledLogin           int
 	NumCalledSetAPIKey       int
@@ -27,6 +30,16 @@ type MockAbstractClient struct {
 	NumCalledCloseWebsocket    int
 
 	Response []byte
+}
+
+func (m *MockAbstractClient) GetIPAddress() (string, error) {
+	m.NumCalledGetIPAddress++
+
+	if m.GetIPAddressError != nil {
+		return "", m.GetIPAddressError
+	}
+
+	return "127.0.0.1", nil
 }
 
 func (m *MockAbstractClient) GetURL() string {

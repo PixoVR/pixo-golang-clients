@@ -32,6 +32,7 @@ with the platform, deploying gameserver versions, and simplifying the testing of
     - [Delete](#delete)
 - [Modules](#modules)
   - [Create Module Version](#create-module-version)
+- [Sessions](#sessions)
 - [Run Mock Matchmaking Server](#run-mock-matchmaking-server)
 - [Deploy a Module Game Server Version](#deploy-a-module-game-server-version)
     - [Gameserver Build Pipeline (e.g. Cloud Build)](#gameserver-build-pipeline-eg-cloud-build)
@@ -219,6 +220,31 @@ pixo modules deploy \
     --server-version 1.00.00 \
     --package com.pixovr.test \
     --zip-file /path/to/zip
+```
+
+## Sessions
+
+### Start a Session
+```bash
+pixo sessions start \
+  --module-id 1 \
+  --ip-address 127.0.0.1
+```
+
+### End a Session
+```bash
+# Using current session ID
+pixo sessions end \
+  --score 1 \
+  --max-score 2
+```
+
+```bash
+# Or with session ID as input
+pixo sessions end \
+  --session-id 123 \
+  --score 1 \
+  --max-score 2
 ```
 
 
