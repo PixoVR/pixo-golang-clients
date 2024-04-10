@@ -40,7 +40,10 @@ var sessionsEndCmd = &cobra.Command{
 
 		percentScore := int(session.ScaledScore * 100)
 
-		Ctx.ConfigManager.Printf(":white_check_mark: Session completed\nScore %d/%d\nPercent: %d%s\nDuration: %s", score, maxScore, percentScore, "%", session.Duration)
+		Ctx.ConfigManager.Println("\n:white_check_mark: Session completed")
+		Ctx.ConfigManager.Printf(":trophy: Score: %d/%d\n", score, maxScore)
+		Ctx.ConfigManager.Printf(":input_numbers: Percent: %d%s\n", percentScore, "%")
+		Ctx.ConfigManager.Printf(":hourglass_done: Duration: %s\n", session.Duration)
 		return nil
 	},
 }
