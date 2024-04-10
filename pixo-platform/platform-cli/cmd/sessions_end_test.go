@@ -70,11 +70,11 @@ var _ = Describe("Sessions End", func() {
 			"--score",
 			"1",
 			"--max-score",
-			"1",
+			"3",
 		)
 
 		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring("Session completed with score 1/1 - 100%"))
+		Expect(output).To(ContainSubstring("Session completed with score 1/3 - 33%"))
 	})
 
 })
