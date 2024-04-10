@@ -102,8 +102,7 @@ export PIXO_API_KEY=<api-key>
 export PIXO_USERNAME=<username>
 export PIXO_PASSWORD=<password>
 
-# Pixo Platform Environment Used - if not set, defaults to na and prod
-export PIXO_LIFECYCLE=stage
+# Pixo Platform Environment Used - if not set, defaults to na
 export PIXO_REGION=saudi
 ```
 
@@ -345,7 +344,6 @@ steps:
       - --pre-check
     env:
       - "PIXO_REGION=${_PIXO_REGION}"
-      - "PIXO_LIFECYCLE=${_PIXO_LIFECYCLE}"
     secretEnv:
       - "PIXO_API_KEY"
 
@@ -368,7 +366,6 @@ steps:
       - gcr.io/${PROJECT_ID}/${_LIFECYCLE}/${_PROJECT_NAME}:${COMMIT_SHA}
     env:
       - "PIXO_REGION=${_PIXO_REGION}"
-      - "PIXO_LIFECYCLE=${_PIXO_LIFECYCLE}"
     secretEnv:
       - "PIXO_API_KEY"
 
