@@ -74,7 +74,7 @@ var _ = Describe("Sessions End", func() {
 		)
 
 		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring("Session completed with score 1/3 - 33%"))
+		Expect(output).To(ContainSubstring("Session completed\nScore 1/3\nPercent: 33%\nDuration: 1s"))
 	})
 
 })

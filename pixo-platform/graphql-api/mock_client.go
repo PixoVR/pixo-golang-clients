@@ -316,6 +316,8 @@ func (m *MockGraphQLClient) UpdateSession(ctx context.Context, session Session) 
 
 	session.ScaledScore = session.RawScore / session.MaxScore
 
+	session.Duration = "1s"
+
 	return &session, nil
 }
 

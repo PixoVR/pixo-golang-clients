@@ -71,6 +71,7 @@ var _ = Describe("GraphQL API", func() {
 		Expect(updatedSession.MaxScore).To(Equal(input.MaxScore))
 		Expect(updatedSession.ScaledScore).To(Equal(input.RawScore / input.MaxScore))
 		Expect(updatedSession.CompletedAt).NotTo(BeNil())
+		Expect(updatedSession.Duration).NotTo(BeNil())
 
 		// ERROR: invalid input syntax for type uuid: "" (SQLSTATE 22P02) ??
 		//event, err := tokenClient.CreateEvent(ctx, session.ID, faker.UUIDDigit(), "test", "{}")

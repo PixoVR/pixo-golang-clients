@@ -19,6 +19,7 @@ type Session struct {
 	Status      string  `json:"status"`
 	Completed   bool    `json:"completed"`
 	CompletedAt string  `json:"completedAt"`
+	Duration    string  `json:"duration"`
 
 	UserID   int              `json:"userId"`
 	User     platform.User    `json:"user"`
@@ -93,7 +94,7 @@ func (g *GraphQLAPIClient) CreateSession(ctx context.Context, moduleID int, ipAd
 }
 
 func (g *GraphQLAPIClient) UpdateSession(ctx context.Context, session Session) (*Session, error) {
-	query := `mutation updateSession($input: SessionInput!) { updateSession(input: $input) { id rawScore maxScore scaledScore completedAt } }`
+	query := `mutation updateSession($input: SessionInput!) { updateSession(input: $input) { id rawScore maxScore scaledScore completedAt duration } }`
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{
