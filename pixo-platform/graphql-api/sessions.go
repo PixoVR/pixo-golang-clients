@@ -93,7 +93,7 @@ func (g *GraphQLAPIClient) CreateSession(ctx context.Context, moduleID int, ipAd
 }
 
 func (g *GraphQLAPIClient) UpdateSession(ctx context.Context, session Session) (*Session, error) {
-	query := `mutation updateSession($input: SessionInput!) { updateSession(input: $input) { id } }`
+	query := `mutation updateSession($input: SessionInput!) { updateSession(input: $input) { id rawScore maxScore scaledScore completedAt } }`
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{

@@ -15,7 +15,7 @@ var sessionsEndCmd = &cobra.Command{
 	Short: "End a session",
 	Long:  `End a session to mimic headset interactions`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		sessionID, ok := Ctx.ConfigManager.GetIntConfigValueOrAskUser("session-id", cmd)
+		sessionID, ok := Ctx.ConfigManager.GetIntConfigValue("session-id")
 		if !ok {
 			Ctx.ConfigManager.Println(":exclamation: Session ID not provided")
 		}
@@ -31,14 +31,16 @@ var sessionsEndCmd = &cobra.Command{
 		}
 
 		spinner := loader.NewLoader(cmd.Context(), "Ending session...", Ctx.ConfigManager)
-		_, err := Ctx.PlatformClient.UpdateSession(cmd.Context(), input)
+		session, err := Ctx.PlatformClient.UpdateSession(cmd.Context(), input)
 		spinner.Stop()
 		if err != nil {
 			Ctx.ConfigManager.Println(":exclamation: Unable to end session: ", err)
 			return nil
 		}
 
-		Ctx.ConfigManager.Printf(":white_check_mark: Session completed with score %d/%d", score, maxScore)
+		percentScore := int(session.ScaledScore) * 100
+
+		Ctx.ConfigManager.Printf(":white_check_mark: Session completed with score %d/%d - %d%s", score, maxScore, percentScore, "%")
 		return nil
 	},
 }
@@ -46,7 +48,7 @@ var sessionsEndCmd = &cobra.Command{
 func init() {
 	sessionsCmd.AddCommand(sessionsEndCmd)
 
-	sessionsEndCmd.Flags().Int("session-id", 0, "Session ID")
+	sessionsEndCmd.Flags().Int("id", 0, "Session ID")
 	sessionsEndCmd.Flags().Int("score", 0, "Score for the session")
 	sessionsEndCmd.Flags().Int("max-score", 0, "Max possible score for the session")
 }

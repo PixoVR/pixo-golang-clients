@@ -314,6 +314,8 @@ func (m *MockGraphQLClient) UpdateSession(ctx context.Context, session Session) 
 		return nil, errors.New("invalid session id")
 	}
 
+	session.ScaledScore = session.RawScore / session.MaxScore
+
 	return &session, nil
 }
 

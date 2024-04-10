@@ -75,6 +75,10 @@ var _ = Describe("Sessions Start", func() {
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring("Session started for module 1 with ID 1"))
+
+		output, err = executor.RunCommand("config")
+		Expect(err).NotTo(HaveOccurred())
+		Expect(output).To(ContainSubstring("Session Id: 1"))
 	})
 
 })

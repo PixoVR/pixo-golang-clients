@@ -7,7 +7,7 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/config"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/editor"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/forms"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/forms/charm"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/forms/basic"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/loader"
 	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
@@ -35,7 +35,8 @@ func NewCLIContextWithConfig(configFiles ...string) *CLIContext {
 		}
 	}
 
-	formHandler := charm.NewFormHandler()
+	//formHandler := charm.NewFormHandler()
+	formHandler := basic.NewFormHandler(os.Stdin, os.Stdout)
 
 	configManager := config.NewFileManager(configFile, formHandler)
 

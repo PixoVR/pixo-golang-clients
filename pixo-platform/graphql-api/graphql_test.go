@@ -67,6 +67,10 @@ var _ = Describe("GraphQL API", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(updatedSession).NotTo(BeNil())
 		Expect(updatedSession.ID).To(Equal(session.ID))
+		Expect(updatedSession.RawScore).To(Equal(input.RawScore))
+		Expect(updatedSession.MaxScore).To(Equal(input.MaxScore))
+		Expect(updatedSession.ScaledScore).To(Equal(input.RawScore / input.MaxScore))
+		Expect(updatedSession.CompletedAt).NotTo(BeNil())
 
 		// ERROR: invalid input syntax for type uuid: "" (SQLSTATE 22P02) ??
 		//event, err := tokenClient.CreateEvent(ctx, session.ID, faker.UUIDDigit(), "test", "{}")
@@ -157,9 +161,7 @@ var _ = Describe("GraphQL API", func() {
 	It("can return an error if a required field is missing", func() {
 		cleanup := makeTestFile(localFilePath)
 		defer cleanup()
-		_, err := tokenClient.CreateModuleVersion(ctx, ModuleVersion{
-			LocalFilePath: localFilePath,
-		})
+		_, err := tokenClient.CreateModuleVersion(ctx, ModuleVersion{LocalFilePath: localFilePath})
 		Expect(err).To(HaveOccurred())
 	})
 

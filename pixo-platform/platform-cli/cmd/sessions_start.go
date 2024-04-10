@@ -36,6 +36,7 @@ var sessionsStartCmd = &cobra.Command{
 		}
 
 		Ctx.ConfigManager.Printf(":white_check_mark: Session started for module %d with ID %d", moduleID, session.ID)
+		Ctx.ConfigManager.SetIntConfigValue("session-id", session.ID)
 		return nil
 	},
 }
