@@ -33,6 +33,8 @@ with the platform, deploying gameserver versions, and simplifying the testing of
 - [Modules](#modules)
   - [Create Module Version](#create-module-version)
 - [Sessions](#sessions)
+  - [Start a Session](#start-a-session)
+  - [End a Session](#end-a-session)
 - [Run Mock Matchmaking Server](#run-mock-matchmaking-server)
 - [Deploy a Module Game Server Version](#deploy-a-module-game-server-version)
     - [Gameserver Build Pipeline (e.g. Cloud Build)](#gameserver-build-pipeline-eg-cloud-build)
