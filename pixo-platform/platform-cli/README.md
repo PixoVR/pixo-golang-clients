@@ -225,9 +225,7 @@ pixo modules deploy \
 
 ### Start a Session
 ```bash
-pixo sessions start \
-  --module-id 1 \
-  --ip-address 127.0.0.1
+pixo sessions start --module-id 1
 ```
 
 ### End a Session
