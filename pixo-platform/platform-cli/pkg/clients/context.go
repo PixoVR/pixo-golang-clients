@@ -1,6 +1,7 @@
 package clients
 
 import (
+	"context"
 	abstract_client "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
@@ -96,7 +97,11 @@ func (p *CLIContext) Authenticate(cmd *cobra.Command) error {
 	}
 	p.ConfigManager.SetConfigValue("password", password)
 
-	spinner := loader.NewLoader(cmd.Context(), "Logging into the Pixo Platform...", p.ConfigManager)
+	var ctx context.Context
+	if cmd != nil {
+		ctx = cmd.Context()
+	}
+	spinner := loader.NewLoader(ctx, "Logging into the Pixo Platform...", p.ConfigManager)
 	defer spinner.Stop()
 
 	if err := p.PlatformClient.Login(username, password); err != nil {
