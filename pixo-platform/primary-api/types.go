@@ -2,6 +2,48 @@ package primary_api
 
 import "time"
 
+type JSONEvent struct {
+	ID              string  `json:"id"`
+	SessionDuration float64 `json:"sessionDuration"` // this needs to be a float so that we can handle 1 and 1.0
+	LessonStatus    *string `json:"lessonStatus"`
+	ModuleName      string  `json:"moduleName"`
+	Actor           struct {
+		Name *string `json:"name"`
+		Mbox *string `json:"mBox"`
+	} `json:"actor"`
+	Verb struct {
+		ID      *string `json:"id"`
+		Display struct {
+			EN *string `json:"en"`
+		} `json:"display"`
+	} `json:"verb"`
+	Object *struct {
+		ID *string `json:"id"`
+	} `json:"object"`
+	Result *struct {
+		Completion bool   `json:"completion"`
+		Success    bool   `json:"success"`
+		Duration   string `json:"duration"`
+		Score      *struct {
+			Scaled float32 `json:"scaled"`
+			Raw    float64 `json:"raw"`
+			Min    float32 `json:"min"`
+			Max    float32 `json:"max"`
+		} `json:"score"`
+	} `json:"result"`
+	Context *struct {
+		Registration string                 `json:"registration"`
+		Revision     string                 `json:"revision"`
+		Extensions   map[string]interface{} `json:"extensions"`
+	} `json:"context"`
+
+	Score       *float64 `json:"score"`
+	ScoreMin    *float64 `json:"scoreMin"`
+	ScoreMax    *float64 `json:"scoreMax"`
+	ScoreScaled *float64 `json:"scoreScaled"`
+	Success     *bool    `json:"success"`
+}
+
 type OrgModule struct {
 	ID             int       `json:"id"`
 	ModuleID       int       `json:"moduleId"`

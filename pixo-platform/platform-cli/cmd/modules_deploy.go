@@ -4,11 +4,10 @@ Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
-	"context"
 	"fmt"
 	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/forms"
-	"github.com/charmbracelet/huh/spinner"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/loader"
 	"github.com/spf13/cobra"
 	"strconv"
 	"strings"
@@ -134,17 +133,17 @@ var modulesDeployCmd = &cobra.Command{
 			ControlIds:      selectedControlTypes,
 		}
 
-		//spinner := loader.NewSpinner(Ctx.ConfigManager)
-		ctx, cancel := context.WithCancel(context.Background())
-		err := spinner.New().
-			Type(spinner.Line).
-			Title("Deploying module version...").
-			Context(ctx).
-			Run()
+		spinner := loader.NewLoader(cmd.Context(), "Deploying module version...", Ctx.ConfigManager)
+		//ctx, cancel := context.WithCancel(context.Background())
+		//err := spinner.New().
+		//	Type(spinner.Line).
+		//	Title("Deploying module version...").
+		//	Context(ctx).
+		//	Run()
 
 		moduleVersion, err := Ctx.PlatformClient.CreateModuleVersion(cmd.Context(), input)
-		cancel()
-		//spinner.Stop()
+		//cancel()
+		spinner.Stop()
 		if err != nil {
 			Ctx.ConfigManager.Printf(":exclamation: %s\n", err.Error())
 			return
