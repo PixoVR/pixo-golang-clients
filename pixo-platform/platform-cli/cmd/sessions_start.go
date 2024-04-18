@@ -19,9 +19,9 @@ var sessionsStartCmd = &cobra.Command{
 			Ctx.ConfigManager.Println(":exclamation: Module ID not provided")
 		}
 
-		spinner := loader.NewLoader(cmd.Context(), "Starting session...", Ctx.ConfigManager)
-
+		spinner := loader.NewLoader(cmd.Context(), "Finding IP Address...", Ctx.ConfigManager)
 		ipAddress, err := Ctx.PlatformClient.GetIPAddress()
+		spinner.Stop()
 		if err != nil {
 			ipAddress, ok = Ctx.ConfigManager.GetConfigValueOrAskUser("ip-address", cmd)
 			if !ok {
@@ -29,6 +29,7 @@ var sessionsStartCmd = &cobra.Command{
 			}
 		}
 
+		spinner = loader.NewLoader(cmd.Context(), "Starting session...", Ctx.ConfigManager)
 		session, err := Ctx.PlatformClient.CreateSession(cmd.Context(), moduleID, ipAddress, "")
 		spinner.Stop()
 		if err != nil {
