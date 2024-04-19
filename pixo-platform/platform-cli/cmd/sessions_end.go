@@ -23,6 +23,11 @@ var sessionsEndCmd = &cobra.Command{
 			Ctx.ConfigManager.Println(":exclamation: Session ID not provided")
 		}
 
+		moduleID, ok := Ctx.ConfigManager.GetIntConfigValueOrAskUser("module-id", cmd)
+		if !ok {
+			Ctx.ConfigManager.Println(":exclamation: Module ID not provided")
+		}
+
 		score, _ := Ctx.ConfigManager.GetIntConfigValueOrAskUser("score", cmd)
 		maxScore, _ := Ctx.ConfigManager.GetIntConfigValueOrAskUser("max-score", cmd)
 
@@ -33,6 +38,7 @@ var sessionsEndCmd = &cobra.Command{
 			MaxScore:  float64(maxScore),
 			Completed: true,
 			IPAddress: ipAddress,
+			ModuleID:  moduleID,
 		}
 
 		spinner := loader.NewLoader(cmd.Context(), "Ending session...", Ctx.ConfigManager)
