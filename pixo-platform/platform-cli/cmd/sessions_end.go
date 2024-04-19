@@ -75,10 +75,16 @@ var sessionsEndCmd = &cobra.Command{
 			OrgID:     session.OrgID,
 			ModuleID:  session.ModuleID,
 			JSONData: &primary_api.JSONEvent{
+				LessonStatus:    &[]string{"passed"}[0],
 				SessionDuration: sessionDuration.Seconds(),
 				Score:           &session.RawScore,
 				ScoreMax:        &session.MaxScore,
 				ScoreScaled:     &session.ScaledScore,
+				Result: &primary_api.Result{
+					Completion: true,
+					Success:    true,
+					Duration:   session.Duration,
+				},
 			},
 		}
 

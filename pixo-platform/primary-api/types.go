@@ -2,6 +2,18 @@ package primary_api
 
 import "time"
 
+type Result struct {
+	Completion bool   `json:"completion,omitempty"`
+	Success    bool   `json:"success,omitempty"`
+	Duration   string `json:"duration,omitempty"`
+	Score      *struct {
+		Scaled float32 `json:"scaled,omitempty"`
+		Raw    float64 `json:"raw,omitempty"`
+		Min    float32 `json:"min,omitempty"`
+		Max    float32 `json:"max,omitempty"`
+	} `json:"score,omitempty"`
+}
+
 type JSONEvent struct {
 	ID              string  `json:"id,omitempty"`
 	SessionDuration float64 `json:"sessionDuration,omitempty"`
@@ -20,17 +32,7 @@ type JSONEvent struct {
 	Object *struct {
 		ID *string `json:"id,omitempty"`
 	} `json:"object,omitempty"`
-	Result *struct {
-		Completion bool   `json:"completion,omitempty"`
-		Success    bool   `json:"success,omitempty"`
-		Duration   string `json:"duration,omitempty"`
-		Score      *struct {
-			Scaled float32 `json:"scaled,omitempty"`
-			Raw    float64 `json:"raw,omitempty"`
-			Min    float32 `json:"min,omitempty"`
-			Max    float32 `json:"max,omitempty"`
-		} `json:"score,omitempty"`
-	} `json:"result,omitempty"`
+	Result  *Result `json:"result,omitempty"`
 	Context *struct {
 		Registration string                 `json:"registration,omitempty"`
 		Revision     string                 `json:"revision,omitempty"`
