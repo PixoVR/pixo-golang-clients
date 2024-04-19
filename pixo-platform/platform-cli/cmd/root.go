@@ -15,6 +15,8 @@ import (
 )
 
 var (
+	cliVersion = "0.0.197"
+
 	homeDir          = os.Getenv("HOME")
 	configDirName    = ".pixo"
 	configFileName   = "config.yaml"
@@ -33,7 +35,7 @@ func GetRootCmd() *cobra.Command {
 
 var rootCmd = &cobra.Command{
 	Use:     "pixo",
-	Version: "0.0.196",
+	Version: cliVersion,
 	Short:   "A CLI for the Pixo Platform",
 	Long:    `A CLI tool used to streamline interactions with the Pixo Platform`,
 }
