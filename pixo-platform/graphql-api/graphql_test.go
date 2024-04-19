@@ -43,7 +43,7 @@ var _ = Describe("GraphQL API", func() {
 		Expect(session.ID).NotTo(BeZero())
 	})
 
-	It("can create get and update a session, and then create an event with a secret key", func() {
+	It("can create get and update a session", func() {
 		session, err := tokenClient.CreateSession(ctx, moduleID, "127.0.0.1", "test")
 		Expect(err).NotTo(HaveOccurred())
 		Expect(session).NotTo(BeNil())
@@ -67,16 +67,14 @@ var _ = Describe("GraphQL API", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(updatedSession).NotTo(BeNil())
 		Expect(updatedSession.ID).To(Equal(session.ID))
+		Expect(updatedSession.UserID).To(Equal(retrievedSession.UserID))
+		Expect(updatedSession.User.OrgID).To(Equal(retrievedSession.User.OrgID))
+		Expect(updatedSession.ModuleID).To(Equal(retrievedSession.ModuleID))
 		Expect(updatedSession.RawScore).To(Equal(input.RawScore))
 		Expect(updatedSession.MaxScore).To(Equal(input.MaxScore))
 		Expect(updatedSession.ScaledScore).To(Equal(input.RawScore / input.MaxScore))
 		Expect(updatedSession.CompletedAt).NotTo(BeNil())
 		Expect(updatedSession.Duration).NotTo(BeNil())
-
-		// ERROR: invalid input syntax for type uuid: "" (SQLSTATE 22P02) ??
-		//event, err := tokenClient.CreateEvent(ctx, session.ID, faker.UUIDDigit(), "test", "{}")
-		//Expect(err).NotTo(HaveOccurred())
-		//Expect(event).NotTo(BeNil())
 	})
 
 	It("can get the multiplayer server configs", func() {
