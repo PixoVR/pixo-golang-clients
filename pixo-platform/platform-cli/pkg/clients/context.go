@@ -17,10 +17,11 @@ import (
 )
 
 type CLIContext struct {
-	FormHandler       forms.FormHandler
-	ConfigManager     config.Manager
-	OldAPIClient      abstract_client.AbstractClient
-	PlatformClient    platform.PlatformClient
+	FormHandler    forms.FormHandler
+	ConfigManager  config.Manager
+	OldAPIClient   abstract_client.AbstractClient
+	PlatformClient platform.PlatformClient
+	//HeadsetClient     platform.HeadsetClient
 	MatchmakingClient matchmaker.Matchmaker
 	FileOpener        editor.FileOpener
 }

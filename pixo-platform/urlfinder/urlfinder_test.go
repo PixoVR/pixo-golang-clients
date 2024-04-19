@@ -82,6 +82,12 @@ var _ = Describe("Urlfinder", func() {
 			Expect(url).To(Equal("https://api.apex.dev.pixovr.com"))
 		})
 
+		It("can find the local old api url", func() {
+			config := urlfinder.ServiceConfig{Service: "api", Lifecycle: "local", Port: 8003}
+			url := config.FormatURL()
+			Expect(url).To(Equal("http://localhost:8003"))
+		})
+
 		It("can find the url for the legacy saudi prod platform API", func() {
 			config := urlfinder.ServiceConfig{
 				Region:  "saudi",
@@ -97,6 +103,22 @@ var _ = Describe("Urlfinder", func() {
 			}
 			url := config.FormatURL()
 			Expect(url).To(Equal("https://saudi.apex.pixovr.com/v2"))
+		})
+
+	})
+
+	Context("headset api", func() {
+
+		It("can find the local headset api url", func() {
+			config := urlfinder.ServiceConfig{Service: "modules", Lifecycle: "local", Port: 8003}
+			url := config.FormatURL()
+			Expect(url).To(Equal("http://localhost:8003"))
+		})
+
+		It("can find the default headset api url", func() {
+			config := urlfinder.ServiceConfig{Service: "modules"}
+			url := config.FormatURL()
+			Expect(url).To(Equal("https://modules.apex.pixovr.com"))
 		})
 
 	})

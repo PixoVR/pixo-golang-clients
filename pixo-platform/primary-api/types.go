@@ -3,45 +3,45 @@ package primary_api
 import "time"
 
 type JSONEvent struct {
-	ID              string  `json:"id"`
-	SessionDuration float64 `json:"sessionDuration"` // this needs to be a float so that we can handle 1 and 1.0
-	LessonStatus    *string `json:"lessonStatus"`
-	ModuleName      string  `json:"moduleName"`
+	ID              string  `json:"id,omitempty"`
+	SessionDuration float64 `json:"sessionDuration,omitempty"`
+	LessonStatus    *string `json:"lessonStatus,omitempty"`
+	ModuleName      string  `json:"moduleName,omitempty"`
 	Actor           struct {
-		Name *string `json:"name"`
-		Mbox *string `json:"mBox"`
-	} `json:"actor"`
+		Name *string `json:"name,omitempty"`
+		Mbox *string `json:"mBox,omitempty"`
+	} `json:"actor,omitempty"`
 	Verb struct {
-		ID      *string `json:"id"`
+		ID      *string `json:"id,omitempty"`
 		Display struct {
-			EN *string `json:"en"`
-		} `json:"display"`
-	} `json:"verb"`
+			EN *string `json:"en,omitempty"`
+		} `json:"display,omitempty"`
+	} `json:"verb,omitempty"`
 	Object *struct {
-		ID *string `json:"id"`
-	} `json:"object"`
+		ID *string `json:"id,omitempty"`
+	} `json:"object,omitempty"`
 	Result *struct {
-		Completion bool   `json:"completion"`
-		Success    bool   `json:"success"`
-		Duration   string `json:"duration"`
+		Completion bool   `json:"completion,omitempty"`
+		Success    bool   `json:"success,omitempty"`
+		Duration   string `json:"duration,omitempty"`
 		Score      *struct {
-			Scaled float32 `json:"scaled"`
-			Raw    float64 `json:"raw"`
-			Min    float32 `json:"min"`
-			Max    float32 `json:"max"`
-		} `json:"score"`
-	} `json:"result"`
+			Scaled float32 `json:"scaled,omitempty"`
+			Raw    float64 `json:"raw,omitempty"`
+			Min    float32 `json:"min,omitempty"`
+			Max    float32 `json:"max,omitempty"`
+		} `json:"score,omitempty"`
+	} `json:"result,omitempty"`
 	Context *struct {
-		Registration string                 `json:"registration"`
-		Revision     string                 `json:"revision"`
-		Extensions   map[string]interface{} `json:"extensions"`
-	} `json:"context"`
+		Registration string                 `json:"registration,omitempty"`
+		Revision     string                 `json:"revision,omitempty"`
+		Extensions   map[string]interface{} `json:"extensions,omitempty"`
+	} `json:"context,omitempty"`
 
-	Score       *float64 `json:"score"`
-	ScoreMin    *float64 `json:"scoreMin"`
-	ScoreMax    *float64 `json:"scoreMax"`
-	ScoreScaled *float64 `json:"scoreScaled"`
-	Success     *bool    `json:"success"`
+	Score       *float64 `json:"score,omitempty"`
+	ScoreMin    *float64 `json:"scoreMin,omitempty"`
+	ScoreMax    *float64 `json:"scoreMax,omitempty"`
+	ScoreScaled *float64 `json:"scoreScaled,omitempty"`
+	Success     *bool    `json:"success,omitempty"`
 }
 
 type OrgModule struct {
