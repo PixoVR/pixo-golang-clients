@@ -47,10 +47,6 @@ func (m *MultiplayerMatchmaker) Login(username, password string) error {
 	return nil
 }
 
-func (m *MultiplayerMatchmaker) ActiveUserID() int {
-	return 1
-}
-
 func newServiceConfig(lifecycle, region string) urlfinder.ServiceConfig {
 	return urlfinder.ServiceConfig{
 		Service:   "matchmaking",

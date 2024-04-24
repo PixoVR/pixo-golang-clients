@@ -2,7 +2,6 @@ package clients
 
 import (
 	"context"
-	abstract_client "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/config"
@@ -17,11 +16,10 @@ import (
 )
 
 type CLIContext struct {
-	FormHandler    forms.FormHandler
-	ConfigManager  config.Manager
-	OldAPIClient   abstract_client.AbstractClient
-	PlatformClient platform.PlatformClient
-	//HeadsetClient     platform.HeadsetClient
+	FormHandler       forms.FormHandler
+	ConfigManager     config.Manager
+	OldAPIClient      primary_api.OldAPIClient
+	PlatformClient    platform.PlatformClient
 	MatchmakingClient matchmaker.Matchmaker
 	FileOpener        editor.FileOpener
 }
@@ -112,6 +110,7 @@ func (p *CLIContext) Authenticate(cmd *cobra.Command) error {
 
 	p.ConfigManager.SetConfigValue("token", p.PlatformClient.GetToken())
 	p.ConfigManager.SetIntConfigValue("user-id", p.PlatformClient.ActiveUserID())
+	p.ConfigManager.SetIntConfigValue("org-id", p.PlatformClient.ActiveUserID())
 
 	return nil
 }

@@ -52,6 +52,7 @@ func (a *AbstractServiceClient) FormatRequest() *resty.Request {
 
 	if a.token != "" {
 		req.SetHeader("Authorization", fmt.Sprintf("Bearer %s", a.token))
+		req.SetHeader("x-access-token", a.token)
 	}
 
 	if a.key != "" {

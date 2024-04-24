@@ -92,6 +92,10 @@ func (m *MockGraphQLClient) ActiveUserID() int {
 	return 1
 }
 
+func (m *MockGraphQLClient) ActiveOrgID() int {
+	return 1
+}
+
 func (m *MockGraphQLClient) GetToken() string {
 	return faker.UUIDHyphenated()
 }

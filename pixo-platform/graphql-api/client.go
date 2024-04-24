@@ -17,6 +17,9 @@ import (
 type PlatformClient interface {
 	abstract_client.AbstractClient
 
+	ActiveUserID() int
+	ActiveOrgID() int
+
 	GetUserByUsername(ctx context.Context, username string) (*platform.User, error)
 	CreateUser(ctx context.Context, user platform.User) (*platform.User, error)
 	UpdateUser(ctx context.Context, user platform.User) (*platform.User, error)
@@ -129,11 +132,26 @@ func (g *GraphQLAPIClient) ActiveUserID() int {
 
 	rawToken, err := auth.ParseJWT(token)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to parse JWT")
 		return 0
 	}
 
 	return rawToken.UserID
+}
+
+func (g *GraphQLAPIClient) ActiveOrgID() int {
+
+	if !g.IsAuthenticated() {
+		return 0
+	}
+
+	token := g.GetToken()
+
+	rawToken, err := auth.ParseJWT(token)
+	if err != nil {
+		return 0
+	}
+
+	return rawToken.OrgID
 }
 
 func newServiceConfig(config urlfinder.ClientConfig) urlfinder.ServiceConfig {

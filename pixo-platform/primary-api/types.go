@@ -14,6 +14,13 @@ type Result struct {
 	} `json:"score,omitempty"`
 }
 
+type Webhook struct {
+	ID          int    `json:"id,omitempty"`
+	OrgID       int    `json:"orgId,omitempty"`
+	Description string `json:"description,omitempty"`
+	URL         string `json:"url,omitempty"`
+}
+
 type JSONEvent struct {
 	ID              string  `json:"id,omitempty"`
 	SessionDuration float64 `json:"sessionDuration,omitempty"`

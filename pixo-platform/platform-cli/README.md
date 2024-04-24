@@ -32,6 +32,10 @@ with the platform, deploying gameserver versions, and simplifying the testing of
     - [Delete](#delete)
 - [Modules](#modules)
   - [Create Module Version](#create-module-version)
+- [Webhooks](#webhooks)
+  - [Create](#create-webhook)
+  - [List](#list-webhook)
+  - [Delete](#delete-webhook)
 - [Sessions](#sessions)
   - [Start a Session](#start-a-session)
   - [End a Session](#end-a-session)
@@ -221,6 +225,25 @@ pixo modules deploy \
     --server-version 1.00.00 \
     --package com.pixovr.test \
     --zip-file /path/to/zip
+```
+
+## Webhooks
+
+### Create Webhook
+```bash
+pixo webhooks create \
+  --url https://example.com/webhook
+  --description "Test Webhook"
+```
+
+### List Webhook
+```bash
+pixo webhooks list
+```
+
+### Delete Webhook
+```bash
+pixo webhooks delete --webhook-id 1
 ```
 
 ## Sessions

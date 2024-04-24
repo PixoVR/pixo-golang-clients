@@ -50,6 +50,7 @@ var _ = Describe("Users API", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(client.IsAuthenticated()).To(BeTrue())
 		Expect(client.ActiveUserID()).To(Equal(testUser.ID))
+		Expect(client.ActiveOrgID()).To(Equal(testUser.OrgID))
 	})
 
 	It("can get a user by username", func() {
