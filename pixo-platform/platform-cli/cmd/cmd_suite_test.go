@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/headset"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/cmd"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/clients"
@@ -30,6 +31,7 @@ func TestCLI(t *testing.T) {
 type TestExecutor struct {
 	ConfigManager         config.Manager
 	MockPlatformClient    *graphql_api.MockGraphQLClient
+	MockHeadsetClient     *headset.MockClient
 	MockMatchmakingClient *matchmaker.MockMatchmaker
 	MockOldAPIClient      *primary_api.MockClient
 	MockFileOpener        *editor.MockFileOpener
@@ -54,8 +56,9 @@ func NewTestExecutor() *TestExecutor {
 	err := configManager.SetConfigFile(testConfigPath)
 	Expect(err).NotTo(HaveOccurred())
 
-	mockOldAPIClient := &primary_api.MockClient{}
 	mockPlatformClient := &graphql_api.MockGraphQLClient{}
+	mockHeadsetClient := &headset.MockClient{}
+	mockOldAPIClient := &primary_api.MockClient{}
 	mockMatchmaker := matchmaker.NewMockMatchmaker()
 	mockFileOpener := &editor.MockFileOpener{}
 
@@ -63,6 +66,7 @@ func NewTestExecutor() *TestExecutor {
 		FormHandler:       formHandler,
 		ConfigManager:     configManager,
 		PlatformClient:    mockPlatformClient,
+		HeadsetClient:     mockHeadsetClient,
 		MatchmakingClient: mockMatchmaker,
 		OldAPIClient:      mockOldAPIClient,
 		FileOpener:        mockFileOpener,
@@ -72,6 +76,7 @@ func NewTestExecutor() *TestExecutor {
 	executor := &TestExecutor{
 		ConfigManager:         configManager,
 		MockPlatformClient:    mockPlatformClient,
+		MockHeadsetClient:     mockHeadsetClient,
 		MockMatchmakingClient: mockMatchmaker,
 		MockOldAPIClient:      mockOldAPIClient,
 		MockFileOpener:        mockFileOpener,
