@@ -9,12 +9,22 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func oldAPILogin() {
+	username, _ := Ctx.ConfigManager.GetConfigValue("username")
+	password, _ := Ctx.ConfigManager.GetConfigValue("password")
+	if err := Ctx.OldAPIClient.Login(username, password); err != nil {
+		Ctx.ConfigManager.Println(":exclamation: Unable to login to old API: ", err)
+	}
+}
+
 // webhooksCreateCmd represents the sessions start command
 var webhooksCreateCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Create a webhook",
 	Long:  `Create a webhook`,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		oldAPILogin()
+
 		url, ok := Ctx.ConfigManager.GetConfigValueOrAskUser("url", cmd)
 		if !ok {
 			Ctx.ConfigManager.Println(":exclamation: URL not provided")

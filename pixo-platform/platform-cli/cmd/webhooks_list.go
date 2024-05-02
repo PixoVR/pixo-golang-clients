@@ -15,6 +15,8 @@ var webhooksListCmd = &cobra.Command{
 	Short: "List webhooks",
 	Long:  `List webhooks`,
 	Run: func(cmd *cobra.Command, args []string) {
+		oldAPILogin()
+	
 		spinner := loader.NewLoader(cmd.Context(), "Getting webhooks...", Ctx.ConfigManager)
 		webhooks, err := Ctx.OldAPIClient.GetWebhooks(Ctx.PlatformClient.ActiveOrgID())
 		spinner.Stop()

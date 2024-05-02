@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	cliVersion = "0.1.0"
+	cliVersion = "0.1.1"
 
 	homeDir          = os.Getenv("HOME")
 	configDirName    = ".pixo"
@@ -46,12 +46,6 @@ func Execute() {
 
 	if err := Ctx.Authenticate(nil); err != nil {
 		log.Error().Err(err).Msg("Failed to authenticate")
-	}
-
-	username, _ := Ctx.ConfigManager.GetConfigValue("username")
-	password, _ := Ctx.ConfigManager.GetConfigValue("password")
-	if err := Ctx.OldAPIClient.Login(username, password); err != nil {
-		Ctx.ConfigManager.Println(":exclamation: Unable to login to old API: ", err)
 	}
 
 	if err := rootCmd.Execute(); err != nil {

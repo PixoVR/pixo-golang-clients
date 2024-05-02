@@ -14,6 +14,8 @@ var webhooksDeleteCmd = &cobra.Command{
 	Short: "Delete webhooks",
 	Long:  `Delete webhooks`,
 	Run: func(cmd *cobra.Command, args []string) {
+		oldAPILogin()
+
 		id, ok := Ctx.ConfigManager.GetIntConfigValueOrAskUser("webhook-id", cmd)
 		if !ok {
 			Ctx.ConfigManager.Println(":exclamation: ID is required")
