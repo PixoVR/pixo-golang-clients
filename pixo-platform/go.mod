@@ -18,7 +18,7 @@ require (
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/viper v1.18.2
 	gitlab.com/david_mbuvi/go_asterisks v0.0.0-20221114073100-4669d8bedcbe
-	golang.org/x/text v0.14.0
+	golang.org/x/text v0.15.0
 	gopkg.in/ini.v1 v1.67.0
 	gopkg.in/yaml.v3 v3.0.1
 )
