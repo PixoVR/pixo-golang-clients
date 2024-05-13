@@ -8,7 +8,7 @@ require (
 	github.com/fatih/color v1.16.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-faker/faker/v4 v4.4.1
-	github.com/go-resty/resty/v2 v2.13.0
+	github.com/go-resty/resty/v2 v2.13.1
 	github.com/gorilla/websocket v1.5.1
 	github.com/hasura/go-graphql-client v0.12.1
 	github.com/kyokomi/emoji v2.2.4+incompatible
