@@ -3,7 +3,7 @@ module github.com/PixoVR/pixo-golang-clients/vertex-ai
 go 1.20
 
 require (
-	github.com/go-resty/resty/v2 v2.13.0
+	github.com/go-resty/resty/v2 v2.13.1
 	github.com/joho/godotenv v1.5.1
 	github.com/onsi/ginkgo/v2 v2.17.3
 	github.com/onsi/gomega v1.33.1
