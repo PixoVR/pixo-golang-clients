@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/PixoVR/pixo-golang-server-utilities/pixo-platform v0.0.0-20240125065526-606fcb3d2761
 	github.com/charmbracelet/huh v0.3.0
-	github.com/fatih/color v1.16.0
+	github.com/fatih/color v1.17.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-faker/faker/v4 v4.4.1
 	github.com/go-resty/resty/v2 v2.13.1
