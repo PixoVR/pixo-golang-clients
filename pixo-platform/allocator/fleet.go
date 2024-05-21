@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func (a *AllocatorClient) RegisterFleet(request FleetRequest) Response {
+func (a *Client) RegisterFleet(request FleetRequest) Response {
 
 	body, err := json.Marshal(request)
 	if err != nil {
@@ -40,7 +40,7 @@ func (a *AllocatorClient) RegisterFleet(request FleetRequest) Response {
 	return response
 }
 
-func (a *AllocatorClient) DeregisterFleet(request FleetRequest) Response {
+func (a *Client) DeregisterFleet(request FleetRequest) Response {
 	cleanedSemanticVersion := strings.ReplaceAll(request.ServerVersion.SemanticVersion, ".", "-")
 
 	path := fmt.Sprintf("allocator/fleets/module/%d/semanticVersion/%s", request.ServerVersion.ModuleID, cleanedSemanticVersion)

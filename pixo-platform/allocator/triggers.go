@@ -7,7 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (a *AllocatorClient) RegisterTrigger(trigger platform.MultiplayerServerTrigger) Response {
+func (a *Client) RegisterTrigger(trigger platform.MultiplayerServerTrigger) Response {
 
 	body, err := json.Marshal(trigger)
 	if err != nil {
@@ -29,7 +29,7 @@ func (a *AllocatorClient) RegisterTrigger(trigger platform.MultiplayerServerTrig
 	return Response{HTTPResponse: res}
 }
 
-func (a *AllocatorClient) UpdateTrigger(trigger platform.MultiplayerServerTrigger) Response {
+func (a *Client) UpdateTrigger(trigger platform.MultiplayerServerTrigger) Response {
 
 	body, err := json.Marshal(trigger)
 	if err != nil {
@@ -51,7 +51,7 @@ func (a *AllocatorClient) UpdateTrigger(trigger platform.MultiplayerServerTrigge
 	return Response{HTTPResponse: res}
 }
 
-func (a *AllocatorClient) DeleteTrigger(id int) Response {
+func (a *Client) DeleteTrigger(id int) Response {
 
 	path := fmt.Sprintf("allocator/build/triggers/%d", id)
 

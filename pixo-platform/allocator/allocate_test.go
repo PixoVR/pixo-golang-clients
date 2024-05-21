@@ -13,7 +13,7 @@ import (
 var _ = Describe("Allocate", Ordered, func() {
 
 	var (
-		allocatorClient *AllocatorClient
+		allocatorClient *Client
 		config          urlfinder.ClientConfig
 	)
 
@@ -23,6 +23,10 @@ var _ = Describe("Allocate", Ordered, func() {
 			Lifecycle: "dev",
 		}
 		allocatorClient = NewClient(config)
+		Expect(allocatorClient.IsAuthenticated()).To(BeTrue())
+	})
+
+	It("should be able to authenticate with the allocator", func() {
 		Expect(allocatorClient.IsAuthenticated()).To(BeTrue())
 	})
 

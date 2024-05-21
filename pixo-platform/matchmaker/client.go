@@ -9,6 +9,9 @@ import (
 
 type MultiplayerMatchmaker struct {
 	*abstractClient.AbstractServiceClient
+
+	platformClient graphql_api.PlatformClient
+
 	gameserverAddress    *net.UDPAddr
 	gameserverConnection *net.UDPConn
 }
@@ -41,11 +44,12 @@ func NewMatchmaker(config urlfinder.ClientConfig, timeoutSeconds ...int) *Multip
 
 	return &MultiplayerMatchmaker{
 		AbstractServiceClient: abstractClient.NewClient(abstractConfig),
+		platformClient:        graphql_api.NewClient(config),
 	}
 }
 
 func (m *MultiplayerMatchmaker) Login(username, password string) error {
-	return nil
+	return m.platformClient.Login(username, password)
 }
 
 func newServiceConfig(lifecycle, region string) urlfinder.ServiceConfig {

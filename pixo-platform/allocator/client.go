@@ -2,47 +2,47 @@ package allocator
 
 import (
 	abstractClient "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
-	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
+	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 )
 
-// AllocatorClient is a struct for the primary API that contains an abstract client
-type AllocatorClient struct {
+// Client is a struct for the primary API that contains an abstract client
+type Client struct {
 	abstractClient.AbstractServiceClient
+
+	platformClient graphql_api.PlatformClient
 }
 
-// NewClient is a function that returns a AbstractServiceClient
-func NewClient(config urlfinder.ClientConfig) *AllocatorClient {
-
-	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
-
-	abstractConfig := abstractClient.AbstractConfig{
-		URL:   serviceConfig.FormatURL(),
-		Token: config.Token,
-	}
-
-	return &AllocatorClient{
-		AbstractServiceClient: *abstractClient.NewClient(abstractConfig),
-	}
-}
-
-func NewClientWithBasicAuth(username, password string, config urlfinder.ClientConfig) (*AllocatorClient, error) {
-	primaryClient, err := primary_api.NewClientWithBasicAuth(username, password, config)
+func NewClientWithBasicAuth(username, password string, config urlfinder.ClientConfig) (*Client, error) {
+	platformClient, err := graphql_api.NewClientWithBasicAuth(username, password, config)
 	if err != nil {
 		return nil, err
 	}
+
+	config.Token = platformClient.GetToken()
+
+	return NewClient(config), nil
+}
+
+// NewClient is a function that returns a AbstractServiceClient
+func NewClient(config urlfinder.ClientConfig) *Client {
 
 	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
 
 	abstractConfig := abstractClient.AbstractConfig{
 		Path:  serviceConfig.Service,
 		URL:   serviceConfig.FormatURL(),
-		Token: primaryClient.GetToken(),
+		Token: config.Token,
 	}
 
-	return &AllocatorClient{
+	return &Client{
 		AbstractServiceClient: *abstractClient.NewClient(abstractConfig),
-	}, nil
+		platformClient:        graphql_api.NewClient(config),
+	}
+}
+
+func (a *Client) Login(username, password string) error {
+	return a.platformClient.Login(username, password)
 }
 
 func newServiceConfig(lifecycle, region string) urlfinder.ServiceConfig {
