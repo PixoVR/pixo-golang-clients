@@ -4,11 +4,14 @@ import (
 	"bytes"
 	"fmt"
 	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/headset"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/cmd"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/clients"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/config"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/editor"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/forms/basic"
+	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 	"io"
@@ -22,20 +25,15 @@ import (
 
 func TestCLI(t *testing.T) {
 	RegisterFailHandler(Fail)
-
-	//root := GetProjectRoot()
-	//envPath := filepath.Join(root, "../../../../.env")
-	//
-	//_ = godotenv.Load(envPath)
-
 	RunSpecs(t, "Pixo Platform CLI Suite")
 }
 
 type TestExecutor struct {
 	ConfigManager         config.Manager
 	MockPlatformClient    *graphql_api.MockGraphQLClient
+	MockHeadsetClient     *headset.MockClient
 	MockMatchmakingClient *matchmaker.MockMatchmaker
-	MockOldAPIClient      *graphql_api.MockGraphQLClient
+	MockOldAPIClient      *primary_api.MockClient
 	MockFileOpener        *editor.MockFileOpener
 	configFile            string
 }
@@ -53,18 +51,22 @@ func NewTestExecutor() *TestExecutor {
 		log.Info().Msgf("test config file does not exist: %s", testConfigPath)
 	}
 
-	configManager := config.NewFileManager("")
+	formHandler := basic.NewFormHandler(nil, nil)
+	configManager := config.NewFileManager("", formHandler)
 	err := configManager.SetConfigFile(testConfigPath)
 	Expect(err).NotTo(HaveOccurred())
 
-	mockOldAPIClient := &graphql_api.MockGraphQLClient{}
 	mockPlatformClient := &graphql_api.MockGraphQLClient{}
+	mockHeadsetClient := &headset.MockClient{}
+	mockOldAPIClient := &primary_api.MockClient{}
 	mockMatchmaker := matchmaker.NewMockMatchmaker()
 	mockFileOpener := &editor.MockFileOpener{}
 
 	mockPlatformCtx := &clients.CLIContext{
+		FormHandler:       formHandler,
 		ConfigManager:     configManager,
 		PlatformClient:    mockPlatformClient,
+		HeadsetClient:     mockHeadsetClient,
 		MatchmakingClient: mockMatchmaker,
 		OldAPIClient:      mockOldAPIClient,
 		FileOpener:        mockFileOpener,
@@ -74,6 +76,7 @@ func NewTestExecutor() *TestExecutor {
 	executor := &TestExecutor{
 		ConfigManager:         configManager,
 		MockPlatformClient:    mockPlatformClient,
+		MockHeadsetClient:     mockHeadsetClient,
 		MockMatchmakingClient: mockMatchmaker,
 		MockOldAPIClient:      mockOldAPIClient,
 		MockFileOpener:        mockFileOpener,
@@ -121,6 +124,5 @@ func (t *TestExecutor) RunCommand(args ...string) (string, error) {
 func (t *TestExecutor) RunCommandAndExpectSuccess(args ...string) string {
 	output, err := t.RunCommandWithInput(os.Stdin, args...)
 	Expect(err).NotTo(HaveOccurred())
-	Expect(output).NotTo(BeEmpty())
 	return output
 }

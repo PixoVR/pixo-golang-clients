@@ -17,6 +17,9 @@ import (
 type PlatformClient interface {
 	abstract_client.AbstractClient
 
+	ActiveUserID() int
+	ActiveOrgID() int
+
 	GetUserByUsername(ctx context.Context, username string) (*platform.User, error)
 	CreateUser(ctx context.Context, user platform.User) (*platform.User, error)
 	UpdateUser(ctx context.Context, user platform.User) (*platform.User, error)
@@ -26,15 +29,20 @@ type PlatformClient interface {
 	CreateAPIKey(ctx context.Context, input platform.APIKey) (*platform.APIKey, error)
 	DeleteAPIKey(ctx context.Context, id int) error
 
+	GetPlatforms(ctx context.Context) ([]*Platform, error)
+	GetControlTypes(ctx context.Context) ([]*ControlType, error)
+
+	CreateModuleVersion(ctx context.Context, input ModuleVersion) (*ModuleVersion, error)
+
 	GetSession(ctx context.Context, id int) (*Session, error)
 	CreateSession(ctx context.Context, moduleID int, ipAddress, deviceId string) (*Session, error)
-	UpdateSession(ctx context.Context, id int, status string, completed bool) (*Session, error)
+	UpdateSession(ctx context.Context, session Session) (*Session, error)
 	CreateEvent(ctx context.Context, sessionID int, uuid string, eventType string, data string) (*platform.Event, error)
 
 	GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]*MultiplayerServerConfigQueryParams, error)
 	GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionQueryParams) ([]*MultiplayerServerVersion, error)
 	GetMultiplayerServerVersion(ctx context.Context, id int) (*MultiplayerServerVersion, error)
-	CreateMultiplayerServerVersion(ctx context.Context, moduleID int, image, semanticVersion, engine string) (*MultiplayerServerVersion, error)
+	CreateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error)
 }
 
 var _ PlatformClient = (*GraphQLAPIClient)(nil)
@@ -66,6 +74,7 @@ func NewClient(config urlfinder.ClientConfig) *GraphQLAPIClient {
 	c := http.Client{Transport: t}
 
 	abstractConfig := abstract_client.AbstractConfig{
+		Path:   serviceConfig.Service,
 		Token:  config.Token,
 		APIKey: config.APIKey,
 		URL:    url,
@@ -124,11 +133,26 @@ func (g *GraphQLAPIClient) ActiveUserID() int {
 
 	rawToken, err := auth.ParseJWT(token)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to parse JWT")
 		return 0
 	}
 
 	return rawToken.UserID
+}
+
+func (g *GraphQLAPIClient) ActiveOrgID() int {
+
+	if !g.IsAuthenticated() {
+		return 0
+	}
+
+	token := g.GetToken()
+
+	rawToken, err := auth.ParseJWT(token)
+	if err != nil {
+		return 0
+	}
+
+	return rawToken.OrgID
 }
 
 func newServiceConfig(config urlfinder.ClientConfig) urlfinder.ServiceConfig {

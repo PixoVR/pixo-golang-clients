@@ -23,7 +23,7 @@ var setCmd = &cobra.Command{
 		}
 
 		region, ok := Ctx.ConfigManager.GetFlagValue("region", cmd)
-		if region != "" {
+		if ok {
 			env.Region = region
 		}
 

@@ -6,6 +6,13 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+type OldAPIClient interface {
+	Login(username, password string) error
+	CreateWebhook(webhook Webhook) error
+	GetWebhooks(orgID int) ([]Webhook, error)
+	DeleteWebhook(webhookID int) error
+}
+
 // PrimaryAPIClient is a struct for the primary API that contains an abstract client
 type PrimaryAPIClient struct {
 	abstractClient.AbstractServiceClient

@@ -39,6 +39,10 @@ func (s ServiceConfig) FormatURL() string {
 			s.Port = 8000
 		}
 
+		if s.Service == "api" || s.Service == "modules" {
+			return fmt.Sprintf("http://localhost:%d", s.Port)
+		}
+
 		return fmt.Sprintf("http://localhost:%d/%s", s.Port, s.Service)
 	}
 
@@ -75,12 +79,12 @@ func (s ServiceConfig) FormatURL() string {
 			prefix = fmt.Sprintf("%s.%s", prefix, s.Tenant)
 		}
 	} else {
-		if s.Service == "api" {
+		if s.Service == "api" || s.Service == "modules" {
 			prefix = s.Service
 		}
 	}
 
-	if s.Service == "api" {
+	if s.Service == "api" || s.Service == "modules" {
 		return fmt.Sprintf("https://%s.%s.%s", prefix, s.Tenant, s.GetBaseDomain())
 	}
 

@@ -2,6 +2,57 @@ package primary_api
 
 import "time"
 
+type Result struct {
+	Completion bool   `json:"completion,omitempty"`
+	Success    bool   `json:"success,omitempty"`
+	Duration   string `json:"duration,omitempty"`
+	Score      *struct {
+		Scaled float32 `json:"scaled,omitempty"`
+		Raw    float64 `json:"raw,omitempty"`
+		Min    float32 `json:"min,omitempty"`
+		Max    float32 `json:"max,omitempty"`
+	} `json:"score,omitempty"`
+}
+
+type Webhook struct {
+	ID          int    `json:"id,omitempty"`
+	OrgID       int    `json:"orgId,omitempty"`
+	Description string `json:"description,omitempty"`
+	URL         string `json:"url,omitempty"`
+}
+
+type JSONEvent struct {
+	ID              string  `json:"id,omitempty"`
+	SessionDuration float64 `json:"sessionDuration,omitempty"`
+	LessonStatus    *string `json:"lessonStatus,omitempty"`
+	ModuleName      string  `json:"moduleName,omitempty"`
+	Actor           struct {
+		Name *string `json:"name,omitempty"`
+		Mbox *string `json:"mBox,omitempty"`
+	} `json:"actor,omitempty"`
+	Verb struct {
+		ID      *string `json:"id,omitempty"`
+		Display struct {
+			EN *string `json:"en,omitempty"`
+		} `json:"display,omitempty"`
+	} `json:"verb,omitempty"`
+	Object *struct {
+		ID *string `json:"id,omitempty"`
+	} `json:"object,omitempty"`
+	Result  *Result `json:"result,omitempty"`
+	Context *struct {
+		Registration string                 `json:"registration,omitempty"`
+		Revision     string                 `json:"revision,omitempty"`
+		Extensions   map[string]interface{} `json:"extensions,omitempty"`
+	} `json:"context,omitempty"`
+
+	Score       *float64 `json:"score,omitempty"`
+	ScoreMin    *float64 `json:"scoreMin,omitempty"`
+	ScoreMax    *float64 `json:"scoreMax,omitempty"`
+	ScoreScaled *float64 `json:"scoreScaled,omitempty"`
+	Success     *bool    `json:"success,omitempty"`
+}
+
 type OrgModule struct {
 	ID             int       `json:"id"`
 	ModuleID       int       `json:"moduleId"`
@@ -51,6 +102,8 @@ type EventResult struct {
 type Org struct {
 	ID        int       `json:"id"`
 	Name      string    `json:"name"`
+	Type      string    `json:"type"`
+	Status    string    `json:"enabled"`
 	CreatedAt time.Time `json:"createdAt"`
 }
 

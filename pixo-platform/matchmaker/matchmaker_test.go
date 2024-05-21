@@ -30,8 +30,8 @@ var _ = Describe("Multiplayer", func() {
 
 	It("can dial a the matchmaking service and request a match", func() {
 		req := matchmaker.MatchRequest{
-			ModuleID:      1,
-			ServerVersion: "1.00.00",
+			ModuleID:      43,
+			ServerVersion: "1.03.02",
 		}
 
 		conn, _, err := m.DialMatchmaker()
@@ -76,8 +76,8 @@ var _ = Describe("Multiplayer", func() {
 
 	It("can retrieve a game server address using the matchmaker and send a message to it", func() {
 		req := matchmaker.MatchRequest{
-			ModuleID:      271,
-			ServerVersion: "2.00.01",
+			ModuleID:      43,
+			ServerVersion: "1.03.02",
 		}
 
 		addr, err := m.FindMatch(req)

@@ -24,6 +24,7 @@ func NewClient(config urlfinder.ClientConfig) Client {
 	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
 
 	abstractConfig := abstractClient.AbstractConfig{
+		Path:  serviceConfig.Service,
 		URL:   serviceConfig.FormatURL(),
 		Token: config.Token,
 	}

@@ -45,9 +45,11 @@ type MultiplayerServerVersion struct {
 	ModuleID        int             `json:"moduleId" graphql:"moduleId"`
 	Module          platform.Module `json:"module" graphql:"module"`
 	Engine          string          `json:"engine" graphql:"engine"`
+	Status          string          `json:"status" graphql:"status"`
 	SemanticVersion string          `json:"semanticVersion" graphql:"semanticVersion"`
 	ImageRegistry   string          `json:"imageRegistry" graphql:"imageRegistry"`
-	Status          string          `json:"status" graphql:"status"`
+	FileLink        string          `json:"fileLink" graphql:"fileLink"`
+	LocalFilePath   string          `json:"-" graphql:"-"`
 }
 
 type MultiplayerServerVersionQueryParams struct {

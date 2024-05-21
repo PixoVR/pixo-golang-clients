@@ -7,13 +7,14 @@ import (
 )
 
 type AbstractClient interface {
+	Path() string
+	GetIPAddress() (string, error)
 	Login(username, password string) error
 	SetAPIKey(key string)
 	SetToken(key string)
 	GetToken() string
 	GetURL() string
 	IsAuthenticated() bool
-	ActiveUserID() int
 
 	Get(path string) (*resty.Response, error)
 	Post(path string, body []byte) (*resty.Response, error)

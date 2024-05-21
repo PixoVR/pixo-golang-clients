@@ -10,6 +10,11 @@ func (a *AbstractServiceClient) Client() *resty.Client {
 	return a.restyClient
 }
 
+// Path returns the name of the service client
+func (a *AbstractServiceClient) Path() string {
+	return a.path
+}
+
 // GetURL returns the url of the restClient
 func (a *AbstractServiceClient) GetURL() string {
 	return a.url
@@ -52,6 +57,7 @@ func (a *AbstractServiceClient) FormatRequest() *resty.Request {
 
 	if a.token != "" {
 		req.SetHeader("Authorization", fmt.Sprintf("Bearer %s", a.token))
+		req.SetHeader("x-access-token", a.token)
 	}
 
 	if a.key != "" {
@@ -65,6 +71,6 @@ func (a *AbstractServiceClient) FormatRequest() *resty.Request {
 	return req
 }
 
-func (a *AbstractServiceClient) AddHeader(key string, value string) {
+func (a *AbstractServiceClient) SetHeader(key string, value string) {
 	a.headers[key] = value
 }
