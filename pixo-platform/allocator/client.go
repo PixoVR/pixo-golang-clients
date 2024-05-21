@@ -35,6 +35,7 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
 
 	abstractConfig := abstractClient.AbstractConfig{
+		Path:  serviceConfig.Service,
 		URL:   serviceConfig.FormatURL(),
 		Token: primaryClient.GetToken(),
 	}

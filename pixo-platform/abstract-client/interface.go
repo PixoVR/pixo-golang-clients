@@ -7,6 +7,7 @@ import (
 )
 
 type AbstractClient interface {
+	Path() string
 	GetIPAddress() (string, error)
 	Login(username, password string) error
 	SetAPIKey(key string)

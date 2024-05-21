@@ -74,6 +74,7 @@ func NewClient(config urlfinder.ClientConfig) *GraphQLAPIClient {
 	c := http.Client{Transport: t}
 
 	abstractConfig := abstract_client.AbstractConfig{
+		Path:   serviceConfig.Service,
 		Token:  config.Token,
 		APIKey: config.APIKey,
 		URL:    url,

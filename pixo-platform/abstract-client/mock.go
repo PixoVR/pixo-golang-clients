@@ -41,6 +41,10 @@ type MockAbstractClient struct {
 	Response []byte
 }
 
+func (m *MockAbstractClient) Path() string {
+	return ""
+}
+
 func (m *MockAbstractClient) GetIPAddress() (string, error) {
 	m.NumCalledGetIPAddress++
 

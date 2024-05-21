@@ -33,6 +33,7 @@ func NewMatchmaker(config urlfinder.ClientConfig, timeoutSeconds ...int) *Multip
 	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
 	url := getURL(serviceConfig.FormatURL())
 	abstractConfig := abstractClient.AbstractConfig{
+		Path:           serviceConfig.Service,
 		URL:            url,
 		Token:          config.Token,
 		TimeoutSeconds: timeoutSeconds[0],

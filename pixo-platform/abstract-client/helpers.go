@@ -10,6 +10,11 @@ func (a *AbstractServiceClient) Client() *resty.Client {
 	return a.restyClient
 }
 
+// Path returns the name of the service client
+func (a *AbstractServiceClient) Path() string {
+	return a.path
+}
+
 // GetURL returns the url of the restClient
 func (a *AbstractServiceClient) GetURL() string {
 	return a.url

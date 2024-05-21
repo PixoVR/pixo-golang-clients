@@ -83,6 +83,10 @@ func (m *MockGraphQLClient) GetURL() string {
 	return faker.URL()
 }
 
+func (m *MockGraphQLClient) Path() string {
+	return "v2"
+}
+
 func (m *MockGraphQLClient) Login(username, password string) error {
 	m.isAuthenticated = true
 	return nil
