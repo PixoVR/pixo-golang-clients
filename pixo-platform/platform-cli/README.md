@@ -30,7 +30,18 @@ with the platform, deploying gameserver versions, and simplifying the testing of
     - [Create](#create)
     - [List](#list)
     - [Delete](#delete)
-- [Run Mock Matchmaking Server](#run-mock-matchmaking-server)
+- [Modules](#modules)
+  - [Create Module Version](#create-module-version)
+- [Webhooks](#webhooks)
+  - [Create](#create-webhook)
+  - [List](#list-webhook)
+  - [Delete](#delete-webhook)
+- [Sessions](#sessions)
+  - [Start a Session](#start-a-session)
+  - [End a Session](#end-a-session)
+- [Running Mock Servers](#run-mock-servers)
+  - [Platform](#platform)
+  - [Matchmaking](#matchmaking)
 - [Deploy a Module Game Server Version](#deploy-a-module-game-server-version)
     - [Gameserver Build Pipeline (e.g. Cloud Build)](#gameserver-build-pipeline-eg-cloud-build)
         - [Sample Ini Configuration](#sample-ini-configuration)
@@ -208,9 +219,21 @@ pixo keys delete --key-id 1
 ```
 
 
-## Run Mock Matchmaking Server
+## Run Mock Servers
+### Platform
+Run a mock server that mimics the Pixo Platform API to test functionality locally.
+It has the following REST endpoints available. See the [Swagger API Docs](https://apex.pixovr.com/v2/swagger/index.html) for more details.
 
-Run a mock matchmaking server to test matchmaking functionality locally.
+#### GET
+- `/v2/assets`
+- `/v2/assets/download`
+ 
+#### POST
+- `/v2/assets`
+
+### Matchmaking 
+
+Run a mock server that mimics the Pixo Matchmaking API to test matchmaking functionality locally.
 It has a single websocket endpoint, `/matchmaking/matchmake`, that accepts a message (which it ignores)
 and sends a message back containing the IP and port of the game server to connect to.
 
