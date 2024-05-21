@@ -24,7 +24,7 @@ type DeleteUserResponse struct {
 }
 
 func (g *GraphQLAPIClient) CreateUser(ctx context.Context, user platform.User) (*platform.User, error) {
-	query := `mutation createUser($input: UserInput!) { createUser(input: $input) { id firstName lastName username role } }`
+	query := `mutation createUser($input: UserInput!) { createUser(input: $input) { id orgId firstName lastName username role } }`
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{

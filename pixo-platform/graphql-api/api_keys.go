@@ -93,7 +93,7 @@ func (g *GraphQLAPIClient) DeleteAPIKey(ctx context.Context, id int) error {
 	}
 
 	if !deleteResponse.Success {
-		return errors.New("failed to delete api apiKey")
+		return errors.New("failed to delete api key")
 	}
 
 	return nil

@@ -5,6 +5,8 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"strings"
 )
 
@@ -34,7 +36,7 @@ var configCmd = &cobra.Command{
 		}
 
 		if lifecycle := Ctx.ConfigManager.Lifecycle(); lifecycle != "" {
-			Ctx.ConfigManager.Println(":gear:  Lifecycle: ", lifecycle)
+			Ctx.ConfigManager.Println(":gear: Lifecycle: ", lifecycle)
 		}
 
 		Ctx.ConfigManager.Println()
@@ -56,40 +58,12 @@ var configCmd = &cobra.Command{
 		}
 
 		if _, ok := Ctx.ConfigManager.GetConfigValue("token"); ok {
-			Ctx.ConfigManager.Println(":key: Token: ********")
+			Ctx.ConfigManager.Println(":coin: Token: ********")
 		}
 
 		Ctx.ConfigManager.Println()
 
 		activeEnv := Ctx.ConfigManager.GetActiveEnv()
-
-		userInfoList := []string{
-			"username",
-			"user-id",
-			"api-key",
-		}
-		sensitiveList := []string{
-			"password",
-			"token",
-			"api-key",
-		}
-		isSensitiveOrRepetitive := func(k string) bool {
-			list := append(userInfoList, sensitiveList...)
-			for _, s := range list {
-				if strings.Contains(k, s) {
-					return true
-				}
-			}
-
-			return false
-		}
-
-		cleanKey := func(k string) string {
-			k = strings.Replace(k, "id", "ID", -1)
-			k = strings.Replace(k, "api", "API", -1)
-			k = strings.Replace(k, "-", " ", -1)
-			return strings.Title(k)
-		}
 
 		for k, v := range activeEnv.EnvMap {
 			if isSensitiveOrRepetitive(k) {
@@ -105,4 +79,37 @@ func init() {
 	rootCmd.AddCommand(configCmd)
 
 	configCmd.PersistentFlags().BoolVarP(&edit, "edit", "e", false, "Edit the config file in your default editor")
+}
+
+func cleanKey(k string) string {
+	k = strings.Replace(k, "id", "ID", -1)
+	k = strings.Replace(k, "api", "API", -1)
+	k = strings.Replace(k, "-", " ", -1)
+
+	c := cases.Title(language.English)
+	return c.String(k)
+}
+
+var (
+	userInfoList = []string{
+		"username",
+		"user-id",
+		"api-key",
+	}
+	sensitiveList = []string{
+		"password",
+		"token",
+		"api-key",
+	}
+)
+
+func isSensitiveOrRepetitive(k string) bool {
+	list := append(userInfoList, sensitiveList...)
+	for _, s := range list {
+		if strings.Contains(k, s) {
+			return true
+		}
+	}
+
+	return false
 }

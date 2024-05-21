@@ -1,11 +1,14 @@
 package clients
 
 import (
-	abstract_client "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
+	"context"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/headset"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/config"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/editor"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/forms"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/forms/basic"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/loader"
 	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
@@ -14,8 +17,10 @@ import (
 )
 
 type CLIContext struct {
+	FormHandler       forms.FormHandler
 	ConfigManager     config.Manager
-	OldAPIClient      abstract_client.AbstractClient
+	OldAPIClient      primary_api.OldAPIClient
+	HeadsetClient     headset.Client
 	PlatformClient    platform.PlatformClient
 	MatchmakingClient matchmaker.Matchmaker
 	FileOpener        editor.FileOpener
@@ -32,7 +37,10 @@ func NewCLIContextWithConfig(configFiles ...string) *CLIContext {
 		}
 	}
 
-	configManager := config.NewFileManager(configFile)
+	//formHandler := charm.NewFormHandler()
+	formHandler := basic.NewFormHandler(os.Stdin, os.Stdout)
+
+	configManager := config.NewFileManager(configFile, formHandler)
 
 	token, _ := configManager.GetConfigValue("token")
 
@@ -43,8 +51,10 @@ func NewCLIContextWithConfig(configFiles ...string) *CLIContext {
 	}
 
 	return &CLIContext{
+		FormHandler:       formHandler,
 		ConfigManager:     configManager,
 		OldAPIClient:      primary_api.NewClient(clientConfig),
+		HeadsetClient:     headset.NewClient(clientConfig),
 		PlatformClient:    platform.NewClient(clientConfig),
 		MatchmakingClient: matchmaker.NewMatchmaker(clientConfig),
 		FileOpener:        editor.NewFileOpener(""),
@@ -64,6 +74,7 @@ func (p *CLIContext) Authenticate(cmd *cobra.Command) error {
 	token, ok := p.ConfigManager.GetFlagOrConfigValue("token", cmd)
 	if ok {
 		p.PlatformClient.SetToken(token)
+		p.HeadsetClient.SetToken(token)
 		p.ConfigManager.SetConfigValue("token", token)
 		return nil
 	}
@@ -89,7 +100,11 @@ func (p *CLIContext) Authenticate(cmd *cobra.Command) error {
 	}
 	p.ConfigManager.SetConfigValue("password", password)
 
-	spinner := loader.NewSpinner(p.ConfigManager)
+	var ctx context.Context
+	if cmd != nil {
+		ctx = cmd.Context()
+	}
+	spinner := loader.NewLoader(ctx, "Logging into the Pixo Platform...", p.ConfigManager)
 	defer spinner.Stop()
 
 	if err := p.PlatformClient.Login(username, password); err != nil {
@@ -99,6 +114,7 @@ func (p *CLIContext) Authenticate(cmd *cobra.Command) error {
 
 	p.ConfigManager.SetConfigValue("token", p.PlatformClient.GetToken())
 	p.ConfigManager.SetIntConfigValue("user-id", p.PlatformClient.ActiveUserID())
+	p.ConfigManager.SetIntConfigValue("org-id", p.PlatformClient.ActiveUserID())
 
 	return nil
 }

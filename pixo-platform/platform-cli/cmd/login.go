@@ -18,14 +18,22 @@ var loginCmd = &cobra.Command{
 	- global config file ~/.pixo/config.yaml
 	Will prioritize in order of the above list, and will prompt the user if none is found.	
 `,
-	RunE: func(cmd *cobra.Command, args []string) error {
+	Run: func(cmd *cobra.Command, args []string) {
 		if err := Ctx.Authenticate(cmd); err != nil {
 			Ctx.ConfigManager.Println(":exclamation: Login failed. Please check your credentials and try again.")
-			return nil
 		}
 
-		Ctx.ConfigManager.Println(":rocket: Login successful. Here is your API token: \n", Ctx.PlatformClient.GetToken())
-		return nil
+		msg := ":rocket: Login successful. Here is your API "
+		token, ok := Ctx.ConfigManager.GetConfigValue("token")
+		if ok {
+			Ctx.ConfigManager.Println(msg, "token:\n", token)
+			return
+		}
+
+		apiKey, ok := Ctx.ConfigManager.GetConfigValue("api-key")
+		if ok {
+			Ctx.ConfigManager.Println(msg, "key:\n", apiKey)
+		}
 	},
 }
 

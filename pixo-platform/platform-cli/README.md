@@ -30,6 +30,15 @@ with the platform, deploying gameserver versions, and simplifying the testing of
     - [Create](#create)
     - [List](#list)
     - [Delete](#delete)
+- [Modules](#modules)
+  - [Create Module Version](#create-module-version)
+- [Webhooks](#webhooks)
+  - [Create](#create-webhook)
+  - [List](#list-webhook)
+  - [Delete](#delete-webhook)
+- [Sessions](#sessions)
+  - [Start a Session](#start-a-session)
+  - [End a Session](#end-a-session)
 - [Run Mock Matchmaking Server](#run-mock-matchmaking-server)
 - [Deploy a Module Game Server Version](#deploy-a-module-game-server-version)
     - [Gameserver Build Pipeline (e.g. Cloud Build)](#gameserver-build-pipeline-eg-cloud-build)
@@ -99,8 +108,7 @@ export PIXO_API_KEY=<api-key>
 export PIXO_USERNAME=<username>
 export PIXO_PASSWORD=<password>
 
-# Pixo Platform Environment Used - if not set, defaults to na and prod
-export PIXO_LIFECYCLE=stage
+# Pixo Platform Environment Used - if not set, defaults to na
 export PIXO_REGION=saudi
 ```
 
@@ -124,7 +132,8 @@ pixo config
 👤  Username: <username>
 🔒  Password: ********
 🔑  API Key: ********
-🔑  Token: ********
+🪙  Token: ********
+
 
 ➡️  Module ID: 1
 ➡️  Server Version: 1.00.00
@@ -167,7 +176,7 @@ pixo auth login --username <username> --password <password>
 
 # Example output:
 🚀 Login successful. Here is your API token: 
-<jwt-token>
+<token>
 ```
 
 
@@ -205,6 +214,59 @@ pixo keys list --user-id 1
 ### Delete
 ```bash
 pixo keys delete --key-id 1
+```
+
+## Modules
+
+### Create Module Version
+```bash
+pixo modules deploy \
+    --module-id 1 \
+    --server-version 1.00.00 \
+    --package com.pixovr.test \
+    --zip-file /path/to/zip
+```
+
+## Webhooks
+
+### Create Webhook
+```bash
+pixo webhooks create \
+  --url https://example.com/webhook
+  --description "Test Webhook"
+```
+
+### List Webhook
+```bash
+pixo webhooks list
+```
+
+### Delete Webhook
+```bash
+pixo webhooks delete --webhook-id 1
+```
+
+## Sessions
+
+### Start a Session
+```bash
+pixo sessions start --module-id 1
+```
+
+### End a Session
+```bash
+# Using current session ID
+pixo sessions end \
+  --score 1 \
+  --max-score 2
+```
+
+```bash
+# Or with session ID as input
+pixo sessions end \
+  --session-id 123 \
+  --score 1 \
+  --max-score 2
 ```
 
 
@@ -258,19 +320,28 @@ pixo mp matchmake \
 ## Deploy a Module Game Server Version
 ```bash
 # Check if version with matching semantic version already exists
-pixo mp serverVersions deploy \
+pixo mp servers deploy \
     --pre-check \
     --module-id 1 \
     --server-version 1.00.00
 ```
 
 ```bash
-# Deploy a new version
-pixo mp serverVersions deploy \
+# Deploy a new version with image
+pixo mp servers deploy \
     --module-id 1 \
     --server-version 1.00.00 \
     --image gcr.io/pixo-bootstrap/multiplayer/gameservers/simple-server:latest
 ```
+
+```bash
+# Deploy a new version with zipfile
+pixo mp servers deploy \
+    --module-id 1 \
+    --server-version 1.00.00 \
+    --zip-file /path/to/zipfile
+```
+
 
 ### Gameserver Build Pipeline (e.g. Cloud Build)
 If no `server-version` configuration value is found, it will search for an ini file  
@@ -289,14 +360,13 @@ steps:
     id: "Version Pre-Check"
     args:
       - mp
-      - serverVersions
+      - servers
       - deploy
       - --module-id
       - ${_MODULE_ID}
       - --pre-check
     env:
       - "PIXO_REGION=${_PIXO_REGION}"
-      - "PIXO_LIFECYCLE=${_PIXO_LIFECYCLE}"
     secretEnv:
       - "PIXO_API_KEY"
 
@@ -311,7 +381,7 @@ steps:
     id: "Deploy MP Server Version"
     args:
       - mp
-      - serverVersions
+      - servers
       - deploy
       - --module-id
       - ${_MP_MODULE_ID}
@@ -319,7 +389,6 @@ steps:
       - gcr.io/${PROJECT_ID}/${_LIFECYCLE}/${_PROJECT_NAME}:${COMMIT_SHA}
     env:
       - "PIXO_REGION=${_PIXO_REGION}"
-      - "PIXO_LIFECYCLE=${_PIXO_LIFECYCLE}"
     secretEnv:
       - "PIXO_API_KEY"
 

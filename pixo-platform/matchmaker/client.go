@@ -33,6 +33,7 @@ func NewMatchmaker(config urlfinder.ClientConfig, timeoutSeconds ...int) *Multip
 	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
 	url := getURL(serviceConfig.FormatURL())
 	abstractConfig := abstractClient.AbstractConfig{
+		Path:           serviceConfig.Service,
 		URL:            url,
 		Token:          config.Token,
 		TimeoutSeconds: timeoutSeconds[0],
@@ -45,10 +46,6 @@ func NewMatchmaker(config urlfinder.ClientConfig, timeoutSeconds ...int) *Multip
 
 func (m *MultiplayerMatchmaker) Login(username, password string) error {
 	return nil
-}
-
-func (m *MultiplayerMatchmaker) ActiveUserID() int {
-	return 1
 }
 
 func newServiceConfig(lifecycle, region string) urlfinder.ServiceConfig {

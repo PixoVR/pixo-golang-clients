@@ -61,7 +61,7 @@ var matchmakeCmd = &cobra.Command{
 
 		Ctx.ConfigManager.Printf(":magnifying_glass_tilted_left:Attempting to find a match for module %d with server version %s...\n", matchRequest.ModuleID, matchRequest.ServerVersion)
 
-		spinner := loader.NewSpinner(Ctx.ConfigManager)
+		spinner := loader.NewLoader(cmd.Context(), "", Ctx.ConfigManager)
 
 		addr, err := Ctx.MatchmakingClient.FindMatch(matchRequest)
 		spinner.Stop()

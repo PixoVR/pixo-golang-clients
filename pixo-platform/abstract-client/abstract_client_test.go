@@ -29,7 +29,7 @@ var _ = Describe("Abstract", func() {
 	})
 
 	It("can add headers needed for authentication", func() {
-		apiClient.AddHeader("x-fake-header", fakeToken)
+		apiClient.SetHeader("x-fake-header", fakeToken)
 
 		request := apiClient.FormatRequest()
 
@@ -52,6 +52,12 @@ var _ = Describe("Abstract", func() {
 
 		Expect(err).To(HaveOccurred())
 		Expect(res).To(BeNil())
+	})
+
+	It("can return the current ip address", func() {
+		ip, err := apiClient.GetIPAddress()
+		Expect(err).NotTo(HaveOccurred())
+		Expect(ip).To(MatchRegexp(`\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}`))
 	})
 
 })

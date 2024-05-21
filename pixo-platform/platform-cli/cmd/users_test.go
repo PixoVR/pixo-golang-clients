@@ -15,7 +15,6 @@ var _ = Describe("Users", func() {
 
 	BeforeEach(func() {
 		executor = NewTestExecutor()
-
 	})
 
 	AfterEach(func() {
@@ -53,6 +52,7 @@ var _ = Describe("Users", func() {
 		executor.ExpectLoginToSucceed(username, password)
 
 		output, err = executor.RunCommand("config")
+		Expect(output).To(ContainSubstring(fmt.Sprintf("Username: %s", username)))
 		Expect(err).NotTo(HaveOccurred())
 	})
 

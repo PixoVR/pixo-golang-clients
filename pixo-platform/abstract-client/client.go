@@ -7,6 +7,7 @@ import (
 
 // AbstractServiceClient is a struct that contains the url of the Pixo Service and a restyClient to make requests
 type AbstractServiceClient struct {
+	path           string
 	url            string
 	token          string
 	key            string
@@ -17,6 +18,7 @@ type AbstractServiceClient struct {
 }
 
 type AbstractConfig struct {
+	Path           string
 	APIKey         string
 	Token          string
 	URL            string
@@ -31,6 +33,7 @@ func NewClient(config AbstractConfig) *AbstractServiceClient {
 	}
 
 	return &AbstractServiceClient{
+		path:           config.Path,
 		url:            config.URL,
 		token:          config.Token,
 		key:            config.APIKey,

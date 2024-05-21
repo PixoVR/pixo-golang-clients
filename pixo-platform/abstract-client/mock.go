@@ -7,6 +7,9 @@ import (
 )
 
 type MockAbstractClient struct {
+	NumCalledGetIPAddress int
+	GetIPAddressError     error
+
 	NumCalledGetURL          int
 	NumCalledLogin           int
 	NumCalledSetAPIKey       int
@@ -15,11 +18,20 @@ type MockAbstractClient struct {
 	NumCalledIsAuthenticated int
 	NumCalledActiveUserID    int
 
-	NumCalledGet    int
-	NumCalledPost   int
-	NumCalledPut    int
-	NumCalledPatch  int
+	NumCalledGet int
+	GetError     error
+
+	NumCalledPost int
+	PostError     error
+
+	NumCalledPut int
+	PutError     error
+
+	NumCalledPatch int
+	PatchError     error
+
 	NumCalledDelete int
+	DeleteError     error
 
 	NumCalledDialWebsocket     int
 	NumCalledWriteToWebsocket  int
@@ -27,6 +39,20 @@ type MockAbstractClient struct {
 	NumCalledCloseWebsocket    int
 
 	Response []byte
+}
+
+func (m *MockAbstractClient) Path() string {
+	return ""
+}
+
+func (m *MockAbstractClient) GetIPAddress() (string, error) {
+	m.NumCalledGetIPAddress++
+
+	if m.GetIPAddressError != nil {
+		return "", m.GetIPAddressError
+	}
+
+	return "127.0.0.1", nil
 }
 
 func (m *MockAbstractClient) GetURL() string {
@@ -64,26 +90,51 @@ func (m *MockAbstractClient) ActiveUserID() int {
 
 func (m *MockAbstractClient) Get(path string) (*resty.Response, error) {
 	m.NumCalledGet++
+
+	if m.GetError != nil {
+		return nil, m.GetError
+	}
+
 	return nil, nil
 }
 
 func (m *MockAbstractClient) Post(path string, body []byte) (*resty.Response, error) {
 	m.NumCalledPost++
+
+	if m.PostError != nil {
+		return nil, m.PostError
+	}
+
 	return nil, nil
 }
 
 func (m *MockAbstractClient) Put(path string, body []byte) (*resty.Response, error) {
 	m.NumCalledPut++
+
+	if m.PutError != nil {
+		return nil, m.PutError
+	}
+
 	return nil, nil
 }
 
 func (m *MockAbstractClient) Patch(path string, body []byte) (*resty.Response, error) {
 	m.NumCalledPatch++
+
+	if m.PatchError != nil {
+		return nil, m.PatchError
+	}
+
 	return nil, nil
 }
 
 func (m *MockAbstractClient) Delete(path string) (*resty.Response, error) {
 	m.NumCalledDelete++
+
+	if m.DeleteError != nil {
+		return nil, m.DeleteError
+	}
+
 	return nil, nil
 }
 

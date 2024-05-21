@@ -15,7 +15,7 @@ var listApiKeyCmd = &cobra.Command{
 	Short: "List API keys",
 	Long:  `List API key with the following command:`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		spinner := loader.NewSpinner(Ctx.ConfigManager)
+		spinner := loader.NewLoader(cmd.Context(), ":key: Getting API Keys...", Ctx.ConfigManager)
 
 		apiKeyParams := &graphql_api.APIKeyQueryParams{}
 

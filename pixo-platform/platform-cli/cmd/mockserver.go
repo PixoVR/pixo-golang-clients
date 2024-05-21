@@ -64,7 +64,7 @@ func init() {
 	mpCmd.AddCommand(mockserverCmd)
 
 	mockserverCmd.Flags().String("gameserver-ip", matchmaker.Localhost, "IP address of the game server to be returned in the response")
-	mockserverCmd.Flags().String("server-version", "1.00.00", "Version of the server to be returned in the response")
+	mockserverCmd.Flags().String("server-version", "1.00.00", "SemanticVersion of the server to be returned in the response")
 	mockserverCmd.Flags().Int("gameserver-port", matchmaker.DefaultGameserverPort, "Port of the game server to be returned in the response")
 	mockserverCmd.Flags().Int("matchmaker-port", 8080, "Port of the mock matchmaker server")
 	mockserverCmd.Flags().String("map-name", "Default", "Name of the map to be returned in the response")

@@ -17,8 +17,8 @@ var (
 	isPrecheck bool
 )
 
-// deployCmd represents the deploy rootCmd
-var deployCmd = &cobra.Command{
+// mpDeployCmd represents the mp server versions deploy command
+var mpDeployCmd = &cobra.Command{
 	Use:   "deploy",
 	Short: "Deploy a multiplayer server version",
 	Long:  `Deploy a docker image as a multiplayer server version on the Pixo Platform for a module`,
@@ -47,8 +47,6 @@ var deployCmd = &cobra.Command{
 
 		}
 
-		Ctx.ConfigManager.Println("Deploying server version: ", semanticVersion)
-
 		if isPrecheck {
 
 			params := &platformAPI.MultiplayerServerVersionQueryParams{
@@ -56,7 +54,7 @@ var deployCmd = &cobra.Command{
 				SemanticVersion: semanticVersion,
 			}
 
-			spinner := loader.NewSpinner(Ctx.ConfigManager)
+			spinner := loader.NewLoader(cmd.Context(), "Getting multiplayer server versions...", Ctx.ConfigManager)
 
 			if versions, err := Ctx.PlatformClient.GetMultiplayerServerVersions(cmd.Context(), params); err != nil {
 				Ctx.ConfigManager.Println(":negative_squared_cross_mark: Unable to retrieve server versions from the Pixo Platform")
@@ -73,14 +71,30 @@ var deployCmd = &cobra.Command{
 			return nil
 		}
 
-		image, ok := Ctx.ConfigManager.GetConfigValueOrAskUser("image", cmd)
-		if !ok {
-			return errors.New("no gameserver image provided")
+		var filePath string
+		image, ok := Ctx.ConfigManager.GetFlagOrConfigValue("image", cmd)
+		if !ok || image == "" {
+			filePath, ok = Ctx.ConfigManager.GetFlagOrConfigValue("zip-file", cmd)
+			if !ok || filePath == "" {
+				imageResponse := Ctx.ConfigManager.ReadFromUser("DOCKER IMAGE")
+				if imageResponse == "" {
+					return errors.New("no image or zip file provided")
+				}
+				image = imageResponse
+			}
 		}
 
-		spinner := loader.NewSpinner(Ctx.ConfigManager)
+		msg := fmt.Sprint("Deploying server version: ", semanticVersion)
+		spinner := loader.NewLoader(cmd.Context(), msg, Ctx.ConfigManager)
 
-		if _, err := Ctx.PlatformClient.CreateMultiplayerServerVersion(cmd.Context(), moduleID, image, semanticVersion, "unreal"); err != nil {
+		input := platformAPI.MultiplayerServerVersion{
+			ModuleID:        moduleID,
+			ImageRegistry:   image,
+			LocalFilePath:   filePath,
+			SemanticVersion: semanticVersion,
+			Engine:          "unreal",
+		}
+		if _, err := Ctx.PlatformClient.CreateMultiplayerServerVersion(cmd.Context(), input); err != nil {
 			msg := fmt.Sprintf("Failed to deploy multiplayer server version: %s - %s", semanticVersion, err.Error())
 			return errors.New(msg)
 		}
@@ -92,9 +106,10 @@ var deployCmd = &cobra.Command{
 }
 
 func init() {
-	serverVersionsCmd.AddCommand(deployCmd)
+	serversCmd.AddCommand(mpDeployCmd)
 
-	deployCmd.PersistentFlags().StringP("image", "i", "", "Docker image to deploy as the multiplayer server version")
-	deployCmd.Flags().StringP("ini", "f", parser.DefaultConfigFilepath, "Path to the ini file to use for the rootCmd")
-	deployCmd.Flags().BoolVarP(&isPrecheck, "pre-check", "p", false, "Check if server version exists already")
+	mpDeployCmd.PersistentFlags().StringP("image", "i", "", "Docker image to deploy as the multiplayer server version")
+	mpDeployCmd.Flags().StringP("ini", "f", parser.DefaultConfigFilepath, "Path to the ini file to use for the semantic version")
+	mpDeployCmd.Flags().StringP("zip-file", "z", "", "Path to the zip file to use for the upload")
+	mpDeployCmd.Flags().BoolVarP(&isPrecheck, "pre-check", "p", false, "Check if server version exists already")
 }

@@ -13,10 +13,7 @@ var authCmd = &cobra.Command{
 	Short: "Authenticate with the Pixo Platform",
 	Long:  `Manage authentication and authorization with the Pixo Platform.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := cmd.Help(); err != nil {
-			Ctx.ConfigManager.Println("error printing help: ", err)
-			return
-		}
+		_ = cmd.Help()
 	},
 }
 

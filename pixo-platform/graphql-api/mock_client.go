@@ -53,8 +53,19 @@ type MockGraphQLClient struct {
 	CalledCreateEvent bool
 	CreateEventError  bool
 
-	CalledGetMultiplayerServerConfigs bool
-	GetMultiplayerServerConfigsError  bool
+	CalledGetPlatforms bool
+	GetPlatformsError  bool
+
+	CalledGetControlTypes bool
+	GetControlTypesError  bool
+
+	CalledCreateModuleVersion bool
+	CreateModuleVersionError  bool
+
+	CalledGetMultiplayerServerConfigs        bool
+	GetMultiplayerServerConfigsError         bool
+	GetMultiplayerServerConfigsEmpty         bool
+	GetMultiplayerServerConfigsEmptyVersions bool
 
 	CalledGetMultiplayerServerVersions bool
 	GetMultiplayerServerVersionsError  bool
@@ -72,12 +83,20 @@ func (m *MockGraphQLClient) GetURL() string {
 	return faker.URL()
 }
 
+func (m *MockGraphQLClient) Path() string {
+	return "v2"
+}
+
 func (m *MockGraphQLClient) Login(username, password string) error {
 	m.isAuthenticated = true
 	return nil
 }
 
 func (m *MockGraphQLClient) ActiveUserID() int {
+	return 1
+}
+
+func (m *MockGraphQLClient) ActiveOrgID() int {
 	return 1
 }
 
@@ -192,7 +211,7 @@ func (m *MockGraphQLClient) CreateAPIKey(ctx context.Context, input platform.API
 	m.CalledCreateAPIKey = true
 
 	if m.CreateAPIKeyError {
-		return nil, errors.New("error creating api apiKey")
+		return nil, errors.New("error creating api key")
 	}
 
 	input.ID = 1
@@ -291,7 +310,7 @@ func (m *MockGraphQLClient) CreateSession(ctx context.Context, moduleID int, ipA
 	}, nil
 }
 
-func (m *MockGraphQLClient) UpdateSession(ctx context.Context, id int, status string, completed bool) (*Session, error) {
+func (m *MockGraphQLClient) UpdateSession(ctx context.Context, session Session) (*Session, error) {
 
 	m.CalledUpdateSession = true
 
@@ -299,16 +318,17 @@ func (m *MockGraphQLClient) UpdateSession(ctx context.Context, id int, status st
 		return nil, errors.New("error updating session")
 	}
 
-	if id <= 0 {
+	if session.ID <= 0 {
 		return nil, errors.New("invalid session id")
 	}
 
-	return &Session{
-		ID:        id,
-		UserID:    1,
-		ModuleID:  1,
-		IPAddress: "127.0.0.1",
-	}, nil
+	if session.MaxScore > 0 {
+		session.ScaledScore = session.RawScore / session.MaxScore
+	}
+
+	session.Duration = "1s"
+
+	return &session, nil
 }
 
 func (m *MockGraphQLClient) CreateEvent(ctx context.Context, sessionID int, uuid string, eventType string, data string) (*platform.Event, error) {
@@ -342,8 +362,78 @@ func (m *MockGraphQLClient) CreateEvent(ctx context.Context, sessionID int, uuid
 	}, nil
 }
 
+func (m *MockGraphQLClient) GetPlatforms(ctx context.Context) ([]*Platform, error) {
+	m.CalledGetPlatforms = true
+
+	if m.GetPlatformsError {
+		return nil, errors.New("error getting platforms")
+	}
+
+	return []*Platform{{
+		ID:   1,
+		Name: "android",
+	}}, nil
+}
+
+func (m *MockGraphQLClient) GetControlTypes(ctx context.Context) ([]*ControlType, error) {
+	m.CalledGetControlTypes = true
+
+	if m.GetControlTypesError {
+		return nil, errors.New("error getting control types")
+	}
+
+	return []*ControlType{{
+		ID:   1,
+		Name: "keyboard/mouse",
+	}}, nil
+}
+
+func (m *MockGraphQLClient) CreateModuleVersion(ctx context.Context, input ModuleVersion) (*ModuleVersion, error) {
+
+	m.CalledCreateModuleVersion = true
+
+	if m.CreateModuleVersionError {
+		return nil, errors.New("error creating module version")
+	}
+
+	if input.ModuleID == 0 {
+		return nil, errors.New("invalid module id")
+	}
+
+	if input.LocalFilePath == "" {
+		return nil, errors.New("local file path required")
+	}
+
+	if input.SemanticVersion == "" {
+		return nil, errors.New("invalid version")
+	}
+
+	return &ModuleVersion{
+		ModuleID:        input.ModuleID,
+		SemanticVersion: input.SemanticVersion,
+		Package:         input.Package,
+	}, nil
+}
+
 func (m *MockGraphQLClient) GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]*MultiplayerServerConfigQueryParams, error) {
 	m.CalledGetMultiplayerServerConfigs = true
+
+	if m.GetMultiplayerServerConfigsError {
+		return nil, errors.New("error getting multiplayer server configs")
+	}
+
+	if m.GetMultiplayerServerConfigsEmpty {
+		return []*MultiplayerServerConfigQueryParams{}, nil
+	}
+
+	if m.GetMultiplayerServerConfigsEmptyVersions {
+		return []*MultiplayerServerConfigQueryParams{
+			{
+				ModuleID: 1,
+				Capacity: 5,
+			},
+		}, nil
+	}
 
 	return []*MultiplayerServerConfigQueryParams{
 		{
@@ -412,18 +502,18 @@ func (m *MockGraphQLClient) GetMultiplayerServerVersion(ctx context.Context, ver
 	}, nil
 }
 
-func (m *MockGraphQLClient) CreateMultiplayerServerVersion(ctx context.Context, moduleID int, image, semanticVersion, engine string) (*MultiplayerServerVersion, error) {
+func (m *MockGraphQLClient) CreateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error) {
 	m.CalledCreateMultiplayerServerVersion = true
 
-	if moduleID == 0 {
+	if input.ModuleID == 0 {
 		return nil, errors.New("invalid module id")
 	}
 
-	if image == "" {
-		return nil, errors.New("invalid image")
+	if input.ImageRegistry == "" && input.LocalFilePath == "" {
+		return nil, errors.New("image or file path required")
 	}
 
-	if semanticVersion == "" {
+	if input.SemanticVersion == "" {
 		return nil, errors.New("invalid semantic version")
 	}
 
@@ -432,9 +522,9 @@ func (m *MockGraphQLClient) CreateMultiplayerServerVersion(ctx context.Context, 
 	}
 
 	return &MultiplayerServerVersion{
-		ModuleID:        moduleID,
-		SemanticVersion: semanticVersion,
-		Status:          "enabled",
-		Engine:          engine,
+		ModuleID:        input.ModuleID,
+		SemanticVersion: input.SemanticVersion,
+		Status:          input.Status,
+		Engine:          input.Engine,
 	}, nil
 }
