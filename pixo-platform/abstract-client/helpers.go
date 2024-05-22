@@ -3,6 +3,7 @@ package abstract_client
 import (
 	"fmt"
 	"github.com/go-resty/resty/v2"
+	"strings"
 )
 
 // Client returns the resty client
@@ -42,6 +43,10 @@ func (a *AbstractServiceClient) SetAPIKey(key string) {
 
 // GetURLWithPath returns the url of the service client with the given path appended
 func (a *AbstractServiceClient) GetURLWithPath(path string, protocolInput ...string) string {
+	if strings.HasPrefix(path, "/") {
+		return fmt.Sprintf("%s%s", a.serviceConfig.FormatURL(protocolInput...), path)
+	}
+
 	return fmt.Sprintf("%s/%s", a.serviceConfig.FormatURL(protocolInput...), path)
 }
 
