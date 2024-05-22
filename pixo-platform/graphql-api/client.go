@@ -74,10 +74,9 @@ func NewClient(config urlfinder.ClientConfig) *GraphQLAPIClient {
 	c := http.Client{Transport: t}
 
 	abstractConfig := abstract_client.AbstractConfig{
-		Path:   serviceConfig.Service,
-		Token:  config.Token,
-		APIKey: config.APIKey,
-		URL:    url,
+		ServiceConfig: serviceConfig,
+		Token:         config.Token,
+		APIKey:        config.APIKey,
 	}
 
 	return &GraphQLAPIClient{
@@ -92,12 +91,8 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 
 	serviceConfig := newServiceConfig(config)
 
-	url := serviceConfig.FormatURL()
-
-	abstractConfig := abstract_client.AbstractConfig{URL: url}
-
 	client := &GraphQLAPIClient{
-		AbstractServiceClient: abstract_client.NewClient(abstractConfig),
+		AbstractServiceClient: abstract_client.NewClient(abstract_client.AbstractConfig{ServiceConfig: serviceConfig}),
 		defaultContext:        context.Background(),
 	}
 
@@ -108,7 +103,7 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 
 	httpClient := http.Client{Transport: &transport{underlyingTransport: http.DefaultTransport, token: client.GetToken()}}
 
-	client.Client = graphql.NewClient(fmt.Sprintf("%s/query", url), &httpClient)
+	client.Client = graphql.NewClient(fmt.Sprintf("%s/query", serviceConfig.FormatURL()), &httpClient)
 
 	return client, nil
 }

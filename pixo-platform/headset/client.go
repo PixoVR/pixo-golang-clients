@@ -20,11 +20,9 @@ type client struct {
 // NewClient is a function that returns a new Client
 func NewClient(config urlfinder.ClientConfig) Client {
 
-	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
-
 	abstractConfig := abstractClient.AbstractConfig{
-		URL:   serviceConfig.FormatURL(),
-		Token: config.Token,
+		ServiceConfig: newServiceConfig(config.Lifecycle, config.Region),
+		Token:         config.Token,
 	}
 
 	return &client{
@@ -42,8 +40,8 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
 
 	abstractConfig := abstractClient.AbstractConfig{
-		URL:   serviceConfig.FormatURL(),
-		Token: primaryClient.GetToken(),
+		ServiceConfig: serviceConfig,
+		Token:         primaryClient.GetToken(),
 	}
 
 	return &client{

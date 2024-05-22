@@ -3,7 +3,6 @@ package heartbeat
 import (
 	abstractClient "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
 	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
-	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 )
 
@@ -21,12 +20,9 @@ type client struct {
 // NewClient is a function that returns a new Client
 func NewClient(config urlfinder.ClientConfig) Client {
 
-	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
-
 	abstractConfig := abstractClient.AbstractConfig{
-		Path:  serviceConfig.Service,
-		URL:   serviceConfig.FormatURL(),
-		Token: config.Token,
+		ServiceConfig: newServiceConfig(config.Lifecycle, config.Region),
+		Token:         config.Token,
 	}
 
 	return &client{
@@ -36,16 +32,14 @@ func NewClient(config urlfinder.ClientConfig) Client {
 }
 
 func NewClientWithBasicAuth(username, password string, config urlfinder.ClientConfig) (Client, error) {
-	primaryClient, err := primary_api.NewClientWithBasicAuth(username, password, config)
+	platformClient, err := graphql_api.NewClientWithBasicAuth(username, password, config)
 	if err != nil {
 		return nil, err
 	}
 
-	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
-
 	abstractConfig := abstractClient.AbstractConfig{
-		URL:   serviceConfig.FormatURL(),
-		Token: primaryClient.GetToken(),
+		ServiceConfig: newServiceConfig(config.Lifecycle, config.Region),
+		Token:         platformClient.GetToken(),
 	}
 
 	return &client{

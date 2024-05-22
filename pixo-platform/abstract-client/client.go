@@ -1,27 +1,27 @@
 package abstract_client
 
 import (
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"github.com/go-resty/resty/v2"
 	"github.com/gorilla/websocket"
 )
 
 // AbstractServiceClient is a struct that contains the url of the Pixo Service and a restyClient to make requests
 type AbstractServiceClient struct {
-	path           string
-	url            string
-	token          string
-	key            string
-	headers        map[string]string
+	serviceConfig urlfinder.ServiceConfig
+	token         string
+	key           string
+	headers       map[string]string
+
 	restyClient    *resty.Client
 	websocketConn  *websocket.Conn
 	timeoutSeconds int
 }
 
 type AbstractConfig struct {
-	Path           string
+	ServiceConfig  urlfinder.ServiceConfig
 	APIKey         string
 	Token          string
-	URL            string
 	TimeoutSeconds int
 }
 
@@ -33,8 +33,7 @@ func NewClient(config AbstractConfig) *AbstractServiceClient {
 	}
 
 	return &AbstractServiceClient{
-		path:           config.Path,
-		url:            config.URL,
+		serviceConfig:  config.ServiceConfig,
 		token:          config.Token,
 		key:            config.APIKey,
 		timeoutSeconds: config.TimeoutSeconds,

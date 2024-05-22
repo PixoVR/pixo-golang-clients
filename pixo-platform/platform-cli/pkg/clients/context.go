@@ -56,7 +56,7 @@ func NewCLIContextWithConfig(configFiles ...string) *CLIContext {
 		OldAPIClient:      primary_api.NewClient(clientConfig),
 		HeadsetClient:     headset.NewClient(clientConfig),
 		PlatformClient:    platform.NewClient(clientConfig),
-		MatchmakingClient: matchmaker.NewMatchmaker(clientConfig),
+		MatchmakingClient: matchmaker.NewClient(clientConfig),
 		FileOpener:        editor.NewFileOpener(""),
 	}
 }

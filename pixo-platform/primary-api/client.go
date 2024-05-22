@@ -3,7 +3,6 @@ package primary_api
 import (
 	abstractClient "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
-	"github.com/rs/zerolog/log"
 )
 
 type OldAPIClient interface {
@@ -24,8 +23,8 @@ func NewClient(config urlfinder.ClientConfig) *PrimaryAPIClient {
 	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
 
 	abstractConfig := abstractClient.AbstractConfig{
-		Token: config.Token,
-		URL:   serviceConfig.FormatURL(),
+		ServiceConfig: serviceConfig,
+		Token:         config.Token,
 	}
 
 	return &PrimaryAPIClient{
@@ -39,7 +38,7 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
 
 	abstractConfig := abstractClient.AbstractConfig{
-		URL: serviceConfig.FormatURL(),
+		ServiceConfig: serviceConfig,
 	}
 
 	primaryClient := &PrimaryAPIClient{
@@ -47,7 +46,6 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 	}
 
 	if err := primaryClient.Login(username, password); err != nil {
-		log.Error().Err(err).Msg("Failed to login to the pixo platform")
 		return nil, err
 	}
 

@@ -12,37 +12,37 @@ func (a *AbstractServiceClient) Client() *resty.Client {
 
 // Path returns the name of the service client
 func (a *AbstractServiceClient) Path() string {
-	return a.path
+	return a.serviceConfig.Service
 }
 
-// GetURL returns the url of the restClient
-func (a *AbstractServiceClient) GetURL() string {
-	return a.url
+// GetURL returns the url of the service client for the given protocol
+func (a *AbstractServiceClient) GetURL(protocolInput ...string) string {
+	return a.serviceConfig.FormatURL(protocolInput...)
 }
 
-// GetToken returns the token of the restClient
+// GetToken returns the token of the service client
 func (a *AbstractServiceClient) GetToken() string {
 	return a.token
 }
 
-// SetToken sets the token of the restClient
+// SetToken sets the token of the service client
 func (a *AbstractServiceClient) SetToken(token string) {
 	a.token = token
 }
 
-// GetAPIKey returns the token of the restClient
+// GetAPIKey returns the token of the service client
 func (a *AbstractServiceClient) GetAPIKey() string {
 	return a.key
 }
 
-// SetAPIKey sets the token of the restClient
+// SetAPIKey sets the token of the service client
 func (a *AbstractServiceClient) SetAPIKey(key string) {
 	a.key = key
 }
 
-// GetURLWithPath returns the url of the restClient with a path appended
-func (a *AbstractServiceClient) GetURLWithPath(path string) string {
-	return fmt.Sprintf("%s/%s", a.url, path)
+// GetURLWithPath returns the url of the service client with the given path appended
+func (a *AbstractServiceClient) GetURLWithPath(path string, protocolInput ...string) string {
+	return fmt.Sprintf("%s/%s", a.serviceConfig.FormatURL(protocolInput...), path)
 }
 
 // IsAuthenticated returns true if the client is authenticated

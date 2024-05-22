@@ -1,8 +1,8 @@
 package matchmaker
 
 import (
-	"errors"
 	"net"
+	"time"
 )
 
 func (m *MultiplayerMatchmaker) DialGameserver(addr *net.UDPAddr) error {
@@ -21,23 +21,6 @@ func (m *MultiplayerMatchmaker) DialGameserver(addr *net.UDPAddr) error {
 	return nil
 }
 
-func (m *MultiplayerMatchmaker) SendAndReceiveMessage(message []byte) ([]byte, error) {
-	if m.gameserverConnection == nil {
-		return nil, errors.New("gameserver connection is nil")
-	}
-
-	if err := m.sendGameServerMessage(message); err != nil {
-		return nil, err
-	}
-
-	response, err := m.readGameServerMessage()
-	if err != nil {
-		return nil, err
-	}
-
-	return response, nil
-}
-
 func (m *MultiplayerMatchmaker) CloseGameserverConnection() error {
 	if err := m.gameserverConnection.Close(); err != nil {
 		return err
@@ -46,7 +29,7 @@ func (m *MultiplayerMatchmaker) CloseGameserverConnection() error {
 	return nil
 }
 
-func (m *MultiplayerMatchmaker) sendGameServerMessage(message []byte) error {
+func (m *MultiplayerMatchmaker) SendMessageToGameserver(message []byte) error {
 	if _, err := m.gameserverConnection.Write(message); err != nil {
 		return err
 	}
@@ -54,7 +37,17 @@ func (m *MultiplayerMatchmaker) sendGameServerMessage(message []byte) error {
 	return nil
 }
 
-func (m *MultiplayerMatchmaker) readGameServerMessage() ([]byte, error) {
+func (m *MultiplayerMatchmaker) ReadMessageFromGameserver() ([]byte, error) {
+	if m.gameserverConnection == nil {
+		if err := m.DialGameserver(m.gameserverAddress); err != nil {
+			return nil, err
+		}
+	}
+
+	if err := m.gameserverConnection.SetReadDeadline(time.Now().Add(5 * time.Second)); err != nil {
+		return nil, err
+	}
+
 	received := make([]byte, 1024)
 	n, err := m.gameserverConnection.Read(received)
 	if err != nil {

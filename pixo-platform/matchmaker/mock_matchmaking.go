@@ -11,11 +11,29 @@ import (
 
 type MockMatchmaker struct {
 	abstract_client.MockAbstractClient
-	NumCalledFindMatch       int
-	NumCalledDialGameserver  int
-	NumCalledSendAndReceive  int
+
+	NumCalledDialMatchmaker int
+	DialMatchmakerError     error
+
+	NumCalledFindMatch int
+	FindMatchError     error
+
+	NumCalledReadResponse int
+	ReadResponseError     error
+
+	NumCalledDialGameserver int
+	DialGameserverError     error
+
+	NumCalledSendToGameserver int
+	SendToGameserverError     error
+
+	NumCalledReadFromGameserver int
+	ReadFromGameserverError     error
+
 	NumCalledCloseGameserver int
-	response                 []byte
+	CloseGameserverError     error
+
+	response []byte
 }
 
 func NewMockMatchmaker() *MockMatchmaker {
@@ -39,6 +57,10 @@ func NewMockMatchmaker() *MockMatchmaker {
 func (m *MockMatchmaker) FindMatch(request MatchRequest) (*net.UDPAddr, error) {
 	m.NumCalledFindMatch++
 
+	if m.FindMatchError != nil {
+		return nil, m.FindMatchError
+	}
+
 	return &net.UDPAddr{
 		IP:   net.ParseIP(Localhost),
 		Port: DefaultGameserverPort,
@@ -46,20 +68,35 @@ func (m *MockMatchmaker) FindMatch(request MatchRequest) (*net.UDPAddr, error) {
 }
 
 func (m *MockMatchmaker) DialMatchmaker() (*websocket.Conn, *http.Response, error) {
-	m.NumCalledDialWebsocket++
+	m.NumCalledDialMatchmaker++
+
+	if m.DialMatchmakerError != nil {
+		return nil, nil, m.DialMatchmakerError
+
+	}
 	return nil, nil, nil
 }
 
 func (m *MockMatchmaker) SendRequest(conn *websocket.Conn, req MatchRequest) error {
-	m.NumCalledWriteToWebsocket++
-	return nil
+	reqBytes, _ := json.Marshal(req)
+
+	if m.WriteToWebsocketError != nil {
+		return m.WriteToWebsocketError
+
+	}
+
+	return m.WriteToWebsocket(reqBytes)
 }
 
 func (m *MockMatchmaker) ReadResponse(conn *websocket.Conn) (MatchResponse, error) {
-	m.NumCalledReadFromWebsocket++
+	m.NumCalledReadResponse++
+
+	if m.ReadResponseError != nil {
+		return MatchResponse{}, m.ReadResponseError
+	}
+
 	response := MatchResponse{}
-	err := json.Unmarshal(m.response, &response)
-	if err != nil {
+	if err := json.Unmarshal(m.response, &response); err != nil {
 		return MatchResponse{}, err
 	}
 
@@ -67,21 +104,45 @@ func (m *MockMatchmaker) ReadResponse(conn *websocket.Conn) (MatchResponse, erro
 }
 
 func (m *MockMatchmaker) CloseMatchmakerConnection(conn *websocket.Conn) error {
-	m.NumCalledCloseWebsocket++
-	return nil
+	return m.CloseWebsocketConnection()
 }
 
 func (m *MockMatchmaker) DialGameserver(addr *net.UDPAddr) error {
 	m.NumCalledDialGameserver++
+
+	if m.DialGameserverError != nil {
+		return m.DialGameserverError
+	}
+
 	return nil
 }
 
 func (m *MockMatchmaker) CloseGameserverConnection() error {
 	m.NumCalledCloseGameserver++
+
+	if m.CloseGameserverError != nil {
+		return m.CloseGameserverError
+	}
+
 	return nil
 }
 
-func (m *MockMatchmaker) SendAndReceiveMessage(message []byte) ([]byte, error) {
-	m.NumCalledSendAndReceive++
+func (m *MockMatchmaker) SendMessageToGameserver(message []byte) error {
+	m.NumCalledSendToGameserver++
+
+	if m.SendToGameserverError != nil {
+		return m.SendToGameserverError
+	}
+
+	return nil
+}
+
+func (m *MockMatchmaker) ReadMessageFromGameserver() ([]byte, error) {
+	m.NumCalledReadFromGameserver++
+
+	if m.ReadFromGameserverError != nil {
+		return nil, m.ReadFromGameserverError
+	}
+
 	return []byte("{\"IPAddress\":\"127.0.0.1\",\"Port\":7777}"), nil
 }

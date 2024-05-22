@@ -126,33 +126,72 @@ var _ = Describe("Urlfinder", func() {
 	Context("matchmaking", func() {
 
 		It("can find the local matchmaking url", func() {
-			config := urlfinder.ServiceConfig{Service: "matchmaking", Lifecycle: "local", Port: 8080}
+			config := urlfinder.ServiceConfig{
+				Service:   "matchmaking",
+				Lifecycle: "local",
+				Port:      8080,
+			}
+
 			url := config.FormatURL()
+
+			Expect(url).To(Equal("http://localhost:8080/matchmaking"))
+		})
+
+		It("can find the local matchmaking websocket url", func() {
+			config := urlfinder.ServiceConfig{Service: "matchmaking", Lifecycle: "local", Port: 8080}
+			url := config.FormatURL("ws")
 			Expect(url).To(Equal("ws://localhost:8080/matchmaking"))
 		})
 
-		It("can find the default matchmaking url", func() {
+		It("can generate the default matchmaking url", func() {
 			config := urlfinder.ServiceConfig{Service: "matchmaking"}
 			url := config.FormatURL()
-			Expect(url).To(Equal("wss://apex.pixovr.com/matchmaking"))
+			Expect(url).To(Equal("https://apex.pixovr.com/matchmaking"))
 		})
 
-		It("can find the saudi matchmaking url", func() {
+		It("can generate the saudi matchmaking https url", func() {
 			config := urlfinder.ServiceConfig{
 				Service: "matchmaking",
 				Region:  "saudi",
 			}
+
 			url := config.FormatURL()
-			Expect(url).To(Equal("wss://saudi.apex.pixovr.com/matchmaking"))
+
+			Expect(url).To(Equal("https://saudi.apex.pixovr.com/matchmaking"))
 		})
 
-		It("can find the saudi matchmaking url", func() {
+		It("can find the stage saudi matchmaking url", func() {
 			config := urlfinder.ServiceConfig{
 				Service:   "matchmaking",
 				Region:    "saudi",
 				Lifecycle: "stage",
 			}
+
 			url := config.FormatURL()
+
+			Expect(url).To(Equal("https://saudi.apex.stage.pixovr.com/matchmaking"))
+		})
+
+		It("can generate the saudi matchmaking websocket url", func() {
+			config := urlfinder.ServiceConfig{
+				Service: "matchmaking",
+				Region:  "saudi",
+			}
+
+			url := config.FormatURL("ws")
+
+			Expect(url).To(Equal("wss://saudi.apex.pixovr.com/matchmaking"))
+		})
+
+		It("can find the saudi matchmaking websocket url when formatting", func() {
+			config := urlfinder.ServiceConfig{
+				Service:   "matchmaking",
+				Region:    "saudi",
+				Lifecycle: "stage",
+			}
+
+			url := config.FormatURL("ws")
+
 			Expect(url).To(Equal("wss://saudi.apex.stage.pixovr.com/matchmaking"))
 		})
 
@@ -162,7 +201,9 @@ var _ = Describe("Urlfinder", func() {
 				Tenant:    "multiplayer",
 				Lifecycle: "dev",
 			}
+
 			url := config.FormatURL()
+
 			Expect(url).To(Equal("https://multi-central1.multiplayer.dev.pixovr.com/allocator"))
 		})
 
@@ -173,7 +214,9 @@ var _ = Describe("Urlfinder", func() {
 				Region:    "saudi",
 				Lifecycle: "dev",
 			}
+
 			url := config.FormatURL()
+
 			Expect(url).To(Equal("https://multi-saudi.multiplayer.dev.pixovr.com/allocator"))
 		})
 

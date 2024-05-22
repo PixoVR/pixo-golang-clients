@@ -93,13 +93,18 @@ func gameserverReadLoop(addr *net.UDPAddr) {
 			break
 		}
 
-		response, err := Ctx.MatchmakingClient.SendAndReceiveMessage([]byte(userInput))
-		if err != nil {
+		if err := Ctx.MatchmakingClient.SendMessageToGameserver([]byte(userInput)); err != nil {
 			Ctx.ConfigManager.Println(":warning:Could not send message to gameserver: ", err)
 			continue
 		}
 
-		Ctx.ConfigManager.Println(":arrow_right:Response: ", string(response))
+		res, err := Ctx.MatchmakingClient.ReadMessageFromGameserver()
+		if err != nil {
+			Ctx.ConfigManager.Println(":warning:Could not read message from gameserver: ", err)
+			continue
+		}
+
+		Ctx.ConfigManager.Println(":arrow_right:Response: ", string(res))
 	}
 
 	Ctx.ConfigManager.Println("\n:stop_sign:Closing connection to gameserver at ", addr.String())

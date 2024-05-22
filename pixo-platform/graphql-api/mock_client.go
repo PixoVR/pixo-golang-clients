@@ -79,7 +79,7 @@ type MockGraphQLClient struct {
 	CreateMultiplayerServerVersionError  bool
 }
 
-func (m *MockGraphQLClient) GetURL() string {
+func (m *MockGraphQLClient) GetURL(protocol ...string) string {
 	return faker.URL()
 }
 

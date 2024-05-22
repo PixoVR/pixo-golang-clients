@@ -49,7 +49,7 @@ var _ = Describe("Module", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring("Enter MODULE ID:"))
 		Expect(output).To(ContainSubstring("Module ID not provided"))
-		Expect(executor.MockMatchmakingClient.NumCalledDialWebsocket).To(Equal(0))
+		Expect(executor.MockMatchmakingClient.NumCalledDialMatchmaker).To(Equal(0))
 		Expect(executor.MockMatchmakingClient.NumCalledWriteToWebsocket).To(Equal(0))
 		Expect(executor.MockMatchmakingClient.NumCalledReadFromWebsocket).To(Equal(0))
 		Expect(executor.MockMatchmakingClient.NumCalledCloseWebsocket).To(Equal(0))
