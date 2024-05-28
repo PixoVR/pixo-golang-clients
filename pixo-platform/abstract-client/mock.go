@@ -11,13 +11,21 @@ type MockAbstractClient struct {
 	NumCalledGetIPAddress int
 	GetIPAddressError     error
 
-	NumCalledGetURL          int
-	NumCalledLogin           int
-	NumCalledSetAPIKey       int
-	NumCalledSetToken        int
-	NumCalledGetToken        int
+	NumCalledGetURL int
+
+	NumCalledLogin int
+	LoginError     error
+
+	NumCalledSetAPIKey int
+
+	NumCalledSetToken int
+	Token             string
+
+	NumCalledGetToken int
+
 	NumCalledIsAuthenticated int
-	NumCalledActiveUserID    int
+
+	NumCalledActiveUserID int
 
 	NumCalledGet int
 	GetError     error
@@ -70,6 +78,10 @@ func (m *MockAbstractClient) GetURL(protocol ...string) string {
 
 func (m *MockAbstractClient) Login(username, password string) error {
 	m.NumCalledLogin++
+	if m.LoginError != nil {
+		return m.LoginError
+	}
+	m.SetToken("token")
 	return nil
 }
 
@@ -77,13 +89,14 @@ func (m *MockAbstractClient) SetAPIKey(key string) {
 	m.NumCalledSetAPIKey++
 }
 
-func (m *MockAbstractClient) SetToken(key string) {
+func (m *MockAbstractClient) SetToken(token string) {
 	m.NumCalledSetToken++
+	m.Token = token
 }
 
 func (m *MockAbstractClient) GetToken() string {
 	m.NumCalledGetToken++
-	return ""
+	return m.Token
 }
 
 func (m *MockAbstractClient) IsAuthenticated() bool {
