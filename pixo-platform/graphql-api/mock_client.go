@@ -101,16 +101,18 @@ func (m *MockGraphQLClient) ActiveOrgID() int {
 }
 
 func (m *MockGraphQLClient) GetToken() string {
-	return faker.UUIDHyphenated()
+	return m.MockAbstractClient.GetToken()
 }
 
 func (m *MockGraphQLClient) SetToken(token string) {
 	m.isAuthenticated = true
+	m.MockAbstractClient.SetToken(token)
 	return
 }
 
 func (m *MockGraphQLClient) SetAPIKey(apiKey string) {
 	m.isAuthenticated = true
+	m.MockAbstractClient.SetAPIKey(apiKey)
 	return
 }
 
