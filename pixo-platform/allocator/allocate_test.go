@@ -27,10 +27,6 @@ var _ = Describe("Allocate", Ordered, func() {
 		Expect(allocatorClient.IsAuthenticated()).To(BeTrue())
 	})
 
-	It("should be able to authenticate with the allocator", func() {
-		Expect(allocatorClient.IsAuthenticated()).To(BeTrue())
-	})
-
 	It("should be able make a health check against the allocator", func() {
 		client := NewClient(config)
 		res, err := client.Get("health")
