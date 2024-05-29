@@ -65,4 +65,4 @@ jobs:
 #          config: frontend/.coverage.yaml
 
 permissions:
-  contents: read
+  contents: write
