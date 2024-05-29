@@ -16,8 +16,8 @@ cloud.google.com/go/iam v1.1.8/go.mod h1:GvE6lyMmfxXauzNq8NbgJbeVQNspG+tcdL/W8QO
 cloud.google.com/go/storage v1.41.0 h1:RusiwatSu6lHeEXe3kglxakAmAbfV+rhtPqA6i8RBx0=
 cloud.google.com/go/storage v1.41.0/go.mod h1:J1WCa/Z2FcgdEDuPUY8DxT5I+d9mFKsCepp5vR6Sq80=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
-github.com/PixoVR/pixo-golang-server-utilities/pixo-platform v0.0.0-20240529005735-331c11716930 h1:UWDmQXbbYMU/Gbqk/yeVO9sDR573UnUvB1fpyDQREaw=
-github.com/PixoVR/pixo-golang-server-utilities/pixo-platform v0.0.0-20240529005735-331c11716930/go.mod h1:8gm5EZpbnWGT1ccVpqOlmrAcrPnla95ULbDM/6S/8lw=
+github.com/PixoVR/pixo-golang-server-utilities/pixo-platform v0.0.0-20240529011512-747c4936c3c8 h1:OAEu5j9ay/CTgTId0cDQ/YvQL1XZESMdg/OJKvsR8jc=
+github.com/PixoVR/pixo-golang-server-utilities/pixo-platform v0.0.0-20240529011512-747c4936c3c8/go.mod h1:8gm5EZpbnWGT1ccVpqOlmrAcrPnla95ULbDM/6S/8lw=
 github.com/PuerkitoBio/purell v1.1.1/go.mod h1:c11w/QuzBsJSee3cPx9rAFu61PvFxuPbtSwDGJws/X0=
 github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578/go.mod h1:uGdkoq3SwY9Y+13GIhn11/XLaGBb4BfwItxLd5jeuXE=
 github.com/alicebob/gopher-json v0.0.0-20200520072559-a9ecdc9d1d3a/go.mod h1:SGnFV6hVsYE877CKEZ6tDNTjaSXYUk6QqoIK6PrAtcc=

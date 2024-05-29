@@ -7,7 +7,7 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 )
 
-var _ = Describe("Urlfinder", func() {
+var _ = Describe("URL Finder", func() {
 
 	Context("default domain", func() {
 

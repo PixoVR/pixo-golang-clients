@@ -5,12 +5,13 @@ go 1.22.0
 toolchain go1.22.3
 
 require (
-	github.com/PixoVR/pixo-golang-server-utilities/pixo-platform v0.0.0-20240529005735-331c11716930
+	github.com/PixoVR/pixo-golang-server-utilities/pixo-platform v0.0.0-20240529011512-747c4936c3c8
 	github.com/charmbracelet/huh v0.4.2
 	github.com/fatih/color v1.17.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-faker/faker/v4 v4.4.1
 	github.com/go-resty/resty/v2 v2.13.1
+	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/gorilla/websocket v1.5.1
 	github.com/hasura/go-graphql-client v0.12.1
 	github.com/kyokomi/emoji v2.2.4+incompatible
@@ -68,7 +69,6 @@ require (
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/gnostic-models v0.6.8 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect

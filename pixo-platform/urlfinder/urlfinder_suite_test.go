@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestUrlfinder(t *testing.T) {
+func TestURLFinder(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Urlfinder Suite")
+	RunSpecs(t, "URL Finder Suite")
 }
