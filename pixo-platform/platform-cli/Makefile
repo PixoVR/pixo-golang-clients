@@ -13,6 +13,11 @@ cp:
 lint:
 	golangci-lint run --timeout 5m
 
+update:
+	@echo "🔄 Updating Pixo utilities..."
+	@go get github.com/PixoVR/pixo-golang-server-utilities/pixo-platform@0.1.52
+	@go mod tidy
+
 test:
 	@echo "🧪 Running tests with coverage..."
 	@go test ./... -coverprofile=./cover.out -covermode=atomic -coverpkg=./...

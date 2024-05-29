@@ -1,6 +1,8 @@
 package abstract_client
 
 import (
+	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
+	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/middleware/auth"
 	"github.com/go-faker/faker/v4"
 	"github.com/go-resty/resty/v2"
 	"github.com/gorilla/websocket"
@@ -81,7 +83,9 @@ func (m *MockAbstractClient) Login(username, password string) error {
 	if m.LoginError != nil {
 		return m.LoginError
 	}
-	m.SetToken("token")
+
+	signedToken := auth.GetTestJWT(platform.User{ID: 1})
+	m.SetToken(signedToken)
 	return nil
 }
 
