@@ -54,8 +54,8 @@ jobs:
         env:
           PIXO_LIFECYCLE: stage
           PIXO_REGION: na
-          SECRET_KEY: ${{ secrets.DEV_SECRET_KEY }}
-          PIXO_API_KEY: ${{ secrets.DEV_PIXO_API_KEY }}
+          SECRET_KEY: ${{ secrets.STAGE_SECRET_KEY }}
+          PIXO_API_KEY: ${{ secrets.STAGE_PIXO_API_KEY }}
           PIXO_USERNAME: ${{ secrets.SUPERADMIN_USERNAME }}
           PIXO_PASSWORD: ${{ secrets.SUPERADMIN_PASSWORD }}
 
