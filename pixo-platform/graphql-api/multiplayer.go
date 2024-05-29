@@ -45,7 +45,7 @@ func (g *GraphQLAPIClient) GetMultiplayerServerVersions(ctx context.Context, par
 
 	res := make([]*MultiplayerServerVersion, len(configs[0].ServerVersions))
 
-	for i, _ := range configs[0].ServerVersions {
+	for i := range configs[0].ServerVersions {
 		res[i] = &MultiplayerServerVersion{
 			ModuleID:        configs[0].ModuleID,
 			ImageRegistry:   configs[0].ServerVersions[i].ImageRegistry,

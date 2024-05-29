@@ -1,17 +1,15 @@
 
-NAME = pixo-dev
-EXECUTABLE = ./bin/$(NAME)
 GO_BIN ?= $$(go env GOPATH)/bin
 
-all: lint test build docker cp
-
-dev: build cp
-
-cp:
-	sudo cp $(EXECUTABLE) /usr/local/bin/$(NAME)
+all: lint test
 
 lint:
 	golangci-lint run --timeout 5m
+
+update:
+	@echo "🔄 Updating Pixo utilities..."
+	@go get github.com/PixoVR/pixo-golang-server-utilities/pixo-platform@0.1.53
+	@go mod tidy
 
 test:
 	@echo "🧪 Running tests with coverage..."
@@ -25,21 +23,3 @@ report:
 	@echo "📊 Generating coverage report..."
 	@IS_LOCAL=true go test -cover -v -coverprofile=prof.out ./...
 	@go tool cover -html=prof.out
-
-build:
-	go build -o $(EXECUTABLE) main.go
-
-image:
-	docker build .. -t ${NAME} -f ./Dockerfile
-
-container:
-	docker run --rm -it ${NAME} --version
-
-container-debug:
-	docker run --rm -it --entrypoint /bin/bash ${NAME}
-
-docker: image container
-
-clean:
-	rm -rf ${EXECUTABLE} || true
-	docker rmi --force ${NAME}:latest || true

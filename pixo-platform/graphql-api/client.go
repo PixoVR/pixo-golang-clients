@@ -51,8 +51,7 @@ var _ PlatformClient = (*GraphQLAPIClient)(nil)
 type GraphQLAPIClient struct {
 	*abstract_client.AbstractServiceClient
 	*graphql.Client
-	underlyingTransport http.RoundTripper
-	defaultContext      context.Context
+	defaultContext context.Context
 }
 
 // NewClient is a function that returns a GraphQLAPIClient
