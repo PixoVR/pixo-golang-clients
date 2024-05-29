@@ -3,6 +3,7 @@ package primary_api_test
 import (
 	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
+	config2 "github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/config"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"os"
@@ -21,8 +22,8 @@ var _ = Describe("Webhook", Ordered, func() {
 
 	BeforeEach(func() {
 		config := urlfinder.ClientConfig{
-			Lifecycle: "dev",
-			Region:    "na",
+			Lifecycle: config2.GetEnvOrReturn("PIXO_LIFECYCLE", "stage"),
+			Region:    config2.GetEnvOrReturn("PIXO_REGION", "na"),
 		}
 		primaryAPIClient = primary_api.NewClient(config)
 		Expect(primaryAPIClient.Login(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"))).To(Succeed())

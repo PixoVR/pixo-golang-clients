@@ -5,6 +5,7 @@ import (
 	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
 	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/heartbeat"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
+	config2 "github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/config"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"os"
@@ -15,7 +16,7 @@ var _ = Describe("Heartbeat", Ordered, func() {
 	var (
 		heartbeatClient Client
 		config          = urlfinder.ClientConfig{
-			Lifecycle: "dev",
+			Lifecycle: config2.GetEnvOrReturn("PIXO_LIFECYCLE", "stage"),
 		}
 		username = os.Getenv("PIXO_USERNAME")
 		password = os.Getenv("PIXO_PASSWORD")

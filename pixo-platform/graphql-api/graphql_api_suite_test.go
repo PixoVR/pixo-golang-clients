@@ -2,6 +2,7 @@ package graphql_api_test
 
 import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
+	config2 "github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/config"
 	"os"
 	"testing"
 
@@ -18,7 +19,7 @@ func TestGraphQLAPISuite(t *testing.T) {
 var (
 	apiKeyClient *GraphQLAPIClient
 	tokenClient  *GraphQLAPIClient
-	lifecycle    = "dev"
+	lifecycle    = config2.GetEnvOrReturn("PIXO_LIFECYCLE", "stage")
 	pixoUsername = os.Getenv("PIXO_USERNAME")
 	pixoPassword = os.Getenv("PIXO_PASSWORD")
 	pixoAPIKey   = os.Getenv("PIXO_API_KEY")

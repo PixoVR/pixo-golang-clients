@@ -1,14 +1,16 @@
 package matchmaker_test
 
 import (
+	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
+	config2 "github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/config"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"os"
 )
 
-var _ = Describe("Multiplayer", func() {
+var _ = Describe("Matchmaker", func() {
 
 	var (
 		m matchmaker.Matchmaker
@@ -17,15 +19,15 @@ var _ = Describe("Multiplayer", func() {
 	BeforeEach(func() {
 		var err error
 		config := urlfinder.ClientConfig{
-			Lifecycle: "dev",
-			Region:    "na",
+			Lifecycle: config2.GetEnvOrReturn("PIXO_LIFECYCLE", "stage"),
+			Region:    config2.GetEnvOrReturn("PIXO_REGION", "na"),
 		}
 		m, err = matchmaker.NewClientWithBasicAuth(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"), config)
 		Expect(err).NotTo(HaveOccurred())
 	})
 
 	It("can get the base url for the matchmaker", func() {
-		Expect(m.GetURL("ws")).To(Equal("wss://apex.dev.pixovr.com/matchmaking"))
+		Expect(m.GetURL("ws")).To(Equal(fmt.Sprintf("wss://apex.%s.pixovr.com/matchmaking", config2.GetEnvOrReturn("PIXO_LIFECYCLE", "stage"))))
 	})
 
 	It("can dial a the matchmaking service and request a match", func() {
