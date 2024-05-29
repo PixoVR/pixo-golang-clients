@@ -82,7 +82,6 @@ func (m *MockMatchmaker) SendRequest(conn *websocket.Conn, req MatchRequest) err
 
 	if m.WriteToWebsocketError != nil {
 		return m.WriteToWebsocketError
-
 	}
 
 	return m.WriteToWebsocket(reqBytes)
