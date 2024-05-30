@@ -54,8 +54,6 @@ jobs:
           mkdir ~/.pixo
           go test ./... -coverprofile=./cover.out -covermode=atomic -coverpkg=./...
         env:
-          PIXO_LIFECYCLE: stage
-          PIXO_REGION: na
           SECRET_KEY: ${{ secrets.STAGE_SECRET_KEY }}
           PIXO_API_KEY: ${{ secrets.STAGE_PIXO_API_KEY }}
           PIXO_USERNAME: ${{ secrets.SUPERADMIN_USERNAME }}
