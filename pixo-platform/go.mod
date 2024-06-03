@@ -19,7 +19,7 @@ require (
 	github.com/onsi/gomega v1.33.1
 	github.com/rs/zerolog v1.33.0
 	github.com/spf13/cobra v1.8.0
-	github.com/spf13/viper v1.18.2
+	github.com/spf13/viper v1.19.0
 	gitlab.com/david_mbuvi/go_asterisks v0.0.0-20221114073100-4669d8bedcbe
 	golang.org/x/text v0.15.0
 	gopkg.in/ini.v1 v1.67.0
