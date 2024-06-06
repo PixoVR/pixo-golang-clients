@@ -18,64 +18,76 @@ var _ PlatformClient = (*MockGraphQLClient)(nil)
 type MockGraphQLClient struct {
 	abstract_client.MockAbstractClient
 
-	CalledGetUser bool
-	GetUserError  bool
+	NumCalledGetUser int
+	GetUserError     error
 
-	CalledCreateUser bool
-	CreateUserError  bool
+	NumCalledCreateUser int
+	CreateUserError     error
 
-	CalledUpdateUser bool
-	UpdateUserError  bool
+	NumCalledUpdateUser int
+	UpdateUserError     error
 
-	CalledDeleteUser bool
-	DeleteUserError  bool
+	NumCalledDeleteUser int
+	DeleteUserError     error
 
-	CalledGetAPIKeys bool
-	GetAPIKeysEmpty  bool
-	GetAPIKeysError  bool
+	NumCalledGetOrg int
+	GetOrgError     error
 
-	CalledCreateAPIKey bool
-	CreateAPIKeyError  bool
+	NumCalledCreateOrg int
+	CreateOrgError     error
 
-	CalledDeleteAPIKey bool
-	DeleteAPIKeyError  bool
+	NumCalledUpdateOrg int
+	UpdateOrgError     error
 
-	CalledGetSession bool
-	GetSessionError  bool
+	NumCalledDeleteOrg int
+	DeleteOrgError     error
 
-	CalledCreateSession bool
-	CreateSessionError  bool
+	NumCalledGetAPIKeys int
+	GetAPIKeysEmpty     bool
+	GetAPIKeysError     error
 
-	CalledUpdateSession bool
-	UpdateSessionError  bool
+	NumCalledCreateAPIKey int
+	CreateAPIKeyError     error
 
-	CalledCreateEvent bool
-	CreateEventError  bool
+	NumCalledDeleteAPIKey int
+	DeleteAPIKeyError     error
 
-	CalledGetPlatforms bool
-	GetPlatformsError  bool
+	NumCalledGetSession int
+	GetSessionError     error
 
-	CalledGetControlTypes bool
-	GetControlTypesError  bool
+	NumCalledCreateSession int
+	CreateSessionError     error
 
-	CalledCreateModuleVersion bool
-	CreateModuleVersionError  bool
+	NumCalledUpdateSession int
+	UpdateSessionError     error
 
-	CalledGetMultiplayerServerConfigs        bool
-	GetMultiplayerServerConfigsError         bool
+	NumCalledCreateEvent int
+	CreateEventError     error
+
+	NumCalledGetPlatforms int
+	GetPlatformsError     error
+
+	NumCalledGetControlTypes int
+	GetControlTypesError     error
+
+	NumCalledCreateModuleVersion int
+	CreateModuleVersionError     error
+
+	NumCalledGetMultiplayerServerConfigs     int
+	GetMultiplayerServerConfigsError         error
 	GetMultiplayerServerConfigsEmpty         bool
 	GetMultiplayerServerConfigsEmptyVersions bool
 
-	CalledGetMultiplayerServerVersions bool
-	GetMultiplayerServerVersionsError  bool
-	GetMultiplayerServerVersionsEmpty  bool
+	NumCalledGetMultiplayerServerVersions int
+	GetMultiplayerServerVersionsError     error
+	GetMultiplayerServerVersionsEmpty     bool
 
-	CalledGetMultiplayerServerVersion bool
-	GetMultiplayerServerVersionError  bool
-	GetMultiplayerServerVersionEmpty  bool
+	NumCalledGetMultiplayerServerVersion int
+	GetMultiplayerServerVersionError     error
+	GetMultiplayerServerVersionEmpty     bool
 
-	CalledCreateMultiplayerServerVersion bool
-	CreateMultiplayerServerVersionError  bool
+	NumCalledCreateMultiplayerServerVersion int
+	CreateMultiplayerServerVersionError     error
 }
 
 func (m *MockGraphQLClient) Path() string {
@@ -91,14 +103,14 @@ func (m *MockGraphQLClient) ActiveOrgID() int {
 }
 
 func (m *MockGraphQLClient) GetUserByUsername(ctx context.Context, username string) (*platform.User, error) {
-	m.CalledGetUser = true
-
-	if m.GetUserError {
-		return nil, errors.New("error getting user")
-	}
+	m.NumCalledGetUser++
 
 	if username == "" {
 		return nil, commonerrors.ErrorRequired("username")
+	}
+
+	if m.GetUserError != nil {
+		return nil, m.GetUserError
 	}
 
 	return &platform.User{
@@ -113,11 +125,7 @@ func (m *MockGraphQLClient) GetUserByUsername(ctx context.Context, username stri
 }
 
 func (m *MockGraphQLClient) CreateUser(ctx context.Context, user platform.User) (*platform.User, error) {
-	m.CalledCreateUser = true
-
-	if m.CreateUserError {
-		return nil, errors.New("error creating user")
-	}
+	m.NumCalledCreateUser++
 
 	if user.Username == "" {
 		return nil, commonerrors.ErrorRequired("username")
@@ -131,6 +139,10 @@ func (m *MockGraphQLClient) CreateUser(ctx context.Context, user platform.User) 
 		return nil, errors.New("invalid org id")
 	}
 
+	if m.CreateUserError != nil {
+		return nil, m.CreateUserError
+	}
+
 	user.ID = 1
 	user.CreatedAt = time.Now().UTC()
 	user.UpdatedAt = time.Now().UTC()
@@ -138,11 +150,7 @@ func (m *MockGraphQLClient) CreateUser(ctx context.Context, user platform.User) 
 }
 
 func (m *MockGraphQLClient) UpdateUser(ctx context.Context, user platform.User) (*platform.User, error) {
-	m.CalledUpdateUser = true
-
-	if m.UpdateUserError {
-		return nil, errors.New("error updating user")
-	}
+	m.NumCalledUpdateUser++
 
 	if user.ID <= 0 {
 		return nil, errors.New("invalid user id")
@@ -156,29 +164,96 @@ func (m *MockGraphQLClient) UpdateUser(ctx context.Context, user platform.User) 
 		return nil, errors.New("invalid org id")
 	}
 
+	if m.UpdateUserError != nil {
+		return nil, m.UpdateUserError
+	}
+
 	user.UpdatedAt = time.Now().UTC()
 	return &user, nil
 }
 
 func (m *MockGraphQLClient) DeleteUser(ctx context.Context, id int) error {
-	m.CalledDeleteUser = true
-
-	if m.DeleteUserError {
-		return errors.New("error deleting user")
-	}
+	m.NumCalledDeleteUser++
 
 	if id <= 0 {
 		return errors.New("invalid user id")
+	}
+
+	if m.DeleteUserError != nil {
+		return m.DeleteUserError
+	}
+
+	return nil
+}
+
+func (m *MockGraphQLClient) GetOrg(ctx context.Context, id int) (*Org, error) {
+	m.NumCalledGetOrg++
+
+	if id <= 0 {
+		return nil, errors.New("invalid org id")
+	}
+
+	if m.GetOrgError != nil {
+		return nil, m.GetOrgError
+	}
+
+	return &Org{
+		ID:   1,
+		Name: faker.Name(),
+	}, nil
+}
+
+func (m *MockGraphQLClient) CreateOrg(ctx context.Context, org Org) (*Org, error) {
+	m.NumCalledCreateOrg++
+
+	if org.Name == "" {
+		return nil, commonerrors.ErrorRequired("name")
+	}
+
+	if m.CreateOrgError != nil {
+		return nil, m.CreateOrgError
+	}
+
+	org.ID = 1
+	org.CreatedAt = time.Now().UTC()
+	org.UpdatedAt = time.Now().UTC()
+	return &org, nil
+}
+
+func (m *MockGraphQLClient) UpdateOrg(ctx context.Context, org Org) (*Org, error) {
+	m.NumCalledUpdateOrg++
+
+	if org.ID <= 0 {
+		return nil, errors.New("org id is required")
+	}
+
+	if m.UpdateOrgError != nil {
+		return nil, m.UpdateOrgError
+	}
+
+	org.UpdatedAt = time.Now().UTC()
+	return &org, nil
+}
+
+func (m *MockGraphQLClient) DeleteOrg(ctx context.Context, id int) error {
+	m.NumCalledDeleteOrg++
+
+	if id <= 0 {
+		return errors.New("invalid org id")
+	}
+
+	if m.DeleteOrgError != nil {
+		return m.DeleteOrgError
 	}
 
 	return nil
 }
 
 func (m *MockGraphQLClient) CreateAPIKey(ctx context.Context, input platform.APIKey) (*platform.APIKey, error) {
-	m.CalledCreateAPIKey = true
+	m.NumCalledCreateAPIKey++
 
-	if m.CreateAPIKeyError {
-		return nil, errors.New("error creating api key")
+	if m.CreateAPIKeyError != nil {
+		return nil, m.CreateAPIKeyError
 	}
 
 	input.ID = 1
@@ -190,14 +265,14 @@ func (m *MockGraphQLClient) CreateAPIKey(ctx context.Context, input platform.API
 }
 
 func (m *MockGraphQLClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) ([]*platform.APIKey, error) {
-	m.CalledGetAPIKeys = true
+	m.NumCalledGetAPIKeys++
+
+	if m.GetAPIKeysError != nil {
+		return nil, m.GetAPIKeysError
+	}
 
 	if m.GetAPIKeysEmpty {
 		return []*platform.APIKey{}, nil
-	}
-
-	if m.GetAPIKeysError {
-		return nil, errors.New("error getting user")
 	}
 
 	if params.UserID == nil {
@@ -216,28 +291,28 @@ func (m *MockGraphQLClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryP
 }
 
 func (m *MockGraphQLClient) DeleteAPIKey(ctx context.Context, id int) error {
-	m.CalledDeleteAPIKey = true
-
-	if m.DeleteAPIKeyError {
-		return errors.New("error deleting api key")
-	}
+	m.NumCalledDeleteAPIKey++
 
 	if id <= 0 {
 		return errors.New("invalid api key id")
+	}
+
+	if m.DeleteAPIKeyError != nil {
+		return m.DeleteAPIKeyError
 	}
 
 	return nil
 }
 
 func (m *MockGraphQLClient) GetSession(ctx context.Context, id int) (*Session, error) {
-	m.CalledGetSession = true
-
-	if m.GetSessionError {
-		return nil, errors.New("error getting session")
-	}
+	m.NumCalledGetSession++
 
 	if id <= 0 {
 		return nil, errors.New("invalid session id")
+	}
+
+	if m.GetSessionError != nil {
+		return nil, m.GetSessionError
 	}
 
 	return &Session{
@@ -250,11 +325,7 @@ func (m *MockGraphQLClient) GetSession(ctx context.Context, id int) (*Session, e
 }
 
 func (m *MockGraphQLClient) CreateSession(ctx context.Context, moduleID int, ipAddress, deviceId string) (*Session, error) {
-	m.CalledCreateSession = true
-
-	if m.CreateSessionError {
-		return nil, errors.New("error creating session")
-	}
+	m.NumCalledCreateSession++
 
 	if moduleID <= 0 {
 		return nil, errors.New("invalid module id")
@@ -262,6 +333,10 @@ func (m *MockGraphQLClient) CreateSession(ctx context.Context, moduleID int, ipA
 
 	if ipAddress == "" {
 		return nil, commonerrors.ErrorRequired("ip address")
+	}
+
+	if m.CreateSessionError != nil {
+		return nil, m.CreateSessionError
 	}
 
 	return &Session{
@@ -274,14 +349,14 @@ func (m *MockGraphQLClient) CreateSession(ctx context.Context, moduleID int, ipA
 }
 
 func (m *MockGraphQLClient) UpdateSession(ctx context.Context, session Session) (*Session, error) {
-	m.CalledUpdateSession = true
-
-	if m.UpdateSessionError {
-		return nil, errors.New("error updating session")
-	}
+	m.NumCalledUpdateSession++
 
 	if session.ID <= 0 {
 		return nil, errors.New("invalid session id")
+	}
+
+	if m.UpdateSessionError != nil {
+		return nil, m.UpdateSessionError
 	}
 
 	if session.MaxScore > 0 {
@@ -294,11 +369,7 @@ func (m *MockGraphQLClient) UpdateSession(ctx context.Context, session Session) 
 }
 
 func (m *MockGraphQLClient) CreateEvent(ctx context.Context, sessionID int, uuid string, eventType string, data string) (*platform.Event, error) {
-	m.CalledCreateEvent = true
-
-	if m.CreateEventError {
-		return nil, errors.New("error creating event")
-	}
+	m.NumCalledCreateEvent++
 
 	if sessionID <= 0 {
 		return nil, InvalidSessionError
@@ -306,6 +377,10 @@ func (m *MockGraphQLClient) CreateEvent(ctx context.Context, sessionID int, uuid
 
 	if eventType == "" {
 		return nil, commonerrors.ErrorRequired("event type")
+	}
+
+	if m.CreateEventError != nil {
+		return nil, m.CreateEventError
 	}
 
 	var jsonData platform.EventResult
@@ -324,10 +399,10 @@ func (m *MockGraphQLClient) CreateEvent(ctx context.Context, sessionID int, uuid
 }
 
 func (m *MockGraphQLClient) GetPlatforms(ctx context.Context) ([]*Platform, error) {
-	m.CalledGetPlatforms = true
+	m.NumCalledGetPlatforms++
 
-	if m.GetPlatformsError {
-		return nil, errors.New("error getting platforms")
+	if m.GetPlatformsError != nil {
+		return nil, m.GetPlatformsError
 	}
 
 	return []*Platform{{
@@ -337,10 +412,10 @@ func (m *MockGraphQLClient) GetPlatforms(ctx context.Context) ([]*Platform, erro
 }
 
 func (m *MockGraphQLClient) GetControlTypes(ctx context.Context) ([]*ControlType, error) {
-	m.CalledGetControlTypes = true
+	m.NumCalledGetControlTypes++
 
-	if m.GetControlTypesError {
-		return nil, errors.New("error getting control types")
+	if m.GetControlTypesError != nil {
+		return nil, m.GetControlTypesError
 	}
 
 	return []*ControlType{{
@@ -350,11 +425,7 @@ func (m *MockGraphQLClient) GetControlTypes(ctx context.Context) ([]*ControlType
 }
 
 func (m *MockGraphQLClient) CreateModuleVersion(ctx context.Context, input ModuleVersion) (*ModuleVersion, error) {
-	m.CalledCreateModuleVersion = true
-
-	if m.CreateModuleVersionError {
-		return nil, errors.New("error creating module version")
-	}
+	m.NumCalledCreateModuleVersion++
 
 	if input.ModuleID == 0 {
 		return nil, errors.New("invalid module id")
@@ -368,6 +439,10 @@ func (m *MockGraphQLClient) CreateModuleVersion(ctx context.Context, input Modul
 		return nil, errors.New("invalid version")
 	}
 
+	if m.CreateModuleVersionError != nil {
+		return nil, m.CreateModuleVersionError
+	}
+
 	return &ModuleVersion{
 		ModuleID:        input.ModuleID,
 		SemanticVersion: input.SemanticVersion,
@@ -376,10 +451,10 @@ func (m *MockGraphQLClient) CreateModuleVersion(ctx context.Context, input Modul
 }
 
 func (m *MockGraphQLClient) GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]*MultiplayerServerConfigQueryParams, error) {
-	m.CalledGetMultiplayerServerConfigs = true
+	m.NumCalledGetMultiplayerServerConfigs++
 
-	if m.GetMultiplayerServerConfigsError {
-		return nil, errors.New("error getting multiplayer server configs")
+	if m.GetMultiplayerServerConfigsError != nil {
+		return nil, m.GetMultiplayerServerConfigsError
 	}
 
 	if m.GetMultiplayerServerConfigsEmpty {
@@ -412,15 +487,7 @@ func (m *MockGraphQLClient) GetMultiplayerServerConfigs(ctx context.Context, par
 }
 
 func (m *MockGraphQLClient) GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionQueryParams) ([]*MultiplayerServerVersion, error) {
-	m.CalledGetMultiplayerServerVersions = true
-
-	if m.GetMultiplayerServerVersionsEmpty {
-		return []*MultiplayerServerVersion{}, nil
-	}
-
-	if m.GetMultiplayerServerVersionsError {
-		return nil, errors.New("error getting multiplayer server versions")
-	}
+	m.NumCalledGetMultiplayerServerVersions++
 
 	if params.ModuleID == 0 {
 		return nil, errors.New("invalid module id")
@@ -428,6 +495,14 @@ func (m *MockGraphQLClient) GetMultiplayerServerVersions(ctx context.Context, pa
 
 	if params.SemanticVersion == "" {
 		return nil, errors.New("invalid semantic version")
+	}
+
+	if m.GetMultiplayerServerVersionsError != nil {
+		return nil, m.GetMultiplayerServerVersionsError
+	}
+
+	if m.GetMultiplayerServerVersionsEmpty {
+		return []*MultiplayerServerVersion{}, nil
 	}
 
 	return []*MultiplayerServerVersion{
@@ -441,14 +516,14 @@ func (m *MockGraphQLClient) GetMultiplayerServerVersions(ctx context.Context, pa
 }
 
 func (m *MockGraphQLClient) GetMultiplayerServerVersion(ctx context.Context, versionID int) (*MultiplayerServerVersion, error) {
-	m.CalledGetMultiplayerServerVersion = true
+	m.NumCalledGetMultiplayerServerVersion++
+
+	if m.GetMultiplayerServerVersionError != nil {
+		return nil, m.GetMultiplayerServerVersionError
+	}
 
 	if m.GetMultiplayerServerVersionEmpty {
 		return nil, nil
-	}
-
-	if m.GetMultiplayerServerVersionError {
-		return nil, errors.New("error getting multiplayer server version")
 	}
 
 	return &MultiplayerServerVersion{
@@ -461,7 +536,7 @@ func (m *MockGraphQLClient) GetMultiplayerServerVersion(ctx context.Context, ver
 }
 
 func (m *MockGraphQLClient) CreateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error) {
-	m.CalledCreateMultiplayerServerVersion = true
+	m.NumCalledCreateMultiplayerServerVersion++
 
 	if input.ModuleID == 0 {
 		return nil, errors.New("invalid module id")
@@ -475,8 +550,8 @@ func (m *MockGraphQLClient) CreateMultiplayerServerVersion(ctx context.Context, 
 		return nil, errors.New("invalid semantic version")
 	}
 
-	if m.CreateMultiplayerServerVersionError {
-		return nil, errors.New("error creating multiplayer server version")
+	if m.CreateMultiplayerServerVersionError != nil {
+		return nil, m.CreateMultiplayerServerVersionError
 	}
 
 	return &MultiplayerServerVersion{

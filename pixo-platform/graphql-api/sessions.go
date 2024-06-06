@@ -24,7 +24,7 @@ type Session struct {
 	UserID   int              `json:"userId"`
 	User     platform.User    `json:"user"`
 	OrgID    int              `json:"orgId"`
-	Org      platform.Org     `json:"org"`
+	Org      Org              `json:"org"`
 	ModuleID int              `json:"moduleId"`
 	Module   platform.Module  `json:"module"`
 	Events   []platform.Event `json:"events"`

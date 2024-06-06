@@ -34,6 +34,11 @@ type PlatformClient interface {
 
 	CreateModuleVersion(ctx context.Context, input ModuleVersion) (*ModuleVersion, error)
 
+	GetOrg(ctx context.Context, id int) (*Org, error)
+	CreateOrg(ctx context.Context, org Org) (*Org, error)
+	UpdateOrg(ctx context.Context, org Org) (*Org, error)
+	DeleteOrg(ctx context.Context, id int) error
+
 	GetSession(ctx context.Context, id int) (*Session, error)
 	CreateSession(ctx context.Context, moduleID int, ipAddress, deviceId string) (*Session, error)
 	UpdateSession(ctx context.Context, session Session) (*Session, error)
