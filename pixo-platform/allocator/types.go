@@ -1,7 +1,7 @@
 package allocator
 
 import (
-	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
+	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
 	"github.com/go-resty/resty/v2"
 )
 

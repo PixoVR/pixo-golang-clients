@@ -4,7 +4,7 @@ Copyright © 2024 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
-	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
+	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/loader"
 	"github.com/spf13/cobra"
 )

@@ -2,15 +2,15 @@ package clients
 
 import (
 	"context"
-	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/headset"
+	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
+	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/config"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/editor"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/forms"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/forms/basic"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/loader"
-	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"github.com/spf13/cobra"
 	"os"
@@ -21,7 +21,7 @@ type CLIContext struct {
 	ConfigManager     config.Manager
 	OldAPIClient      primary_api.OldAPIClient
 	HeadsetClient     headset.Client
-	PlatformClient    platform.PlatformClient
+	PlatformClient    platform.Client
 	MatchmakingClient matchmaker.Matchmaker
 	FileOpener        editor.FileOpener
 }

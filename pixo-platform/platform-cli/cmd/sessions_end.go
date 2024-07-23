@@ -5,9 +5,9 @@ package cmd
 
 import (
 	"encoding/json"
-	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
+	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
+	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/loader"
-	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/spf13/cobra"
 	"time"
 )

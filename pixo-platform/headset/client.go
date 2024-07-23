@@ -2,8 +2,8 @@ package headset
 
 import (
 	abstractClient "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
-	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
-	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
+	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
+	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 )
 
@@ -14,7 +14,7 @@ type Client interface {
 // Client is a struct that contains an AbstractServiceClient
 type client struct {
 	abstractClient.AbstractServiceClient
-	platformClient graphql_api.PlatformClient
+	platformClient graphql_api.Client
 }
 
 // NewClient is a function that returns a new Client

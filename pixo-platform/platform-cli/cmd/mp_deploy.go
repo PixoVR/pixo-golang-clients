@@ -6,7 +6,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	platformAPI "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
+	platformAPI "github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/parser"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/loader"
 	"github.com/kyokomi/emoji"

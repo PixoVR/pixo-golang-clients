@@ -2,7 +2,7 @@ package allocator
 
 import (
 	abstractClient "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
-	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
+	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 )
 
@@ -10,7 +10,7 @@ import (
 type Client struct {
 	abstractClient.AbstractServiceClient
 
-	platformClient graphql_api.PlatformClient
+	platformClient graphql_api.Client
 }
 
 func NewClientWithBasicAuth(username, password string, config urlfinder.ClientConfig) (*Client, error) {

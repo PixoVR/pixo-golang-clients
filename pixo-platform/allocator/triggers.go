@@ -3,7 +3,7 @@ package allocator
 import (
 	"encoding/json"
 	"fmt"
-	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
+	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
 	"github.com/rs/zerolog/log"
 )
 

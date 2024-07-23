@@ -4,8 +4,8 @@ Copyright © 2024 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
+	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/loader"
-	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
 	"github.com/spf13/cobra"
 )
 

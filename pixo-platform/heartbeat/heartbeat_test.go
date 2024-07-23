@@ -2,8 +2,8 @@ package heartbeat_test
 
 import (
 	"context"
-	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
 	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/heartbeat"
+	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	config2 "github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/config"
 	. "github.com/onsi/ginkgo/v2"

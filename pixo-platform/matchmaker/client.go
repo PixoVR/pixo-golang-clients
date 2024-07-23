@@ -2,7 +2,7 @@ package matchmaker
 
 import (
 	abstractClient "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
-	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
+	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"net"
 )
@@ -10,7 +10,7 @@ import (
 type MultiplayerMatchmaker struct {
 	*abstractClient.AbstractServiceClient
 
-	platformClient graphql_api.PlatformClient
+	platformClient graphql_api.Client
 
 	gameserverAddress    *net.UDPAddr
 	gameserverConnection *net.UDPConn
