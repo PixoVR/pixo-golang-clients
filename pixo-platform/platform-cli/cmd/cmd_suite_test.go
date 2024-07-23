@@ -30,7 +30,7 @@ func TestCLI(t *testing.T) {
 
 type TestExecutor struct {
 	ConfigManager         config.Manager
-	MockPlatformClient    *graphql_api.MockGraphQLClient
+	MockPlatformClient    *graphql_api.MockClient
 	MockHeadsetClient     *headset.MockClient
 	MockMatchmakingClient *matchmaker.MockMatchmaker
 	MockOldAPIClient      *primary_api.MockClient
@@ -56,7 +56,7 @@ func NewTestExecutor() *TestExecutor {
 	err := configManager.SetConfigFile(testConfigPath)
 	Expect(err).NotTo(HaveOccurred())
 
-	mockPlatformClient := &graphql_api.MockGraphQLClient{}
+	mockPlatformClient := &graphql_api.MockClient{}
 	mockHeadsetClient := &headset.MockClient{}
 	mockOldAPIClient := &primary_api.MockClient{}
 	mockMatchmaker := matchmaker.NewMockMatchmaker()

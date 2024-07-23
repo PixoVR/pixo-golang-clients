@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	abstract_client "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
+	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
 	commonerrors "github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/commonerrors"
 	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/k8s/agones"
@@ -13,10 +13,10 @@ import (
 	"time"
 )
 
-var _ Client = (*MockGraphQLClient)(nil)
+var _ Client = (*MockClient)(nil)
 
-type MockGraphQLClient struct {
-	abstract_client.MockAbstractClient
+type MockClient struct {
+	abstract.MockAbstractClient
 
 	NumCalledGetUser int
 	GetUserError     error
@@ -41,6 +41,21 @@ type MockGraphQLClient struct {
 
 	NumCalledDeleteOrg int
 	DeleteOrgError     error
+
+	NumCalledGetWebhooks int
+	GetWebhooksError     error
+
+	NumCalledGetWebhook int
+	GetWebhookError     error
+
+	NumCalledCreateWebhook int
+	CreateWebhookError     error
+
+	NumCalledUpdateWebhook int
+	UpdateWebhookError     error
+
+	NumCalledDeleteWebhook int
+	DeleteWebhookError     error
 
 	NumCalledGetAPIKeys int
 	GetAPIKeysEmpty     bool
@@ -90,19 +105,19 @@ type MockGraphQLClient struct {
 	CreateMultiplayerServerVersionError     error
 }
 
-func (m *MockGraphQLClient) Path() string {
+func (m *MockClient) Path() string {
 	return "v2"
 }
 
-func (m *MockGraphQLClient) ActiveUserID() int {
+func (m *MockClient) ActiveUserID() int {
 	return 1
 }
 
-func (m *MockGraphQLClient) ActiveOrgID() int {
+func (m *MockClient) ActiveOrgID() int {
 	return 1
 }
 
-func (m *MockGraphQLClient) GetUserByUsername(ctx context.Context, username string) (*platform.User, error) {
+func (m *MockClient) GetUserByUsername(ctx context.Context, username string) (*platform.User, error) {
 	m.NumCalledGetUser++
 
 	if username == "" {
@@ -124,7 +139,7 @@ func (m *MockGraphQLClient) GetUserByUsername(ctx context.Context, username stri
 	}, nil
 }
 
-func (m *MockGraphQLClient) CreateUser(ctx context.Context, user platform.User) (*platform.User, error) {
+func (m *MockClient) CreateUser(ctx context.Context, user platform.User) (*platform.User, error) {
 	m.NumCalledCreateUser++
 
 	if user.Username == "" {
@@ -149,7 +164,7 @@ func (m *MockGraphQLClient) CreateUser(ctx context.Context, user platform.User) 
 	return &user, nil
 }
 
-func (m *MockGraphQLClient) UpdateUser(ctx context.Context, user platform.User) (*platform.User, error) {
+func (m *MockClient) UpdateUser(ctx context.Context, user platform.User) (*platform.User, error) {
 	m.NumCalledUpdateUser++
 
 	if user.ID <= 0 {
@@ -172,7 +187,7 @@ func (m *MockGraphQLClient) UpdateUser(ctx context.Context, user platform.User) 
 	return &user, nil
 }
 
-func (m *MockGraphQLClient) DeleteUser(ctx context.Context, id int) error {
+func (m *MockClient) DeleteUser(ctx context.Context, id int) error {
 	m.NumCalledDeleteUser++
 
 	if id <= 0 {
@@ -186,7 +201,7 @@ func (m *MockGraphQLClient) DeleteUser(ctx context.Context, id int) error {
 	return nil
 }
 
-func (m *MockGraphQLClient) GetOrg(ctx context.Context, id int) (*Org, error) {
+func (m *MockClient) GetOrg(ctx context.Context, id int) (*Org, error) {
 	m.NumCalledGetOrg++
 
 	if id <= 0 {
@@ -203,7 +218,7 @@ func (m *MockGraphQLClient) GetOrg(ctx context.Context, id int) (*Org, error) {
 	}, nil
 }
 
-func (m *MockGraphQLClient) CreateOrg(ctx context.Context, org Org) (*Org, error) {
+func (m *MockClient) CreateOrg(ctx context.Context, org Org) (*Org, error) {
 	m.NumCalledCreateOrg++
 
 	if org.Name == "" {
@@ -220,7 +235,7 @@ func (m *MockGraphQLClient) CreateOrg(ctx context.Context, org Org) (*Org, error
 	return &org, nil
 }
 
-func (m *MockGraphQLClient) UpdateOrg(ctx context.Context, org Org) (*Org, error) {
+func (m *MockClient) UpdateOrg(ctx context.Context, org Org) (*Org, error) {
 	m.NumCalledUpdateOrg++
 
 	if org.ID <= 0 {
@@ -235,7 +250,7 @@ func (m *MockGraphQLClient) UpdateOrg(ctx context.Context, org Org) (*Org, error
 	return &org, nil
 }
 
-func (m *MockGraphQLClient) DeleteOrg(ctx context.Context, id int) error {
+func (m *MockClient) DeleteOrg(ctx context.Context, id int) error {
 	m.NumCalledDeleteOrg++
 
 	if id <= 0 {
@@ -249,7 +264,7 @@ func (m *MockGraphQLClient) DeleteOrg(ctx context.Context, id int) error {
 	return nil
 }
 
-func (m *MockGraphQLClient) CreateAPIKey(ctx context.Context, input platform.APIKey) (*platform.APIKey, error) {
+func (m *MockClient) CreateAPIKey(ctx context.Context, input platform.APIKey) (*platform.APIKey, error) {
 	m.NumCalledCreateAPIKey++
 
 	if m.CreateAPIKeyError != nil {
@@ -264,7 +279,7 @@ func (m *MockGraphQLClient) CreateAPIKey(ctx context.Context, input platform.API
 	return &input, nil
 }
 
-func (m *MockGraphQLClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) ([]*platform.APIKey, error) {
+func (m *MockClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) ([]*platform.APIKey, error) {
 	m.NumCalledGetAPIKeys++
 
 	if m.GetAPIKeysError != nil {
@@ -290,7 +305,7 @@ func (m *MockGraphQLClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryP
 	}, nil
 }
 
-func (m *MockGraphQLClient) DeleteAPIKey(ctx context.Context, id int) error {
+func (m *MockClient) DeleteAPIKey(ctx context.Context, id int) error {
 	m.NumCalledDeleteAPIKey++
 
 	if id <= 0 {
@@ -304,7 +319,112 @@ func (m *MockGraphQLClient) DeleteAPIKey(ctx context.Context, id int) error {
 	return nil
 }
 
-func (m *MockGraphQLClient) GetSession(ctx context.Context, id int) (*Session, error) {
+func (m *MockClient) GetWebhooks(ctx context.Context, params *WebhookParams) ([]Webhook, error) {
+	m.NumCalledGetWebhooks++
+
+	if m.GetWebhooksError != nil {
+		return nil, m.GetWebhooksError
+	}
+
+	return []Webhook{
+		{
+			ID:    1,
+			OrgID: 1,
+			URL:   "http://example.com",
+			Token: "token",
+		},
+		{
+			ID:    2,
+			OrgID: 2,
+			URL:   "http://example-2.com",
+			Token: "token-2",
+		},
+	}, nil
+}
+
+func (m *MockClient) GetWebhook(ctx context.Context, id int) (*Webhook, error) {
+	m.NumCalledGetWebhook++
+
+	if id <= 0 {
+		return nil, errors.New("invalid webhook id")
+	}
+
+	if m.GetWebhookError != nil {
+		return nil, m.GetWebhookError
+	}
+
+	return &Webhook{
+		ID:    id,
+		OrgID: 1,
+		URL:   "http://example.com",
+		Token: "token",
+	}, nil
+}
+
+func (m *MockClient) CreateWebhook(ctx context.Context, input Webhook) (*Webhook, error) {
+	m.NumCalledCreateWebhook++
+
+	if input.OrgID <= 0 {
+		return nil, errors.New("invalid org id")
+	}
+
+	if input.URL == "" {
+		return nil, commonerrors.ErrorRequired("url")
+	}
+
+	if input.Token == "" {
+		return nil, commonerrors.ErrorRequired("token")
+	}
+
+	if m.CreateWebhookError != nil {
+		return nil, m.CreateWebhookError
+	}
+
+	input.ID = 1
+	return &input, nil
+}
+
+func (m *MockClient) UpdateWebhook(ctx context.Context, input Webhook) (*Webhook, error) {
+	m.NumCalledUpdateWebhook++
+
+	if input.ID <= 0 {
+		return nil, errors.New("invalid webhook id")
+	}
+
+	if input.OrgID <= 0 {
+		return nil, errors.New("invalid org id")
+	}
+
+	if input.URL == "" {
+		return nil, commonerrors.ErrorRequired("url")
+	}
+
+	if input.Token == "" {
+		return nil, commonerrors.ErrorRequired("token")
+	}
+
+	if m.UpdateWebhookError != nil {
+		return nil, m.UpdateWebhookError
+	}
+
+	return &input, nil
+}
+
+func (m *MockClient) DeleteWebhook(ctx context.Context, id int) error {
+	m.NumCalledDeleteWebhook++
+
+	if id <= 0 {
+		return errors.New("invalid webhook id")
+	}
+
+	if m.DeleteWebhookError != nil {
+		return m.DeleteWebhookError
+	}
+
+	return nil
+}
+
+func (m *MockClient) GetSession(ctx context.Context, id int) (*Session, error) {
 	m.NumCalledGetSession++
 
 	if id <= 0 {
@@ -324,7 +444,7 @@ func (m *MockGraphQLClient) GetSession(ctx context.Context, id int) (*Session, e
 	}, nil
 }
 
-func (m *MockGraphQLClient) CreateSession(ctx context.Context, moduleID int, ipAddress, deviceId string) (*Session, error) {
+func (m *MockClient) CreateSession(ctx context.Context, moduleID int, ipAddress, deviceId string) (*Session, error) {
 	m.NumCalledCreateSession++
 
 	if moduleID <= 0 {
@@ -348,7 +468,7 @@ func (m *MockGraphQLClient) CreateSession(ctx context.Context, moduleID int, ipA
 	}, nil
 }
 
-func (m *MockGraphQLClient) UpdateSession(ctx context.Context, session Session) (*Session, error) {
+func (m *MockClient) UpdateSession(ctx context.Context, session Session) (*Session, error) {
 	m.NumCalledUpdateSession++
 
 	if session.ID <= 0 {
@@ -368,7 +488,7 @@ func (m *MockGraphQLClient) UpdateSession(ctx context.Context, session Session) 
 	return &session, nil
 }
 
-func (m *MockGraphQLClient) CreateEvent(ctx context.Context, sessionID int, uuid string, eventType string, data string) (*platform.Event, error) {
+func (m *MockClient) CreateEvent(ctx context.Context, sessionID int, uuid string, eventType string, data string) (*platform.Event, error) {
 	m.NumCalledCreateEvent++
 
 	if sessionID <= 0 {
@@ -398,7 +518,7 @@ func (m *MockGraphQLClient) CreateEvent(ctx context.Context, sessionID int, uuid
 	}, nil
 }
 
-func (m *MockGraphQLClient) GetPlatforms(ctx context.Context) ([]*Platform, error) {
+func (m *MockClient) GetPlatforms(ctx context.Context) ([]*Platform, error) {
 	m.NumCalledGetPlatforms++
 
 	if m.GetPlatformsError != nil {
@@ -411,7 +531,7 @@ func (m *MockGraphQLClient) GetPlatforms(ctx context.Context) ([]*Platform, erro
 	}}, nil
 }
 
-func (m *MockGraphQLClient) GetControlTypes(ctx context.Context) ([]*ControlType, error) {
+func (m *MockClient) GetControlTypes(ctx context.Context) ([]*ControlType, error) {
 	m.NumCalledGetControlTypes++
 
 	if m.GetControlTypesError != nil {
@@ -424,7 +544,7 @@ func (m *MockGraphQLClient) GetControlTypes(ctx context.Context) ([]*ControlType
 	}}, nil
 }
 
-func (m *MockGraphQLClient) CreateModuleVersion(ctx context.Context, input ModuleVersion) (*ModuleVersion, error) {
+func (m *MockClient) CreateModuleVersion(ctx context.Context, input ModuleVersion) (*ModuleVersion, error) {
 	m.NumCalledCreateModuleVersion++
 
 	if input.ModuleID == 0 {
@@ -450,7 +570,7 @@ func (m *MockGraphQLClient) CreateModuleVersion(ctx context.Context, input Modul
 	}, nil
 }
 
-func (m *MockGraphQLClient) GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]*MultiplayerServerConfigQueryParams, error) {
+func (m *MockClient) GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]*MultiplayerServerConfigQueryParams, error) {
 	m.NumCalledGetMultiplayerServerConfigs++
 
 	if m.GetMultiplayerServerConfigsError != nil {
@@ -486,7 +606,7 @@ func (m *MockGraphQLClient) GetMultiplayerServerConfigs(ctx context.Context, par
 	}, nil
 }
 
-func (m *MockGraphQLClient) GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionQueryParams) ([]*MultiplayerServerVersion, error) {
+func (m *MockClient) GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionQueryParams) ([]*MultiplayerServerVersion, error) {
 	m.NumCalledGetMultiplayerServerVersions++
 
 	if params.ModuleID == 0 {
@@ -515,7 +635,7 @@ func (m *MockGraphQLClient) GetMultiplayerServerVersions(ctx context.Context, pa
 	}, nil
 }
 
-func (m *MockGraphQLClient) GetMultiplayerServerVersion(ctx context.Context, versionID int) (*MultiplayerServerVersion, error) {
+func (m *MockClient) GetMultiplayerServerVersion(ctx context.Context, versionID int) (*MultiplayerServerVersion, error) {
 	m.NumCalledGetMultiplayerServerVersion++
 
 	if m.GetMultiplayerServerVersionError != nil {
@@ -535,7 +655,7 @@ func (m *MockGraphQLClient) GetMultiplayerServerVersion(ctx context.Context, ver
 	}, nil
 }
 
-func (m *MockGraphQLClient) CreateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error) {
+func (m *MockClient) CreateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error) {
 	m.NumCalledCreateMultiplayerServerVersion++
 
 	if input.ModuleID == 0 {
