@@ -105,6 +105,46 @@ type MockClient struct {
 	CreateMultiplayerServerVersionError     error
 }
 
+func (m *MockClient) Reset() {
+	m.NumCalledCreateEvent = 0
+
+	m.NumCalledCreateSession = 0
+
+	m.NumCalledGetUser = 0
+	m.NumCalledCreateUser = 0
+	m.NumCalledUpdateOrg = 0
+	m.NumCalledDeleteUser = 0
+
+	m.NumCalledGetOrg = 0
+	m.NumCalledCreateOrg = 0
+	m.NumCalledUpdateUser = 0
+	m.NumCalledDeleteOrg = 0
+
+	m.NumCalledGetAPIKeys = 0
+	m.NumCalledCreateAPIKey = 0
+	m.NumCalledDeleteAPIKey = 0
+
+	m.NumCalledGetWebhooks = 0
+	m.NumCalledGetWebhook = 0
+	m.NumCalledCreateWebhook = 0
+	m.NumCalledUpdateWebhook = 0
+	m.NumCalledDeleteWebhook = 0
+
+	m.NumCalledGetSession = 0
+	m.NumCalledUpdateSession = 0
+
+	m.NumCalledGetPlatforms = 0
+
+	m.NumCalledGetControlTypes = 0
+
+	m.NumCalledCreateModuleVersion = 0
+
+	m.NumCalledGetMultiplayerServerConfigs = 0
+	m.NumCalledGetMultiplayerServerVersions = 0
+	m.NumCalledGetMultiplayerServerVersion = 0
+	m.NumCalledCreateMultiplayerServerVersion = 0
+}
+
 func (m *MockClient) Path() string {
 	return "v2"
 }
@@ -328,16 +368,18 @@ func (m *MockClient) GetWebhooks(ctx context.Context, params *WebhookParams) ([]
 
 	return []Webhook{
 		{
-			ID:    1,
-			OrgID: 1,
-			URL:   "http://example.com",
-			Token: "token",
+			ID:          1,
+			OrgID:       1,
+			URL:         "https://example.com",
+			Description: "test",
+			Token:       "token",
 		},
 		{
-			ID:    2,
-			OrgID: 2,
-			URL:   "http://example-2.com",
-			Token: "token-2",
+			ID:          2,
+			OrgID:       2,
+			URL:         "https://example-2.com",
+			Description: "test-2",
+			Token:       "token-2",
 		},
 	}, nil
 }
@@ -370,10 +412,6 @@ func (m *MockClient) CreateWebhook(ctx context.Context, input Webhook) (*Webhook
 
 	if input.URL == "" {
 		return nil, commonerrors.ErrorRequired("url")
-	}
-
-	if input.Token == "" {
-		return nil, commonerrors.ErrorRequired("token")
 	}
 
 	if m.CreateWebhookError != nil {

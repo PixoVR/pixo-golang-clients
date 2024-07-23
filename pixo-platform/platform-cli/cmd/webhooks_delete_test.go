@@ -31,11 +31,11 @@ var _ = Describe("Webhooks Delete", func() {
 		)
 
 		Expect(output).To(ContainSubstring("ID is required"))
-		Expect(executor.MockOldAPIClient.NumCalledDeleteWebhook).To(Equal(0))
+		Expect(executor.MockPlatformClient.NumCalledDeleteWebhook).To(Equal(0))
 	})
 
 	It("can return an error if the api call fails", func() {
-		executor.MockOldAPIClient.DeleteWebhookError = errors.New("error")
+		executor.MockPlatformClient.DeleteWebhookError = errors.New("error")
 
 		output := executor.RunCommandAndExpectSuccess(
 			"webhooks",
@@ -46,7 +46,7 @@ var _ = Describe("Webhooks Delete", func() {
 
 		Expect(output).To(ContainSubstring("error"))
 		Expect(output).To(ContainSubstring("Unable to delete webhook"))
-		Expect(executor.MockOldAPIClient.NumCalledDeleteWebhook).To(Equal(1))
+		Expect(executor.MockPlatformClient.NumCalledDeleteWebhook).To(Equal(1))
 	})
 
 	It("can delete a webhook", func() {

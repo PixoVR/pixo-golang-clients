@@ -23,7 +23,7 @@ type DeleteAPIKeyResponse struct {
 	Success bool `json:"deleteApiKey"`
 }
 
-func (g *GraphQLAPIClient) CreateAPIKey(ctx context.Context, input legacy.APIKey) (*legacy.APIKey, error) {
+func (g *PlatformAPIClient) CreateAPIKey(ctx context.Context, input legacy.APIKey) (*legacy.APIKey, error) {
 	query := `mutation createApiKey($input: ApiKeyInput!) { createApiKey(input: $input) { id key userId user { role } } }`
 
 	variables := map[string]interface{}{
@@ -49,7 +49,7 @@ func (g *GraphQLAPIClient) CreateAPIKey(ctx context.Context, input legacy.APIKey
 	return &apiKeyResponse.APIKey, nil
 }
 
-func (g *GraphQLAPIClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) ([]*legacy.APIKey, error) {
+func (g *PlatformAPIClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) ([]*legacy.APIKey, error) {
 	query := `query apiKeys($params: ApiKeyParams) { apiKeys(params: $params) { id key userId user { role } } }`
 
 	variables := map[string]interface{}{
@@ -75,7 +75,7 @@ func (g *GraphQLAPIClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryPa
 	return apiKeysResponse.APIKeys, nil
 }
 
-func (g *GraphQLAPIClient) DeleteAPIKey(ctx context.Context, id int) error {
+func (g *PlatformAPIClient) DeleteAPIKey(ctx context.Context, id int) error {
 	query := `mutation deleteApiKey($id: ID!) { deleteApiKey(id: $id) }`
 
 	variables := map[string]interface{}{

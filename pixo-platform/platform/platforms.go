@@ -15,7 +15,7 @@ type GetPlatformsResponse struct {
 	Platforms []*Platform `json:"platforms,omitempty"`
 }
 
-func (g *GraphQLAPIClient) GetPlatforms(ctx context.Context) ([]*Platform, error) {
+func (g *PlatformAPIClient) GetPlatforms(ctx context.Context) ([]*Platform, error) {
 	query := `query platforms { platforms { id name shortName } }`
 
 	res, err := g.Client.ExecRaw(ctx, query, nil)

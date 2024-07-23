@@ -29,7 +29,7 @@ type ModuleVersion struct {
 	PlatformIds     []int         `json:"platformIds,omitempty"`
 }
 
-func (g *GraphQLAPIClient) CreateModuleVersion(ctx context.Context, input ModuleVersion) (*ModuleVersion, error) {
+func (g *PlatformAPIClient) CreateModuleVersion(ctx context.Context, input ModuleVersion) (*ModuleVersion, error) {
 	query := `mutation createModuleVersion($input: ModuleVersionInput!) { createModuleVersion(input: $input) { id moduleId module { abbreviation } version package status fileLink } }`
 
 	if input.LocalFilePath == "" {

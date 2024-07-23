@@ -17,7 +17,7 @@ type LoginResponse struct {
 }
 
 // Login performs a login request to the API
-func (g *GraphQLAPIClient) Login(username, password string) error {
+func (g *PlatformAPIClient) Login(username, password string) error {
 	url := g.GetURLWithPath("auth/login")
 
 	loginInput := LoginRequest{

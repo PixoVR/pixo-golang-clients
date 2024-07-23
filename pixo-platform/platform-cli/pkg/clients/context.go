@@ -3,7 +3,6 @@ package clients
 import (
 	"context"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/headset"
-	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/config"
@@ -19,7 +18,6 @@ import (
 type CLIContext struct {
 	FormHandler       forms.FormHandler
 	ConfigManager     config.Manager
-	OldAPIClient      primary_api.OldAPIClient
 	HeadsetClient     headset.Client
 	PlatformClient    platform.Client
 	MatchmakingClient matchmaker.Matchmaker
@@ -53,7 +51,6 @@ func NewCLIContextWithConfig(configFiles ...string) *CLIContext {
 	return &CLIContext{
 		FormHandler:       formHandler,
 		ConfigManager:     configManager,
-		OldAPIClient:      primary_api.NewClient(clientConfig),
 		HeadsetClient:     headset.NewClient(clientConfig),
 		PlatformClient:    platform.NewClient(clientConfig),
 		MatchmakingClient: matchmaker.NewClient(clientConfig),

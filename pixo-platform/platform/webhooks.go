@@ -40,7 +40,7 @@ type DeleteWebhookResponse struct {
 	Success bool `json:"deleteWebhook"`
 }
 
-func (g *GraphQLAPIClient) GetWebhooks(ctx context.Context, params *WebhookParams) ([]Webhook, error) {
+func (g *PlatformAPIClient) GetWebhooks(ctx context.Context, params *WebhookParams) ([]Webhook, error) {
 	query := `query webhooks($params: WebhookParams) { webhooks(params: $params) { id orgId org { name } url token description } }`
 
 	variables := map[string]interface{}{
@@ -61,7 +61,7 @@ func (g *GraphQLAPIClient) GetWebhooks(ctx context.Context, params *WebhookParam
 	return webhooksResponse.Webhooks, nil
 }
 
-func (g *GraphQLAPIClient) GetWebhook(ctx context.Context, id int) (*Webhook, error) {
+func (g *PlatformAPIClient) GetWebhook(ctx context.Context, id int) (*Webhook, error) {
 	query := `query webhook($id: ID) { webhook(id: $id) { id url description token orgId org { name } }`
 
 	variables := map[string]interface{}{
@@ -81,8 +81,25 @@ func (g *GraphQLAPIClient) GetWebhook(ctx context.Context, id int) (*Webhook, er
 	return &webhookResponse.Webhook, nil
 }
 
-func (g *GraphQLAPIClient) CreateWebhook(ctx context.Context, webhook Webhook) (*Webhook, error) {
-	query := `mutation createWebhook($input: WebhookInput!) { createWebhook(input: $input) { id orgId org { name } url token description } }`
+func (g *PlatformAPIClient) CreateWebhook(ctx context.Context, webhook Webhook) (*Webhook, error) {
+	query := `mutation createWebhook($input: WebhookInput!) {
+  createWebhook(input: $input) {
+    id
+    url
+    description
+    token
+    orgId
+    org {
+      id
+      name
+    }
+    createdBy
+    updatedBy
+    createdAt
+    updatedAt
+  }
+}
+`
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{
@@ -106,7 +123,7 @@ func (g *GraphQLAPIClient) CreateWebhook(ctx context.Context, webhook Webhook) (
 	return &webhookResponse.Webhook, nil
 }
 
-func (g *GraphQLAPIClient) UpdateWebhook(ctx context.Context, webhook Webhook) (*Webhook, error) {
+func (g *PlatformAPIClient) UpdateWebhook(ctx context.Context, webhook Webhook) (*Webhook, error) {
 
 	if webhook.ID == 0 {
 		return nil, errors.New("webhook id is required")
@@ -149,7 +166,7 @@ func (g *GraphQLAPIClient) UpdateWebhook(ctx context.Context, webhook Webhook) (
 	return &updateWebhookResponse.Webhook, nil
 }
 
-func (g *GraphQLAPIClient) DeleteWebhook(ctx context.Context, id int) error {
+func (g *PlatformAPIClient) DeleteWebhook(ctx context.Context, id int) error {
 	query := `mutation deleteWebhook($id: ID!) { deleteWebhook(id: $id) }`
 
 	variables := map[string]interface{}{

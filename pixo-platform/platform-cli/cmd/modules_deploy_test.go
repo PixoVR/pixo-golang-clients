@@ -2,6 +2,7 @@ package cmd_test
 
 import (
 	"bytes"
+	"errors"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -113,7 +114,7 @@ var _ = Describe("Module", func() {
 	})
 
 	It("can return an error if the platform options cant be found", func() {
-		executor.MockPlatformClient.GetPlatformsError = true
+		executor.MockPlatformClient.GetPlatformsError = errors.New("error")
 		input := bytes.NewReader([]byte(""))
 
 		output, err := executor.RunCommandWithInput(
@@ -132,7 +133,7 @@ var _ = Describe("Module", func() {
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring("error"))
-		Expect(executor.MockPlatformClient.CalledGetPlatforms).To(BeTrue())
+		Expect(executor.MockPlatformClient.NumCalledGetPlatforms).To(Equal(1))
 	})
 
 	It("can return an error if platforms are missing", func() {
@@ -153,13 +154,13 @@ var _ = Describe("Module", func() {
 		)
 
 		Expect(err).NotTo(HaveOccurred())
-		Expect(executor.MockPlatformClient.CalledGetPlatforms).To(BeTrue())
+		Expect(executor.MockPlatformClient.NumCalledGetPlatforms).To(Equal(1))
 		Expect(output).To(ContainSubstring("Select PLATFORMS:"))
 		Expect(output).To(ContainSubstring("Platforms not provided"))
 	})
 
 	It("can return an error if the control types options cant be found", func() {
-		executor.MockPlatformClient.GetControlTypesError = true
+		executor.MockPlatformClient.GetControlTypesError = errors.New("error")
 		input := bytes.NewReader([]byte("1\n"))
 
 		output, err := executor.RunCommandWithInput(
@@ -177,7 +178,7 @@ var _ = Describe("Module", func() {
 		)
 
 		Expect(err).NotTo(HaveOccurred())
-		Expect(executor.MockPlatformClient.CalledGetControlTypes).To(BeTrue())
+		Expect(executor.MockPlatformClient.NumCalledGetControlTypes).To(Equal(1))
 		Expect(output).To(ContainSubstring("error"))
 	})
 
@@ -199,13 +200,13 @@ var _ = Describe("Module", func() {
 		)
 
 		Expect(err).NotTo(HaveOccurred())
-		Expect(executor.MockPlatformClient.CalledGetControlTypes).To(BeTrue())
+		Expect(executor.MockPlatformClient.NumCalledGetControlTypes).To(Equal(1))
 		Expect(output).To(ContainSubstring("Select CONTROL TYPES:"))
 		Expect(output).To(ContainSubstring("Control types not provided"))
 	})
 
 	It("can return an error if the api call fails", func() {
-		executor.MockPlatformClient.CreateModuleVersionError = true
+		executor.MockPlatformClient.CreateModuleVersionError = errors.New("error")
 		input := bytes.NewReader([]byte("1\n1\n"))
 
 		output, err := executor.RunCommandWithInput(
@@ -228,7 +229,7 @@ var _ = Describe("Module", func() {
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring("error"))
-		Expect(executor.MockPlatformClient.CalledCreateModuleVersion).To(BeTrue())
+		Expect(executor.MockPlatformClient.NumCalledCreateModuleVersion).To(Equal(1))
 	})
 
 	It("can deploy a module version", func() {
@@ -251,7 +252,7 @@ var _ = Describe("Module", func() {
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring("Deployed version 1.0.0 for module 1"))
-		Expect(executor.MockPlatformClient.CalledCreateModuleVersion).To(BeTrue())
+		Expect(executor.MockPlatformClient.NumCalledCreateModuleVersion).To(Equal(1))
 	})
 
 })

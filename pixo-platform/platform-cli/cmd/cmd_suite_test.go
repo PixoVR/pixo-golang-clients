@@ -4,9 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/headset"
-	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
-	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/cmd"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/clients"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/config"
@@ -30,10 +29,9 @@ func TestCLI(t *testing.T) {
 
 type TestExecutor struct {
 	ConfigManager         config.Manager
-	MockPlatformClient    *graphql_api.MockClient
+	MockPlatformClient    *platform.MockClient
 	MockHeadsetClient     *headset.MockClient
 	MockMatchmakingClient *matchmaker.MockMatchmaker
-	MockOldAPIClient      *primary_api.MockClient
 	MockFileOpener        *editor.MockFileOpener
 	configFile            string
 }
@@ -56,9 +54,8 @@ func NewTestExecutor() *TestExecutor {
 	err := configManager.SetConfigFile(testConfigPath)
 	Expect(err).NotTo(HaveOccurred())
 
-	mockPlatformClient := &graphql_api.MockClient{}
+	mockPlatformClient := &platform.MockClient{}
 	mockHeadsetClient := &headset.MockClient{}
-	mockOldAPIClient := &primary_api.MockClient{}
 	mockMatchmaker := matchmaker.NewMockMatchmaker()
 	mockFileOpener := &editor.MockFileOpener{}
 
@@ -68,7 +65,6 @@ func NewTestExecutor() *TestExecutor {
 		PlatformClient:    mockPlatformClient,
 		HeadsetClient:     mockHeadsetClient,
 		MatchmakingClient: mockMatchmaker,
-		OldAPIClient:      mockOldAPIClient,
 		FileOpener:        mockFileOpener,
 	}
 	cmd.Ctx = mockPlatformCtx
@@ -78,7 +74,6 @@ func NewTestExecutor() *TestExecutor {
 		MockPlatformClient:    mockPlatformClient,
 		MockHeadsetClient:     mockHeadsetClient,
 		MockMatchmakingClient: mockMatchmaker,
-		MockOldAPIClient:      mockOldAPIClient,
 		MockFileOpener:        mockFileOpener,
 		configFile:            testConfigPath,
 	}
@@ -89,6 +84,7 @@ func NewTestExecutor() *TestExecutor {
 func (t *TestExecutor) Cleanup() {
 	log.Debug().Msgf("Cleaning up test config file: %s", t.configFile)
 	viper.Reset()
+	t.MockPlatformClient.Reset()
 	_ = os.Remove(t.configFile)
 }
 

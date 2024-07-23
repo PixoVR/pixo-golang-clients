@@ -46,7 +46,7 @@ var _ = Describe("Users", func() {
 			role,
 		)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(executor.MockPlatformClient.CalledCreateUser).To(BeTrue())
+		Expect(executor.MockPlatformClient.NumCalledCreateUser).To(Equal(1))
 		Expect(output).To(ContainSubstring(fmt.Sprintf("User created: %s", username)))
 
 		executor.ExpectLoginToSucceed(username, password)

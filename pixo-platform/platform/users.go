@@ -23,7 +23,7 @@ type DeleteUserResponse struct {
 	Success bool `json:"deleteUser"`
 }
 
-func (g *GraphQLAPIClient) CreateUser(ctx context.Context, user platform.User) (*platform.User, error) {
+func (g *PlatformAPIClient) CreateUser(ctx context.Context, user platform.User) (*platform.User, error) {
 	query := `mutation createUser($input: UserInput!) { createUser(input: $input) { id orgId firstName lastName username role } }`
 
 	variables := map[string]interface{}{
@@ -50,7 +50,7 @@ func (g *GraphQLAPIClient) CreateUser(ctx context.Context, user platform.User) (
 	return &userResponse.User, nil
 }
 
-func (g *GraphQLAPIClient) UpdateUser(ctx context.Context, user platform.User) (*platform.User, error) {
+func (g *PlatformAPIClient) UpdateUser(ctx context.Context, user platform.User) (*platform.User, error) {
 
 	if user.ID == 0 {
 		return nil, errors.New("user id is required")
@@ -101,7 +101,7 @@ func (g *GraphQLAPIClient) UpdateUser(ctx context.Context, user platform.User) (
 	return &userResponse.User, nil
 }
 
-func (g *GraphQLAPIClient) DeleteUser(ctx context.Context, id int) error {
+func (g *PlatformAPIClient) DeleteUser(ctx context.Context, id int) error {
 	query := `mutation deleteUser($id: ID!) { deleteUser(id: $id) }`
 
 	variables := map[string]interface{}{
@@ -125,7 +125,7 @@ func (g *GraphQLAPIClient) DeleteUser(ctx context.Context, id int) error {
 	return nil
 }
 
-func (g *GraphQLAPIClient) GetUserByUsername(ctx context.Context, username string) (*platform.User, error) {
+func (g *PlatformAPIClient) GetUserByUsername(ctx context.Context, username string) (*platform.User, error) {
 	query := `query user($id: ID, $username: String) { user(id: $id, username: $username) { id username firstName lastName orgId role } }`
 
 	variables := map[string]interface{}{

@@ -119,7 +119,7 @@ var _ = Describe("Server Deploy", Ordered, func() {
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring(fmt.Sprintf("Deployed version: %s", semanticVersion)))
-		Expect(executor.MockPlatformClient.CalledCreateMultiplayerServerVersion).To(BeTrue())
+		Expect(executor.MockPlatformClient.NumCalledCreateMultiplayerServerVersion).To(Equal(1))
 	})
 
 })

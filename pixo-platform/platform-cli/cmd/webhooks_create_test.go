@@ -33,26 +33,26 @@ var _ = Describe("Webhooks Create", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring("Enter URL:"))
 		Expect(output).To(ContainSubstring("URL not provided"))
+		Expect(executor.MockPlatformClient.NumCalledCreateWebhook).To(Equal(0))
 	})
 
 	It("can return an error if the description is missing", func() {
-		input := bytes.NewReader([]byte(""))
+		input := bytes.NewReader([]byte("https://example.com\n"))
 
 		output, err := executor.RunCommandWithInput(
 			input,
 			"webhooks",
 			"create",
-			"--url",
-			"https://example.com",
 		)
 
 		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring("Enter DESCRIPTION:"))
+		Expect(output).To(ContainSubstring("Enter description:"))
 		Expect(output).To(ContainSubstring("DESCRIPTION not provided"))
+		Expect(executor.MockPlatformClient.NumCalledCreateWebhook).To(Equal(0))
 	})
 
 	It("can return an error if the api call fails", func() {
-		executor.MockOldAPIClient.CreateWebhookError = errors.New("error")
+		executor.MockPlatformClient.CreateWebhookError = errors.New("error")
 
 		output := executor.RunCommandAndExpectSuccess(
 			"webhooks",
@@ -64,7 +64,7 @@ var _ = Describe("Webhooks Create", func() {
 		)
 
 		Expect(output).To(ContainSubstring("error"))
-		Expect(executor.MockOldAPIClient.NumCalledCreateWebhook).To(Equal(1))
+		Expect(executor.MockPlatformClient.NumCalledCreateWebhook).To(Equal(1))
 	})
 
 	It("can create a webhook", func() {
@@ -79,6 +79,7 @@ var _ = Describe("Webhooks Create", func() {
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring("Webhook created"))
+		Expect(executor.MockPlatformClient.NumCalledCreateWebhook).To(Equal(1))
 	})
 
 })

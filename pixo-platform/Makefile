@@ -8,7 +8,7 @@ lint:
 
 update:
 	@echo "🔄 Updating Pixo utilities..."
-	@go get github.com/PixoVR/pixo-golang-server-utilities/pixo-platform@0.1.53
+	@go get github.com/PixoVR/pixo-golang-server-utilities/pixo-platform@0.1.81
 	@go mod tidy
 
 test:

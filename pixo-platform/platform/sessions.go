@@ -49,7 +49,7 @@ type CreateEventResponse struct {
 	Event platform.Event `json:"createEvent"`
 }
 
-func (g *GraphQLAPIClient) GetSession(ctx context.Context, id int) (*Session, error) {
+func (g *PlatformAPIClient) GetSession(ctx context.Context, id int) (*Session, error) {
 	query := `query session($id: ID!) { session(id: $id) { id userId user { orgId } moduleId } }`
 
 	variables := map[string]interface{}{
@@ -69,7 +69,7 @@ func (g *GraphQLAPIClient) GetSession(ctx context.Context, id int) (*Session, er
 	return &sessionResponse.Session, nil
 }
 
-func (g *GraphQLAPIClient) CreateSession(ctx context.Context, moduleID int, ipAddress, deviceId string) (*Session, error) {
+func (g *PlatformAPIClient) CreateSession(ctx context.Context, moduleID int, ipAddress, deviceId string) (*Session, error) {
 	query := `mutation createSession($input: SessionInput!) { createSession(input: $input) { id userId user { orgId } moduleId } }`
 
 	variables := map[string]interface{}{
@@ -93,7 +93,7 @@ func (g *GraphQLAPIClient) CreateSession(ctx context.Context, moduleID int, ipAd
 	return &sessionResponse.Session, nil
 }
 
-func (g *GraphQLAPIClient) UpdateSession(ctx context.Context, session Session) (*Session, error) {
+func (g *PlatformAPIClient) UpdateSession(ctx context.Context, session Session) (*Session, error) {
 	query := `mutation updateSession($input: SessionInput!) { updateSession(input: $input) { id rawScore maxScore scaledScore completedAt duration moduleId userId user { orgId } } }`
 
 	variables := map[string]interface{}{
@@ -119,7 +119,7 @@ func (g *GraphQLAPIClient) UpdateSession(ctx context.Context, session Session) (
 	return &sessionResponse.Session, nil
 }
 
-func (g *GraphQLAPIClient) CreateEvent(ctx context.Context, sessionID int, uuid string, eventType string, data string) (*platform.Event, error) {
+func (g *PlatformAPIClient) CreateEvent(ctx context.Context, sessionID int, uuid string, eventType string, data string) (*platform.Event, error) {
 	query := `mutation createEvent($input: EventInput!) { createEvent(input: $input) { id } }`
 
 	variables := map[string]interface{}{

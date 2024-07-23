@@ -52,7 +52,7 @@ var _ = Describe("Sessions Start", func() {
 
 	It("can return an error if the api call fails", func() {
 		input := bytes.NewReader([]byte("1"))
-		executor.MockPlatformClient.CreateSessionError = true
+		executor.MockPlatformClient.CreateSessionError = errors.New("error")
 
 		output, err := executor.RunCommandWithInput(
 			input,
@@ -62,7 +62,7 @@ var _ = Describe("Sessions Start", func() {
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring("error"))
-		Expect(executor.MockPlatformClient.CalledCreateSession).To(BeTrue())
+		Expect(executor.MockPlatformClient.NumCalledCreateSession).To(Equal(1))
 	})
 
 	It("can start a session", func() {

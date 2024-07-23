@@ -4,18 +4,10 @@ Copyright © 2024 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
-	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/loader"
 	"github.com/spf13/cobra"
 )
-
-func oldAPILogin() {
-	username, _ := Ctx.ConfigManager.GetConfigValue("username")
-	password, _ := Ctx.ConfigManager.GetConfigValue("password")
-	if err := Ctx.OldAPIClient.Login(username, password); err != nil {
-		Ctx.ConfigManager.Println(":exclamation: Unable to login to old API: ", err)
-	}
-}
 
 // webhooksCreateCmd represents the sessions start command
 var webhooksCreateCmd = &cobra.Command{
@@ -23,20 +15,20 @@ var webhooksCreateCmd = &cobra.Command{
 	Short: "Create a webhook",
 	Long:  `Create a webhook`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		oldAPILogin()
-
 		url, ok := Ctx.ConfigManager.GetConfigValueOrAskUser("url", cmd)
 		if !ok {
 			Ctx.ConfigManager.Println(":exclamation: URL not provided")
+			return nil
 		}
 
 		description, ok := Ctx.ConfigManager.GetFlagOrConfigValueOrAskUser("description", cmd)
 		if !ok {
 			Ctx.ConfigManager.Println(":exclamation: DESCRIPTION not provided")
+			return nil
 		}
 
 		spinner := loader.NewLoader(cmd.Context(), "Creating webhook...", Ctx.ConfigManager)
-		err := Ctx.OldAPIClient.CreateWebhook(primary_api.Webhook{
+		_, err := Ctx.PlatformClient.CreateWebhook(cmd.Context(), platform.Webhook{
 			OrgID:       Ctx.PlatformClient.ActiveOrgID(),
 			URL:         url,
 			Description: description,
