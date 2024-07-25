@@ -4,7 +4,7 @@ Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/config"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/config"
 	"github.com/spf13/cobra"
 )
 
@@ -28,7 +28,7 @@ var setCmd = &cobra.Command{
 		}
 
 		if err := Ctx.ConfigManager.SetActiveEnv(env); err != nil {
-			Ctx.ConfigManager.Println(":exclamation: Unable to set active environment: ", err)
+			Ctx.Printer.Println(":exclamation: Unable to set active environment: ", err)
 			return
 		}
 
@@ -45,23 +45,23 @@ var setCmd = &cobra.Command{
 		key, ok := Ctx.ConfigManager.GetFlagValue("key", cmd)
 		if ok {
 			if val, err := cmd.Flags().GetString("val"); err != nil {
-				Ctx.ConfigManager.Println(":exclamation: Unable to get value flag")
+				Ctx.Printer.Println(":exclamation: Unable to get value flag")
 				return
 			} else if val != "" {
 				Ctx.ConfigManager.SetConfigValue(key, val)
-				Ctx.ConfigManager.Printf(":rocket: Config value %s set to %s\n", key, val)
+				Ctx.Printer.Printf(":rocket: Config value %s set to %s\n", key, val)
 				rootCmd.SetArgs([]string{"config"})
 				_ = rootCmd.Execute()
 				return
 			} else {
-				Ctx.ConfigManager.Println("Value must be provided")
+				Ctx.Printer.Println("Value must be provided")
 				return
 			}
 		}
 
-		Ctx.ConfigManager.Println()
-		Ctx.ConfigManager.Println(":check_mark_button:Config updated successfully")
-		Ctx.ConfigManager.Println()
+		Ctx.Printer.Println()
+		Ctx.Printer.Println(":check_mark_button:Config updated successfully")
+		Ctx.Printer.Println()
 		rootCmd.SetArgs([]string{"config"})
 		if cmd != nil {
 			_ = cmd.Execute()

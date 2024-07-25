@@ -20,19 +20,20 @@ var loginCmd = &cobra.Command{
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := Ctx.Authenticate(cmd); err != nil {
-			Ctx.ConfigManager.Println(":exclamation: Login failed. Please check your credentials and try again.")
+			Ctx.Printer.Println(":exclamation: Login failed. Please check your credentials and try again.")
 		}
 
 		msg := ":rocket: Login successful. Here is your API "
+
 		token, ok := Ctx.ConfigManager.GetConfigValue("token")
 		if ok {
-			Ctx.ConfigManager.Println(msg, "token:\n", token)
+			Ctx.Printer.Println(msg, "token:\n", token)
 			return
 		}
 
 		apiKey, ok := Ctx.ConfigManager.GetConfigValue("api-key")
 		if ok {
-			Ctx.ConfigManager.Println(msg, "key:\n", apiKey)
+			Ctx.Printer.Println(msg, "key:\n", apiKey)
 		}
 	},
 }

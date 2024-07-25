@@ -5,7 +5,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/clients"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/ctx"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"os"
@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	cliVersion = "0.1.2"
+	cliVersion = "0.1.16"
 
 	homeDir          = os.Getenv("HOME")
 	configDirName    = ".pixo"
@@ -24,14 +24,12 @@ var (
 	globalConfigFile = fmt.Sprintf("%s/%s", globalCfgDir, configFileName)
 	localConfigFile  = fmt.Sprintf("./%s/%s", configDirName, configFileName)
 
+	activeConfigFile string
+
 	isDebug          bool
 	cfgFileFlagInput string
-	Ctx              *clients.CLIContext
+	Ctx              *ctx.CLIContext
 )
-
-func GetRootCmd() *cobra.Command {
-	return rootCmd
-}
 
 var rootCmd = &cobra.Command{
 	Use:     "pixo",
@@ -40,9 +38,15 @@ var rootCmd = &cobra.Command{
 	Long:    `A CLI tool used to streamline interactions with the Pixo Platform`,
 }
 
+func GetRootCmd() *cobra.Command {
+	return rootCmd
+}
+
 func Execute() {
 
-	Ctx = clients.NewCLIContextWithConfig(localConfigFile, globalConfigFile)
+	Ctx = ctx.NewCLIContextWithConfig(localConfigFile, globalConfigFile)
+
+	activeConfigFile = Ctx.FileManager.ConfigFile()
 
 	if err := Ctx.Authenticate(nil); err != nil {
 		log.Error().Err(err).Msg("Failed to authenticate")

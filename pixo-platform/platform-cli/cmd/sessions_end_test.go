@@ -9,10 +9,6 @@ import (
 
 var _ = Describe("Sessions End", func() {
 
-	var (
-		executor *TestExecutor
-	)
-
 	BeforeEach(func() {
 		executor = NewTestExecutor()
 	})
@@ -51,7 +47,7 @@ var _ = Describe("Sessions End", func() {
 	})
 
 	It("can return an error if the update session api call fails", func() {
-		executor.MockPlatformClient.UpdateSessionError = true
+		executor.MockPlatformClient.UpdateSessionError = errors.New("error")
 
 		output, err := executor.RunCommand(
 			"sessions",
@@ -62,7 +58,7 @@ var _ = Describe("Sessions End", func() {
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring("error"))
-		Expect(executor.MockPlatformClient.CalledUpdateSession).To(BeTrue())
+		Expect(executor.MockPlatformClient.NumCalledUpdateSession).To(Equal(1))
 	})
 
 	It("can return an error if the create event api call fails", func() {
@@ -90,7 +86,7 @@ var _ = Describe("Sessions End", func() {
 		)
 
 		Expect(output).To(ContainSubstring("Session completed"))
-		Expect(executor.MockPlatformClient.CalledUpdateSession).To(BeTrue())
+		Expect(executor.MockPlatformClient.NumCalledUpdateSession).To(Equal(1))
 	})
 
 	It("can end a session with scores", func() {
@@ -111,7 +107,7 @@ var _ = Describe("Sessions End", func() {
 		Expect(output).To(ContainSubstring("Percent: 33%"))
 		Expect(output).To(ContainSubstring("Duration: 1s"))
 		Expect(executor.MockPlatformClient.NumCalledPost).To(Equal(1))
-		Expect(executor.MockPlatformClient.CalledUpdateSession).To(BeTrue())
+		Expect(executor.MockPlatformClient.NumCalledUpdateSession).To(Equal(1))
 	})
 
 })

@@ -22,28 +22,28 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		region := Ctx.ConfigManager.Region()
 		if region != "" {
-			Ctx.ConfigManager.Println(":earth_americas: Region: ", region)
+			Ctx.Printer.Println(":earth_americas: Region: ", region)
 		}
 
 		lifecycle := Ctx.ConfigManager.Lifecycle()
 		if lifecycle != "" {
-			Ctx.ConfigManager.Println(":gear:  Lifecycle: ", lifecycle)
+			Ctx.Printer.Println(":gear:  Lifecycle: ", lifecycle)
 		}
 
-		Ctx.ConfigManager.Println()
+		Ctx.Printer.Println()
 
 		client := urlfinder.ServiceConfig{
 			Region:    region,
 			Lifecycle: lifecycle,
 		}
 		url := strings.Replace(client.FormatURL(), "/v2", "", 1)
-		Ctx.ConfigManager.Println(":link: Web: ", url)
-		Ctx.ConfigManager.Println("\n:link: Platform API: ", url, "/v2")
-		Ctx.ConfigManager.Println(":link: Platform API Docs: ", url, "/v2/swagger/index.html")
-		Ctx.ConfigManager.Println("\n:link: Matchmaking API: ", url, "/matchmaking")
-		Ctx.ConfigManager.Println(":link: Matchmaking API Docs: ", url, "/matchmaking/swagger/index.html")
-		Ctx.ConfigManager.Println("\n:link: Heartbeat API: ", url, "/heartbeat")
-		Ctx.ConfigManager.Println(":link: Heartbeat API Docs: ", url, "/heartbeat/swagger/index.html")
+		Ctx.Printer.Println(":link: Web: ", url)
+		Ctx.Printer.Println("\n:link: Platform API: ", url, "/v2")
+		Ctx.Printer.Println(":link: Platform API Docs: ", url, "/v2/swagger/index.html")
+		Ctx.Printer.Println("\n:link: Matchmaking API: ", url, "/matchmaking")
+		Ctx.Printer.Println(":link: Matchmaking API Docs: ", url, "/matchmaking/swagger/index.html")
+		Ctx.Printer.Println("\n:link: Heartbeat API: ", url, "/heartbeat")
+		Ctx.Printer.Println(":link: Heartbeat API Docs: ", url, "/heartbeat/swagger/index.html")
 	},
 }
 

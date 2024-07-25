@@ -7,7 +7,7 @@ import (
 var _ = Describe("Builds", func() {
 
 	//var (
-	//	allocatorClient *multiplayerAllocator.AllocatorClient
+	//	allocatorClient *multiplayerAllocator.Client
 	//)
 	//
 	//BeforeEach(func() {

@@ -10,21 +10,17 @@ import (
 	"os"
 )
 
-var _ = Describe("Server Deploy", Ordered, func() {
+var _ = Describe("Server Deploy", func() {
 
 	var (
-		executor        *TestExecutor
-		semanticVersion string
+		semanticVersion = fmt.Sprintf("%d.%d.%d", rand.Intn(100), rand.Intn(100), rand.Intn(100))
 	)
 
-	BeforeAll(func() {
-		semanticVersion = fmt.Sprintf("%d.%d.%d", rand.Intn(100), rand.Intn(100), rand.Intn(100))
+	BeforeEach(func() {
 		executor = NewTestExecutor()
-		Expect(executor).NotTo(BeNil())
-		Expect(semanticVersion).NotTo(BeEmpty())
 	})
 
-	AfterAll(func() {
+	AfterEach(func() {
 		executor.Cleanup()
 	})
 
@@ -40,6 +36,7 @@ var _ = Describe("Server Deploy", Ordered, func() {
 			"--image",
 			agones.SimpleGameServerImage,
 		)
+
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring(fmt.Sprintf("Deployed version: %s", semanticVersion)))
 	})
@@ -53,7 +50,7 @@ var _ = Describe("Server Deploy", Ordered, func() {
 			"--module-id",
 			"1",
 			"--server-version",
-			semanticVersion,
+			"1.00.00",
 		)
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("already exists"))
@@ -98,12 +95,12 @@ var _ = Describe("Server Deploy", Ordered, func() {
 		localFilePath := "./test.zip"
 		file, err := os.Create(localFilePath)
 		Expect(err).NotTo(HaveOccurred())
+		_, err = file.WriteString("test")
+		Expect(err).NotTo(HaveOccurred())
 		defer func() {
 			_ = file.Close()
 			_ = os.Remove(localFilePath)
 		}()
-		_, err = file.WriteString("test")
-		Expect(err).NotTo(HaveOccurred())
 
 		output, err := executor.RunCommand(
 			"mp",
@@ -119,7 +116,7 @@ var _ = Describe("Server Deploy", Ordered, func() {
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring(fmt.Sprintf("Deployed version: %s", semanticVersion)))
-		Expect(executor.MockPlatformClient.CalledCreateMultiplayerServerVersion).To(BeTrue())
+		Expect(executor.MockPlatformClient.NumCalledCreateMultiplayerServerVersion).To(Equal(1))
 	})
 
 })

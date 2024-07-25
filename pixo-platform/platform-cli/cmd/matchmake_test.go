@@ -9,10 +9,6 @@ import (
 
 var _ = Describe("Matchmake", func() {
 
-	var (
-		executor *TestExecutor
-	)
-
 	BeforeEach(func() {
 		executor = NewTestExecutor()
 	})
@@ -22,7 +18,7 @@ var _ = Describe("Matchmake", func() {
 	})
 
 	It("should ask for the module id and server version if it is not provided", func() {
-		input := bytes.NewReader([]byte("1\n"))
+		input := bytes.NewBufferString("1\n")
 		output, err := executor.RunCommandWithInput(
 			input,
 			"mp",
@@ -35,7 +31,7 @@ var _ = Describe("Matchmake", func() {
 	})
 
 	It("can return an error if module id is missing", func() {
-		reader := bytes.NewReader([]byte("0\n"))
+		reader := bytes.NewBufferString("0\n")
 		output, err := executor.RunCommandWithInput(
 			reader,
 			"mp",
@@ -47,13 +43,14 @@ var _ = Describe("Matchmake", func() {
 		Expect(output).To(ContainSubstring("Enter MODULE ID:"))
 		Expect(output).To(ContainSubstring("Module ID not provided"))
 		Expect(executor.MockMatchmakingClient.NumCalledDialWebsocket).To(Equal(0))
-		Expect(executor.MockMatchmakingClient.NumCalledWriteToWebsocket).To(Equal(0))
+		Expect(executor.MockMatchmakingClient.NumCalledWriteToWebsocketError).To(Equal(0))
 		Expect(executor.MockMatchmakingClient.NumCalledReadFromWebsocket).To(Equal(0))
 		Expect(executor.MockMatchmakingClient.NumCalledCloseWebsocket).To(Equal(0))
 	})
 
 	It("can return an error if server version is missing", func() {
-		reader := bytes.NewReader([]byte("\n"))
+		reader := bytes.NewBufferString("\n")
+
 		output, err := executor.RunCommandWithInput(
 			reader,
 			"mp",
@@ -63,10 +60,11 @@ var _ = Describe("Matchmake", func() {
 			"--server-version",
 			"",
 		)
+
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring("Server version not provided"))
 		Expect(executor.MockMatchmakingClient.NumCalledDialWebsocket).To(Equal(0))
-		Expect(executor.MockMatchmakingClient.NumCalledWriteToWebsocket).To(Equal(0))
+		Expect(executor.MockMatchmakingClient.NumCalledWriteToWebsocketError).To(Equal(0))
 		Expect(executor.MockMatchmakingClient.NumCalledReadFromWebsocket).To(Equal(0))
 		Expect(executor.MockMatchmakingClient.NumCalledCloseWebsocket).To(Equal(0))
 	})
@@ -83,7 +81,7 @@ var _ = Describe("Matchmake", func() {
 		Expect(output).To(ContainSubstring("Attempting to find a match"))
 		Expect(executor.MockMatchmakingClient.NumCalledFindMatch).To(Equal(1))
 
-		input := bytes.NewReader([]byte("exit\n"))
+		input := bytes.NewBufferString("exit\n")
 		output = executor.RunCommandWithInputAndExpectSuccess(
 			input,
 			"mp",
@@ -97,26 +95,27 @@ var _ = Describe("Matchmake", func() {
 	})
 
 	It("can load test matchmaking", func() {
-		num := 20
+		numRequests := 20
 		output := executor.RunCommandAndExpectSuccess(
 			"mp",
 			"matchmake",
 			"--load",
-			fmt.Sprint(num),
+			fmt.Sprint(numRequests),
 			"--module-id",
 			"1",
 			"--server-version",
 			"1.00.00",
 		)
-		Expect(output).To(ContainSubstring(fmt.Sprintf("Starting load test with %d connections to", num)))
+
+		Expect(output).To(ContainSubstring(fmt.Sprintf("Starting load test with %d connections to", numRequests)))
 		Expect(output).To(ContainSubstring("Connection Errors:"))
 		Expect(output).To(ContainSubstring("Matching Errors:"))
 		Expect(output).To(ContainSubstring("Matches Received:"))
 		Expect(output).To(ContainSubstring("Gameservers Received:"))
-		Expect(executor.MockMatchmakingClient.NumCalledDialWebsocket).To(BeNumerically(">", 0))
-		Expect(executor.MockMatchmakingClient.NumCalledWriteToWebsocket).To(BeNumerically(">", 0))
-		Expect(executor.MockMatchmakingClient.NumCalledReadFromWebsocket).To(BeNumerically(">", 0))
-		Expect(executor.MockMatchmakingClient.NumCalledCloseWebsocket).To(BeNumerically(">", 0))
+		Expect(executor.MockMatchmakingClient.NumCalledDialWebsocket).To(Equal(numRequests), "incorrect number of dial matchmaker calls")
+		Expect(executor.MockMatchmakingClient.NumCalledWriteToWebsocketError).To(Equal(numRequests), "incorrect number of write to websocket calls")
+		Expect(executor.MockMatchmakingClient.NumCalledReadFromWebsocket).To(Equal(numRequests), "incorrect number of read from websocket calls")
+		Expect(executor.MockMatchmakingClient.NumCalledCloseWebsocket).To(Equal(numRequests), "incorrect number of close websocket calls")
 	})
 
 })

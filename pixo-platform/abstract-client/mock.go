@@ -1,8 +1,12 @@
 package abstract_client
 
 import (
+	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/config"
+	"github.com/go-faker/faker/v4"
 	"github.com/go-resty/resty/v2"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/websocket"
+	"github.com/rs/zerolog/log"
 	"net/http"
 )
 
@@ -10,13 +14,21 @@ type MockAbstractClient struct {
 	NumCalledGetIPAddress int
 	GetIPAddressError     error
 
-	NumCalledGetURL          int
-	NumCalledLogin           int
-	NumCalledSetAPIKey       int
-	NumCalledSetToken        int
-	NumCalledGetToken        int
+	NumCalledGetURL int
+
+	NumCalledLogin int
+	LoginError     error
+
+	NumCalledSetAPIKey int
+
+	NumCalledSetToken int
+	Token             string
+
+	NumCalledGetToken int
+
 	NumCalledIsAuthenticated int
-	NumCalledActiveUserID    int
+
+	NumCalledActiveUserID int
 
 	NumCalledGet int
 	GetError     error
@@ -33,16 +45,23 @@ type MockAbstractClient struct {
 	NumCalledDelete int
 	DeleteError     error
 
-	NumCalledDialWebsocket     int
-	NumCalledWriteToWebsocket  int
+	NumCalledDialWebsocket int
+	DialWebsocketError     error
+
+	NumCalledWriteToWebsocketError int
+	WriteToWebsocketError          error
+
 	NumCalledReadFromWebsocket int
-	NumCalledCloseWebsocket    int
+	ReadFromWebsocketError     error
+
+	NumCalledCloseWebsocket int
+	CloseWebsocketError     error
 
 	Response []byte
 }
 
 func (m *MockAbstractClient) Path() string {
-	return ""
+	return "/api"
 }
 
 func (m *MockAbstractClient) GetIPAddress() (string, error) {
@@ -55,13 +74,29 @@ func (m *MockAbstractClient) GetIPAddress() (string, error) {
 	return "127.0.0.1", nil
 }
 
-func (m *MockAbstractClient) GetURL() string {
+func (m *MockAbstractClient) GetURL(protocol ...string) string {
 	m.NumCalledGetURL++
-	return ""
+	return faker.URL()
 }
 
 func (m *MockAbstractClient) Login(username, password string) error {
 	m.NumCalledLogin++
+	if m.LoginError != nil {
+		return m.LoginError
+	}
+
+	claims := jwt.MapClaims{
+		"authorized": true,
+		"userId":     1,
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	signedToken, err := token.SignedString([]byte(config.GetEnvOrReturn("SECRET_KEY", "fake-key")))
+	if err != nil {
+		log.Panic().Err(err).Msg("error signing token")
+	}
+
+	m.SetToken(signedToken)
 	return nil
 }
 
@@ -69,13 +104,14 @@ func (m *MockAbstractClient) SetAPIKey(key string) {
 	m.NumCalledSetAPIKey++
 }
 
-func (m *MockAbstractClient) SetToken(key string) {
+func (m *MockAbstractClient) SetToken(token string) {
 	m.NumCalledSetToken++
+	m.Token = token
 }
 
 func (m *MockAbstractClient) GetToken() string {
 	m.NumCalledGetToken++
-	return ""
+	return m.Token
 }
 
 func (m *MockAbstractClient) IsAuthenticated() bool {
@@ -140,20 +176,41 @@ func (m *MockAbstractClient) Delete(path string) (*resty.Response, error) {
 
 func (m *MockAbstractClient) DialWebsocket(endpoint string) (*websocket.Conn, *http.Response, error) {
 	m.NumCalledDialWebsocket++
+
+	if m.DialWebsocketError != nil {
+		return nil, nil, m.DialWebsocketError
+	}
+
 	return nil, nil, nil
 }
 
 func (m *MockAbstractClient) WriteToWebsocket(message []byte) error {
-	m.NumCalledWriteToWebsocket++
+	m.NumCalledWriteToWebsocketError++
+
+	if m.WriteToWebsocketError != nil {
+		return m.WriteToWebsocketError
+	}
+
 	return nil
 }
 
 func (m *MockAbstractClient) ReadFromWebsocket() (int, []byte, error) {
 	m.NumCalledReadFromWebsocket++
-	return 0, m.Response, nil
+
+	if m.ReadFromWebsocketError != nil {
+		return 0, nil, m.ReadFromWebsocketError
+
+	}
+
+	return len(m.Response), m.Response, nil
 }
 
 func (m *MockAbstractClient) CloseWebsocketConnection() error {
 	m.NumCalledCloseWebsocket++
+
+	if m.CloseWebsocketError != nil {
+		return m.CloseWebsocketError
+	}
+
 	return nil
 }

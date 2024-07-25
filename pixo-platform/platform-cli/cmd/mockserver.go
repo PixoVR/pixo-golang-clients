@@ -6,7 +6,7 @@ package cmd
 import (
 	"encoding/json"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/mockserver"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/mockserver"
 	"github.com/spf13/cobra"
 )
 
@@ -52,11 +52,11 @@ var mockserverCmd = &cobra.Command{
 
 		response, err := json.Marshal(data)
 		if err != nil {
-			Ctx.ConfigManager.Println(":exclamation: Could not marshal response: ", err)
+			Ctx.Printer.Println(":exclamation: Could not marshal response: ", err)
 			return
 		}
 
-		mockserver.Run(serverPort, Ctx.ConfigManager, "matchmaking/"+matchmaker.MatchmakingEndpoint, response)
+		mockserver.Run(serverPort, Ctx.Printer, "matchmaking/"+matchmaker.MatchmakingEndpoint, response)
 	},
 }
 

@@ -3,6 +3,7 @@ package allocator_test
 import (
 	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/allocator"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
+	config2 "github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/config"
 	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/k8s/agones"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -13,14 +14,14 @@ import (
 var _ = Describe("Allocate", Ordered, func() {
 
 	var (
-		allocatorClient *AllocatorClient
+		allocatorClient *Client
 		config          urlfinder.ClientConfig
 	)
 
 	BeforeEach(func() {
 		config = urlfinder.ClientConfig{
-			Token:     os.Getenv("SECRET_KEY"),
-			Lifecycle: "dev",
+			Token:     os.Getenv("TEST_PIXO_SECRET_KEY"),
+			Lifecycle: config2.GetEnvOrReturn("TEST_PIXO_LIFECYCLE", "dev"),
 		}
 		allocatorClient = NewClient(config)
 		Expect(allocatorClient.IsAuthenticated()).To(BeTrue())

@@ -13,7 +13,7 @@ package allocator_test
 //var _ = Describe("Triggers", Ordered, func() {
 //
 //	var (
-//		allocatorClient *AllocatorClient
+//		allocatorClient *Client
 //		trigger         = platform.MultiplayerServerTrigger{
 //			ID:       1,
 //			ModuleID: 1,
@@ -27,7 +27,7 @@ package allocator_test
 //			Revision:   "dev",
 //			Dockerfile: "Dockerfile",
 //			Context:    "simple-server",
-//			GetConfig:     "version.ini",
+//			Config:     "version.ini",
 //		}
 //	)
 //

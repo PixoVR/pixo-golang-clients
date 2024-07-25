@@ -5,7 +5,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (a *AllocatorClient) AllocateGameserver(request AllocationRequest) AllocationResponse {
+func (a *Client) AllocateGameserver(request AllocationRequest) AllocationResponse {
 
 	body, err := json.Marshal(request)
 	if err != nil {

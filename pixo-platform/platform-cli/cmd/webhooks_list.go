@@ -5,7 +5,8 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/loader"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/loader"
 	"github.com/spf13/cobra"
 )
 
@@ -15,18 +16,16 @@ var webhooksListCmd = &cobra.Command{
 	Short: "List webhooks",
 	Long:  `List webhooks`,
 	Run: func(cmd *cobra.Command, args []string) {
-		oldAPILogin()
-	
-		spinner := loader.NewLoader(cmd.Context(), "Getting webhooks...", Ctx.ConfigManager)
-		webhooks, err := Ctx.OldAPIClient.GetWebhooks(Ctx.PlatformClient.ActiveOrgID())
+		spinner := loader.NewLoader(cmd.Context(), "Getting webhooks...", Ctx.Printer)
+		webhooks, err := Ctx.PlatformClient.GetWebhooks(cmd.Context(), &platform.WebhookParams{OrgID: Ctx.PlatformClient.ActiveOrgID()})
 		spinner.Stop()
 		if err != nil {
-			Ctx.ConfigManager.Println(":exclamation: Unable to get webhooks: ", err)
+			Ctx.Printer.Println(":exclamation: Unable to get webhooks: ", err)
 			return
 		}
 
 		for _, webhook := range webhooks {
-			Ctx.ConfigManager.Println(fmt.Sprintf("%d. Description: %s\n    URL: %s", webhook.ID, webhook.Description, webhook.URL))
+			Ctx.Printer.Println(fmt.Sprintf("%d. Description: %s\n    URL: %s", webhook.ID, webhook.Description, webhook.URL))
 		}
 	},
 }

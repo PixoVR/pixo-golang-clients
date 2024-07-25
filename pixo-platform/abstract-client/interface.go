@@ -13,7 +13,7 @@ type AbstractClient interface {
 	SetAPIKey(key string)
 	SetToken(key string)
 	GetToken() string
-	GetURL() string
+	GetURL(protocol ...string) string
 	IsAuthenticated() bool
 
 	Get(path string) (*resty.Response, error)

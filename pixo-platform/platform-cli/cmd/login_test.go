@@ -9,21 +9,37 @@ import (
 
 var _ = Describe("Login", func() {
 
-	var (
-		executor *TestExecutor
-	)
-
 	BeforeEach(func() {
 		executor = NewTestExecutor()
-
 	})
 
 	AfterEach(func() {
 		executor.Cleanup()
 	})
 
+	It("can login with flags", func() {
+		output, err := executor.RunCommand(
+			"auth",
+			"login",
+			"--username",
+			"testuser1",
+			"--password",
+			"fakepassword",
+		)
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(output).To(ContainSubstring("Login successful. Here is your API token:"))
+		userID, ok := executor.ConfigManager.GetConfigValue("user-id")
+		Expect(ok).To(BeTrue())
+		Expect(userID).To(Equal(fmt.Sprint(executor.MockPlatformClient.ActiveUserID())))
+		orgID, ok := executor.ConfigManager.GetConfigValue("org-id")
+		Expect(ok).To(BeTrue())
+		Expect(orgID).To(Equal(fmt.Sprint(executor.MockPlatformClient.ActiveOrgID())))
+	})
+
 	It("can login from user input", func() {
-		input := bytes.NewReader([]byte("testuser\nfakepassword\n"))
+		input := bytes.NewBufferString("testuser2\nfakepassword\n")
+
 		output, err := executor.RunCommandWithInput(
 			input,
 			"auth",
@@ -45,7 +61,6 @@ var _ = Describe("Login", func() {
 })
 
 func (t *TestExecutor) ExpectLoginToSucceed(username, password string) {
-
 	output, err := t.RunCommand(
 		"auth",
 		"login",

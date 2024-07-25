@@ -18,5 +18,6 @@ type Matchmaker interface {
 
 	DialGameserver(addr *net.UDPAddr) error
 	CloseGameserverConnection() error
-	SendAndReceiveMessage(message []byte) ([]byte, error)
+	SendMessageToGameserver(message []byte) error
+	ReadMessageFromGameserver() ([]byte, error)
 }

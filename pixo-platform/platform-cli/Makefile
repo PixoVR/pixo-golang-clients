@@ -1,7 +1,6 @@
 
 NAME = pixo-dev
 EXECUTABLE = ./bin/$(NAME)
-GO_BIN ?= $$(go env GOPATH)/bin
 
 all: lint test build docker cp
 
@@ -19,13 +18,11 @@ test:
 
 coverage: test
 	@echo "🧪 Checking test coverage threshold..."
-	@${GO_BIN}/go-test-coverage --config=./.coverage.yaml
+	@go-test-coverage --config=./.coverage.yaml
 
 report:
 	@echo "📊 Generating coverage report..."
-	@IS_LOCAL=true go test -cover -v -coverprofile=prof.out ./...
-	@go tool cover -html=prof.out
-
+	@go tool cover -html=cover.out
 
 build:
 	go build -o $(EXECUTABLE) main.go

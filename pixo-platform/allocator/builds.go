@@ -22,7 +22,7 @@ type Workflow struct {
 	CreatedAt time.Time `json:"createdAt"`
 }
 
-func (a *AllocatorClient) GetBuildWorkflows() ([]Workflow, error) {
+func (a *Client) GetBuildWorkflows() ([]Workflow, error) {
 	path := "build/workflows"
 
 	res, err := a.Get(path)
@@ -45,7 +45,7 @@ func (a *AllocatorClient) GetBuildWorkflows() ([]Workflow, error) {
 	return workflowsResponse.Workflows, nil
 }
 
-func (a *AllocatorClient) GetBuildWorkflowLogs(workflowName string) (chan *argo.Log, error) {
+func (a *Client) GetBuildWorkflowLogs(workflowName string) (chan *argo.Log, error) {
 	path := fmt.Sprintf("build/workflows/%s/logs", workflowName)
 
 	req := a.FormatRequest()

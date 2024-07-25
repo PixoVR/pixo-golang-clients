@@ -2,6 +2,7 @@ package urlfinder
 
 import (
 	"fmt"
+	"strings"
 )
 
 type ServiceConfig struct {
@@ -24,15 +25,25 @@ type ClientConfig struct {
 	Region    string
 }
 
-func (s ServiceConfig) FormatURL() string {
+func (s ServiceConfig) FormatURL(protocolInput ...string) string {
+
+	protocol := "https"
+	if len(protocolInput) > 0 {
+		protocol = protocolInput[0]
+		if strings.HasPrefix(protocol, "ws") {
+			protocol = "wss"
+		}
+	}
 
 	if s.Service == "" {
 		s.Service = DefaultService
 	}
 
 	if s.Lifecycle == "local" {
-		if s.Service == "matchmaking" {
-			return fmt.Sprintf("ws://localhost:%d/matchmaking", s.Port)
+		if protocol == "wss" {
+			protocol = "ws"
+		} else {
+			protocol = "http"
 		}
 
 		if s.Port == 0 {
@@ -43,7 +54,7 @@ func (s ServiceConfig) FormatURL() string {
 			return fmt.Sprintf("http://localhost:%d", s.Port)
 		}
 
-		return fmt.Sprintf("http://localhost:%d/%s", s.Port, s.Service)
+		return fmt.Sprintf("%s://localhost:%d/%s", protocol, s.Port, s.Service)
 	}
 
 	if s.Tenant == "" {
@@ -86,11 +97,6 @@ func (s ServiceConfig) FormatURL() string {
 
 	if s.Service == "api" || s.Service == "modules" {
 		return fmt.Sprintf("https://%s.%s.%s", prefix, s.Tenant, s.GetBaseDomain())
-	}
-
-	protocol := "https"
-	if s.Service == "matchmaking" {
-		protocol = "wss"
 	}
 
 	if prefix == "" {

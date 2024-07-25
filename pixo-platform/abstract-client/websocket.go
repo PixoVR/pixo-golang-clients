@@ -13,7 +13,7 @@ func (a *AbstractServiceClient) DialWebsocket(endpoint string) (*websocket.Conn,
 		httpHeader.Add("Authorization", "Bearer "+a.token)
 	}
 
-	conn, httpResponse, err := websocket.DefaultDialer.Dial(a.GetURLWithPath(endpoint), httpHeader)
+	conn, httpResponse, err := websocket.DefaultDialer.Dial(a.GetURLWithPath(endpoint, "ws"), httpHeader)
 	if err != nil {
 		return nil, nil, err
 	}

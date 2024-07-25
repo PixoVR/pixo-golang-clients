@@ -5,9 +5,9 @@ package cmd
 
 import (
 	"fmt"
-	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/graphql-api"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/forms"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/loader"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/loader"
 	"github.com/spf13/cobra"
 	"strconv"
 	"strings"
@@ -23,25 +23,25 @@ var modulesDeployCmd = &cobra.Command{
 
 		moduleID, ok := Ctx.ConfigManager.GetIntConfigValueOrAskUser("module-id", cmd)
 		if !ok {
-			Ctx.ConfigManager.Println(":exclamation: Module ID not provided")
+			Ctx.Printer.Println(":exclamation: Module ID not provided")
 			return
 		}
 
 		semVer, ok := Ctx.ConfigManager.GetConfigValueOrAskUser("semantic-version", cmd)
 		if !ok {
-			Ctx.ConfigManager.Println(":exclamation: Semantic version not provided")
+			Ctx.Printer.Println(":exclamation: Semantic version not provided")
 			return
 		}
 
 		packageName, ok := Ctx.ConfigManager.GetConfigValueOrAskUser("package", cmd)
 		if !ok {
-			Ctx.ConfigManager.Println(":exclamation: Package name not provided")
+			Ctx.Printer.Println(":exclamation: Package name not provided")
 			return
 		}
 
 		zipFilepath, ok := Ctx.ConfigManager.GetConfigValueOrAskUser("zip-file", cmd)
 		if !ok {
-			Ctx.ConfigManager.Println(":exclamation: Zip file not provided")
+			Ctx.Printer.Println(":exclamation: Zip file not provided")
 			return
 		}
 
@@ -50,7 +50,7 @@ var modulesDeployCmd = &cobra.Command{
 		if !ok {
 			platforms, err := Ctx.PlatformClient.GetPlatforms(cmd.Context())
 			if err != nil {
-				Ctx.ConfigManager.Printf(":exclamation: %s\n", err.Error())
+				Ctx.Printer.Printf(":exclamation: %s\n", err.Error())
 				return
 			}
 
@@ -64,20 +64,20 @@ var modulesDeployCmd = &cobra.Command{
 
 			selectedPlatforms, err = Ctx.FormHandler.MultiSelectIDs("Select PLATFORMS:\n", platformOptions)
 			if err != nil || len(selectedPlatforms) == 0 {
-				Ctx.ConfigManager.Println(":exclamation: Platforms not provided")
+				Ctx.Printer.Println(":exclamation: Platforms not provided")
 				return
 			}
 		} else {
 			selectedPlatformStrings := strings.Split(platformsInput, ",")
 			if len(selectedPlatformStrings) == 0 {
-				Ctx.ConfigManager.Println(":exclamation: Platforms not provided")
+				Ctx.Printer.Println(":exclamation: Platforms not provided")
 				return
 			}
 
 			for _, selectedPlatformString := range selectedPlatformStrings {
 				selectedPlatform, err := strconv.Atoi(selectedPlatformString)
 				if err != nil {
-					Ctx.ConfigManager.Println(":exclamation: Invalid platform ID")
+					Ctx.Printer.Println(":exclamation: Invalid platform ID")
 					return
 				}
 				selectedPlatforms = append(selectedPlatforms, selectedPlatform)
@@ -87,10 +87,9 @@ var modulesDeployCmd = &cobra.Command{
 		var selectedControlTypes []int
 		controlTypesInput, ok := Ctx.ConfigManager.GetFlagValue("controls", cmd)
 		if !ok {
-
 			controlTypes, err := Ctx.PlatformClient.GetControlTypes(cmd.Context())
 			if err != nil {
-				Ctx.ConfigManager.Printf(":exclamation: %s\n", err.Error())
+				Ctx.Printer.Printf(":exclamation: %s\n", err.Error())
 				return
 			}
 
@@ -104,27 +103,27 @@ var modulesDeployCmd = &cobra.Command{
 
 			selectedControlTypes, err = Ctx.FormHandler.MultiSelectIDs("Select CONTROL TYPES:\n", controlTypeOptions)
 			if err != nil || len(selectedControlTypes) == 0 {
-				Ctx.ConfigManager.Println(":exclamation: Control types not provided")
+				Ctx.Printer.Println(":exclamation: Control types not provided")
 				return
 			}
 		} else {
 			selectedControlTypeStrings := strings.Split(controlTypesInput, ",")
 			if len(selectedControlTypeStrings) == 0 {
-				Ctx.ConfigManager.Println(":exclamation: Control types not provided")
+				Ctx.Printer.Println(":exclamation: Control types not provided")
 				return
 			}
 
 			for _, selectedControlTypeString := range selectedControlTypeStrings {
 				selectedControlType, err := strconv.Atoi(selectedControlTypeString)
 				if err != nil {
-					Ctx.ConfigManager.Println(":exclamation: Invalid control type ID")
+					Ctx.Printer.Println(":exclamation: Invalid control type ID")
 					return
 				}
 				selectedControlTypes = append(selectedControlTypes, selectedControlType)
 			}
 		}
 
-		input := graphql_api.ModuleVersion{
+		input := platform.ModuleVersion{
 			ModuleID:        moduleID,
 			LocalFilePath:   zipFilepath,
 			SemanticVersion: semVer,
@@ -133,7 +132,7 @@ var modulesDeployCmd = &cobra.Command{
 			ControlIds:      selectedControlTypes,
 		}
 
-		spinner := loader.NewLoader(cmd.Context(), "Deploying module version...", Ctx.ConfigManager)
+		spinner := loader.NewLoader(cmd.Context(), "Deploying module version...", Ctx.Printer)
 		//ctx, cancel := context.WithCancel(context.Background())
 		//err := spinner.New().
 		//	Type(spinner.Line).
@@ -145,11 +144,11 @@ var modulesDeployCmd = &cobra.Command{
 		//cancel()
 		spinner.Stop()
 		if err != nil {
-			Ctx.ConfigManager.Printf(":exclamation: %s\n", err.Error())
+			Ctx.Printer.Printf(":exclamation: %s\n", err.Error())
 			return
 		}
 
-		Ctx.ConfigManager.Printf("Deployed version %s for module %d\n", moduleVersion.SemanticVersion, moduleVersion.ModuleID)
+		Ctx.Printer.Printf("Deployed version %s for module %d\n", moduleVersion.SemanticVersion, moduleVersion.ModuleID)
 	},
 }
 

@@ -1,6 +1,7 @@
 package abstract_client_test
 
 import (
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/env"
 	"testing"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -9,5 +10,6 @@ import (
 
 func TestAbstractClient(t *testing.T) {
 	RegisterFailHandler(Fail)
+	env.SourceProjectEnv()
 	RunSpecs(t, "AbstractClient Suite")
 }

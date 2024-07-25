@@ -5,6 +5,7 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"net/http"
 )
 
 var _ = Describe("Abstract", func() {
@@ -48,14 +49,16 @@ var _ = Describe("Abstract", func() {
 	})
 
 	It("should return a response if the request fails", func() {
-		res, err := apiClient.Post("invalid", nil)
+		res, err := apiClient.Post("nonexistent", nil)
 
-		Expect(err).To(HaveOccurred())
-		Expect(res).To(BeNil())
+		Expect(err).NotTo(HaveOccurred())
+		Expect(res).NotTo(BeNil())
+		Expect(res.StatusCode()).To(Equal(http.StatusNotFound))
 	})
 
 	It("can return the current ip address", func() {
 		ip, err := apiClient.GetIPAddress()
+
 		Expect(err).NotTo(HaveOccurred())
 		Expect(ip).To(MatchRegexp(`\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}`))
 	})
