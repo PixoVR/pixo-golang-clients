@@ -103,10 +103,11 @@ func (g *PlatformClient) CreateWebhook(ctx context.Context, webhook Webhook) (*W
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{
-			"orgId":       webhook.OrgID,
-			"url":         webhook.URL,
-			"token":       webhook.Token,
-			"description": webhook.Description,
+			"orgId":         webhook.OrgID,
+			"url":           webhook.URL,
+			"token":         webhook.Token,
+			"description":   webhook.Description,
+			"generateToken": webhook.GenerateToken,
 		},
 	}
 

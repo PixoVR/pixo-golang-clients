@@ -412,6 +412,10 @@ func (m *MockClient) CreateWebhook(ctx context.Context, input Webhook) (*Webhook
 		return nil, commonerrors.ErrorRequired("url")
 	}
 
+	if input.GenerateToken != nil && *input.GenerateToken {
+		input.Token = faker.UUIDHyphenated()
+	}
+
 	if m.CreateWebhookError != nil {
 		return nil, m.CreateWebhookError
 	}

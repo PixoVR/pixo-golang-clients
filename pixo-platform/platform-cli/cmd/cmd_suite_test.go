@@ -33,7 +33,7 @@ func TestCLI(t *testing.T) {
 type TestExecutor struct {
 	rootCmd               *cobra.Command
 	Printer               *printer.EmojiPrinter
-	FormHandler           *basic.FormHandler
+	FormHandler           *basic.Handler
 	ConfigManager         *config.ConfigManager
 	InMemoryConfig        *config.InMemoryConfigManager
 	MockPlatformClient    *platform.MockClient

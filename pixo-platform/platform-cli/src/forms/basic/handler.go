@@ -2,39 +2,42 @@ package basic
 
 import (
 	"bufio"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
 	"io"
 	"os"
 )
 
-type FormHandler struct {
+var _ forms.FormHandler = &Handler{}
+
+type Handler struct {
 	reader io.Reader
 	writer io.Writer
 	buffer *bufio.Reader
 }
 
-func NewFormHandler(input io.Reader, output io.Writer) *FormHandler {
-	return &FormHandler{
+func NewFormHandler(input io.Reader, output io.Writer) *Handler {
+	return &Handler{
 		reader: input,
 		writer: output,
 	}
 }
 
-func (f *FormHandler) SetReader(r io.Reader) {
+func (f *Handler) SetReader(r io.Reader) {
 	f.reader = r
 }
 
-func (f *FormHandler) SetWriter(w io.Writer) {
+func (f *Handler) SetWriter(w io.Writer) {
 	f.writer = w
 }
 
-func (f *FormHandler) writerOrStdout() io.Writer {
+func (f *Handler) writerOrStdout() io.Writer {
 	if f.writer == nil {
 		return os.Stdout
 	}
 	return f.writer
 }
 
-func (f *FormHandler) readerOrStdin() io.Reader {
+func (f *Handler) readerOrStdin() io.Reader {
 	if f.reader == nil {
 		return os.Stdin
 	}

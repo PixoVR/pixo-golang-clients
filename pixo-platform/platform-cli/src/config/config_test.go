@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/config"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms/basic"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -259,6 +260,85 @@ var _ = Describe("Config Manager", func() {
 			val, ok := configManager.GetBoolFlagOrConfigValue("is-active", cmd)
 			Expect(ok).To(BeTrue())
 			Expect(val).To(Equal(false))
+		})
+
+		It("can use a form to get values from the user if they're not supplied", func() {
+			input.WriteString("some-val\nno\none,two\ntwo,one\n")
+			configManager.SetConfigValue("config-key", "config-val")
+			configManager.SetConfigValue("config-confirm", "yes")
+			configManager.SetConfigValue("config-multiselect", "three,four")
+			configManager.SetConfigValue("config-multiselect-ids", "4,3")
+			questions := []config.Value{
+				{Question: forms.Question{Type: forms.Input, Key: "val", Prompt: "Enter val: "}},
+				{Question: forms.Question{Type: forms.SensitiveInput, Key: "config-key", Prompt: "Enter config val: "}},
+				{Question: forms.Question{Type: forms.Confirm, Key: "confirm", Prompt: "Enter confirm val: "}},
+				{Question: forms.Question{Type: forms.Confirm, Key: "config-confirm", Prompt: "Enter config confirm val: "}},
+				{Question: forms.Question{
+					Type:   forms.MultiSelect,
+					Key:    "multiselect",
+					Prompt: "Enter multiselect vals: ",
+					Options: []forms.Option{
+						{Label: "one"},
+						{Label: "two"},
+					},
+				}},
+				{Question: forms.Question{
+					Type:   forms.MultiSelect,
+					Key:    "config-multiselect",
+					Prompt: "Enter config multiselect vals: ",
+					Options: []forms.Option{
+						{Label: "three"},
+						{Label: "four"},
+					},
+				}},
+				{Question: forms.Question{
+					Type:   forms.MultiSelectIDs,
+					Key:    "multiselect-ids",
+					Prompt: "Enter multiselect id vals: ",
+					Options: []forms.Option{
+						{Label: "one", Value: "1"},
+						{Label: "two", Value: "2"},
+					},
+				}},
+				{Question: forms.Question{
+					Type:   forms.MultiSelectIDs,
+					Key:    "config-multiselect-ids",
+					Prompt: "Enter config multiselect id vals: ",
+					Options: []forms.Option{
+						{Label: "three", Value: "3"},
+						{Label: "four", Value: "4"},
+					},
+				}},
+			}
+
+			answers, err := configManager.GetValuesOrSubmitForm(questions, &cobra.Command{})
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(answers).To(HaveLen(len(questions)))
+
+			Expect(answers).To(HaveKeyWithValue("val", "some-val"))
+			Expect(output.String()).To(ContainSubstring("Enter val: "))
+
+			Expect(answers).To(HaveKeyWithValue("config-key", "config-val"))
+			Expect(output.String()).NotTo(ContainSubstring("Enter config val: "))
+
+			Expect(answers).To(HaveKeyWithValue("confirm", false))
+			Expect(output.String()).To(ContainSubstring("Enter confirm val: "))
+
+			Expect(answers).To(HaveKeyWithValue("config-confirm", true))
+			Expect(output.String()).NotTo(ContainSubstring("Enter confirm config val: "))
+
+			Expect(answers).To(HaveKeyWithValue("multiselect", []string{"one", "two"}))
+			Expect(output.String()).To(ContainSubstring("Enter multiselect vals: "))
+
+			Expect(answers).To(HaveKeyWithValue("config-multiselect", []string{"three", "four"}))
+			Expect(output.String()).NotTo(ContainSubstring("Enter config multiselect vals: "))
+
+			Expect(answers).To(HaveKeyWithValue("multiselect-ids", []int{2, 1}))
+			Expect(output.String()).To(ContainSubstring("Enter multiselect id vals: "))
+
+			Expect(answers).To(HaveKeyWithValue("config-multiselect-ids", []int{4, 3}))
+			Expect(output.String()).NotTo(ContainSubstring("Enter config multiselect id vals: "))
 		})
 
 	})

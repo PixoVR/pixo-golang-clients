@@ -15,7 +15,7 @@ var _ = Describe("Config Manager", func() {
 	var (
 		input           *bytes.Buffer
 		output          *bytes.Buffer
-		formHandler     *basic.FormHandler
+		formHandler     *basic.Handler
 		inMemoryManager *config.InMemoryConfigManager
 		configManager   *config.ConfigManager
 	)

@@ -1,13 +1,12 @@
 package basic
 
 import (
-	"bufio"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
 	"strconv"
 	"strings"
 )
 
-func (f *FormHandler) MultiSelect(prompt string, options []forms.Option) ([]string, error) {
+func (f *Handler) MultiSelect(prompt string, options []forms.Option) ([]string, error) {
 	if _, err := f.writer.Write([]byte(prompt)); err != nil {
 		return nil, err
 	}
@@ -20,8 +19,7 @@ func (f *FormHandler) MultiSelect(prompt string, options []forms.Option) ([]stri
 		_, _ = f.writer.Write([]byte("\n"))
 	}
 
-	bytesReader := bufio.NewReader(f.reader)
-	response, err := bytesReader.ReadString('\n')
+	response, err := f.ReadLine()
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +27,7 @@ func (f *FormHandler) MultiSelect(prompt string, options []forms.Option) ([]stri
 	return strings.Split(strings.Trim(response, "\n"), ","), nil
 }
 
-func (f *FormHandler) MultiSelectIDs(prompt string, options []forms.Option) ([]int, error) {
+func (f *Handler) MultiSelectIDs(prompt string, options []forms.Option) ([]int, error) {
 	answers, err := f.MultiSelect(prompt, options)
 	if err != nil {
 		return nil, err

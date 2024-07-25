@@ -9,27 +9,31 @@ import (
 	"strings"
 )
 
-func (f *FormHandler) GetResponseFromUser(prompt string) (string, error) {
+func (f *Handler) ReadLine() (string, error) {
+	if f.buffer == nil {
+		f.buffer = bufio.NewReader(f.readerOrStdin())
+	}
+
+	line, err := f.buffer.ReadString('\n')
+	if err != nil {
+		return "", err
+	}
+
+	return trim(line), nil
+}
+
+func (f *Handler) GetResponseFromUser(prompt string) (string, error) {
+	prompt = strings.ReplaceAll(prompt, "-", " ")
 	prompt = emoji.Sprintf(":fountain_pen: Enter %s: ", prompt)
 	if _, err := f.writerOrStdout().Write([]byte(prompt)); err != nil {
 		return "", err
 	}
 
-	if f.buffer == nil {
-		f.buffer = bufio.NewReader(f.readerOrStdin())
-	}
-
-	response, err := f.buffer.ReadString('\n')
-	if err != nil {
-		return "", err
-	}
-
-	trimmedResponse := strings.Trim(response, "\r\n")
-	log.Debug().Str("response", trimmedResponse).Msg("User response")
-	return trimmedResponse, nil
+	return f.ReadLine()
 }
 
-func (f *FormHandler) GetSensitiveResponseFromUser(prompt string) (string, error) {
+func (f *Handler) GetSensitiveResponseFromUser(prompt string) (string, error) {
+	prompt = strings.ReplaceAll(prompt, "-", " ")
 	prompt = emoji.Sprintf(":lock: Enter %s: ", prompt)
 	if _, err := f.writerOrStdout().Write([]byte(prompt)); err != nil {
 		return "", err
@@ -64,4 +68,8 @@ func NewCustomFieldReader(reader io.Reader, fd uintptr) *CustomFieldReader {
 		Reader: bufio.NewReader(reader),
 		fd:     fd,
 	}
+}
+
+func trim(line string) string {
+	return strings.Trim(line, "\r\n")
 }
