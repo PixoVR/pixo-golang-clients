@@ -75,8 +75,8 @@ var mpDeployCmd = &cobra.Command{
 		if !ok || image == "" {
 			filePath, ok = Ctx.ConfigManager.GetFlagOrConfigValue("zip-file", cmd)
 			if !ok || filePath == "" {
-				imageResponse, err := Ctx.FormHandler.GetResponseFromUser("DOCKER IMAGE")
-				if err != nil {
+				var imageResponse string
+				if err := Ctx.FormHandler.GetResponseFromUser("DOCKER IMAGE", &imageResponse); err != nil {
 					return err
 				}
 				if imageResponse == "" {

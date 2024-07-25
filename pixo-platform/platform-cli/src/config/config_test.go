@@ -316,28 +316,28 @@ var _ = Describe("Config Manager", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(answers).To(HaveLen(len(questions)))
 
-			Expect(answers).To(HaveKeyWithValue("val", "some-val"))
+			Expect(forms.String(answers["val"])).To(Equal("some-val"))
 			Expect(output.String()).To(ContainSubstring("Enter val: "))
 
 			Expect(answers).To(HaveKeyWithValue("config-key", "config-val"))
 			Expect(output.String()).NotTo(ContainSubstring("Enter config val: "))
 
-			Expect(answers).To(HaveKeyWithValue("confirm", false))
+			Expect(forms.Bool(answers["confirm"])).To(BeFalse())
 			Expect(output.String()).To(ContainSubstring("Enter confirm val: "))
 
-			Expect(answers).To(HaveKeyWithValue("config-confirm", true))
+			Expect(forms.Bool(answers["config-confirm"])).To(BeTrue())
 			Expect(output.String()).NotTo(ContainSubstring("Enter confirm config val: "))
 
-			Expect(answers).To(HaveKeyWithValue("multiselect", []string{"one", "two"}))
+			Expect(forms.StringSlice(answers["multiselect"])).To(Equal([]string{"one", "two"}))
 			Expect(output.String()).To(ContainSubstring("Enter multiselect vals: "))
 
-			Expect(answers).To(HaveKeyWithValue("config-multiselect", []string{"three", "four"}))
+			Expect(forms.StringSlice(answers["config-multiselect"])).To(Equal([]string{"three", "four"}))
 			Expect(output.String()).NotTo(ContainSubstring("Enter config multiselect vals: "))
 
-			Expect(answers).To(HaveKeyWithValue("multiselect-ids", []int{2, 1}))
+			Expect(forms.IntSlice(answers["multiselect-ids"])).To(Equal([]int{2, 1}))
 			Expect(output.String()).To(ContainSubstring("Enter multiselect id vals: "))
 
-			Expect(answers).To(HaveKeyWithValue("config-multiselect-ids", []int{4, 3}))
+			Expect(forms.IntSlice(answers["config-multiselect-ids"])).To(Equal([]int{4, 3}))
 			Expect(output.String()).NotTo(ContainSubstring("Enter config multiselect id vals: "))
 		})
 

@@ -22,21 +22,29 @@ func (f *Handler) ReadLine() (string, error) {
 	return trim(line), nil
 }
 
-func (f *Handler) GetResponseFromUser(prompt string) (string, error) {
+func (f *Handler) GetResponseFromUser(prompt string, response *string) error {
 	prompt = strings.ReplaceAll(prompt, "-", " ")
 	prompt = emoji.Sprintf(":fountain_pen: Enter %s: ", prompt)
 	if _, err := f.writerOrStdout().Write([]byte(prompt)); err != nil {
-		return "", err
+		return err
 	}
 
-	return f.ReadLine()
+	answer, err := f.ReadLine()
+	if err != nil {
+		return err
+	}
+
+	if response != nil {
+		*response = answer
+	}
+	return nil
 }
 
-func (f *Handler) GetSensitiveResponseFromUser(prompt string) (string, error) {
+func (f *Handler) GetSensitiveResponseFromUser(prompt string, response *string) error {
 	prompt = strings.ReplaceAll(prompt, "-", " ")
 	prompt = emoji.Sprintf(":lock: Enter %s: ", prompt)
 	if _, err := f.writerOrStdout().Write([]byte(prompt)); err != nil {
-		return "", err
+		return err
 	}
 
 	if f.buffer == nil {
@@ -47,11 +55,14 @@ func (f *Handler) GetSensitiveResponseFromUser(prompt string) (string, error) {
 	customReader := NewCustomFieldReader(f.buffer, fd)
 	val, err := go_asterisks.GetUsersPassword(prompt, true, customReader, f.writer)
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	log.Debug().Str("response", strings.Trim(string(val), "\r\n")).Msg("User response")
-	return strings.Trim(string(val), "\r\n"), err
+	if response != nil {
+		*response = trim(string(val))
+	}
+	return nil
 }
 
 type CustomFieldReader struct {

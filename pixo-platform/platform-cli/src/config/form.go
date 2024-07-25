@@ -22,21 +22,21 @@ func (c *ConfigManager) GetValuesOrSubmitForm(values []Value, cmd *cobra.Command
 		case forms.Input, forms.SensitiveInput:
 			val, ok := c.GetFlagOrConfigValue(value.Question.Key, cmd)
 			if ok {
-				vals[value.Question.Key] = val
+				vals[value.Question.Key] = forms.String(val)
 			} else {
 				questions = append(questions, value.Question)
 			}
 		case forms.Confirm:
 			val, ok := c.GetBoolFlagOrConfigValue(value.Question.Key, cmd)
 			if ok {
-				vals[value.Question.Key] = val
+				vals[value.Question.Key] = forms.Bool(val)
 			} else {
 				questions = append(questions, value.Question)
 			}
 		case forms.MultiSelect:
 			val, ok := c.GetFlagOrConfigValue(value.Question.Key, cmd)
 			if ok {
-				vals[value.Question.Key] = strings.Split(val, ",")
+				vals[value.Question.Key] = forms.StringSlice(strings.Split(val, ","))
 			} else {
 				questions = append(questions, value.Question)
 			}
@@ -48,7 +48,7 @@ func (c *ConfigManager) GetValuesOrSubmitForm(values []Value, cmd *cobra.Command
 				for i, id := range intIDs {
 					ids[i], _ = strconv.Atoi(id)
 				}
-				vals[value.Question.Key] = ids
+				vals[value.Question.Key] = forms.IntSlice(ids)
 			} else {
 				questions = append(questions, value.Question)
 			}

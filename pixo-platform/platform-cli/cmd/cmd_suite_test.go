@@ -83,7 +83,6 @@ func (t *TestExecutor) Cleanup() {
 	t.MockPlatformClient.Reset()
 	t.rootCmd.SetArgs(nil)
 	t.clearFlagValues(t.rootCmd)
-
 }
 
 func (t *TestExecutor) clearFlagValues(cmd *cobra.Command) {

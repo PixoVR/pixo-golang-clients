@@ -8,13 +8,8 @@ func (f *Handler) InputField(prompt string, response *string) huh.Field {
 		Value(response)
 }
 
-func (f *Handler) GetResponseFromUser(prompt string) (string, error) {
-	var response string
-	if err := f.InputField(prompt, &response).Run(); err != nil {
-		return "", err
-	}
-
-	return response, nil
+func (f *Handler) GetResponseFromUser(prompt string, response *string) error {
+	return f.InputField(prompt, response).Run()
 }
 
 func (f *Handler) SensitiveInputField(prompt string, response *string) huh.Field {
@@ -24,11 +19,6 @@ func (f *Handler) SensitiveInputField(prompt string, response *string) huh.Field
 		Value(response)
 }
 
-func (f *Handler) GetSensitiveResponseFromUser(prompt string) (string, error) {
-	var response string
-	if err := f.SensitiveInputField(prompt, &response).Run(); err != nil {
-		return "", err
-	}
-
-	return response, nil
+func (f *Handler) GetSensitiveResponseFromUser(prompt string, response *string) error {
+	return f.SensitiveInputField(prompt, response).Run()
 }

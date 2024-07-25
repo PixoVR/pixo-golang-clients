@@ -62,8 +62,7 @@ var modulesDeployCmd = &cobra.Command{
 				}
 			}
 
-			selectedPlatforms, err = Ctx.FormHandler.MultiSelectIDs("Select PLATFORMS:\n", platformOptions)
-			if err != nil || len(selectedPlatforms) == 0 {
+			if err = Ctx.FormHandler.MultiSelectIDs("Select PLATFORMS:\n", platformOptions, &selectedPlatforms); err != nil || len(selectedPlatforms) == 0 {
 				Ctx.Printer.Println(":exclamation: Platforms not provided")
 				return
 			}
@@ -101,7 +100,7 @@ var modulesDeployCmd = &cobra.Command{
 				}
 			}
 
-			selectedControlTypes, err = Ctx.FormHandler.MultiSelectIDs("Select CONTROL TYPES:\n", controlTypeOptions)
+			err = Ctx.FormHandler.MultiSelectIDs("Select CONTROL TYPES:\n", controlTypeOptions, &selectedControlTypes)
 			if err != nil || len(selectedControlTypes) == 0 {
 				Ctx.Printer.Println(":exclamation: Control types not provided")
 				return

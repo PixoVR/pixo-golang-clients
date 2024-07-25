@@ -20,6 +20,7 @@ var _ = Describe("Basic Forms", func() {
 			{Label: "no", Value: "2"},
 			{Label: "maybe", Value: "3"},
 		}
+		answer string
 	)
 
 	BeforeEach(func() {
@@ -34,7 +35,7 @@ var _ = Describe("Basic Forms", func() {
 		It("can ask for basic input", func() {
 			input.WriteString("yes\n")
 
-			answer, err := s.GetResponseFromUser(question)
+			err := s.GetResponseFromUser(question, &answer)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(answer).NotTo(BeEmpty())
@@ -44,10 +45,10 @@ var _ = Describe("Basic Forms", func() {
 		It("can ask for sensitive input", func() {
 			input.WriteString("password\n")
 
-			response, err := s.GetSensitiveResponseFromUser("Enter password:")
+			err := s.GetSensitiveResponseFromUser("Enter password:", &answer)
 
 			Expect(err).NotTo(HaveOccurred())
-			Expect(response).To(Equal("password"))
+			Expect(answer).To(Equal("password"))
 			Expect(output.String()).To(ContainSubstring("Enter password:"))
 			Expect(output.String()).NotTo(ContainSubstring("new-password"))
 		})
@@ -55,29 +56,31 @@ var _ = Describe("Basic Forms", func() {
 		It("can read a sensitive value from the user after reading a non sensitive value", func() {
 			input.WriteString("new-username\nnewer-username\nnew-password\n")
 
-			val, err := s.GetResponseFromUser("username")
+			err := s.GetResponseFromUser("username", &answer)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(val).To(Equal("new-username"))
+			Expect(answer).To(Equal("new-username"))
 
-			val, err = s.GetResponseFromUser("username")
+			err = s.GetResponseFromUser("username", &answer)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(val).To(Equal("newer-username"))
+			Expect(answer).To(Equal("newer-username"))
 
-			val, err = s.GetSensitiveResponseFromUser("password")
+			err = s.GetSensitiveResponseFromUser("password", &answer)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(val).To(Equal("new-password"))
+			Expect(answer).To(Equal("new-password"))
 		})
 
 	})
 
 	DescribeTable("can ask for confirmation",
 		func(input string, expected bool) {
+			var boolAnswer bool
 			inputBuffer := bytes.NewBufferString(input)
 			s.SetReader(inputBuffer)
 
-			answer := s.Confirm(question)
+			err := s.Confirm(question, &boolAnswer)
+			Expect(err).NotTo(HaveOccurred())
 
-			Expect(answer).To(Equal(expected))
+			Expect(boolAnswer).To(Equal(expected))
 		},
 		Entry("empty", "\n", false),
 		Entry("yes", "yes\n", true),
@@ -92,14 +95,19 @@ var _ = Describe("Basic Forms", func() {
 
 	Context("multiselect", func() {
 
+		var (
+			intSliceAnswer    []int
+			stringSliceAnswer []string
+		)
+
 		It("can ask a question with multiple answers", func() {
 			input.WriteString("yes\n")
 
-			answers, err := s.MultiSelect(question, options)
+			err := s.MultiSelect(question, options, &stringSliceAnswer)
 
 			Expect(err).NotTo(HaveOccurred())
-			Expect(answers).To(HaveLen(1))
-			Expect(answers[0]).To(Equal("yes"))
+			Expect(stringSliceAnswer).To(HaveLen(1))
+			Expect(stringSliceAnswer[0]).To(Equal("yes"))
 			Expect(output.String()).To(ContainSubstring(question))
 			for _, option := range options {
 				Expect(output.String()).To(ContainSubstring(option.Label))
@@ -109,12 +117,12 @@ var _ = Describe("Basic Forms", func() {
 		It("can ask a question with multiple answers and return values as ints", func() {
 			input.WriteString("yes,no\n")
 
-			answers, err := s.MultiSelectIDs(question, options)
+			err := s.MultiSelectIDs(question, options, &intSliceAnswer)
 
 			Expect(err).NotTo(HaveOccurred())
-			Expect(answers).To(HaveLen(2))
-			Expect(answers[0]).To(Equal(1))
-			Expect(answers[1]).To(Equal(2))
+			Expect(intSliceAnswer).To(HaveLen(2))
+			Expect(intSliceAnswer[0]).To(Equal(1))
+			Expect(intSliceAnswer[1]).To(Equal(2))
 			Expect(output.String()).To(ContainSubstring(question))
 		})
 
@@ -126,12 +134,12 @@ var _ = Describe("Basic Forms", func() {
 
 			customInput.WriteString("yes,no\n")
 
-			answers, err := s.MultiSelect(question, options)
+			err := s.MultiSelect(question, options, &stringSliceAnswer)
 
 			Expect(err).NotTo(HaveOccurred())
-			Expect(answers).To(HaveLen(2))
-			Expect(answers[0]).To(Equal("yes"))
-			Expect(answers[1]).To(Equal("no"))
+			Expect(stringSliceAnswer).To(HaveLen(2))
+			Expect(stringSliceAnswer[0]).To(Equal("yes"))
+			Expect(stringSliceAnswer[1]).To(Equal("no"))
 			Expect(customOutput.String()).To(ContainSubstring(question))
 			Expect(customOutput.String()).To(ContainSubstring("yes"))
 			Expect(customOutput.String()).To(ContainSubstring("no"))
@@ -181,20 +189,20 @@ var _ = Describe("Basic Forms", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(answers).NotTo(BeNil())
 
-			Expect(answers).To(HaveKeyWithValue("something", "some-input"))
+			Expect(forms.String(answers["something"])).To(Equal("some-input"))
 			Expect(output.String()).To(ContainSubstring("Enter some input"))
 
-			Expect(answers).To(HaveKeyWithValue("sensitive", "sensitive-output"))
+			Expect(forms.String(answers["sensitive"])).To(Equal("sensitive-output"))
 			Expect(output.String()).To(ContainSubstring("Enter sensitive output"))
 			Expect(output.String()).NotTo(ContainSubstring("sensitive-output"))
 
-			Expect(answers).To(HaveKeyWithValue("confirm", false))
+			Expect(forms.Bool(answers["confirm"])).To(BeFalse())
 			Expect(output.String()).To(ContainSubstring("Enter some input"))
 
-			Expect(answers).To(HaveKeyWithValue("multiselect", []string{"yes", "no"}))
+			Expect(forms.StringSlice(answers["multiselect"])).To(Equal([]string{"yes", "no"}))
 			Expect(output.String()).To(ContainSubstring("Select multiple options"))
 
-			Expect(answers).To(HaveKeyWithValue("multiselect-ids", []int{2, 1}))
+			Expect(forms.IntSlice(answers["multiselect-ids"])).To(Equal([]int{2, 1}))
 			Expect(output.String()).To(ContainSubstring("Select multiple options with ids"))
 		})
 

@@ -88,7 +88,8 @@ func gameserverReadLoop(addr *net.UDPAddr) {
 	}
 
 	for {
-		userInput, err := Ctx.FormHandler.GetResponseFromUser("message to gameserver")
+		var userInput string
+		err := Ctx.FormHandler.GetResponseFromUser("message to gameserver", &userInput)
 		if err != nil || userInput == "" || userInput == "exit" {
 			break
 		}

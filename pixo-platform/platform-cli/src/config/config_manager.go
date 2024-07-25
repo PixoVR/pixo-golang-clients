@@ -155,14 +155,14 @@ func (c *ConfigManager) GetConfigValueOrAskUser(key string, cmd *cobra.Command) 
 
 	displayKey := strings.ReplaceAll(strings.ToUpper(key), "-", " ")
 	if strings.ToLower(key) == "password" {
-		response, err := c.formHandler.GetSensitiveResponseFromUser(displayKey)
+		err := c.formHandler.GetSensitiveResponseFromUser(displayKey, &val)
 		if err != nil {
 			return "", false
 		}
-		return response, response != ""
+		return val, err == nil && val != ""
 	}
 
-	val, err := c.formHandler.GetResponseFromUser(displayKey)
+	err := c.formHandler.GetResponseFromUser(displayKey, &val)
 	return val, err == nil && val != ""
 }
 
@@ -179,8 +179,8 @@ func (c *ConfigManager) GetIntConfigValueOrAskUser(key string, cmd *cobra.Comman
 
 	displayKey := strings.ReplaceAll(strings.ToUpper(key), "-", " ")
 
-	strVal, err := c.formHandler.GetResponseFromUser(displayKey)
-	if err != nil {
+	var strVal string
+	if err := c.formHandler.GetResponseFromUser(displayKey, &strVal); err != nil {
 		return 0, false
 	}
 
@@ -199,8 +199,9 @@ func (c *ConfigManager) GetBoolConfigValueOrAskUser(key string, cmd *cobra.Comma
 	}
 
 	displayKey := strings.ReplaceAll(strings.ToUpper(key), "-", " ")
-	strVal, err := c.formHandler.GetResponseFromUser(displayKey)
-	if err != nil {
+
+	var strVal string
+	if err := c.formHandler.GetResponseFromUser(displayKey, &strVal); err != nil {
 		return false, false
 	}
 
@@ -274,7 +275,7 @@ func (c *ConfigManager) GetSensitiveConfigValueOrAskUser(key string, cmd *cobra.
 		return val, true
 	}
 
-	val, err := c.formHandler.GetSensitiveResponseFromUser(key)
+	err := c.formHandler.GetSensitiveResponseFromUser(key, &val)
 	return val, err == nil
 }
 
@@ -284,7 +285,7 @@ func (c *ConfigManager) GetFlagOrConfigValueOrAskUser(key string, cmd *cobra.Com
 		return val, true
 	}
 
-	val, err := c.formHandler.GetResponseFromUser(key)
+	err := c.formHandler.GetResponseFromUser(key, &val)
 	return val, err == nil
 }
 
@@ -294,16 +295,14 @@ func (c *ConfigManager) GetSensitiveFlagOrConfigValueOrAskUser(key string, cmd *
 		return val, true
 	}
 
-	val, err := c.formHandler.GetSensitiveResponseFromUser(key)
+	err := c.formHandler.GetSensitiveResponseFromUser(key, &val)
 	return val, err == nil
 }
 
 func (c *ConfigManager) GetIntFlagOrConfigValueOrAskUser(key string, cmd *cobra.Command) (int, bool) {
 	val, ok := c.GetFlagOrConfigValue(key, cmd)
 	if !ok {
-		var err error
-		val, err = c.formHandler.GetResponseFromUser(key)
-		if err != nil {
+		if err := c.formHandler.GetResponseFromUser(key, &val); err != nil {
 			return 0, false
 		}
 	}
@@ -314,9 +313,7 @@ func (c *ConfigManager) GetIntFlagOrConfigValueOrAskUser(key string, cmd *cobra.
 func (c *ConfigManager) GetBoolFlagOrConfigValueOrAskUser(key string, cmd *cobra.Command) (bool, bool) {
 	val, ok := c.GetFlagOrConfigValue(key, cmd)
 	if !ok {
-		var err error
-		val, err = c.formHandler.GetResponseFromUser(key)
-		if err != nil {
+		if err := c.formHandler.GetResponseFromUser(key, &val); err != nil {
 			return false, false
 		}
 	}

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
 	"github.com/charmbracelet/huh"
-	"strings"
 )
 
 func (f *Handler) AskQuestions(questions []forms.Question) (map[string]interface{}, error) {
@@ -16,7 +15,7 @@ func (f *Handler) AskQuestions(questions []forms.Question) (map[string]interface
 		if question.Prompt != "" {
 			prompt = question.Prompt
 		} else {
-			prompt = strings.ToUpper(question.Key)
+			prompt = forms.CleanPrompt(question.Key)
 		}
 
 		switch question.Type {
@@ -35,11 +34,11 @@ func (f *Handler) AskQuestions(questions []forms.Question) (map[string]interface
 		case forms.MultiSelectIDs:
 			var response []int
 			answers[question.Key] = &response
-			groupItems = append(groupItems, f.MultiSelectIDsInput(prompt, question.Options, response))
+			groupItems = append(groupItems, f.MultiSelectIDsInput(prompt, question.Options, &response))
 		case forms.MultiSelect:
 			var response []string
 			answers[question.Key] = &response
-			groupItems = append(groupItems, f.MultiSelectInput(prompt, question.Options, response))
+			groupItems = append(groupItems, f.MultiSelectInput(prompt, question.Options, &response))
 		default:
 			return nil, errors.New("unknown question type")
 		}

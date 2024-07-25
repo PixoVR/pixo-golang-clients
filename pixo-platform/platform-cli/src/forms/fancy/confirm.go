@@ -10,8 +10,6 @@ func (f *Handler) ConfirmField(title string, confirm *bool) huh.Field {
 		Value(confirm)
 }
 
-func (f *Handler) Confirm(title string) bool {
-	var confirm bool
-	_ = f.ConfirmField(title, &confirm).Run()
-	return confirm
+func (f *Handler) Confirm(title string, confirm *bool) error {
+	return f.ConfirmField(title, confirm).Run()
 }

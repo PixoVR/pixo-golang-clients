@@ -55,8 +55,7 @@ var webhooksCreateCmd = &cobra.Command{
 
 		webhookToken := forms.String(answers["webhook-token"])
 		if !generateToken && webhookToken == "" {
-			generateToken = Ctx.FormHandler.Confirm("Generate token automatically?")
-			if !generateToken {
+			if err = Ctx.FormHandler.Confirm("Generate token automatically?", &generateToken); err != nil || !generateToken {
 				Ctx.Printer.Println(":warning: No token provided. Webhook will be insecure")
 			}
 		}

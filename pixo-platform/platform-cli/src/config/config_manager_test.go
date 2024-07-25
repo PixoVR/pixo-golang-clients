@@ -77,6 +77,7 @@ var _ = Describe("Config Manager", func() {
 		input.WriteString(apiKey + "\n")
 
 		val, ok := configManager.GetConfigValueOrAskUser("api-key", nil)
+
 		Expect(ok).To(BeTrue())
 		Expect(val).To(Equal(apiKey))
 		Expect(output.String()).To(ContainSubstring("Enter API KEY: "))

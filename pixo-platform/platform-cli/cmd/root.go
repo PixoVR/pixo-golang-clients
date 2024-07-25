@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	cliVersion = "0.1.19"
+	cliVersion = "0.1.20"
 
 	homeDir          = os.Getenv("HOME")
 	configDirName    = ".pixo"
