@@ -5,7 +5,7 @@ local-prefix: "github.com/PixoVR/pixo-golang-clients/pixo-platform"
 threshold:
   file: 0
 
-  package: 45
+  package: 0
 
   total: 62
 
