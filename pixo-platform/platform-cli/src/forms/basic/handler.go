@@ -1,7 +1,7 @@
 package basic
 
 import (
-	"bytes"
+	"bufio"
 	"io"
 	"os"
 )
@@ -9,14 +9,13 @@ import (
 type FormHandler struct {
 	reader io.Reader
 	writer io.Writer
-	buffer *bytes.Buffer
+	buffer *bufio.Reader
 }
 
 func NewFormHandler(input io.Reader, output io.Writer) *FormHandler {
 	return &FormHandler{
 		reader: input,
 		writer: output,
-		buffer: new(bytes.Buffer),
 	}
 }
 

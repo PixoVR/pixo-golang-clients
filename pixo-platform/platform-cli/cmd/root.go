@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	cliVersion = "0.1.16"
+	cliVersion = "0.1.17"
 
 	homeDir          = os.Getenv("HOME")
 	configDirName    = ".pixo"
@@ -48,9 +48,7 @@ func Execute() {
 
 	activeConfigFile = Ctx.FileManager.ConfigFile()
 
-	if err := Ctx.Authenticate(nil); err != nil {
-		log.Error().Err(err).Msg("Failed to authenticate")
-	}
+	_ = Ctx.Authenticate(nil)
 
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
