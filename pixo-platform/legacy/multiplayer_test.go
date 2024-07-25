@@ -27,7 +27,7 @@ var _ = Describe("Multiplayer", func() {
 		Expect(tokenClient).NotTo(BeNil())
 		Expect(tokenClient.IsAuthenticated()).To(BeTrue())
 
-		config.Token = os.Getenv("TEST_SECRET_KEY")
+		config.Token = os.Getenv("TEST_PIXO_SECRET_KEY")
 		secretKeyClient = NewClient(config)
 		Expect(secretKeyClient).NotTo(BeNil())
 		Expect(secretKeyClient.IsAuthenticated()).To(BeTrue())

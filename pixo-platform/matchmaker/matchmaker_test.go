@@ -19,7 +19,7 @@ var _ = Describe("Matchmaker", func() {
 	BeforeEach(func() {
 		var err error
 		config := urlfinder.ClientConfig{
-			Lifecycle: config2.GetEnvOrReturn("TEST_PIXO_LIFECYCLE", "stage"),
+			Lifecycle: config2.GetEnvOrReturn("TEST_PIXO_LIFECYCLE", "dev"),
 			Region:    config2.GetEnvOrReturn("TEST_PIXO_REGION", "na"),
 		}
 		m, err = matchmaker.NewClientWithBasicAuth(os.Getenv("TEST_PIXO_USERNAME"), os.Getenv("TEST_PIXO_PASSWORD"), config)

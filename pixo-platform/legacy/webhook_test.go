@@ -22,7 +22,7 @@ var _ = Describe("Webhook", Ordered, func() {
 
 	BeforeEach(func() {
 		config := urlfinder.ClientConfig{
-			Lifecycle: config2.GetEnvOrReturn("TEST_PIXO_LIFECYCLE", "stage"),
+			Lifecycle: config2.GetEnvOrReturn("TEST_PIXO_LIFECYCLE", "dev"),
 			Region:    config2.GetEnvOrReturn("TEST_PIXO_REGION", "na"),
 		}
 		primaryAPIClient = primary_api.NewClient(config)

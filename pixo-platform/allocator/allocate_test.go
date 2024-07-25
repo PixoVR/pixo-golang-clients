@@ -20,8 +20,8 @@ var _ = Describe("Allocate", Ordered, func() {
 
 	BeforeEach(func() {
 		config = urlfinder.ClientConfig{
-			Token:     os.Getenv("TEST_SECRET_KEY"),
-			Lifecycle: config2.GetEnvOrReturn("TEST_PIXO_LIFECYCLE", "stage"),
+			Token:     os.Getenv("TEST_PIXO_SECRET_KEY"),
+			Lifecycle: config2.GetEnvOrReturn("TEST_PIXO_LIFECYCLE", "dev"),
 		}
 		allocatorClient = NewClient(config)
 		Expect(allocatorClient.IsAuthenticated()).To(BeTrue())
