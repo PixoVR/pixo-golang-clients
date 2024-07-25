@@ -36,6 +36,19 @@ func (f *FormHandler) GetResponseFromUser(prompt string) (string, error) {
 	return response, nil
 }
 
+func (f *FormHandler) GetSensitiveResponseFromUser(prompt string) (string, error) {
+	var response string
+	if err := huh.NewInput().
+		Title(prompt).
+		EchoMode(huh.EchoModePassword).
+		Value(&response).
+		Run(); err != nil {
+		return "", err
+	}
+
+	return response, nil
+}
+
 func (f *FormHandler) MultiSelectIDs(prompt string, options []forms.Option) ([]int, error) {
 	var response []int
 

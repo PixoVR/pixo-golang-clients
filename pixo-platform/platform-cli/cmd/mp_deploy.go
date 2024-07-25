@@ -30,7 +30,7 @@ var mpDeployCmd = &cobra.Command{
 			return errors.New("module ID not provided")
 		}
 
-		semanticVersion, ok := Ctx.ConfigManager.GetConfigValueOrAskUser("server-version", cmd)
+		semVer, ok := Ctx.ConfigManager.GetConfigValueOrAskUser("server-version", cmd)
 		if !ok {
 			iniPath, _ := Ctx.ConfigManager.GetConfigValueOrAskUser("ini", cmd)
 			iniParser, err := parser.NewIniParser(&iniPath)
@@ -39,7 +39,7 @@ var mpDeployCmd = &cobra.Command{
 				return errors.New(msg)
 			}
 
-			semanticVersion, err = iniParser.ParseSemanticVersion()
+			semVer, err = iniParser.ParseSemanticVersion()
 			if err != nil {
 				msg := emoji.Sprintf(":exclamation_mark: No semantic version given and failed to parse server version from ini file %s", iniPath)
 				return errors.New(msg)
@@ -48,10 +48,9 @@ var mpDeployCmd = &cobra.Command{
 		}
 
 		if isPrecheck {
-
 			params := &platform.MultiplayerServerVersionQueryParams{
 				ModuleID:        moduleID,
-				SemanticVersion: semanticVersion,
+				SemanticVersion: semVer,
 			}
 
 			spinner := loader.NewLoader(cmd.Context(), "Getting multiplayer server versions...", Ctx.Printer)
@@ -62,12 +61,12 @@ var mpDeployCmd = &cobra.Command{
 
 			} else if len(versions) > 0 {
 				spinner.Stop()
-				Ctx.Printer.Printf(":exclamation: Server version %s already exists\n", semanticVersion)
+				Ctx.Printer.Printf(":exclamation: Server version %s already exists\n", semVer)
 				return errors.New("server version already exists")
 			}
 
 			spinner.Stop()
-			Ctx.Printer.Println(":heavy_check_mark: Server version does not exist yet: ", semanticVersion)
+			Ctx.Printer.Println(":heavy_check_mark: Server version does not exist yet: ", semVer)
 			return nil
 		}
 
@@ -87,23 +86,23 @@ var mpDeployCmd = &cobra.Command{
 			}
 		}
 
-		msg := fmt.Sprint("Deploying server version: ", semanticVersion)
+		msg := fmt.Sprint("Deploying server version: ", semVer)
 		spinner := loader.NewLoader(cmd.Context(), msg, Ctx.Printer)
 
 		input := platform.MultiplayerServerVersion{
 			ModuleID:        moduleID,
 			ImageRegistry:   image,
 			LocalFilePath:   filePath,
-			SemanticVersion: semanticVersion,
+			SemanticVersion: semVer,
 			Engine:          "unreal",
 		}
 		if _, err := Ctx.PlatformClient.CreateMultiplayerServerVersion(cmd.Context(), input); err != nil {
-			msg := fmt.Sprintf("Failed to deploy multiplayer server version: %s - %s", semanticVersion, err.Error())
+			msg := fmt.Sprintf("Failed to deploy multiplayer server version: %s - %s", semVer, err.Error())
 			return errors.New(msg)
 		}
 
 		spinner.Stop()
-		Ctx.Printer.Println(":cruise_ship: Deployed version: ", semanticVersion)
+		Ctx.Printer.Println(":cruise_ship: Deployed version: ", semVer)
 		return nil
 	},
 }
