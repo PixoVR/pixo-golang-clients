@@ -2,7 +2,6 @@ package platform_test
 
 import (
 	"context"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/go-faker/faker/v4"
 	. "github.com/onsi/ginkgo/v2"
@@ -13,14 +12,14 @@ var _ = Describe("Webhooks", func() {
 
 	var (
 		ctx          context.Context
-		webhookInput platform.Webhook
-		testWebhook  *platform.Webhook
+		webhookInput Webhook
+		testWebhook  *Webhook
 	)
 
 	BeforeEach(func() {
 		ctx = context.Background()
 
-		webhookInput = platform.Webhook{
+		webhookInput = Webhook{
 			OrgID:       1,
 			URL:         "http://example.com",
 			Token:       "token",

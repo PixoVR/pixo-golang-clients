@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
 	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/loader"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/loader"
 	"github.com/spf13/cobra"
 	"time"
 )
@@ -20,12 +20,12 @@ var sessionsEndCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		sessionID, ok := Ctx.ConfigManager.GetIntConfigValueOrAskUser("session-id", cmd)
 		if !ok {
-			Ctx.ConfigManager.Println(":exclamation: Session ID not provided")
+			Ctx.Printer.Println(":exclamation: Session ID not provided")
 		}
 
 		moduleID, ok := Ctx.ConfigManager.GetIntConfigValueOrAskUser("module-id", cmd)
 		if !ok {
-			Ctx.ConfigManager.Println(":exclamation: Module ID not provided")
+			Ctx.Printer.Println(":exclamation: Module ID not provided")
 		}
 
 		score, _ := Ctx.ConfigManager.GetIntConfigValueOrAskUser("score", cmd)
@@ -41,17 +41,17 @@ var sessionsEndCmd = &cobra.Command{
 			ModuleID:  moduleID,
 		}
 
-		spinner := loader.NewLoader(cmd.Context(), "Ending session...", Ctx.ConfigManager)
+		spinner := loader.NewLoader(cmd.Context(), "Ending session...", Ctx.Printer)
 
 		session, err := Ctx.PlatformClient.UpdateSession(cmd.Context(), input)
 		if err != nil {
-			Ctx.ConfigManager.Println(":exclamation: Unable to end session: ", err)
+			Ctx.Printer.Println(":exclamation: Unable to end session: ", err)
 			return nil
 		}
 
 		sessionDuration, err := time.ParseDuration(session.Duration)
 		if err != nil {
-			Ctx.ConfigManager.Println(":exclamation: Unable to parse session duration: ", err)
+			Ctx.Printer.Println(":exclamation: Unable to parse session duration: ", err)
 			return nil
 		}
 
@@ -90,23 +90,23 @@ var sessionsEndCmd = &cobra.Command{
 
 		eventBytes, err := json.Marshal(eventInput)
 		if err != nil {
-			Ctx.ConfigManager.Println(":exclamation: Unable to end session: ", err)
+			Ctx.Printer.Println(":exclamation: Unable to end session: ", err)
 			return nil
 		}
 
 		_, err = Ctx.PlatformClient.Post("event", eventBytes)
 		spinner.Stop()
 		if err != nil {
-			Ctx.ConfigManager.Println(":exclamation: Unable to end session: ", err)
+			Ctx.Printer.Println(":exclamation: Unable to end session: ", err)
 			return nil
 		}
 
 		percentScore := int(session.ScaledScore * 100)
 
-		Ctx.ConfigManager.Println("\n:white_check_mark: Session completed")
-		Ctx.ConfigManager.Printf(":input_numbers: Score: %d/%d\n", score, maxScore)
-		Ctx.ConfigManager.Printf(":hundred_points: Percent: %d%s\n", percentScore, "%")
-		Ctx.ConfigManager.Printf(":hourglass_done: Duration: %s\n", session.Duration)
+		Ctx.Printer.Println("\n:white_check_mark: Session completed")
+		Ctx.Printer.Printf(":input_numbers: Score: %d/%d\n", score, maxScore)
+		Ctx.Printer.Printf(":hundred_points: Percent: %d%s\n", percentScore, "%")
+		Ctx.Printer.Printf(":hourglass_done: Duration: %s\n", session.Duration)
 		return nil
 	},
 }

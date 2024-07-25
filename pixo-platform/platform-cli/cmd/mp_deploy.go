@@ -6,9 +6,9 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	platformAPI "github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/parser"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/loader"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/loader"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/parser"
 	"github.com/kyokomi/emoji"
 	"github.com/spf13/cobra"
 )
@@ -26,7 +26,7 @@ var mpDeployCmd = &cobra.Command{
 
 		moduleID, ok := Ctx.ConfigManager.GetIntConfigValueOrAskUser("module-id", cmd)
 		if !ok {
-			Ctx.ConfigManager.Println(":warning: Module ID not provided")
+			Ctx.Printer.Println(":warning: Module ID not provided")
 			return errors.New("module ID not provided")
 		}
 
@@ -49,25 +49,25 @@ var mpDeployCmd = &cobra.Command{
 
 		if isPrecheck {
 
-			params := &platformAPI.MultiplayerServerVersionQueryParams{
+			params := &platform.MultiplayerServerVersionQueryParams{
 				ModuleID:        moduleID,
 				SemanticVersion: semanticVersion,
 			}
 
-			spinner := loader.NewLoader(cmd.Context(), "Getting multiplayer server versions...", Ctx.ConfigManager)
+			spinner := loader.NewLoader(cmd.Context(), "Getting multiplayer server versions...", Ctx.Printer)
 
 			if versions, err := Ctx.PlatformClient.GetMultiplayerServerVersions(cmd.Context(), params); err != nil {
-				Ctx.ConfigManager.Println(":negative_squared_cross_mark: Unable to retrieve server versions from the Pixo Platform")
+				Ctx.Printer.Println(":negative_squared_cross_mark: Unable to retrieve server versions from the Pixo Platform")
 				return err
 
 			} else if len(versions) > 0 {
 				spinner.Stop()
-				Ctx.ConfigManager.Printf(":exclamation: Server version %s already exists\n", semanticVersion)
+				Ctx.Printer.Printf(":exclamation: Server version %s already exists\n", semanticVersion)
 				return errors.New("server version already exists")
 			}
 
 			spinner.Stop()
-			Ctx.ConfigManager.Println(":heavy_check_mark: Server version does not exist yet: ", semanticVersion)
+			Ctx.Printer.Println(":heavy_check_mark: Server version does not exist yet: ", semanticVersion)
 			return nil
 		}
 
@@ -76,7 +76,10 @@ var mpDeployCmd = &cobra.Command{
 		if !ok || image == "" {
 			filePath, ok = Ctx.ConfigManager.GetFlagOrConfigValue("zip-file", cmd)
 			if !ok || filePath == "" {
-				imageResponse := Ctx.ConfigManager.ReadFromUser("DOCKER IMAGE")
+				imageResponse, err := Ctx.FormHandler.GetResponseFromUser("DOCKER IMAGE")
+				if err != nil {
+					return err
+				}
 				if imageResponse == "" {
 					return errors.New("no image or zip file provided")
 				}
@@ -85,9 +88,9 @@ var mpDeployCmd = &cobra.Command{
 		}
 
 		msg := fmt.Sprint("Deploying server version: ", semanticVersion)
-		spinner := loader.NewLoader(cmd.Context(), msg, Ctx.ConfigManager)
+		spinner := loader.NewLoader(cmd.Context(), msg, Ctx.Printer)
 
-		input := platformAPI.MultiplayerServerVersion{
+		input := platform.MultiplayerServerVersion{
 			ModuleID:        moduleID,
 			ImageRegistry:   image,
 			LocalFilePath:   filePath,
@@ -100,7 +103,7 @@ var mpDeployCmd = &cobra.Command{
 		}
 
 		spinner.Stop()
-		Ctx.ConfigManager.Println(":cruise_ship: Deployed version: ", semanticVersion)
+		Ctx.Printer.Println(":cruise_ship: Deployed version: ", semanticVersion)
 		return nil
 	},
 }

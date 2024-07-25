@@ -17,7 +17,7 @@ var _ = Describe("Auth", func() {
 		}
 		primaryAPIClient := primary_api.NewClient(config)
 
-		Expect(primaryAPIClient.Login(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"))).To(Succeed())
+		Expect(primaryAPIClient.Login(os.Getenv("TEST_PIXO_USERNAME"), os.Getenv("TEST_PIXO_PASSWORD"))).To(Succeed())
 
 		Expect(primaryAPIClient.IsAuthenticated()).To(BeTrue())
 	})
@@ -28,7 +28,7 @@ var _ = Describe("Auth", func() {
 			Region:    "na",
 		}
 
-		client, err := primary_api.NewClientWithBasicAuth(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"), config)
+		client, err := primary_api.NewClientWithBasicAuth(os.Getenv("TEST_PIXO_USERNAME"), os.Getenv("TEST_PIXO_PASSWORD"), config)
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(client).NotTo(BeNil())

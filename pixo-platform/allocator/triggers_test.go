@@ -27,7 +27,7 @@ package allocator_test
 //			Revision:   "dev",
 //			Dockerfile: "Dockerfile",
 //			Context:    "simple-server",
-//			GetConfig:     "version.ini",
+//			Config:     "version.ini",
 //		}
 //	)
 //

@@ -5,7 +5,24 @@ import (
 	"encoding/json"
 	"errors"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
+	"time"
 )
+
+type User struct {
+	ID         int    `json:"id,omitempty"`
+	Role       string `json:"role,omitempty"`
+	OrgID      int    `json:"orgId,omitempty"`
+	Org        Org    `json:"org,omitempty"`
+	Username   string `json:"username,omitempty"`
+	Password   string `json:"-"`
+	FirstName  string `json:"firstName,omitempty"`
+	LastName   string `json:"lastName,omitempty"`
+	Email      string `json:"email,omitempty"`
+	ExternalID string `json:"externalId,omitempty"`
+
+	CreatedAt time.Time `json:"createdAt,omitempty"`
+	UpdatedAt time.Time `json:"updatedAt,omitempty"`
+}
 
 type GetUserResponse struct {
 	User platform.User `json:"user"`
@@ -23,7 +40,7 @@ type DeleteUserResponse struct {
 	Success bool `json:"deleteUser"`
 }
 
-func (g *PlatformAPIClient) CreateUser(ctx context.Context, user platform.User) (*platform.User, error) {
+func (g *PlatformClient) CreateUser(ctx context.Context, user platform.User) (*platform.User, error) {
 	query := `mutation createUser($input: UserInput!) { createUser(input: $input) { id orgId firstName lastName username role } }`
 
 	variables := map[string]interface{}{
@@ -50,7 +67,7 @@ func (g *PlatformAPIClient) CreateUser(ctx context.Context, user platform.User) 
 	return &userResponse.User, nil
 }
 
-func (g *PlatformAPIClient) UpdateUser(ctx context.Context, user platform.User) (*platform.User, error) {
+func (g *PlatformClient) UpdateUser(ctx context.Context, user platform.User) (*platform.User, error) {
 
 	if user.ID == 0 {
 		return nil, errors.New("user id is required")
@@ -101,7 +118,7 @@ func (g *PlatformAPIClient) UpdateUser(ctx context.Context, user platform.User) 
 	return &userResponse.User, nil
 }
 
-func (g *PlatformAPIClient) DeleteUser(ctx context.Context, id int) error {
+func (g *PlatformClient) DeleteUser(ctx context.Context, id int) error {
 	query := `mutation deleteUser($id: ID!) { deleteUser(id: $id) }`
 
 	variables := map[string]interface{}{
@@ -125,7 +142,7 @@ func (g *PlatformAPIClient) DeleteUser(ctx context.Context, id int) error {
 	return nil
 }
 
-func (g *PlatformAPIClient) GetUserByUsername(ctx context.Context, username string) (*platform.User, error) {
+func (g *PlatformClient) GetUserByUsername(ctx context.Context, username string) (*platform.User, error) {
 	query := `query user($id: ID, $username: String) { user(id: $id, username: $username) { id username firstName lastName orgId role } }`
 
 	variables := map[string]interface{}{

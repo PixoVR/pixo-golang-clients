@@ -12,7 +12,32 @@ import (
 	"mime/multipart"
 	"os"
 	"path/filepath"
+	"time"
 )
+
+type GitConfig struct {
+	Provider string `json:"provider,omitempty"`
+	OrgName  string `json:"orgName,omitempty"`
+	RepoName string `json:"repoName,omitempty"`
+}
+
+type Module struct {
+	ID            int    `json:"id,omitempty"`
+	Name          string `json:"name,omitempty"`
+	Description   string `json:"description,omitempty"`
+	ImageName     string `json:"imageName,omitempty"`
+	ImagePath     string `json:"imagePath,omitempty"`
+	ThumbnailPath string `json:"thumbnailPath,omitempty"`
+	ShortDesc     string `json:"shortDesc,omitempty"`
+
+	GitConfigID int       `json:"gitConfigId,omitempty"`
+	GitConfig   GitConfig `json:"gitConfig,omitempty"`
+
+	//OrgModules []OrgModule
+
+	CreatedAt time.Time `json:"createdAt,omitempty"`
+	UpdatedAt time.Time `json:"updatedAt,omitempty"`
+}
 
 type ModuleVersion struct {
 	ID              int           `json:"id,omitempty"`
@@ -29,7 +54,7 @@ type ModuleVersion struct {
 	PlatformIds     []int         `json:"platformIds,omitempty"`
 }
 
-func (g *PlatformAPIClient) CreateModuleVersion(ctx context.Context, input ModuleVersion) (*ModuleVersion, error) {
+func (g *PlatformClient) CreateModuleVersion(ctx context.Context, input ModuleVersion) (*ModuleVersion, error) {
 	query := `mutation createModuleVersion($input: ModuleVersionInput!) { createModuleVersion(input: $input) { id moduleId module { abbreviation } version package status fileLink } }`
 
 	if input.LocalFilePath == "" {

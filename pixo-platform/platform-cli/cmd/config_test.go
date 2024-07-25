@@ -7,11 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("ConfigFile", func() {
-
-	var (
-		executor *TestExecutor
-	)
+var _ = Describe("Config", Ordered, func() {
 
 	BeforeEach(func() {
 		executor = NewTestExecutor()

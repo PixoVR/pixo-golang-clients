@@ -15,7 +15,7 @@ import (
 	"path/filepath"
 )
 
-func (g *PlatformAPIClient) GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]*MultiplayerServerConfigQueryParams, error) {
+func (g *PlatformClient) GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]*MultiplayerServerConfigQueryParams, error) {
 
 	variables := map[string]interface{}{
 		"params": params,
@@ -29,7 +29,7 @@ func (g *PlatformAPIClient) GetMultiplayerServerConfigs(ctx context.Context, par
 	return query.MultiplayerServerConfigs, nil
 }
 
-func (g *PlatformAPIClient) GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionQueryParams) ([]*MultiplayerServerVersion, error) {
+func (g *PlatformClient) GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionQueryParams) ([]*MultiplayerServerVersion, error) {
 
 	configs, err := g.GetMultiplayerServerConfigs(ctx, &MultiplayerServerConfigParams{
 		ModuleID:      params.ModuleID,
@@ -56,7 +56,7 @@ func (g *PlatformAPIClient) GetMultiplayerServerVersions(ctx context.Context, pa
 	return res, nil
 }
 
-func (g *PlatformAPIClient) GetMultiplayerServerVersion(ctx context.Context, versionID int) (*MultiplayerServerVersion, error) {
+func (g *PlatformClient) GetMultiplayerServerVersion(ctx context.Context, versionID int) (*MultiplayerServerVersion, error) {
 	query := `query multiplayerServerVersion($id: ID!) { multiplayerServerVersion(id: $id) { id moduleId imageRegistry engine status semanticVersion module { name } } }`
 
 	variables := map[string]interface{}{
@@ -78,7 +78,7 @@ func (g *PlatformAPIClient) GetMultiplayerServerVersion(ctx context.Context, ver
 	return response.MultiplayerServerVersion, nil
 }
 
-func (g *PlatformAPIClient) CreateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error) {
+func (g *PlatformClient) CreateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error) {
 	query := `mutation createMultiplayerServerVersion($input: MultiplayerServerVersionInput!) { createMultiplayerServerVersion(input: $input) { id imageRegistry fileLink semanticVersion engine module { name } } }`
 
 	if input.ImageRegistry == "" && input.LocalFilePath == "" {

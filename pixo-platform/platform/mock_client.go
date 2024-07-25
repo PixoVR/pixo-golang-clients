@@ -2,14 +2,12 @@ package platform
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
 	commonerrors "github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/commonerrors"
 	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/k8s/agones"
 	"github.com/go-faker/faker/v4"
-	"github.com/rs/zerolog/log"
 	"time"
 )
 
@@ -526,14 +524,14 @@ func (m *MockClient) UpdateSession(ctx context.Context, session Session) (*Sessi
 	return &session, nil
 }
 
-func (m *MockClient) CreateEvent(ctx context.Context, sessionID int, uuid string, eventType string, data string) (*platform.Event, error) {
+func (m *MockClient) CreateEvent(ctx context.Context, event Event) (*Event, error) {
 	m.NumCalledCreateEvent++
 
-	if sessionID <= 0 {
+	if event.SessionID <= 0 {
 		return nil, InvalidSessionError
 	}
 
-	if eventType == "" {
+	if event.Type == "" {
 		return nil, commonerrors.ErrorRequired("event type")
 	}
 
@@ -541,19 +539,8 @@ func (m *MockClient) CreateEvent(ctx context.Context, sessionID int, uuid string
 		return nil, m.CreateEventError
 	}
 
-	var jsonData platform.EventResult
-	if err := json.Unmarshal([]byte(data), &jsonData); err != nil {
-		log.Error().Err(err).Msg("error unmarshalling event data")
-	}
-
-	return &platform.Event{
-		ID:        1,
-		SessionID: sessionID,
-		UUID:      uuid,
-		EventType: eventType,
-		Data:      jsonData,
-		CreatedAt: time.Now().UTC(),
-	}, nil
+	event.CreatedAt = time.Now().UTC()
+	return &event, nil
 }
 
 func (m *MockClient) GetPlatforms(ctx context.Context) ([]*Platform, error) {

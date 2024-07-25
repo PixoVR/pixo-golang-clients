@@ -9,10 +9,6 @@ import (
 
 var _ = Describe("Sessions End", func() {
 
-	var (
-		executor *TestExecutor
-	)
-
 	BeforeEach(func() {
 		executor = NewTestExecutor()
 	})

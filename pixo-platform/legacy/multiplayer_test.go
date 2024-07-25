@@ -19,15 +19,15 @@ var _ = Describe("Multiplayer", func() {
 	BeforeEach(func() {
 		var err error
 		config := urlfinder.ClientConfig{
-			Lifecycle: os.Getenv("PIXO_LIFECYCLE"),
-			Region:    os.Getenv("PIXO_REGION"),
+			Lifecycle: os.Getenv("TEST_PIXO_LIFECYCLE"),
+			Region:    os.Getenv("TEST_PIXO_REGION"),
 		}
-		tokenClient, err = NewClientWithBasicAuth(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"), config)
+		tokenClient, err = NewClientWithBasicAuth(os.Getenv("TEST_PIXO_USERNAME"), os.Getenv("TEST_PIXO_PASSWORD"), config)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(tokenClient).NotTo(BeNil())
 		Expect(tokenClient.IsAuthenticated()).To(BeTrue())
 
-		config.Token = os.Getenv("SECRET_KEY")
+		config.Token = os.Getenv("TEST_SECRET_KEY")
 		secretKeyClient = NewClient(config)
 		Expect(secretKeyClient).NotTo(BeNil())
 		Expect(secretKeyClient.IsAuthenticated()).To(BeTrue())

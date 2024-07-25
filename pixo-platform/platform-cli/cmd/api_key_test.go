@@ -8,10 +8,6 @@ import (
 
 var _ = Describe("API Keys", func() {
 
-	var (
-		executor *TestExecutor
-	)
-
 	BeforeEach(func() {
 		executor = NewTestExecutor()
 	})

@@ -3,7 +3,7 @@ package heartbeat_test
 import (
 	"context"
 	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/heartbeat"
-	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	config2 "github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/config"
 	. "github.com/onsi/ginkgo/v2"
@@ -16,10 +16,10 @@ var _ = Describe("Heartbeat", Ordered, func() {
 	var (
 		heartbeatClient Client
 		config          = urlfinder.ClientConfig{
-			Lifecycle: config2.GetEnvOrReturn("PIXO_LIFECYCLE", "stage"),
+			Lifecycle: config2.GetEnvOrReturn("TEST_PIXO_LIFECYCLE", "dev"),
 		}
-		username = os.Getenv("PIXO_USERNAME")
-		password = os.Getenv("PIXO_PASSWORD")
+		username = os.Getenv("TEST_PIXO_USERNAME")
+		password = os.Getenv("TEST_PIXO_PASSWORD")
 	)
 
 	BeforeEach(func() {
@@ -44,9 +44,9 @@ var _ = Describe("Heartbeat", Ordered, func() {
 	})
 
 	It("should be able to create a session and send a pulse", func() {
-		platformClient, err := graphql_api.NewClientWithBasicAuth(username, password, config)
+		platformClient, err := platform.NewClientWithBasicAuth(username, password, config)
 		Expect(err).NotTo(HaveOccurred())
-		session, err := platformClient.CreateSession(context.Background(), 271, "127.0.0.1", "test")
+		session, err := platformClient.CreateSession(context.Background(), 43, "127.0.0.1", "test")
 		Expect(err).NotTo(HaveOccurred())
 		Expect(session).NotTo(BeNil())
 		Expect(heartbeatClient.SendPulse(session.ID)).NotTo(HaveOccurred())

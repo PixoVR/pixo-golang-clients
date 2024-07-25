@@ -8,10 +8,6 @@ import (
 
 var _ = Describe("Webhooks List", func() {
 
-	var (
-		executor *TestExecutor
-	)
-
 	BeforeEach(func() {
 		executor = NewTestExecutor()
 	})

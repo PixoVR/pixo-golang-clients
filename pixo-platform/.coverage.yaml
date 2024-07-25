@@ -1,0 +1,17 @@
+profile: cover.out
+
+local-prefix: "github.com/PixoVR/pixo-golang-clients/pixo-platform"
+
+threshold:
+  file: 0
+
+  package: 45
+
+  total: 62
+
+exclude:
+  paths:
+    - ^platform-cli/src/forms/charm
+    - ^platform-cli/src/forms/editor
+    - ^platform-cli/src/forms/mockserver
+    - ^platform-cli/src/forms/charm

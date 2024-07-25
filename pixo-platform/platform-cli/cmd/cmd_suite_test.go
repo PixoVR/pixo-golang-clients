@@ -2,24 +2,27 @@ package cmd_test
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/headset"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/cmd"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/clients"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/config"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/editor"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/forms/basic"
-	"github.com/rs/zerolog/log"
-	"github.com/spf13/viper"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/config"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/ctx"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/editor"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms/basic"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/printer"
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"io"
-	"math/rand"
 	"os"
 	"testing"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+)
+
+var (
+	executor *TestExecutor
 )
 
 func TestCLI(t *testing.T) {
@@ -28,38 +31,31 @@ func TestCLI(t *testing.T) {
 }
 
 type TestExecutor struct {
-	ConfigManager         config.Manager
+	rootCmd               *cobra.Command
+	Printer               *printer.EmojiPrinter
+	FormHandler           *basic.FormHandler
+	ConfigManager         *config.ConfigManager
+	InMemoryConfig        *config.InMemoryConfigManager
 	MockPlatformClient    *platform.MockClient
 	MockHeadsetClient     *headset.MockClient
 	MockMatchmakingClient *matchmaker.MockMatchmaker
 	MockFileOpener        *editor.MockFileOpener
-	configFile            string
 }
 
 func NewTestExecutor() *TestExecutor {
-	randomID := rand.Intn(1000000000)
-	testConfigPath := fmt.Sprintf("%s/.pixo/.test-config-%d.yaml", os.Getenv("HOME"), randomID)
-	if _, err := os.Stat(testConfigPath); err == nil {
-		if err = os.Remove(testConfigPath); err != nil {
-			log.Warn().Msgf("unable to remove test config file: %s", err)
-		} else {
-			log.Info().Msgf("removed existing test config file: %s", testConfigPath)
-		}
-	} else {
-		log.Info().Msgf("test config file does not exist: %s", testConfigPath)
-	}
-
 	formHandler := basic.NewFormHandler(nil, nil)
-	configManager := config.NewFileManager("", formHandler)
-	err := configManager.SetConfigFile(testConfigPath)
-	Expect(err).NotTo(HaveOccurred())
+	inMemoryConfigManager := config.NewInMemoryConfigManager()
+	configManager := config.NewConfigManager(inMemoryConfigManager)
 
 	mockPlatformClient := &platform.MockClient{}
 	mockHeadsetClient := &headset.MockClient{}
 	mockMatchmaker := matchmaker.NewMockMatchmaker()
+
+	emojiPrinter := printer.NewEmojiPrinter(nil)
 	mockFileOpener := &editor.MockFileOpener{}
 
-	mockPlatformCtx := &clients.CLIContext{
+	cmd.Ctx = &ctx.CLIContext{
+		Printer:           emojiPrinter,
 		FormHandler:       formHandler,
 		ConfigManager:     configManager,
 		PlatformClient:    mockPlatformClient,
@@ -67,40 +63,51 @@ func NewTestExecutor() *TestExecutor {
 		MatchmakingClient: mockMatchmaker,
 		FileOpener:        mockFileOpener,
 	}
-	cmd.Ctx = mockPlatformCtx
 
-	executor := &TestExecutor{
+	rootCmd := cmd.GetRootCmd()
+	return &TestExecutor{
+		rootCmd:               rootCmd,
+		FormHandler:           formHandler,
+		Printer:               emojiPrinter,
+		InMemoryConfig:        inMemoryConfigManager,
 		ConfigManager:         configManager,
 		MockPlatformClient:    mockPlatformClient,
 		MockHeadsetClient:     mockHeadsetClient,
 		MockMatchmakingClient: mockMatchmaker,
 		MockFileOpener:        mockFileOpener,
-		configFile:            testConfigPath,
 	}
-
-	return executor
 }
 
 func (t *TestExecutor) Cleanup() {
-	log.Debug().Msgf("Cleaning up test config file: %s", t.configFile)
-	viper.Reset()
+	t.InMemoryConfig.Clear()
 	t.MockPlatformClient.Reset()
-	_ = os.Remove(t.configFile)
+	t.rootCmd.SetArgs(nil)
+	t.clearFlagValues(t.rootCmd)
+
+}
+
+func (t *TestExecutor) clearFlagValues(cmd *cobra.Command) {
+	cmd.Flags().VisitAll(func(flag *pflag.Flag) {
+		_ = flag.Value.Set(flag.DefValue)
+	})
+	for _, subCmd := range cmd.Commands() {
+		t.clearFlagValues(subCmd)
+	}
 }
 
 func (t *TestExecutor) RunCommandWithInput(reader io.Reader, args ...string) (string, error) {
-	rootCmd := cmd.GetRootCmd()
-	Expect(rootCmd).NotTo(BeNil())
-	rootCmd.SetIn(reader)
+	t.rootCmd.SetIn(reader)
+	t.FormHandler.SetReader(reader)
 	t.ConfigManager.SetReader(reader)
 
 	writer := bytes.NewBufferString("")
-	rootCmd.SetOut(writer)
+	t.rootCmd.SetOut(writer)
+	t.FormHandler.SetWriter(writer)
 	t.ConfigManager.SetWriter(writer)
+	t.Printer.SetWriter(writer)
 
-	args = append([]string{"--config", t.configFile}, args...)
-	rootCmd.SetArgs(args)
-	err := rootCmd.Execute()
+	t.rootCmd.SetArgs(args)
+	err := t.rootCmd.Execute()
 
 	output, _ := io.ReadAll(writer)
 	return string(output), err

@@ -5,10 +5,12 @@ import (
 	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"net"
+	"sync"
 )
 
 type MultiplayerMatchmaker struct {
 	*abstractClient.AbstractServiceClient
+	*sync.Mutex
 
 	platformClient graphql_api.Client
 
@@ -23,7 +25,6 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 	}
 
 	config.Token = platformClient.GetToken()
-
 	return NewClient(config, timeoutSeconds...), nil
 }
 
@@ -43,10 +44,13 @@ func NewClient(config urlfinder.ClientConfig, timeoutSeconds ...int) *Multiplaye
 	return &MultiplayerMatchmaker{
 		AbstractServiceClient: abstractClient.NewClient(abstractConfig),
 		platformClient:        graphql_api.NewClient(config),
+		Mutex:                 &sync.Mutex{},
 	}
 }
 
 func (m *MultiplayerMatchmaker) Login(username, password string) error {
+	m.Lock()
+	defer m.Unlock()
 	return m.platformClient.Login(username, password)
 }
 

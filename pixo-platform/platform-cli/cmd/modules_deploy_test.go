@@ -9,10 +9,6 @@ import (
 
 var _ = Describe("Module", func() {
 
-	var (
-		executor *TestExecutor
-	)
-
 	BeforeEach(func() {
 		executor = NewTestExecutor()
 	})
@@ -22,7 +18,7 @@ var _ = Describe("Module", func() {
 	})
 
 	It("can create a module version", func() {
-		input := bytes.NewReader([]byte("1\n"))
+		input := bytes.NewBufferString("1\n")
 
 		output, err := executor.RunCommandWithInput(
 			input,
@@ -37,7 +33,7 @@ var _ = Describe("Module", func() {
 	})
 
 	It("can return an error if module id is missing", func() {
-		input := bytes.NewReader([]byte("0\n"))
+		input := bytes.NewBufferString("0\n")
 
 		output, err := executor.RunCommandWithInput(
 			input,
@@ -50,14 +46,14 @@ var _ = Describe("Module", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring("Enter MODULE ID:"))
 		Expect(output).To(ContainSubstring("Module ID not provided"))
-		Expect(executor.MockMatchmakingClient.NumCalledDialMatchmaker).To(Equal(0))
-		Expect(executor.MockMatchmakingClient.NumCalledWriteToWebsocket).To(Equal(0))
+		Expect(executor.MockMatchmakingClient.NumCalledDialWebsocket).To(Equal(0))
+		Expect(executor.MockMatchmakingClient.NumCalledWriteToWebsocketError).To(Equal(0))
 		Expect(executor.MockMatchmakingClient.NumCalledReadFromWebsocket).To(Equal(0))
 		Expect(executor.MockMatchmakingClient.NumCalledCloseWebsocket).To(Equal(0))
 	})
 
-	It("can return an error if server version is missing", func() {
-		input := bytes.NewReader([]byte("\n"))
+	It("can return an error if semantic version is missing", func() {
+		input := bytes.NewBufferString("\n")
 
 		output, err := executor.RunCommandWithInput(
 			input,
@@ -65,16 +61,23 @@ var _ = Describe("Module", func() {
 			"deploy",
 			"--module-id",
 			"1",
-			"--semantic-version",
-			"",
+			"--package",
+			"pixovr.com",
+			"--platforms",
+			"1",
+			"--controls",
+			"1",
+			"--zip-file",
+			"test.zip",
 		)
 
 		Expect(err).NotTo(HaveOccurred())
+		Expect(output).To(ContainSubstring("Enter SEMANTIC VERSION:"))
 		Expect(output).To(ContainSubstring("Semantic version not provided"))
 	})
 
 	It("can return an error if package name is missing", func() {
-		input := bytes.NewReader([]byte(""))
+		input := bytes.NewBufferString("")
 
 		output, err := executor.RunCommandWithInput(
 			input,
@@ -92,7 +95,7 @@ var _ = Describe("Module", func() {
 	})
 
 	It("can return an error if zip file path is missing", func() {
-		input := bytes.NewReader([]byte(""))
+		input := bytes.NewBufferString("")
 
 		output, err := executor.RunCommandWithInput(
 			input,
@@ -115,7 +118,7 @@ var _ = Describe("Module", func() {
 
 	It("can return an error if the platform options cant be found", func() {
 		executor.MockPlatformClient.GetPlatformsError = errors.New("error")
-		input := bytes.NewReader([]byte(""))
+		input := bytes.NewBufferString("")
 
 		output, err := executor.RunCommandWithInput(
 			input,
@@ -137,7 +140,7 @@ var _ = Describe("Module", func() {
 	})
 
 	It("can return an error if platforms are missing", func() {
-		input := bytes.NewReader([]byte(""))
+		input := bytes.NewBufferString("")
 
 		output, err := executor.RunCommandWithInput(
 			input,
@@ -161,7 +164,7 @@ var _ = Describe("Module", func() {
 
 	It("can return an error if the control types options cant be found", func() {
 		executor.MockPlatformClient.GetControlTypesError = errors.New("error")
-		input := bytes.NewReader([]byte("1\n"))
+		input := bytes.NewBufferString("1\n")
 
 		output, err := executor.RunCommandWithInput(
 			input,
@@ -183,7 +186,7 @@ var _ = Describe("Module", func() {
 	})
 
 	It("can return an error if control types are missing", func() {
-		input := bytes.NewReader([]byte("1\n"))
+		input := bytes.NewBufferString("1\n")
 
 		output, err := executor.RunCommandWithInput(
 			input,
@@ -207,7 +210,7 @@ var _ = Describe("Module", func() {
 
 	It("can return an error if the api call fails", func() {
 		executor.MockPlatformClient.CreateModuleVersionError = errors.New("error")
-		input := bytes.NewReader([]byte("1\n1\n"))
+		input := bytes.NewBufferString("1\n1\n")
 
 		output, err := executor.RunCommandWithInput(
 			input,

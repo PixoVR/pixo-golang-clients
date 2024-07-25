@@ -35,7 +35,7 @@ type DeleteOrgResponse struct {
 	Success bool `json:"deleteOrg"`
 }
 
-func (g *PlatformAPIClient) GetOrg(ctx context.Context, id int) (*Org, error) {
+func (g *PlatformClient) GetOrg(ctx context.Context, id int) (*Org, error) {
 	query := `query org($id: ID!) { org(id: $id) { id name type openAccess logoLink hubLogoLink } }`
 
 	variables := map[string]interface{}{
@@ -55,7 +55,7 @@ func (g *PlatformAPIClient) GetOrg(ctx context.Context, id int) (*Org, error) {
 	return &orgResponse.Org, nil
 }
 
-func (g *PlatformAPIClient) CreateOrg(ctx context.Context, org Org) (*Org, error) {
+func (g *PlatformClient) CreateOrg(ctx context.Context, org Org) (*Org, error) {
 	query := `mutation createOrg($input: OrgInput!) { createOrg(input: $input) { id name } }`
 
 	variables := map[string]interface{}{
@@ -79,7 +79,7 @@ func (g *PlatformAPIClient) CreateOrg(ctx context.Context, org Org) (*Org, error
 	return &orgResponse.Org, nil
 }
 
-func (g *PlatformAPIClient) UpdateOrg(ctx context.Context, org Org) (*Org, error) {
+func (g *PlatformClient) UpdateOrg(ctx context.Context, org Org) (*Org, error) {
 
 	if org.ID == 0 {
 		return nil, errors.New("org id is required")
@@ -110,7 +110,7 @@ func (g *PlatformAPIClient) UpdateOrg(ctx context.Context, org Org) (*Org, error
 	return &userResponse.Org, nil
 }
 
-func (g *PlatformAPIClient) DeleteOrg(ctx context.Context, id int) error {
+func (g *PlatformClient) DeleteOrg(ctx context.Context, id int) error {
 	query := `mutation deleteOrg($id: ID!) { deleteOrg(id: $id) }`
 
 	variables := map[string]interface{}{

@@ -3,34 +3,33 @@ package platform
 import (
 	"context"
 	"encoding/json"
-	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
 	"time"
 )
 
 type Session struct {
-	ID int `json:"id"`
+	ID int `json:"id,omitempty"`
 
-	UUID        string  `json:"uuid"`
-	IPAddress   string  `json:"ipAddress"`
-	DeviceID    string  `json:"deviceId"`
-	RawScore    float64 `json:"rawScore"`
-	MaxScore    float64 `json:"maxScore"`
-	ScaledScore float64 `json:"scaledScore"`
-	Status      string  `json:"status"`
-	Completed   bool    `json:"completed"`
-	CompletedAt string  `json:"completedAt"`
-	Duration    string  `json:"duration"`
+	UUID        string  `json:"uuid,omitempty"`
+	IPAddress   string  `json:"ipAddress,omitempty"`
+	DeviceID    string  `json:"deviceId,omitempty"`
+	RawScore    float64 `json:"rawScore,omitempty"`
+	MaxScore    float64 `json:"maxScore,omitempty"`
+	ScaledScore float64 `json:"scaledScore,omitempty"`
+	Status      string  `json:"status,omitempty"`
+	Completed   bool    `json:"completed,omitempty"`
+	CompletedAt string  `json:"completedAt,omitempty"`
+	Duration    string  `json:"duration,omitempty"`
 
-	UserID   int              `json:"userId"`
-	User     platform.User    `json:"user"`
-	OrgID    int              `json:"orgId"`
-	Org      Org              `json:"org"`
-	ModuleID int              `json:"moduleId"`
-	Module   platform.Module  `json:"module"`
-	Events   []platform.Event `json:"events"`
+	UserID   int     `json:"userId,omitempty"`
+	User     User    `json:"user,omitempty"`
+	OrgID    int     `json:"orgId,omitempty"`
+	Org      Org     `json:"org,omitempty"`
+	ModuleID int     `json:"moduleId,omitempty"`
+	Module   Module  `json:"module,omitempty"`
+	Events   []Event `json:"events,omitempty"`
 
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	CreatedAt time.Time `json:"createdAt,omitempty"`
+	UpdatedAt time.Time `json:"updatedAt,omitempty"`
 }
 
 type CreateSessionResponse struct {
@@ -45,11 +44,7 @@ type SessionResponse struct {
 	Session Session `json:"session"`
 }
 
-type CreateEventResponse struct {
-	Event platform.Event `json:"createEvent"`
-}
-
-func (g *PlatformAPIClient) GetSession(ctx context.Context, id int) (*Session, error) {
+func (g *PlatformClient) GetSession(ctx context.Context, id int) (*Session, error) {
 	query := `query session($id: ID!) { session(id: $id) { id userId user { orgId } moduleId } }`
 
 	variables := map[string]interface{}{
@@ -69,8 +64,8 @@ func (g *PlatformAPIClient) GetSession(ctx context.Context, id int) (*Session, e
 	return &sessionResponse.Session, nil
 }
 
-func (g *PlatformAPIClient) CreateSession(ctx context.Context, moduleID int, ipAddress, deviceId string) (*Session, error) {
-	query := `mutation createSession($input: SessionInput!) { createSession(input: $input) { id userId user { orgId } moduleId } }`
+func (g *PlatformClient) CreateSession(ctx context.Context, moduleID int, ipAddress, deviceId string) (*Session, error) {
+	query := `mutation createSession($input: SessionInput!) { createSession(input: $input) { id userId user { orgId } moduleId module { id abbreviation } } }`
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{
@@ -93,7 +88,7 @@ func (g *PlatformAPIClient) CreateSession(ctx context.Context, moduleID int, ipA
 	return &sessionResponse.Session, nil
 }
 
-func (g *PlatformAPIClient) UpdateSession(ctx context.Context, session Session) (*Session, error) {
+func (g *PlatformClient) UpdateSession(ctx context.Context, session Session) (*Session, error) {
 	query := `mutation updateSession($input: SessionInput!) { updateSession(input: $input) { id rawScore maxScore scaledScore completedAt duration moduleId userId user { orgId } } }`
 
 	variables := map[string]interface{}{
@@ -117,29 +112,4 @@ func (g *PlatformAPIClient) UpdateSession(ctx context.Context, session Session) 
 	}
 
 	return &sessionResponse.Session, nil
-}
-
-func (g *PlatformAPIClient) CreateEvent(ctx context.Context, sessionID int, uuid string, eventType string, data string) (*platform.Event, error) {
-	query := `mutation createEvent($input: EventInput!) { createEvent(input: $input) { id } }`
-
-	variables := map[string]interface{}{
-		"input": map[string]interface{}{
-			"sessionId": sessionID,
-			"uuid":      uuid,
-			"eventType": eventType,
-			"jsonData":  data,
-		},
-	}
-
-	res, err := g.Client.ExecRaw(ctx, query, variables)
-	if err != nil {
-		return nil, err
-	}
-
-	var eventResponse CreateEventResponse
-	if err = json.Unmarshal(res, &eventResponse); err != nil {
-		return nil, err
-	}
-
-	return &eventResponse.Event, nil
 }

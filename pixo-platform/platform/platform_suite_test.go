@@ -1,6 +1,7 @@
 package platform_test
 
 import (
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/env"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	config2 "github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/config"
 	"os"
@@ -11,21 +12,29 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestGraphQLAPISuite(t *testing.T) {
+func TestPlatformClientSuite(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "GraphQL API Suite")
+	env.SourceProjectEnv()
+	RunSpecs(t, "Platform Client Suite")
 }
 
 var (
-	apiKeyClient *PlatformAPIClient
-	tokenClient  *PlatformAPIClient
-	lifecycle    = config2.GetEnvOrReturn("PIXO_LIFECYCLE", "dev")
-	pixoUsername = os.Getenv("PIXO_USERNAME")
-	pixoPassword = os.Getenv("PIXO_PASSWORD")
-	pixoAPIKey   = os.Getenv("PIXO_API_KEY")
+	apiKeyClient *PlatformClient
+	tokenClient  *PlatformClient
+	lifecycle    string
+	pixoUsername string
+	pixoPassword string
+	pixoAPIKey   string
+	moduleID     = 43
+	orgID        = 20
 )
 
 var _ = BeforeSuite(func() {
+	lifecycle = config2.GetEnvOrReturn("TEST_PIXO_LIFECYCLE", "dev")
+	pixoUsername = os.Getenv("TEST_PIXO_USERNAME")
+	pixoPassword = os.Getenv("TEST_PIXO_PASSWORD")
+	pixoAPIKey = os.Getenv("TEST_PIXO_API_KEY")
+
 	config := urlfinder.ClientConfig{Lifecycle: lifecycle, APIKey: pixoAPIKey}
 	apiKeyClient = NewClient(config)
 	Expect(apiKeyClient).NotTo(BeNil())

@@ -48,8 +48,8 @@ type MockAbstractClient struct {
 	NumCalledDialWebsocket int
 	DialWebsocketError     error
 
-	NumCalledWriteToWebsocket int
-	WriteToWebsocketError     error
+	NumCalledWriteToWebsocketError int
+	WriteToWebsocketError          error
 
 	NumCalledReadFromWebsocket int
 	ReadFromWebsocketError     error
@@ -185,7 +185,7 @@ func (m *MockAbstractClient) DialWebsocket(endpoint string) (*websocket.Conn, *h
 }
 
 func (m *MockAbstractClient) WriteToWebsocket(message []byte) error {
-	m.NumCalledWriteToWebsocket++
+	m.NumCalledWriteToWebsocketError++
 
 	if m.WriteToWebsocketError != nil {
 		return m.WriteToWebsocketError

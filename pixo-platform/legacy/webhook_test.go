@@ -22,11 +22,11 @@ var _ = Describe("Webhook", Ordered, func() {
 
 	BeforeEach(func() {
 		config := urlfinder.ClientConfig{
-			Lifecycle: config2.GetEnvOrReturn("PIXO_LIFECYCLE", "stage"),
-			Region:    config2.GetEnvOrReturn("PIXO_REGION", "na"),
+			Lifecycle: config2.GetEnvOrReturn("TEST_PIXO_LIFECYCLE", "stage"),
+			Region:    config2.GetEnvOrReturn("TEST_PIXO_REGION", "na"),
 		}
 		primaryAPIClient = primary_api.NewClient(config)
-		Expect(primaryAPIClient.Login(os.Getenv("PIXO_USERNAME"), os.Getenv("PIXO_PASSWORD"))).To(Succeed())
+		Expect(primaryAPIClient.Login(os.Getenv("TEST_PIXO_USERNAME"), os.Getenv("TEST_PIXO_PASSWORD"))).To(Succeed())
 	})
 
 	It("can create a webhook", func() {

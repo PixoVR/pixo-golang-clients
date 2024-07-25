@@ -5,7 +5,7 @@ package cmd
 
 import (
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/pkg/loader"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/loader"
 	"github.com/spf13/cobra"
 )
 
@@ -20,9 +20,9 @@ var createUserCmd = &cobra.Command{
 		username, _ := Ctx.ConfigManager.GetConfigValueOrAskUser("username", cmd)
 		orgID, _ := Ctx.ConfigManager.GetIntConfigValueOrAskUser("org-id", cmd)
 		role, _ := Ctx.ConfigManager.GetConfigValueOrAskUser("role", cmd)
-		password, ok := Ctx.ConfigManager.GetSensitiveConfigValueOrAskUser("password", cmd)
+		password, ok := Ctx.ConfigManager.GetSensitiveFlagOrConfigValueOrAskUser("password", cmd)
 		if !ok {
-			Ctx.ConfigManager.Print(":exclamation: Password not provided")
+			Ctx.Printer.Print(":exclamation: Password not provided")
 			return nil
 		}
 
@@ -35,15 +35,15 @@ var createUserCmd = &cobra.Command{
 			Password:  password,
 		}
 
-		spinner := loader.NewLoader(cmd.Context(), "Creating user...", Ctx.ConfigManager)
+		spinner := loader.NewLoader(cmd.Context(), "Creating user...", Ctx.Printer)
 		user, err := Ctx.PlatformClient.CreateUser(cmd.Context(), input)
 		spinner.Stop()
 		if err != nil {
-			Ctx.ConfigManager.Println(":exclamation: Unable to create user: ", err)
+			Ctx.Printer.Println(":exclamation: Unable to create user: ", err)
 			return err
 		}
 
-		Ctx.ConfigManager.Println(":rocket: User created: ", user.Username)
+		Ctx.Printer.Println(":rocket: User created: ", user.Username)
 		return nil
 	},
 }

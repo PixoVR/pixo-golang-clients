@@ -56,8 +56,7 @@ func (p *LegacyAPIClient) GetMatchmakingProfiles() ([]*GameProfileMetadata, erro
 	}
 
 	var profilesResponse GameProfileMetaDataResponse
-	err = json.Unmarshal(res.Body(), &profilesResponse)
-	if err != nil {
+	if err = json.Unmarshal(res.Body(), &profilesResponse); err != nil {
 		log.Debug().Err(err).Msg("Failed to unmarshal multiplayer configurations")
 		return nil, err
 	}

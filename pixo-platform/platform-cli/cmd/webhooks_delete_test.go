@@ -9,10 +9,6 @@ import (
 
 var _ = Describe("Webhooks Delete", func() {
 
-	var (
-		executor *TestExecutor
-	)
-
 	BeforeEach(func() {
 		executor = NewTestExecutor()
 	})

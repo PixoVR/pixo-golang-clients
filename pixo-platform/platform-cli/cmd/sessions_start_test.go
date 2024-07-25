@@ -9,10 +9,6 @@ import (
 
 var _ = Describe("Sessions Start", func() {
 
-	var (
-		executor *TestExecutor
-	)
-
 	BeforeEach(func() {
 		executor = NewTestExecutor()
 	})
@@ -51,7 +47,7 @@ var _ = Describe("Sessions Start", func() {
 	})
 
 	It("can return an error if the api call fails", func() {
-		input := bytes.NewReader([]byte("1"))
+		input := bytes.NewReader([]byte("1\n"))
 		executor.MockPlatformClient.CreateSessionError = errors.New("error")
 
 		output, err := executor.RunCommandWithInput(

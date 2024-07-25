@@ -23,53 +23,53 @@ var configCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		if edit {
-			Ctx.ConfigManager.Println(":file_folder: Opening config file in editor")
-			if err := Ctx.FileOpener.OpenEditor(Ctx.ConfigManager.ConfigFile()); err != nil {
-				Ctx.ConfigManager.Println(":warning: Unable to open editor: ", err)
+			Ctx.Printer.Println(":file_folder: Opening config file in editor")
+			if err := Ctx.FileOpener.OpenEditor(activeConfigFile); err != nil {
+				Ctx.Printer.Println(":warning: Unable to open editor: ", err)
 			}
 		}
 
-		Ctx.ConfigManager.Println(":file_folder: Config: ", Ctx.ConfigManager.ConfigFile())
+		Ctx.Printer.Println(":file_folder: Config: ", activeConfigFile)
 
 		if region := Ctx.ConfigManager.Region(); region != "" {
-			Ctx.ConfigManager.Println(":earth_americas: Region: ", region)
+			Ctx.Printer.Println(":earth_americas: Region: ", region)
 		}
 
 		if lifecycle := Ctx.ConfigManager.Lifecycle(); lifecycle != "" {
-			Ctx.ConfigManager.Println(":gear: Lifecycle: ", lifecycle)
+			Ctx.Printer.Println(":gear: Lifecycle: ", lifecycle)
 		}
 
-		Ctx.ConfigManager.Println()
+		Ctx.Printer.Println()
 
 		if userID, ok := Ctx.ConfigManager.GetConfigValue("user-id"); ok {
-			Ctx.ConfigManager.Println(":id: User ID: ", userID)
+			Ctx.Printer.Println(":id: User ID: ", userID)
 		}
 
 		if username, ok := Ctx.ConfigManager.GetConfigValue("username"); ok {
-			Ctx.ConfigManager.Println(":bust_in_silhouette: Username: ", username)
+			Ctx.Printer.Println(":bust_in_silhouette: Username: ", username)
 		}
 
 		if _, ok := Ctx.ConfigManager.GetConfigValue("password"); ok {
-			Ctx.ConfigManager.Println(":lock: Password: ********")
+			Ctx.Printer.Println(":lock: Password: ********")
 		}
 
 		if _, ok := Ctx.ConfigManager.GetConfigValue("api-key"); ok {
-			Ctx.ConfigManager.Println(":key: API Key: ********")
+			Ctx.Printer.Println(":key: API Key: ********")
 		}
 
 		if _, ok := Ctx.ConfigManager.GetConfigValue("token"); ok {
-			Ctx.ConfigManager.Println(":coin: Token: ********")
+			Ctx.Printer.Println(":coin: Token: ********")
 		}
 
-		Ctx.ConfigManager.Println()
+		Ctx.Printer.Println()
 
-		activeEnv := Ctx.ConfigManager.GetActiveEnv()
+		activeEnv := Ctx.ConfigManager.ActiveEnv()
 
 		for k, v := range activeEnv.EnvMap {
 			if isSensitiveOrRepetitive(k) {
 				continue
 			}
-			Ctx.ConfigManager.Println(":arrow_right: ", cleanKey(k), ": ", v)
+			Ctx.Printer.Println(":arrow_right: ", cleanKey(k), ": ", v)
 		}
 
 	},

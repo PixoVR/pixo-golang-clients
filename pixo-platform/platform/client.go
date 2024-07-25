@@ -48,7 +48,7 @@ type Client interface {
 	GetSession(ctx context.Context, id int) (*Session, error)
 	CreateSession(ctx context.Context, moduleID int, ipAddress, deviceId string) (*Session, error)
 	UpdateSession(ctx context.Context, session Session) (*Session, error)
-	CreateEvent(ctx context.Context, sessionID int, uuid string, eventType string, data string) (*legacy.Event, error)
+	CreateEvent(ctx context.Context, event Event) (*Event, error)
 
 	GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]*MultiplayerServerConfigQueryParams, error)
 	GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionQueryParams) ([]*MultiplayerServerVersion, error)
@@ -56,17 +56,17 @@ type Client interface {
 	CreateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error)
 }
 
-var _ Client = (*PlatformAPIClient)(nil)
+var _ Client = (*PlatformClient)(nil)
 
-// PlatformAPIClient is a struct for the graphql API that contains an abstract client
-type PlatformAPIClient struct {
+// PlatformClient is a struct for the graphql API that contains an abstract client
+type PlatformClient struct {
 	*abstract.AbstractServiceClient
 	*graphql.Client
 	defaultContext context.Context
 }
 
-// NewClient is a function that returns a PlatformAPIClient
-func NewClient(config urlfinder.ClientConfig) *PlatformAPIClient {
+// NewClient is a function that returns a PlatformClient
+func NewClient(config urlfinder.ClientConfig) *PlatformClient {
 
 	if config.APIKey == "" {
 		config.APIKey = os.Getenv("PIXO_API_KEY")
@@ -89,19 +89,19 @@ func NewClient(config urlfinder.ClientConfig) *PlatformAPIClient {
 		APIKey:        config.APIKey,
 	}
 
-	return &PlatformAPIClient{
+	return &PlatformClient{
 		AbstractServiceClient: abstract.NewClient(abstractConfig),
 		Client:                graphql.NewClient(fmt.Sprintf("%s/query", url), &c),
 		defaultContext:        context.Background(),
 	}
 }
 
-// NewClientWithBasicAuth is a function that returns a PlatformAPIClient with basic auth performed
-func NewClientWithBasicAuth(username, password string, config urlfinder.ClientConfig) (*PlatformAPIClient, error) {
+// NewClientWithBasicAuth is a function that returns a PlatformClient with basic auth performed
+func NewClientWithBasicAuth(username, password string, config urlfinder.ClientConfig) (*PlatformClient, error) {
 
 	serviceConfig := newServiceConfig(config)
 
-	client := &PlatformAPIClient{
+	client := &PlatformClient{
 		AbstractServiceClient: abstract.NewClient(abstract.AbstractConfig{ServiceConfig: serviceConfig}),
 		defaultContext:        context.Background(),
 	}
@@ -118,17 +118,17 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 	return client, nil
 }
 
-func (g *PlatformAPIClient) SetToken(token string) {
+func (g *PlatformClient) SetToken(token string) {
 	g.AbstractServiceClient.SetToken(token)
 	httpClient := http.Client{Transport: &transport{underlyingTransport: http.DefaultTransport, token: token}}
 	g.Client = graphql.NewClient(fmt.Sprintf("%s/query", g.GetURL()), &httpClient)
 }
 
-func (g *PlatformAPIClient) SetAPIKey(key string) {
+func (g *PlatformClient) SetAPIKey(key string) {
 	g.AbstractServiceClient.SetAPIKey(key)
 }
 
-func (g *PlatformAPIClient) ActiveUserID() int {
+func (g *PlatformClient) ActiveUserID() int {
 
 	if !g.IsAuthenticated() {
 		return 0
@@ -144,7 +144,7 @@ func (g *PlatformAPIClient) ActiveUserID() int {
 	return rawToken.UserID
 }
 
-func (g *PlatformAPIClient) ActiveOrgID() int {
+func (g *PlatformClient) ActiveOrgID() int {
 
 	if !g.IsAuthenticated() {
 		return 0
