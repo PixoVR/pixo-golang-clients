@@ -102,12 +102,12 @@ var _ = Describe("Users", func() {
 	Context("using an api key", func() {
 
 		var (
-			apiKey *platform.APIKey
+			apiKey *APIKey
 		)
 
 		BeforeEach(func() {
 			var err error
-			apiKey, err = tokenClient.CreateAPIKey(ctx, platform.APIKey{
+			apiKey, err = tokenClient.CreateAPIKey(ctx, APIKey{
 				UserID: testUser.ID,
 			})
 			Expect(err).NotTo(HaveOccurred())
@@ -140,6 +140,7 @@ var _ = Describe("Users", func() {
 			apiKeys, err := tokenClient.GetAPIKeys(ctx, &APIKeyQueryParams{
 				UserID: &testUser.ID,
 			})
+
 			Expect(err).NotTo(HaveOccurred())
 			Expect(apiKeys).NotTo(BeNil())
 			Expect(len(apiKeys)).To(Equal(1))

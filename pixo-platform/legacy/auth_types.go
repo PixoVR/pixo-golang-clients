@@ -29,13 +29,3 @@ type User struct {
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	UpdatedAt time.Time `json:"updatedAt,omitempty"`
 }
-
-type APIKey struct {
-	ID     int    `json:"id,omitempty"`
-	Key    string `json:"key,omitempty"`
-	UserID int    `json:"userId,omitempty"`
-	User   *User  `json:"user,omitempty"`
-
-	CreatedAt time.Time `json:"createdAt,omitempty"`
-	UpdatedAt time.Time `json:"updatedAt,omitempty"`
-}

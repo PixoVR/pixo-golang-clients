@@ -302,7 +302,7 @@ func (m *MockClient) DeleteOrg(ctx context.Context, id int) error {
 	return nil
 }
 
-func (m *MockClient) CreateAPIKey(ctx context.Context, input platform.APIKey) (*platform.APIKey, error) {
+func (m *MockClient) CreateAPIKey(ctx context.Context, input APIKey) (*APIKey, error) {
 	m.NumCalledCreateAPIKey++
 
 	if m.CreateAPIKeyError != nil {
@@ -317,7 +317,7 @@ func (m *MockClient) CreateAPIKey(ctx context.Context, input platform.APIKey) (*
 	return &input, nil
 }
 
-func (m *MockClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) ([]*platform.APIKey, error) {
+func (m *MockClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) ([]APIKey, error) {
 	m.NumCalledGetAPIKeys++
 
 	if m.GetAPIKeysError != nil {
@@ -325,14 +325,18 @@ func (m *MockClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) 
 	}
 
 	if m.GetAPIKeysEmpty {
-		return []*platform.APIKey{}, nil
+		return []APIKey{}, nil
+	}
+
+	if params == nil {
+		params = &APIKeyQueryParams{}
 	}
 
 	if params.UserID == nil {
 		params.UserID = &[]int{1}[0]
 	}
 
-	return []*platform.APIKey{
+	return []APIKey{
 		{
 			ID:        1,
 			UserID:    *params.UserID,

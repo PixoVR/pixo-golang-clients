@@ -25,8 +25,8 @@ type Client interface {
 	UpdateUser(ctx context.Context, user legacy.User) (*legacy.User, error)
 	DeleteUser(ctx context.Context, id int) error
 
-	GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) ([]*legacy.APIKey, error)
-	CreateAPIKey(ctx context.Context, input legacy.APIKey) (*legacy.APIKey, error)
+	GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) ([]APIKey, error)
+	CreateAPIKey(ctx context.Context, input APIKey) (*APIKey, error)
 	DeleteAPIKey(ctx context.Context, id int) error
 
 	GetWebhooks(ctx context.Context, params *WebhookParams) ([]Webhook, error)

@@ -54,7 +54,7 @@ var webhooksDeleteCmd = &cobra.Command{
 
 		ids := forms.IntSlice(answers["webhook-ids"])
 
-		spinner := loader.NewLoader(cmd.Context(), "Getting webhooks...", Ctx.Printer)
+		spinner := loader.NewLoader(cmd.Context(), "Deleting webhooks...", Ctx.Printer)
 		for _, id := range ids {
 			if err := Ctx.PlatformClient.DeleteWebhook(cmd.Context(), id); err != nil {
 				Ctx.Printer.Printf(":exclamation: Unable to delete webhook %d: %s\n", id, err.Error())
