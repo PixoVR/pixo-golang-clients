@@ -13,6 +13,7 @@ exclude:
   paths:
     - ^*/spy.go
     - ^*/mock.go
+    - ^legacy
     - ^platform-cli/main.go
     - ^platform-cli/cmd/root.go
     - ^platform-cli/src/editor
