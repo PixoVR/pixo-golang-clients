@@ -13,6 +13,6 @@ exclude:
   paths:
     - ^main.go
     - ^cmd/root.go
-    - ^src/forms/fancy
     - ^src/editor
+    - ^src/forms/fancy
     - ^src/mockserver

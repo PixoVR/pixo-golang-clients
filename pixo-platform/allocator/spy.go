@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-type AllocatorSpy struct {
+type Spy struct {
 	CalledAllocateGameserver bool
 	CalledRegisterFleet      bool
 	CalledDeregisterFleet    bool
@@ -17,15 +17,15 @@ type AllocatorSpy struct {
 	CalledDeleteTrigger      bool
 }
 
-func NewAllocatorSpy() *AllocatorSpy {
-	return &AllocatorSpy{
+func NewAllocatorSpy() *Spy {
+	return &Spy{
 		CalledAllocateGameserver: false,
 		CalledRegisterFleet:      false,
 		CalledDeregisterFleet:    false,
 	}
 }
 
-func (a *AllocatorSpy) AllocateGameserver(request AllocationRequest) AllocationResponse {
+func (a *Spy) AllocateGameserver(request AllocationRequest) AllocationResponse {
 	a.CalledAllocateGameserver = true
 
 	return AllocationResponse{
@@ -37,7 +37,7 @@ func (a *AllocatorSpy) AllocateGameserver(request AllocationRequest) AllocationR
 	}
 }
 
-func (a *AllocatorSpy) RegisterFleet(fleet FleetRequest) Response {
+func (a *Spy) RegisterFleet(fleet FleetRequest) Response {
 	a.CalledRegisterFleet = true
 
 	return Response{
@@ -49,7 +49,7 @@ func (a *AllocatorSpy) RegisterFleet(fleet FleetRequest) Response {
 	}
 }
 
-func (a *AllocatorSpy) DeregisterFleet(fleet FleetRequest) Response {
+func (a *Spy) DeregisterFleet(fleet FleetRequest) Response {
 	a.CalledDeregisterFleet = true
 
 	return Response{
@@ -61,7 +61,7 @@ func (a *AllocatorSpy) DeregisterFleet(fleet FleetRequest) Response {
 	}
 }
 
-func (a *AllocatorSpy) RegisterTrigger(trigger platform.MultiplayerServerTrigger) Response {
+func (a *Spy) RegisterTrigger(trigger platform.MultiplayerServerTrigger) Response {
 	a.CalledRegisterTrigger = true
 
 	return Response{
@@ -73,7 +73,7 @@ func (a *AllocatorSpy) RegisterTrigger(trigger platform.MultiplayerServerTrigger
 	}
 }
 
-func (a *AllocatorSpy) UpdateTrigger(trigger platform.MultiplayerServerTrigger) Response {
+func (a *Spy) UpdateTrigger(trigger platform.MultiplayerServerTrigger) Response {
 	a.CalledUpdateTrigger = true
 
 	return Response{
@@ -85,7 +85,7 @@ func (a *AllocatorSpy) UpdateTrigger(trigger platform.MultiplayerServerTrigger) 
 	}
 }
 
-func (a *AllocatorSpy) DeleteTrigger(id int) Response {
+func (a *Spy) DeleteTrigger(id int) Response {
 	a.CalledDeleteTrigger = true
 
 	return Response{

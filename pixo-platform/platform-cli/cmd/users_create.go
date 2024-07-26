@@ -18,13 +18,6 @@ var createUserCmd = &cobra.Command{
 	Short: "Create a new user",
 	Long:  `Create a new user with the following command:`,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		authUsername, _ := Ctx.ConfigManager.GetConfigValue("username")
-		authPassword, _ := Ctx.ConfigManager.GetConfigValue("password")
-		if err := Ctx.LegacyClient.Login(authUsername, authPassword); err != nil {
-			Ctx.Printer.Println(":exclamation: Unable to login")
-			return err
-		}
-
 		questions := []config.Value{
 			{Question: forms.Question{Type: forms.Input, Key: "first-name"}},
 			{Question: forms.Question{Type: forms.Input, Key: "last-name"}},

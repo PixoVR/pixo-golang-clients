@@ -9,7 +9,9 @@
 *.so
 *.dylib
 
-.pixo
+**/.pixo
+
+**/report.json
 
 # Test binary, built with `go test -c`
 *.test
