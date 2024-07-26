@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestPlatformClientSuite(t *testing.T) {
+func TestPlatformClient(t *testing.T) {
 	RegisterFailHandler(Fail)
 	env.SourceProjectEnv()
 	RunSpecs(t, "Platform Client Suite")

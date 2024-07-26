@@ -33,8 +33,10 @@ var _ = Describe("Sessions End", func() {
 
 	It("can return an error if the update session api call fails", func() {
 		executor.MockPlatformClient.UpdateSessionError = errors.New("update error")
+		input := bytes.NewBufferString("100\n200\n")
 
-		output, err := executor.RunCommand(
+		output, err := executor.RunCommandWithInput(
+			input,
 			"sessions",
 			"end",
 			"--session-id",
@@ -48,9 +50,10 @@ var _ = Describe("Sessions End", func() {
 
 	It("can return an error if the create event api call fails", func() {
 		executor.MockPlatformClient.PostError = errors.New("error")
+		input := bytes.NewBufferString("100\n200\n")
 
 		output := executor.RunCommandWithInputAndExpectSuccess(
-			bytes.NewReader([]byte("\n")),
+			input,
 			"sessions",
 			"end",
 			"--session-id",
@@ -62,8 +65,10 @@ var _ = Describe("Sessions End", func() {
 	})
 
 	It("can end a session", func() {
+		input := bytes.NewBufferString("100\n200\n")
+
 		output := executor.RunCommandWithInputAndExpectSuccess(
-			bytes.NewReader([]byte("\n")),
+			input,
 			"sessions",
 			"end",
 			"--session-id",

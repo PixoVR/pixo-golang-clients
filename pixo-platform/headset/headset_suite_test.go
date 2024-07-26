@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestHeadsetClientSuite(t *testing.T) {
+func TestHeadsetClient(t *testing.T) {
 	RegisterFailHandler(Fail)
 	env.SourceProjectEnv()
 	RunSpecs(t, "Headset Client Suite")
