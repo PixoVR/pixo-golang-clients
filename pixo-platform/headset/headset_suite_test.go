@@ -21,7 +21,6 @@ var (
 	lifecycle    string
 	username     string
 	password     string
-	moduleID     = 43
 	clientConfig urlfinder.ClientConfig
 )
 
@@ -29,7 +28,5 @@ var _ = BeforeSuite(func() {
 	lifecycle = config.GetEnvOrReturn("TEST_PIXO_LIFECYCLE", "dev")
 	username = os.Getenv("TEST_PIXO_USERNAME")
 	password = os.Getenv("TEST_PIXO_PASSWORD")
-	clientConfig = urlfinder.ClientConfig{
-		Lifecycle: config.GetEnvOrReturn("TEST_PIXO_LIFECYCLE", "dev"),
-	}
+	clientConfig = urlfinder.ClientConfig{Lifecycle: lifecycle}
 })

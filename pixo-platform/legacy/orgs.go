@@ -3,12 +3,11 @@ package legacy
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 )
 
 // GetOrgs returns a list of webhooks.
 func (p *Client) GetOrgs() ([]Org, error) {
-	url := p.GetURLWithPath(fmt.Sprintf("api/orgs"))
+	url := p.GetURLWithPath("api/orgs")
 
 	res, err := p.FormatRequest().
 		Get(url)

@@ -16,9 +16,9 @@ func (f *Handler) Confirm(title string, response *bool) error {
 		isLowercase bool
 		isFirstChar bool
 	)
-	isLowercase = strings.ToLower(answer) == strings.ToLower(yes)
+	isLowercase = strings.EqualFold(answer, yes)
 	if len(answer) > 0 {
-		isFirstChar = strings.ToLower(answer[:1]) == strings.ToLower(yes[:1])
+		isFirstChar = strings.EqualFold(answer[:1], yes[:1])
 	}
 	confirmed := isLowercase || isFirstChar
 

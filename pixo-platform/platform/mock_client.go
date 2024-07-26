@@ -238,7 +238,7 @@ func (m *MockClient) UpdateUser(ctx context.Context, user *User) error {
 	}
 
 	if user.OrgID <= 0 {
-		errors.New("invalid org id")
+		return errors.New("invalid org id")
 	}
 
 	if m.UpdateUserError != nil {
