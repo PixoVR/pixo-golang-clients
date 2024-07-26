@@ -164,7 +164,7 @@ var _ = Describe("Module", func() {
 
 	It("can return an error if the control types options cant be found", func() {
 		executor.MockPlatformClient.GetControlTypesError = errors.New("error")
-		input := bytes.NewBufferString("1\n")
+		input := bytes.NewBufferString("android\n")
 
 		output, err := executor.RunCommandWithInput(
 			input,

@@ -43,11 +43,10 @@ cov: coverage
 .PHONY: report
 report:
 	@echo "📊 Generating coverage report..."
-	@go test -cover -v -coverprofile=prof.out ./...
-	@go tool cover -html=prof.out
+	@go tool cover -html=cover.out
 
 
-.PHONY: test
+.PHONY: mutate
 mutate:
 	@echo "👾 Running Mutation Tester..."
 	@go-mutesting ./src/...
@@ -77,5 +76,11 @@ docker: image container
 
 .PHONY: clean
 clean:
-	rm -rf ${EXECUTABLE} || true
-	docker rmi --force ${NAME}:latest || true
+	@echo "🧹 Cleaning up..."
+	@rm -rf ${EXECUTABLE} || true
+	@docker rmi --force ${NAME}:latest > /dev/null 2>&1 || true
+	@rm -rf ./cover.out || true
+	@rm -rf ./coverprofile.out || true
+	@rm -rf .pixo || true
+	@mkdir .pixo || true
+	@touch .pixo/config.yaml || true

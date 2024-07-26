@@ -2,6 +2,7 @@ package basic
 
 import (
 	"bufio"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
 	"github.com/kyokomi/emoji"
 	"github.com/rs/zerolog/log"
 	"gitlab.com/david_mbuvi/go_asterisks"
@@ -22,26 +23,24 @@ func (f *Handler) ReadLine() (string, error) {
 	return trim(line), nil
 }
 
-func (f *Handler) GetResponseFromUser(prompt string, response *string) error {
-	prompt = strings.ReplaceAll(prompt, "-", " ")
+func (f *Handler) GetResponseFromUser(question *forms.Question) (err error) {
+	prompt := strings.ReplaceAll(question.Prompt, "-", " ")
 	prompt = emoji.Sprintf(":fountain_pen: Enter %s: ", prompt)
-	if _, err := f.writerOrStdout().Write([]byte(prompt)); err != nil {
+
+	if _, err = f.writerOrStdout().Write([]byte(prompt)); err != nil {
 		return err
 	}
 
-	answer, err := f.ReadLine()
+	question.Answer, err = f.ReadLine()
 	if err != nil {
 		return err
 	}
 
-	if response != nil {
-		*response = answer
-	}
 	return nil
 }
 
-func (f *Handler) GetSensitiveResponseFromUser(prompt string, response *string) error {
-	prompt = strings.ReplaceAll(prompt, "-", " ")
+func (f *Handler) GetSensitiveResponseFromUser(question *forms.Question) error {
+	prompt := strings.ReplaceAll(question.Prompt, "-", " ")
 	prompt = emoji.Sprintf(":lock: Enter %s: ", prompt)
 	if _, err := f.writerOrStdout().Write([]byte(prompt)); err != nil {
 		return err
@@ -58,10 +57,11 @@ func (f *Handler) GetSensitiveResponseFromUser(prompt string, response *string) 
 		return err
 	}
 
-	log.Debug().Str("response", strings.Trim(string(val), "\r\n")).Msg("User response")
-	if response != nil {
-		*response = trim(string(val))
-	}
+	question.Answer = strings.Trim(string(val), "\r\n")
+	log.Debug().
+		Str("question", prompt).
+		Interface("answer", question.Answer).
+		Msg("response")
 	return nil
 }
 

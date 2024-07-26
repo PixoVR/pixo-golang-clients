@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/load"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/loader"
 	"net"
@@ -88,13 +89,13 @@ func gameserverReadLoop(addr *net.UDPAddr) {
 	}
 
 	for {
-		var userInput string
-		err := Ctx.FormHandler.GetResponseFromUser("message to gameserver", &userInput)
-		if err != nil || userInput == "" || userInput == "exit" {
+		question := &forms.Question{Prompt: "message to gameserver"}
+		err := Ctx.FormHandler.GetResponseFromUser(question)
+		if err != nil || question.Answer == "" || question.Answer == "exit" {
 			break
 		}
 
-		if err = Ctx.MatchmakingClient.SendMessageToGameserver([]byte(userInput)); err != nil {
+		if err = Ctx.MatchmakingClient.SendMessageToGameserver([]byte(question.Answer.(string))); err != nil {
 			Ctx.Printer.Println(":warning:Could not send message to gameserver: ", err)
 			continue
 		}

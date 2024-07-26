@@ -10,48 +10,46 @@ func (f *Handler) AskQuestions(questions []forms.Question) (map[string]interface
 	answers := make(map[string]interface{})
 	for _, question := range questions {
 		var (
-			prompt string
-			answer interface{}
-			err    error
+			err error
 		)
 
-		if question.Prompt != "" {
-			prompt = question.Prompt
-		} else {
-			prompt = forms.CleanPrompt(question.Key)
+		if question.Prompt == "" {
+			question.Prompt = forms.CleanPrompt(question.Key)
 		}
 
 		switch question.Type {
 		case forms.Input:
-			answer = new(string)
-			err = f.GetResponseFromUser(prompt, answer.(*string))
+			question.Answer = new(string)
+			err = f.GetResponseFromUser(&question)
 		case forms.SensitiveInput:
-			answer = new(string)
-			err = f.GetSensitiveResponseFromUser(prompt, answer.(*string))
+			question.Answer = new(string)
+			err = f.GetSensitiveResponseFromUser(&question)
 		case forms.Confirm:
-			answer = new(bool)
-			err = f.Confirm(prompt, answer.(*bool))
+			question.Answer = new(bool)
+			err = f.Confirm(&question)
 		case forms.Select:
-			answer = new(string)
-			err = f.Select(prompt, question.Options, answer.(*string))
+			question.Answer = new(string)
+			err = f.Select(&question)
 		case forms.SelectID:
-			answer = new(int)
-			err = f.SelectID(prompt, question.Options, answer.(*int))
+			question.Answer = new(int)
+			err = f.SelectID(&question)
 		case forms.MultiSelectIDs:
-			answer = new([]int)
-			err = f.MultiSelectIDs(prompt, question.Options, answer.(*[]int))
+			question.Answer = new([]int)
+			err = f.MultiSelectIDs(&question)
 		case forms.MultiSelect:
-			answer = new([]string)
-			err = f.MultiSelect(prompt, question.Options, answer.(*[]string))
+			question.Answer = new([]string)
+			err = f.MultiSelect(&question)
 		default:
 			log.Panic().Msg("unknown question type")
 		}
 
-		if err != nil {
-			return nil, fmt.Errorf("%s not provided", forms.CleanPrompt(question.Key))
+		if !question.Optional {
+			if err != nil {
+				return nil, fmt.Errorf("%s not provided", forms.CleanPrompt(question.Key))
+			}
+			answers[question.Key] = question.Answer
 		}
-		answers[question.Key] = answer
-		answer = nil
 	}
+
 	return answers, nil
 }

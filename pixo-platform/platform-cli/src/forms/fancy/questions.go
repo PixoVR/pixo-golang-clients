@@ -11,42 +11,39 @@ func (f *Handler) AskQuestions(questions []forms.Question) (map[string]interface
 	var groupItems []huh.Field
 
 	for _, question := range questions {
-		var prompt string
-		if question.Prompt != "" {
-			prompt = question.Prompt
-		} else {
-			prompt = forms.CleanPrompt(question.Key)
+		if question.Prompt == "" {
+			question.Prompt = forms.CleanPrompt(question.Key)
 		}
 
 		switch question.Type {
 		case forms.Input:
-			var response string
-			answers[question.Key] = &response
-			groupItems = append(groupItems, f.InputField(prompt, &response))
+			question.Answer = new(string)
+			answers[question.Key] = question.Answer
+			groupItems = append(groupItems, f.InputField(&question))
 		case forms.SensitiveInput:
-			var response string
-			answers[question.Key] = &response
-			groupItems = append(groupItems, f.SensitiveInputField(prompt, &response))
+			question.Answer = new(string)
+			answers[question.Key] = question.Answer
+			groupItems = append(groupItems, f.SensitiveInputField(&question))
 		case forms.Confirm:
-			var response bool
-			answers[question.Key] = &response
-			groupItems = append(groupItems, f.ConfirmField(prompt, &response))
+			question.Answer = new(bool)
+			answers[question.Key] = question.Answer
+			groupItems = append(groupItems, f.ConfirmField(&question))
 		case forms.Select:
-			var response string
-			answers[question.Key] = &response
-			groupItems = append(groupItems, f.SelectInput(prompt, question.Options, &response))
+			question.Answer = new(string)
+			answers[question.Key] = question.Answer
+			groupItems = append(groupItems, f.SelectInput(&question))
 		case forms.SelectID:
-			var response int
-			answers[question.Key] = &response
-			groupItems = append(groupItems, f.SelectIDInput(prompt, question.Options, &response))
+			question.Answer = new(int)
+			answers[question.Key] = question.Answer
+			groupItems = append(groupItems, f.SelectIDInput(&question))
 		case forms.MultiSelect:
-			var response []string
-			answers[question.Key] = &response
-			groupItems = append(groupItems, f.MultiSelectInput(prompt, question.Options, &response))
+			question.Answer = new([]string)
+			answers[question.Key] = question.Answer
+			groupItems = append(groupItems, f.MultiSelectInput(&question))
 		case forms.MultiSelectIDs:
-			var response []int
-			answers[question.Key] = &response
-			groupItems = append(groupItems, f.MultiSelectIDsInput(prompt, question.Options, &response))
+			question.Answer = new([]int)
+			answers[question.Key] = question.Answer
+			groupItems = append(groupItems, f.MultiSelectIDsInput(&question))
 		default:
 			return nil, errors.New("unknown question type")
 		}

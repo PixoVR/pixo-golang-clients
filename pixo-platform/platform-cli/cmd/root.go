@@ -36,6 +36,16 @@ var rootCmd = &cobra.Command{
 	Version: cliVersion,
 	Short:   "A CLI for the Pixo Platform",
 	Long:    `A CLI tool used to streamline interactions with the Pixo Platform`,
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		initLogger()
+		Ctx.SetIO(cmd)
+	},
+	RunE: func(cmd *cobra.Command, args []string) error {
+		//if _, err := tea.NewProgram(tui.NewModel()).Run(); err != nil {
+		//	return err
+		//}
+		return nil
+	},
 }
 
 func GetRootCmd() *cobra.Command {
@@ -65,11 +75,6 @@ func init() {
 
 	if cfgFileFlagInput == "" {
 		cfgFileFlagInput = globalConfigFile
-	}
-
-	rootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
-		initLogger()
-		Ctx.SetIO(cmd)
 	}
 }
 

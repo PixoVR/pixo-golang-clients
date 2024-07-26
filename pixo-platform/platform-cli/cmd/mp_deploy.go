@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/loader"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/parser"
 	"github.com/kyokomi/emoji"
@@ -75,14 +76,14 @@ var mpDeployCmd = &cobra.Command{
 		if !ok || image == "" {
 			filePath, ok = Ctx.ConfigManager.GetFlagOrConfigValue("zip-file", cmd)
 			if !ok || filePath == "" {
-				var imageResponse string
-				if err := Ctx.FormHandler.GetResponseFromUser("DOCKER IMAGE", &imageResponse); err != nil {
+				question := &forms.Question{Prompt: "DOCKER IMAGE"}
+				if err := Ctx.FormHandler.GetResponseFromUser(question); err != nil {
 					return err
 				}
-				if imageResponse == "" {
+				if question.Answer == "" {
 					return errors.New("no image or zip file provided")
 				}
-				image = imageResponse
+				image = forms.String(question.Answer)
 			}
 		}
 

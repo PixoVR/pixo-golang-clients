@@ -13,9 +13,11 @@ const (
 )
 
 type Question struct {
-	Key     string
-	Prompt  string
-	Type    QuestionType
-	Options []Option
-	Answer  interface{}
+	Type        QuestionType
+	Options     []Option
+	OptionsFunc func() ([]Option, error)
+	Answer      interface{}
+	Key         string
+	Prompt      string
+	Optional    bool
 }

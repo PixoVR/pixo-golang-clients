@@ -154,15 +154,18 @@ func (c *ConfigManager) GetConfigValueOrAskUser(key string, cmd *cobra.Command) 
 	}
 
 	displayKey := strings.ReplaceAll(strings.ToUpper(key), "-", " ")
+	question := &forms.Question{Prompt: displayKey}
+
 	if strings.ToLower(key) == "password" {
-		err := c.formHandler.GetSensitiveResponseFromUser(displayKey, &val)
+		err := c.formHandler.GetSensitiveResponseFromUser(question)
 		if err != nil {
 			return "", false
 		}
-		return val, err == nil && val != ""
+		return question.Answer.(string), err == nil && val != ""
 	}
 
-	err := c.formHandler.GetResponseFromUser(displayKey, &val)
+	err := c.formHandler.GetResponseFromUser(question)
+	val = question.Answer.(string)
 	return val, err == nil && val != ""
 }
 
@@ -178,13 +181,13 @@ func (c *ConfigManager) GetIntConfigValueOrAskUser(key string, cmd *cobra.Comman
 	}
 
 	displayKey := strings.ReplaceAll(strings.ToUpper(key), "-", " ")
+	question := &forms.Question{Prompt: displayKey}
 
-	var strVal string
-	if err := c.formHandler.GetResponseFromUser(displayKey, &strVal); err != nil {
+	if err := c.formHandler.GetResponseFromUser(question); err != nil {
 		return 0, false
 	}
 
-	return ToInt(strVal)
+	return ToInt(question.Answer.(string))
 }
 
 func (c *ConfigManager) GetBoolConfigValueOrAskUser(key string, cmd *cobra.Command) (bool, bool) {
@@ -199,13 +202,13 @@ func (c *ConfigManager) GetBoolConfigValueOrAskUser(key string, cmd *cobra.Comma
 	}
 
 	displayKey := strings.ReplaceAll(strings.ToUpper(key), "-", " ")
+	question := &forms.Question{Prompt: displayKey}
 
-	var strVal string
-	if err := c.formHandler.GetResponseFromUser(displayKey, &strVal); err != nil {
+	if err := c.formHandler.GetResponseFromUser(question); err != nil {
 		return false, false
 	}
 
-	boolVal, err := strconv.ParseBool(strVal)
+	boolVal, err := strconv.ParseBool(question.Answer.(string))
 	return boolVal, err == nil
 }
 
@@ -275,8 +278,13 @@ func (c *ConfigManager) GetSensitiveConfigValueOrAskUser(key string, cmd *cobra.
 		return val, true
 	}
 
-	err := c.formHandler.GetSensitiveResponseFromUser(key, &val)
-	return val, err == nil
+	question := &forms.Question{
+		Type:   forms.SensitiveInput,
+		Prompt: key,
+	}
+	err := c.formHandler.GetSensitiveResponseFromUser(question)
+	val = question.Answer.(string)
+	return val, err == nil && val != ""
 }
 
 func (c *ConfigManager) GetFlagOrConfigValueOrAskUser(key string, cmd *cobra.Command) (string, bool) {
@@ -285,8 +293,13 @@ func (c *ConfigManager) GetFlagOrConfigValueOrAskUser(key string, cmd *cobra.Com
 		return val, true
 	}
 
-	err := c.formHandler.GetResponseFromUser(key, &val)
-	return val, err == nil
+	question := &forms.Question{
+		Type:   forms.Input,
+		Prompt: key,
+	}
+	err := c.formHandler.GetResponseFromUser(question)
+	val = question.Answer.(string)
+	return val, err == nil && val != ""
 }
 
 func (c *ConfigManager) GetSensitiveFlagOrConfigValueOrAskUser(key string, cmd *cobra.Command) (string, bool) {
@@ -295,16 +308,26 @@ func (c *ConfigManager) GetSensitiveFlagOrConfigValueOrAskUser(key string, cmd *
 		return val, true
 	}
 
-	err := c.formHandler.GetSensitiveResponseFromUser(key, &val)
-	return val, err == nil
+	question := &forms.Question{
+		Type:   forms.SensitiveInput,
+		Prompt: key,
+	}
+	err := c.formHandler.GetSensitiveResponseFromUser(question)
+	val = question.Answer.(string)
+	return val, err == nil && val != ""
 }
 
 func (c *ConfigManager) GetIntFlagOrConfigValueOrAskUser(key string, cmd *cobra.Command) (int, bool) {
 	val, ok := c.GetFlagOrConfigValue(key, cmd)
 	if !ok {
-		if err := c.formHandler.GetResponseFromUser(key, &val); err != nil {
+		question := &forms.Question{
+			Type:   forms.Input,
+			Prompt: key,
+		}
+		if err := c.formHandler.GetResponseFromUser(question); err != nil {
 			return 0, false
 		}
+		val = question.Answer.(string)
 	}
 
 	return ToInt(val)
@@ -313,9 +336,14 @@ func (c *ConfigManager) GetIntFlagOrConfigValueOrAskUser(key string, cmd *cobra.
 func (c *ConfigManager) GetBoolFlagOrConfigValueOrAskUser(key string, cmd *cobra.Command) (bool, bool) {
 	val, ok := c.GetFlagOrConfigValue(key, cmd)
 	if !ok {
-		if err := c.formHandler.GetResponseFromUser(key, &val); err != nil {
+		question := &forms.Question{
+			Type:   forms.Confirm,
+			Prompt: key,
+		}
+		if err := c.formHandler.GetResponseFromUser(question); err != nil {
 			return false, false
 		}
+		val = question.Answer.(string)
 	}
 
 	return ToBool(val)
