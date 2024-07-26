@@ -57,6 +57,6 @@ Set Height 600
 
 Type "pixo auth login" Sleep 500ms  Enter
 Type "test.user@pixovr.com" Sleep 500ms  Enter
-Type "some-fake-password!" Sleep 500ms  Enter
+Type "" Sleep 500ms  Enter
 
 Sleep 5s
