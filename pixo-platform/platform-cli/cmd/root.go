@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	cliVersion = "0.1.21"
+	cliVersion = "0.1.22"
 
 	homeDir          = os.Getenv("HOME")
 	configDirName    = ".pixo"
@@ -64,7 +64,6 @@ func init() {
 
 	configCmd.PersistentFlags().StringP("lifecycle", "l", "", "Lifecycle of Pixo Platform to use (dev, stage, prod)")
 	configCmd.PersistentFlags().StringP("region", "r", "", "Region of Pixo Platform to use (na, saudi)")
-	rootCmd.PersistentFlags().IntP("module-id", "m", 0, "Module ID")
 
 	if cfgFileFlagInput == "" {
 		cfgFileFlagInput = globalConfigFile

@@ -3,6 +3,7 @@ package platform
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"time"
 )
 
@@ -44,14 +45,14 @@ type SessionResponse struct {
 	Session Session `json:"session"`
 }
 
-func (g *PlatformClient) GetSession(ctx context.Context, id int) (*Session, error) {
+func (p *PlatformClient) GetSession(ctx context.Context, id int) (*Session, error) {
 	query := `query session($id: ID!) { session(id: $id) { id userId user { orgId } moduleId } }`
 
 	variables := map[string]interface{}{
 		"id": id,
 	}
 
-	res, err := g.Client.ExecRaw(ctx, query, variables)
+	res, err := p.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return nil, err
 	}
@@ -64,31 +65,37 @@ func (g *PlatformClient) GetSession(ctx context.Context, id int) (*Session, erro
 	return &sessionResponse.Session, nil
 }
 
-func (g *PlatformClient) CreateSession(ctx context.Context, moduleID int, ipAddress, deviceId string) (*Session, error) {
+func (p *PlatformClient) CreateSession(ctx context.Context, session *Session) error {
+	if session == nil {
+		return errors.New("session is nil")
+	}
+
 	query := `mutation createSession($input: SessionInput!) { createSession(input: $input) { id userId user { orgId } moduleId module { id abbreviation } } }`
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{
-			"moduleId":  moduleID,
-			"ipAddress": ipAddress,
-			"deviceId":  deviceId,
+			"moduleId":  session.ModuleID,
+			"ipAddress": session.IPAddress,
+			"deviceId":  session.DeviceID,
 		},
 	}
 
-	res, err := g.Client.ExecRaw(ctx, query, variables)
+	res, err := p.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	var sessionResponse CreateSessionResponse
 	if err = json.Unmarshal(res, &sessionResponse); err != nil {
-		return nil, err
+		return err
 	}
 
-	return &sessionResponse.Session, nil
+	*session = sessionResponse.Session
+
+	return nil
 }
 
-func (g *PlatformClient) UpdateSession(ctx context.Context, session Session) (*Session, error) {
+func (p *PlatformClient) UpdateSession(ctx context.Context, session Session) (*Session, error) {
 	query := `mutation updateSession($input: SessionInput!) { updateSession(input: $input) { id rawScore maxScore scaledScore completedAt duration moduleId userId user { orgId } } }`
 
 	variables := map[string]interface{}{
@@ -101,7 +108,7 @@ func (g *PlatformClient) UpdateSession(ctx context.Context, session Session) (*S
 		},
 	}
 
-	res, err := g.Client.ExecRaw(ctx, query, variables)
+	res, err := p.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return nil, err
 	}

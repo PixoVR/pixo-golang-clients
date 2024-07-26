@@ -93,6 +93,52 @@ var _ = Describe("Basic Forms", func() {
 		Entry("N", "N\n", false),
 	)
 
+	Context("single select", func() {
+
+		var (
+			intID int
+		)
+
+		It("can return an error if no option is selected", func() {
+			input.WriteString("\n")
+
+			err := s.Select(question, options, &answer)
+
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("not provided"))
+			Expect(output.String()).To(ContainSubstring(question))
+			for _, option := range options {
+				Expect(output.String()).To(ContainSubstring(option.Label))
+			}
+		})
+
+		It("can ask a single select question", func() {
+			input.WriteString("yes\n")
+			Expect(s.Select(question, options, &answer)).To(Succeed())
+			Expect(answer).To(Equal("yes"))
+		})
+
+		It("can return an error if no option is selected when getting ids", func() {
+			input.WriteString("\n")
+
+			err := s.SelectID(question, options, &intID)
+
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("not provided"))
+			Expect(output.String()).To(ContainSubstring(question))
+			for _, option := range options {
+				Expect(output.String()).To(ContainSubstring(option.Label))
+			}
+		})
+
+		It("can ask a single select question with ids", func() {
+			input.WriteString("yes\n")
+			Expect(s.SelectID(question, options, &intID)).To(Succeed())
+			Expect(intID).To(Equal(1))
+		})
+
+	})
+
 	Context("multiselect", func() {
 
 		var (
@@ -146,7 +192,7 @@ var _ = Describe("Basic Forms", func() {
 		})
 
 		It("can display an entire form", func() {
-			input.WriteString("some-input\nsensitive-output\nno\nyes,no\nno,yes\n")
+			input.WriteString("some-input\nsensitive-output\nno\nyes,no\nno,yes\none\ntwo\n")
 
 			questions := []forms.Question{
 				{
@@ -182,6 +228,24 @@ var _ = Describe("Basic Forms", func() {
 						{Label: "no", Value: "2"},
 					},
 				},
+				{
+					Key:    "select",
+					Prompt: "Select",
+					Type:   forms.Select,
+					Options: []forms.Option{
+						{Label: "one"},
+						{Label: "two"},
+					},
+				},
+				{
+					Key:    "select-id",
+					Prompt: "Select ID",
+					Type:   forms.SelectID,
+					Options: []forms.Option{
+						{Label: "one", Value: "1"},
+						{Label: "two", Value: "2"},
+					},
+				},
 			}
 
 			answers, err := s.AskQuestions(questions)
@@ -204,6 +268,12 @@ var _ = Describe("Basic Forms", func() {
 
 			Expect(forms.IntSlice(answers["multiselect-ids"])).To(Equal([]int{2, 1}))
 			Expect(output.String()).To(ContainSubstring("Select multiple options with ids"))
+
+			Expect(forms.String(answers["select"])).To(Equal("one"))
+			Expect(output.String()).To(ContainSubstring("Select"))
+
+			Expect(forms.Int(answers["select-id"])).To(Equal(2))
+			Expect(output.String()).To(ContainSubstring("Select ID"))
 		})
 
 	})

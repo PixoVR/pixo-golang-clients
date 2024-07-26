@@ -22,18 +22,14 @@ type GitConfig struct {
 }
 
 type Module struct {
-	ID            int    `json:"id,omitempty"`
-	Name          string `json:"name,omitempty"`
-	Description   string `json:"description,omitempty"`
-	ImageName     string `json:"imageName,omitempty"`
-	ImagePath     string `json:"imagePath,omitempty"`
-	ThumbnailPath string `json:"thumbnailPath,omitempty"`
-	ShortDesc     string `json:"shortDesc,omitempty"`
+	ID          int    `json:"id,omitempty"`
+	Name        string `json:"name,omitempty"`
+	Description string `json:"description,omitempty"`
+	ImageLink   string `json:"imageLink,omitempty"`
+	ShortDesc   string `json:"shortDesc,omitempty"`
 
 	GitConfigID int       `json:"gitConfigId,omitempty"`
 	GitConfig   GitConfig `json:"gitConfig,omitempty"`
-
-	//OrgModules []OrgModule
 
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	UpdatedAt time.Time `json:"updatedAt,omitempty"`
@@ -54,7 +50,39 @@ type ModuleVersion struct {
 	PlatformIds     []int         `json:"platformIds,omitempty"`
 }
 
-func (g *PlatformClient) CreateModuleVersion(ctx context.Context, input ModuleVersion) (*ModuleVersion, error) {
+type ModuleParams struct {
+	Name string `json:"name"`
+}
+
+type GetModulesResponse struct {
+	Modules []Module `json:"modules"`
+}
+
+type CreateModuleResponse struct {
+	Module Module `json:"createModule"`
+}
+
+type CreateModuleVersionResponse struct {
+	ModuleVersion ModuleVersion `json:"createModuleVersion"`
+}
+
+func (p *PlatformClient) GetModules(ctx context.Context, params ...ModuleParams) ([]Module, error) {
+	query := `query modules { modules { id name description imageLink shortDesc gitConfigId gitConfig { provider orgName repoName } createdAt updatedAt } }`
+
+	res, err := p.Client.ExecRaw(ctx, query, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var response GetModulesResponse
+	if err = json.Unmarshal(res, &response); err != nil {
+		return nil, err
+	}
+
+	return response.Modules, nil
+}
+
+func (p *PlatformClient) CreateModuleVersion(ctx context.Context, input ModuleVersion) (*ModuleVersion, error) {
 	query := `mutation createModuleVersion($input: ModuleVersionInput!) { createModuleVersion(input: $input) { id moduleId module { abbreviation } version package status fileLink } }`
 
 	if input.LocalFilePath == "" {
@@ -78,19 +106,17 @@ func (g *PlatformClient) CreateModuleVersion(ctx context.Context, input ModuleVe
 	}
 
 	if input.LocalFilePath == "" {
-		res, err := g.Client.ExecRaw(ctx, query, variables)
+		res, err := p.Client.ExecRaw(ctx, query, variables)
 		if err != nil {
 			return nil, err
 		}
 
-		var response struct {
-			ModuleVersion *ModuleVersion `json:"createModuleVersion"`
-		}
+		var response CreateModuleVersionResponse
 		if err = json.Unmarshal(res, &response); err != nil {
 			return nil, err
 		}
 
-		return response.ModuleVersion, nil
+		return &response.ModuleVersion, nil
 	}
 
 	graphqlRequest := struct {
@@ -136,9 +162,9 @@ func (g *PlatformClient) CreateModuleVersion(ctx context.Context, input ModuleVe
 		return nil, err
 	}
 
-	g.AbstractServiceClient.SetHeader("Content-Type", writer.FormDataContentType())
+	p.AbstractServiceClient.SetHeader("Content-Type", writer.FormDataContentType())
 
-	res, err := g.Post("query", payload.Bytes())
+	res, err := p.Post("query", payload.Bytes())
 	if err != nil {
 		log.Error().Err(err).Msg("error creating multiplayer server version")
 		return nil, err
@@ -149,9 +175,7 @@ func (g *PlatformClient) CreateModuleVersion(ctx context.Context, input ModuleVe
 	}
 
 	var gqlRes struct {
-		Data struct {
-			CreateModuleVersion *ModuleVersion `json:"createModuleVersion"`
-		} `json:"data"`
+		Data   CreateModuleVersionResponse `json:"data"`
 		Errors []struct {
 			Message string `json:"message"`
 		}
@@ -165,5 +189,5 @@ func (g *PlatformClient) CreateModuleVersion(ctx context.Context, input ModuleVe
 		return nil, errors.New(gqlRes.Errors[0].Message)
 	}
 
-	return gqlRes.Data.CreateModuleVersion, nil
+	return &gqlRes.Data.ModuleVersion, nil
 }

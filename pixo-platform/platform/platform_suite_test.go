@@ -22,26 +22,26 @@ var (
 	apiKeyClient *PlatformClient
 	tokenClient  *PlatformClient
 	lifecycle    string
-	pixoUsername string
-	pixoPassword string
-	pixoAPIKey   string
+	username     string
+	password     string
+	apiKey       string
 	moduleID     = 43
 	orgID        = 20
 )
 
 var _ = BeforeSuite(func() {
 	lifecycle = config2.GetEnvOrReturn("TEST_PIXO_LIFECYCLE", "dev")
-	pixoUsername = os.Getenv("TEST_PIXO_USERNAME")
-	pixoPassword = os.Getenv("TEST_PIXO_PASSWORD")
-	pixoAPIKey = os.Getenv("TEST_PIXO_API_KEY")
+	username = os.Getenv("TEST_PIXO_USERNAME")
+	password = os.Getenv("TEST_PIXO_PASSWORD")
+	apiKey = os.Getenv("TEST_PIXO_API_KEY")
 
-	config := urlfinder.ClientConfig{Lifecycle: lifecycle, APIKey: pixoAPIKey}
+	config := urlfinder.ClientConfig{Lifecycle: lifecycle, APIKey: apiKey}
 	apiKeyClient = NewClient(config)
 	Expect(apiKeyClient).NotTo(BeNil())
 	Expect(apiKeyClient.IsAuthenticated()).To(BeTrue())
 
 	var err error
-	tokenClient, err = NewClientWithBasicAuth(pixoUsername, pixoPassword, config)
+	tokenClient, err = NewClientWithBasicAuth(username, password, config)
 	Expect(err).NotTo(HaveOccurred())
 	Expect(tokenClient).NotTo(BeNil())
 	Expect(tokenClient.IsAuthenticated()).To(BeTrue())

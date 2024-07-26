@@ -10,17 +10,21 @@ import (
 var _ = Describe("Sessions and Events", func() {
 
 	var (
-		ctx     = context.Background()
-		session *platform.Session
+		ctx       = context.Background()
+		session   *platform.Session
+		ipAddress = "127.0.0.1"
+		deviceID  = "test"
 	)
 
 	BeforeEach(func() {
-		ctx = context.Background()
-		var err error
+		session = &platform.Session{
+			ModuleID:  moduleID,
+			IPAddress: ipAddress,
+			DeviceID:  deviceID,
+		}
 
-		session, err = tokenClient.CreateSession(ctx, moduleID, "127.0.0.1", "test")
+		Expect(tokenClient.CreateSession(ctx, session)).To(Succeed())
 
-		Expect(err).NotTo(HaveOccurred())
 		Expect(session).NotTo(BeNil())
 		Expect(session.ID).NotTo(BeZero())
 		Expect(session.UserID).NotTo(BeZero())
@@ -64,44 +68,40 @@ var _ = Describe("Sessions and Events", func() {
 		Expect(updatedSession.CompletedAt).NotTo(BeNil())
 		Expect(updatedSession.Duration).NotTo(BeNil())
 	})
-
-	It("can create an event without a payload", func() {
-		input := platform.Event{
-			SessionID: session.ID,
-			Type:      "PIXOVR_SESSION_JOIN",
-		}
-
-		event, err := tokenClient.CreateEvent(ctx, input)
-
-		Expect(err).NotTo(HaveOccurred())
-		Expect(event).NotTo(BeNil())
-		Expect(event.ID).NotTo(BeZero())
-	})
-
 	It("can return an error if the json is invalid", func() {
-		input := platform.Event{
+		event := &platform.Event{
 			SessionID: session.ID,
 			Type:      "PIXOVR_SESSION_JOIN",
 			Payload:   `{"missing": "end bracket"`,
 		}
 
-		event, err := tokenClient.CreateEvent(ctx, input)
+		err := tokenClient.CreateEvent(ctx, event)
 
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("invalid json"))
-		Expect(event).To(BeNil())
+	})
+
+	It("can create an event without a payload", func() {
+		event := &platform.Event{
+			SessionID: session.ID,
+			Type:      "PIXOVR_SESSION_JOIN",
+		}
+
+		Expect(tokenClient.CreateEvent(ctx, event)).To(Succeed())
+
+		Expect(event).NotTo(BeNil())
+		Expect(event.ID).NotTo(BeZero())
 	})
 
 	It("can create an event with a payload", func() {
-		input := platform.Event{
+		event := &platform.Event{
 			SessionID: session.ID,
 			Type:      "PIXOVR_SESSION_JOIN",
 			Payload:   `{"score": 1}`,
 		}
 
-		event, err := tokenClient.CreateEvent(ctx, input)
+		Expect(tokenClient.CreateEvent(ctx, event)).To(Succeed())
 
-		Expect(err).NotTo(HaveOccurred())
 		Expect(event).NotTo(BeNil())
 		Expect(event.ID).NotTo(BeZero())
 	})

@@ -2,7 +2,7 @@ package platform_test
 
 import (
 	"context"
-	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
+	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/go-faker/faker/v4"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -12,13 +12,13 @@ var _ = Describe("Orgs API", func() {
 
 	var (
 		ctx      context.Context
-		orgInput graphql_api.Org
-		testOrg  *graphql_api.Org
+		orgInput platform.Org
+		testOrg  *platform.Org
 	)
 
 	BeforeEach(func() {
 		ctx = context.Background()
-		orgInput = graphql_api.Org{
+		orgInput = platform.Org{
 			Name:       faker.Username(),
 			Type:       "distributor",
 			OpenAccess: false,
@@ -47,5 +47,13 @@ var _ = Describe("Orgs API", func() {
 		Expect(retrievedOrg.ID).To(Equal(testOrg.ID))
 		Expect(retrievedOrg.HubLogoLink).NotTo(BeEmpty())
 	})
+
+	//It("can get all orgs", func() {
+	//	orgs, err := tokenClient.GetOrgs(ctx)
+	//
+	//	Expect(err).NotTo(HaveOccurred())
+	//	Expect(orgs).NotTo(BeNil())
+	//	Expect(len(orgs)).To(BeNumerically(">", 0))
+	//})
 
 })

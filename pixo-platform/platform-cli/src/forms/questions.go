@@ -6,6 +6,8 @@ const (
 	Input QuestionType = iota
 	SensitiveInput
 	Confirm
+	Select
+	SelectID
 	MultiSelect
 	MultiSelectIDs
 )

@@ -187,11 +187,12 @@ pixo auth login --username <username> --password <password>
 ### Create
 ```bash
 pixo users create \
-    --username testuser \
-    --password testpassword \
     --first-name Test \
     --last-name User \
-    --org-id 1 \
+    --user-email testuser@example.com \
+    --user-username testuser \
+    --user-password testpassword \
+    --org 1 \
     --role developer
 ```
 
@@ -215,7 +216,7 @@ pixo keys list --user-id 1
 
 ### Delete
 ```bash
-pixo keys delete --key-id 1
+pixo keys delete --key-ids 1
 ```
 
 ## Modules
@@ -252,19 +253,19 @@ pixo webhooks delete --webhook-id 1
 
 ### Start a Session
 ```bash
-pixo sessions start --module-id 1
+pixo sessions simulate --module-id 1
 ```
 
 ### End a Session
 ```bash
-# Using current session ID
+# Using current session id stored in config after starting a session
 pixo sessions end \
   --score 1 \
   --max-score 2
 ```
 
 ```bash
-# Or with session ID as input
+# Or with session id as input
 pixo sessions end \
   --session-id 123 \
   --score 1 \
@@ -315,7 +316,7 @@ session-id: FB0HIFBMY8NAME99IS7C3WALKERB4D76
 owning-user-name: PixoServer
 server-version: 1.00.00
 module-id: 1
-org-id: 1
+org: 1
 ```
 
 You could even use the Pixo CLI to test the mock server (run [simple agones server](https://github.com/PixoVR/multiplayer-gameservers/tree/dev/simple-server) locally to test the example below):
@@ -390,6 +391,8 @@ steps:
       - build
       - -t
       - gcr.io/${PROJECT_ID}/${_LIFECYCLE}/${_PROJECT_NAME}:latest
+      - -t
+      - gcr.io/${PROJECT_ID}/${_LIFECYCLE}/${_PROJECT_NAME}:${COMMIT_SHA}
 
   - name: "gcr.io/pixo-bootstrap/pixo-platform-cli:0.0.177"
     id: "Deploy MP Server Version"
@@ -410,6 +413,11 @@ availableSecrets:
   secretManager:
     - versionName: projects/$PROJECT_ID/secrets/$SECRET_NAME/versions/latest
       env: PIXO_API_KEY
+      
+images:
+  - gcr.io/${PROJECT_ID}/${_LIFECYCLE}/${_PROJECT_NAME}:${COMMIT_SHA}
+
+
 ```
 
 

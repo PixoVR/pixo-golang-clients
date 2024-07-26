@@ -1,6 +1,9 @@
 package forms
 
-import "reflect"
+import (
+	"reflect"
+	"strconv"
+)
 
 func String(stringOrPtr interface{}) string {
 	v := reflect.ValueOf(stringOrPtr)
@@ -48,6 +51,14 @@ func Int(stringOrPtr interface{}) int {
 
 	if v.Kind() == reflect.Int {
 		return int(v.Int())
+	}
+
+	if v.Kind() == reflect.String {
+		i, err := strconv.Atoi(v.String())
+		if err != nil {
+			return 0
+		}
+		return i
 	}
 
 	return 0

@@ -11,15 +11,19 @@ import (
 var _ = Describe("Platform API", func() {
 
 	It("can login and interact with the api", func() {
-		config := urlfinder.ClientConfig{Lifecycle: lifecycle, APIKey: pixoAPIKey}
+		config := urlfinder.ClientConfig{Lifecycle: lifecycle, APIKey: apiKey}
 		client := NewClient(config)
 		Expect(client).NotTo(BeNil())
 
-		Expect(client.Login(pixoUsername, pixoPassword)).To(Succeed())
+		Expect(client.Login(username, password)).To(Succeed())
 		Expect(client.IsAuthenticated()).To(BeTrue())
 		Expect(client.GetToken()).NotTo(BeEmpty())
 
-		session, err := client.CreateSession(context.Background(), moduleID, "127.0.0.1", "test")
+		session := &Session{
+			ModuleID:  moduleID,
+			IPAddress: "localhost",
+		}
+		err := client.CreateSession(context.Background(), session)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(session).NotTo(BeNil())
 		Expect(session.ID).NotTo(BeZero())

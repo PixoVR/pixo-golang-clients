@@ -19,7 +19,7 @@ func (c *ConfigManager) GetValuesOrSubmitForm(values []Value, cmd *cobra.Command
 
 	for _, value := range values {
 		switch value.Type {
-		case forms.Input, forms.SensitiveInput:
+		case forms.Input, forms.SensitiveInput, forms.Select:
 			val, ok := c.GetFlagOrConfigValue(value.Question.Key, cmd)
 			if ok {
 				vals[value.Question.Key] = forms.String(val)
@@ -30,6 +30,13 @@ func (c *ConfigManager) GetValuesOrSubmitForm(values []Value, cmd *cobra.Command
 			val, ok := c.GetBoolFlagOrConfigValue(value.Question.Key, cmd)
 			if ok {
 				vals[value.Question.Key] = forms.Bool(val)
+			} else {
+				questions = append(questions, value.Question)
+			}
+		case forms.SelectID:
+			val, ok := c.GetIntFlagOrConfigValue(value.Question.Key, cmd)
+			if ok {
+				vals[value.Question.Key] = forms.Int(val)
 			} else {
 				questions = append(questions, value.Question)
 			}

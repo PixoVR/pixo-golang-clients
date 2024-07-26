@@ -7,7 +7,7 @@ threshold:
 
   package: 0
 
-  total: 62
+  total: 64
 
 exclude:
   paths:

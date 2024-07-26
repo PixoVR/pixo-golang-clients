@@ -41,6 +41,13 @@ var _ = Describe("Modules", func() {
 		Expect(err).To(HaveOccurred())
 	})
 
+	It("can get modules", func() {
+		modules, err := tokenClient.GetModules(ctx)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(modules).NotTo(BeEmpty())
+		Expect(modules[0].ID).NotTo(BeZero())
+	})
+
 	It("can create a module version", func() {
 		cleanup := makeTestFile(localFilePath)
 		defer cleanup()

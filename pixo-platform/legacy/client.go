@@ -1,48 +1,49 @@
 package legacy
 
 import (
-	abstractClient "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
+	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 )
 
-type OldAPIClient interface {
+type LegacyClient interface {
 	Login(username, password string) error
+	GetOrgs() ([]Org, error)
 	CreateWebhook(webhook Webhook) error
 	GetWebhooks(orgID int) ([]Webhook, error)
 	DeleteWebhook(webhookID int) error
 }
 
-// LegacyAPIClient is a struct for the primary API that contains an abstract client
-type LegacyAPIClient struct {
-	abstractClient.AbstractServiceClient
+// Client is a struct for the primary API that contains an abstract client
+type Client struct {
+	abstract.AbstractServiceClient
 }
 
 // NewClient is a function that returns a AbstractServiceClient
-func NewClient(config urlfinder.ClientConfig) *LegacyAPIClient {
+func NewClient(config urlfinder.ClientConfig) *Client {
 
 	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
 
-	abstractConfig := abstractClient.AbstractConfig{
+	abstractConfig := abstract.AbstractConfig{
 		ServiceConfig: serviceConfig,
 		Token:         config.Token,
 	}
 
-	return &LegacyAPIClient{
-		AbstractServiceClient: *abstractClient.NewClient(abstractConfig),
+	return &Client{
+		AbstractServiceClient: *abstract.NewClient(abstractConfig),
 	}
 }
 
 // NewClientWithBasicAuth is a function that returns a AbstractServiceClient with basic auth performed
-func NewClientWithBasicAuth(username, password string, config urlfinder.ClientConfig) (*LegacyAPIClient, error) {
+func NewClientWithBasicAuth(username, password string, config urlfinder.ClientConfig) (*Client, error) {
 
 	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
 
-	abstractConfig := abstractClient.AbstractConfig{
+	abstractConfig := abstract.AbstractConfig{
 		ServiceConfig: serviceConfig,
 	}
 
-	primaryClient := &LegacyAPIClient{
-		AbstractServiceClient: *abstractClient.NewClient(abstractConfig),
+	primaryClient := &Client{
+		AbstractServiceClient: *abstract.NewClient(abstractConfig),
 	}
 
 	if err := primaryClient.Login(username, password); err != nil {
@@ -52,7 +53,7 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 	return primaryClient, nil
 }
 
-func (p *LegacyAPIClient) ActiveUserID() int {
+func (p *Client) ActiveUserID() int {
 	return 0
 }
 

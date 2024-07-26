@@ -20,6 +20,7 @@ var _ = Describe("Heartbeat", Ordered, func() {
 		}
 		username = os.Getenv("TEST_PIXO_USERNAME")
 		password = os.Getenv("TEST_PIXO_PASSWORD")
+		moduleID = 43
 	)
 
 	BeforeEach(func() {
@@ -46,9 +47,15 @@ var _ = Describe("Heartbeat", Ordered, func() {
 	It("should be able to create a session and send a pulse", func() {
 		platformClient, err := platform.NewClientWithBasicAuth(username, password, config)
 		Expect(err).NotTo(HaveOccurred())
-		session, err := platformClient.CreateSession(context.Background(), 43, "127.0.0.1", "test")
+		session := &platform.Session{
+			ModuleID:  moduleID,
+			IPAddress: "localhost",
+			DeviceID:  "test",
+		}
+		Expect(platformClient.CreateSession(context.Background(), session)).To(Succeed())
 		Expect(err).NotTo(HaveOccurred())
 		Expect(session).NotTo(BeNil())
+
 		Expect(heartbeatClient.SendPulse(session.ID)).NotTo(HaveOccurred())
 	})
 

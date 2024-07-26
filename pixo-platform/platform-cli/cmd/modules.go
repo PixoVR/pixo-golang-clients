@@ -20,4 +20,5 @@ var modulesCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(modulesCmd)
+	modulesCmd.PersistentFlags().IntP("module-id", "m", 0, "Module ID")
 }

@@ -7,7 +7,7 @@ import (
 )
 
 // CreateWebhook creates a webhook with the given description and endpoint.
-func (p *LegacyAPIClient) CreateWebhook(input Webhook) error {
+func (p *Client) CreateWebhook(input Webhook) error {
 	url := p.GetURLWithPath("api/webhook")
 
 	res, err := p.FormatRequest().
@@ -25,7 +25,7 @@ func (p *LegacyAPIClient) CreateWebhook(input Webhook) error {
 }
 
 // GetWebhooks returns a list of webhooks.
-func (p *LegacyAPIClient) GetWebhooks(orgID int) ([]Webhook, error) {
+func (p *Client) GetWebhooks(orgID int) ([]Webhook, error) {
 	url := p.GetURLWithPath(fmt.Sprintf("api/webhooks/org/%d", orgID))
 
 	res, err := p.FormatRequest().
@@ -52,7 +52,7 @@ func (p *LegacyAPIClient) GetWebhooks(orgID int) ([]Webhook, error) {
 }
 
 // DeleteWebhook deletes a webhook with the given ID.
-func (p *LegacyAPIClient) DeleteWebhook(id int) error {
+func (p *Client) DeleteWebhook(id int) error {
 	url := p.GetURLWithPath(fmt.Sprintf("api/webhook/%d", id))
 
 	res, err := p.FormatRequest().

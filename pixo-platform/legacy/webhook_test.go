@@ -12,7 +12,7 @@ import (
 var _ = Describe("Webhook", Ordered, func() {
 
 	var (
-		primaryAPIClient *primary_api.LegacyAPIClient
+		primaryAPIClient *primary_api.Client
 		webhook          = primary_api.Webhook{
 			OrgID:       20,
 			Description: "test-webhook",

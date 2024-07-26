@@ -262,17 +262,112 @@ var _ = Describe("Config Manager", func() {
 			Expect(val).To(Equal(false))
 		})
 
-		It("can use a form to get values from the user if they're not supplied", func() {
-			input.WriteString("some-val\nno\none,two\ntwo,one\n")
+		It("can use a form to get input values from the user if they're not supplied", func() {
+			input.WriteString("some-val\n")
 			configManager.SetConfigValue("config-key", "config-val")
-			configManager.SetConfigValue("config-confirm", "yes")
-			configManager.SetConfigValue("config-multiselect", "three,four")
-			configManager.SetConfigValue("config-multiselect-ids", "4,3")
 			questions := []config.Value{
 				{Question: forms.Question{Type: forms.Input, Key: "val", Prompt: "Enter val: "}},
 				{Question: forms.Question{Type: forms.SensitiveInput, Key: "config-key", Prompt: "Enter config val: "}},
+			}
+
+			answers, err := configManager.GetValuesOrSubmitForm(questions, &cobra.Command{})
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(answers).To(HaveLen(len(questions)))
+
+			Expect(forms.String(answers["val"])).To(Equal("some-val"))
+			Expect(output.String()).To(ContainSubstring("Enter val: "))
+
+			Expect(answers).To(HaveKeyWithValue("config-key", "config-val"))
+			Expect(output.String()).NotTo(ContainSubstring("Enter config val: "))
+		})
+
+		It("can use a form to get confirm values from the user if they're not supplied", func() {
+			input.WriteString("no\n")
+			configManager.SetConfigValue("config-confirm", "yes")
+			questions := []config.Value{
 				{Question: forms.Question{Type: forms.Confirm, Key: "confirm", Prompt: "Enter confirm val: "}},
 				{Question: forms.Question{Type: forms.Confirm, Key: "config-confirm", Prompt: "Enter config confirm val: "}},
+			}
+
+			answers, err := configManager.GetValuesOrSubmitForm(questions, &cobra.Command{})
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(answers).To(HaveLen(len(questions)))
+
+			Expect(forms.Bool(answers["confirm"])).To(BeFalse())
+			Expect(output.String()).To(ContainSubstring("Enter confirm val: "))
+
+			Expect(forms.Bool(answers["config-confirm"])).To(BeTrue())
+			Expect(output.String()).NotTo(ContainSubstring("Enter confirm config val: "))
+		})
+
+		It("can use a form to get select values from the user if they're not supplied", func() {
+			input.WriteString("one\nthree\n")
+			configManager.SetConfigValue("config-select", "two")
+			configManager.SetConfigValue("config-select-id", "4")
+			questions := []config.Value{
+				{Question: forms.Question{
+					Type:   forms.Select,
+					Key:    "select",
+					Prompt: "Enter select val: ",
+					Options: []forms.Option{
+						{Label: "one"},
+						{Label: "two"},
+					},
+				}},
+				{Question: forms.Question{
+					Type:   forms.Select,
+					Key:    "config-select",
+					Prompt: "Enter config select vals: ",
+					Options: []forms.Option{
+						{Label: "one"},
+						{Label: "two"},
+					},
+				}},
+				{Question: forms.Question{
+					Type:   forms.SelectID,
+					Key:    "select-id",
+					Prompt: "Enter select id val: ",
+					Options: []forms.Option{
+						{Label: "three", Value: "3"},
+						{Label: "four", Value: "4"},
+					},
+				}},
+				{Question: forms.Question{
+					Type:   forms.SelectID,
+					Key:    "config-select-id",
+					Prompt: "Enter config select id vals: ",
+					Options: []forms.Option{
+						{Label: "three", Value: "3"},
+						{Label: "four", Value: "4"},
+					},
+				}},
+			}
+
+			answers, err := configManager.GetValuesOrSubmitForm(questions, &cobra.Command{})
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(answers).To(HaveLen(len(questions)))
+
+			Expect(forms.String(answers["select"])).To(Equal("one"))
+			Expect(output.String()).To(ContainSubstring("Enter select val: "))
+
+			Expect(forms.String(answers["config-select"])).To(Equal("two"))
+			Expect(output.String()).NotTo(ContainSubstring("Enter config select vals: "))
+
+			Expect(forms.Int(answers["select-id"])).To(Equal(3))
+			Expect(output.String()).To(ContainSubstring("Enter select id val: "))
+
+			Expect(forms.Int(answers["config-select-id"])).To(Equal(4))
+			Expect(output.String()).NotTo(ContainSubstring("Enter config select id vals: "))
+		})
+
+		It("can use a form to get multiselect values from the user if they're not supplied", func() {
+			input.WriteString("one,two\ntwo,one\n")
+			configManager.SetConfigValue("config-multiselect", "three,four")
+			configManager.SetConfigValue("config-multiselect-ids", "4,3")
+			questions := []config.Value{
 				{Question: forms.Question{
 					Type:   forms.MultiSelect,
 					Key:    "multiselect",
@@ -315,18 +410,6 @@ var _ = Describe("Config Manager", func() {
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(answers).To(HaveLen(len(questions)))
-
-			Expect(forms.String(answers["val"])).To(Equal("some-val"))
-			Expect(output.String()).To(ContainSubstring("Enter val: "))
-
-			Expect(answers).To(HaveKeyWithValue("config-key", "config-val"))
-			Expect(output.String()).NotTo(ContainSubstring("Enter config val: "))
-
-			Expect(forms.Bool(answers["confirm"])).To(BeFalse())
-			Expect(output.String()).To(ContainSubstring("Enter confirm val: "))
-
-			Expect(forms.Bool(answers["config-confirm"])).To(BeTrue())
-			Expect(output.String()).NotTo(ContainSubstring("Enter confirm config val: "))
 
 			Expect(forms.StringSlice(answers["multiselect"])).To(Equal([]string{"one", "two"}))
 			Expect(output.String()).To(ContainSubstring("Enter multiselect vals: "))

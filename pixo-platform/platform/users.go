@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
 	"time"
 )
 
@@ -25,52 +24,61 @@ type User struct {
 }
 
 type GetUserResponse struct {
-	User platform.User `json:"user"`
+	User User `json:"user"`
 }
 
 type CreateUserResponse struct {
-	User platform.User `json:"createUser"`
+	User User `json:"createUser"`
 }
 
 type UpdateUserResponse struct {
-	User platform.User `json:"updateUser"`
+	User User `json:"updateUser"`
 }
 
 type DeleteUserResponse struct {
 	Success bool `json:"deleteUser"`
 }
 
-func (g *PlatformClient) CreateUser(ctx context.Context, user platform.User) (*platform.User, error) {
-	query := `mutation createUser($input: UserInput!) { createUser(input: $input) { id orgId firstName lastName username role } }`
+func (p *PlatformClient) CreateUser(ctx context.Context, user *User) error {
+	if user == nil {
+		return errors.New("user is nil")
+	}
+
+	query := `mutation createUser($input: UserInput!) { createUser(input: $input) { id firstName lastName username email role orgId org { id name }  } }`
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{
 			"firstName": user.FirstName,
 			"lastName":  user.LastName,
 			"username":  user.Username,
+			"email":     user.Email,
 			"password":  user.Password,
 			"orgId":     user.OrgID,
 			"role":      user.Role,
 		},
 	}
 
-	res, err := g.Client.ExecRaw(ctx, query, variables)
+	res, err := p.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	var userResponse CreateUserResponse
 	if err = json.Unmarshal(res, &userResponse); err != nil {
-		return nil, err
+		return err
 	}
 
-	return &userResponse.User, nil
+	*user = userResponse.User
+	return nil
 }
 
-func (g *PlatformClient) UpdateUser(ctx context.Context, user platform.User) (*platform.User, error) {
+func (p *PlatformClient) UpdateUser(ctx context.Context, user *User) error {
+	if user == nil {
+		return errors.New("user is nil")
+	}
 
 	if user.ID == 0 {
-		return nil, errors.New("user id is required")
+		return errors.New("user id is required")
 	}
 
 	query := `mutation updateUser($input: UserInput!) { updateUser(input: $input) { id firstName lastName username role orgId } }`
@@ -105,27 +113,28 @@ func (g *PlatformClient) UpdateUser(ctx context.Context, user platform.User) (*p
 		variables["input"].(map[string]interface{})["role"] = user.Role
 	}
 
-	res, err := g.Client.ExecRaw(ctx, query, variables)
+	res, err := p.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	var userResponse UpdateUserResponse
 	if err = json.Unmarshal(res, &userResponse); err != nil {
-		return nil, err
+		return err
 	}
 
-	return &userResponse.User, nil
+	*user = userResponse.User
+	return nil
 }
 
-func (g *PlatformClient) DeleteUser(ctx context.Context, id int) error {
+func (p *PlatformClient) DeleteUser(ctx context.Context, id int) error {
 	query := `mutation deleteUser($id: ID!) { deleteUser(id: $id) }`
 
 	variables := map[string]interface{}{
 		"id": id,
 	}
 
-	res, err := g.Client.ExecRaw(ctx, query, variables)
+	res, err := p.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return err
 	}
@@ -142,14 +151,14 @@ func (g *PlatformClient) DeleteUser(ctx context.Context, id int) error {
 	return nil
 }
 
-func (g *PlatformClient) GetUserByUsername(ctx context.Context, username string) (*platform.User, error) {
+func (p *PlatformClient) GetUserByUsername(ctx context.Context, username string) (*User, error) {
 	query := `query user($id: ID, $username: String) { user(id: $id, username: $username) { id username firstName lastName orgId role } }`
 
 	variables := map[string]interface{}{
 		"username": username,
 	}
 
-	res, err := g.Client.ExecRaw(ctx, query, variables)
+	res, err := p.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return nil, err
 	}

@@ -7,7 +7,7 @@ import (
 )
 
 // Login performs a login request to the API
-func (p *LegacyAPIClient) Login(username, password string) error {
+func (p *Client) Login(username, password string) error {
 	url := p.GetURLWithPath("login")
 
 	loginInput := LoginRequest{

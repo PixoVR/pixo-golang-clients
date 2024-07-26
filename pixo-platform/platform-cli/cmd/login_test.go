@@ -32,7 +32,7 @@ var _ = Describe("Login", func() {
 		userID, ok := executor.ConfigManager.GetConfigValue("user-id")
 		Expect(ok).To(BeTrue())
 		Expect(userID).To(Equal(fmt.Sprint(executor.MockPlatformClient.ActiveUserID())))
-		orgID, ok := executor.ConfigManager.GetConfigValue("org-id")
+		orgID, ok := executor.ConfigManager.GetConfigValue("org")
 		Expect(ok).To(BeTrue())
 		Expect(orgID).To(Equal(fmt.Sprint(executor.MockPlatformClient.ActiveOrgID())))
 	})
@@ -75,7 +75,7 @@ func (t *TestExecutor) ExpectLoginToSucceed(username, password string) {
 	userID, ok := t.ConfigManager.GetConfigValue("user-id")
 	Expect(ok).To(BeTrue())
 	Expect(userID).To(Equal(fmt.Sprint(t.MockPlatformClient.ActiveUserID())))
-	orgID, ok := t.ConfigManager.GetConfigValue("org-id")
+	orgID, ok := t.ConfigManager.GetConfigValue("org")
 	Expect(ok).To(BeTrue())
 	Expect(orgID).To(Equal(fmt.Sprint(t.MockPlatformClient.ActiveOrgID())))
 }

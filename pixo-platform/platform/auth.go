@@ -17,15 +17,15 @@ type LoginResponse struct {
 }
 
 // Login performs a login request to the API
-func (g *PlatformClient) Login(username, password string) error {
-	url := g.GetURLWithPath("auth/login")
+func (p *PlatformClient) Login(username, password string) error {
+	url := p.GetURLWithPath("auth/login")
 
 	loginInput := LoginRequest{
 		Login:    username,
 		Password: password,
 	}
 
-	res, err := g.FormatRequest().
+	res, err := p.FormatRequest().
 		SetHeader("Content-Type", "application/json").
 		SetBody(loginInput).
 		Post(url)
@@ -42,7 +42,7 @@ func (g *PlatformClient) Login(username, password string) error {
 		return errors.New(string(res.Body()))
 	}
 
-	g.SetToken(loginResponse.Token)
+	p.SetToken(loginResponse.Token)
 
 	return nil
 }

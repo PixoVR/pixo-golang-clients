@@ -31,21 +31,31 @@ func (f *Handler) AskQuestions(questions []forms.Question) (map[string]interface
 			var response bool
 			answers[question.Key] = &response
 			groupItems = append(groupItems, f.ConfirmField(prompt, &response))
-		case forms.MultiSelectIDs:
-			var response []int
+		case forms.Select:
+			var response string
 			answers[question.Key] = &response
-			groupItems = append(groupItems, f.MultiSelectIDsInput(prompt, question.Options, &response))
+			groupItems = append(groupItems, f.SelectInput(prompt, question.Options, &response))
+		case forms.SelectID:
+			var response int
+			answers[question.Key] = &response
+			groupItems = append(groupItems, f.SelectIDInput(prompt, question.Options, &response))
 		case forms.MultiSelect:
 			var response []string
 			answers[question.Key] = &response
 			groupItems = append(groupItems, f.MultiSelectInput(prompt, question.Options, &response))
+		case forms.MultiSelectIDs:
+			var response []int
+			answers[question.Key] = &response
+			groupItems = append(groupItems, f.MultiSelectIDsInput(prompt, question.Options, &response))
 		default:
 			return nil, errors.New("unknown question type")
 		}
 	}
 
-	if err := huh.NewForm(huh.NewGroup(groupItems...)).Run(); err != nil {
-		return nil, err
+	if len(groupItems) > 0 {
+		if err := huh.NewForm(huh.NewGroup(groupItems...)).Run(); err != nil {
+			return nil, err
+		}
 	}
 
 	return answers, nil

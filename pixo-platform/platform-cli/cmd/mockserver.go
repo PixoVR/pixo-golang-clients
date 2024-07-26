@@ -28,7 +28,7 @@ var mockserverCmd = &cobra.Command{
 			moduleID = 1
 		}
 		serverVersion, _ := Ctx.ConfigManager.GetFlagOrConfigValue("server-version", cmd)
-		orgID, _ := Ctx.ConfigManager.GetIntFlagOrConfigValue("org-id", cmd)
+		orgID, _ := Ctx.ConfigManager.GetIntFlagOrConfigValue("org", cmd)
 		sessionName, _ := Ctx.ConfigManager.GetFlagOrConfigValue("session-name", cmd)
 		sessionID, _ := Ctx.ConfigManager.GetFlagOrConfigValue("session-id", cmd)
 		owningUserName, _ := Ctx.ConfigManager.GetFlagOrConfigValue("owning-user-name", cmd)
@@ -71,5 +71,5 @@ func init() {
 	mockserverCmd.Flags().StringP("session-name", "n", "Test", "Name of the session to be returned in the response")
 	mockserverCmd.Flags().StringP("session-id", "i", "FB0HIFBMY8NAME99IS7C3WALKERB4D76", "ID of the session to be returned in the response")
 	mockserverCmd.Flags().StringP("owning-user-name", "u", "PixoServer", "Name of the user that owns the session to be returned in the response")
-	mockserverCmd.Flags().IntP("org-id", "o", 1, "Org ID to be returned in the response")
+	mockserverCmd.Flags().IntP("org", "o", 1, "Org ID to be returned in the response")
 }

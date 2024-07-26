@@ -3,8 +3,9 @@ package ctx
 import (
 	"context"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/headset"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
-	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/config"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/editor"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
@@ -24,6 +25,7 @@ type CLIContext struct {
 	FileOpener        editor.FileOpener
 	HeadsetClient     headset.Client
 	PlatformClient    platform.Client
+	LegacyClient      legacy.LegacyClient
 	MatchmakingClient matchmaker.Matchmaker
 }
 
@@ -60,6 +62,7 @@ func NewCLIContextWithConfig(configFiles ...string) *CLIContext {
 		HeadsetClient:     headset.NewClient(clientConfig),
 		PlatformClient:    platform.NewClient(clientConfig),
 		MatchmakingClient: matchmaker.NewClient(clientConfig),
+		LegacyClient:      legacy.NewClient(clientConfig),
 		FileOpener:        editor.NewFileOpener(""),
 	}
 }
@@ -118,6 +121,6 @@ func (p *CLIContext) Authenticate(cmd *cobra.Command) error {
 
 	p.ConfigManager.SetConfigValue("token", p.PlatformClient.GetToken())
 	p.ConfigManager.SetIntConfigValue("user-id", p.PlatformClient.ActiveUserID())
-	p.ConfigManager.SetIntConfigValue("org-id", p.PlatformClient.ActiveUserID())
+	p.ConfigManager.SetIntConfigValue("org", p.PlatformClient.ActiveUserID())
 	return nil
 }

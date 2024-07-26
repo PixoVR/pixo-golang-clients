@@ -8,8 +8,8 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestPrimaryApi(t *testing.T) {
+func TestLegacyAPI(t *testing.T) {
 	RegisterFailHandler(Fail)
 	env.SourceProjectEnv()
-	RunSpecs(t, "Primary API Suite")
+	RunSpecs(t, "Legacy API Suite")
 }

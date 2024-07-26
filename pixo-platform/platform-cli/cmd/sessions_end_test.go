@@ -18,7 +18,7 @@ var _ = Describe("Sessions End", func() {
 	})
 
 	It("can return an error if the session id is missing", func() {
-		input := bytes.NewReader([]byte(""))
+		input := bytes.NewBufferString("")
 
 		output, err := executor.RunCommandWithInput(
 			input,
@@ -26,28 +26,13 @@ var _ = Describe("Sessions End", func() {
 			"end",
 		)
 
-		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring("Enter SESSION ID:"))
-		Expect(output).To(ContainSubstring("Session ID not provided"))
-	})
-
-	It("can return an error if the module id is missing", func() {
-		input := bytes.NewReader([]byte("1"))
-
-		output, err := executor.RunCommandWithInput(
-			input,
-			"sessions",
-			"end",
-		)
-
-		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring("Enter SESSION ID:"))
-		Expect(output).To(ContainSubstring("Enter MODULE ID:"))
-		Expect(output).To(ContainSubstring("Module ID not provided"))
+		Expect(err).To(HaveOccurred())
+		Expect(err).To(MatchError("SESSION ID not provided"))
+		Expect(output).To(ContainSubstring("SESSION ID:"))
 	})
 
 	It("can return an error if the update session api call fails", func() {
-		executor.MockPlatformClient.UpdateSessionError = errors.New("error")
+		executor.MockPlatformClient.UpdateSessionError = errors.New("update error")
 
 		output, err := executor.RunCommand(
 			"sessions",
@@ -57,7 +42,7 @@ var _ = Describe("Sessions End", func() {
 		)
 
 		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring("error"))
+		Expect(output).To(ContainSubstring("update error"))
 		Expect(executor.MockPlatformClient.NumCalledUpdateSession).To(Equal(1))
 	})
 

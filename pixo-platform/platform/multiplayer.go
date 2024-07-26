@@ -15,23 +15,23 @@ import (
 	"path/filepath"
 )
 
-func (g *PlatformClient) GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]*MultiplayerServerConfigQueryParams, error) {
+func (p *PlatformClient) GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]*MultiplayerServerConfigQueryParams, error) {
 
 	variables := map[string]interface{}{
 		"params": params,
 	}
 
 	var query MultiplayerServerConfigQuery
-	if err := g.Client.Query(ctx, &query, variables); err != nil {
+	if err := p.Client.Query(ctx, &query, variables); err != nil {
 		return nil, err
 	}
 
 	return query.MultiplayerServerConfigs, nil
 }
 
-func (g *PlatformClient) GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionQueryParams) ([]*MultiplayerServerVersion, error) {
+func (p *PlatformClient) GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionQueryParams) ([]*MultiplayerServerVersion, error) {
 
-	configs, err := g.GetMultiplayerServerConfigs(ctx, &MultiplayerServerConfigParams{
+	configs, err := p.GetMultiplayerServerConfigs(ctx, &MultiplayerServerConfigParams{
 		ModuleID:      params.ModuleID,
 		ServerVersion: params.SemanticVersion,
 	})
@@ -56,14 +56,14 @@ func (g *PlatformClient) GetMultiplayerServerVersions(ctx context.Context, param
 	return res, nil
 }
 
-func (g *PlatformClient) GetMultiplayerServerVersion(ctx context.Context, versionID int) (*MultiplayerServerVersion, error) {
+func (p *PlatformClient) GetMultiplayerServerVersion(ctx context.Context, versionID int) (*MultiplayerServerVersion, error) {
 	query := `query multiplayerServerVersion($id: ID!) { multiplayerServerVersion(id: $id) { id moduleId imageRegistry engine status semanticVersion module { name } } }`
 
 	variables := map[string]interface{}{
 		"id": versionID,
 	}
 
-	res, err := g.Client.ExecRaw(ctx, query, variables)
+	res, err := p.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (g *PlatformClient) GetMultiplayerServerVersion(ctx context.Context, versio
 	return response.MultiplayerServerVersion, nil
 }
 
-func (g *PlatformClient) CreateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error) {
+func (p *PlatformClient) CreateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error) {
 	query := `mutation createMultiplayerServerVersion($input: MultiplayerServerVersionInput!) { createMultiplayerServerVersion(input: $input) { id imageRegistry fileLink semanticVersion engine module { name } } }`
 
 	if input.ImageRegistry == "" && input.LocalFilePath == "" {
@@ -100,7 +100,7 @@ func (g *PlatformClient) CreateMultiplayerServerVersion(ctx context.Context, inp
 	}
 
 	if input.LocalFilePath == "" {
-		res, err := g.Client.ExecRaw(ctx, query, variables)
+		res, err := p.Client.ExecRaw(ctx, query, variables)
 		if err != nil {
 			return nil, err
 		}
@@ -158,9 +158,9 @@ func (g *PlatformClient) CreateMultiplayerServerVersion(ctx context.Context, inp
 		return nil, err
 	}
 
-	g.AbstractServiceClient.SetHeader("Content-Type", writer.FormDataContentType())
+	p.AbstractServiceClient.SetHeader("Content-Type", writer.FormDataContentType())
 
-	res, err := g.Post("query", payload.Bytes())
+	res, err := p.Post("query", payload.Bytes())
 	if err != nil {
 		log.Error().Err(err).Msg("error creating multiplayer server version")
 		return nil, err

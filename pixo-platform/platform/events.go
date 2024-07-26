@@ -3,6 +3,7 @@ package platform
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"time"
 )
 
@@ -28,14 +29,14 @@ type EventResponse struct {
 	Event Event `json:"event"`
 }
 
-func (g *PlatformClient) GetEvent(ctx context.Context, id int) (*Event, error) {
+func (p *PlatformClient) GetEvent(ctx context.Context, id int) (*Event, error) {
 	query := `query event($id: ID!) { event(id: $id) { id session } }`
 
 	variables := map[string]interface{}{
 		"id": id,
 	}
 
-	res, err := g.Client.ExecRaw(ctx, query, variables)
+	res, err := p.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +49,11 @@ func (g *PlatformClient) GetEvent(ctx context.Context, id int) (*Event, error) {
 	return &sessionResponse.Event, nil
 }
 
-func (g *PlatformClient) CreateEvent(ctx context.Context, event Event) (*Event, error) {
+func (p *PlatformClient) CreateEvent(ctx context.Context, event *Event) error {
+	if event == nil {
+		return errors.New("event is nil")
+	}
+
 	query := `mutation createEvent($input: EventInput!) { createEvent(input: $input) { id } }`
 
 	variables := map[string]interface{}{
@@ -64,20 +69,21 @@ func (g *PlatformClient) CreateEvent(ctx context.Context, event Event) (*Event, 
 		variables["input"].(map[string]interface{})["jsonData"] = "{}"
 	}
 
-	res, err := g.Client.ExecRaw(ctx, query, variables)
+	res, err := p.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	var eventResponse CreateEventResponse
 	if err = json.Unmarshal(res, &eventResponse); err != nil {
-		return nil, err
+		return err
 	}
 
-	return &eventResponse.Event, nil
+	*event = eventResponse.Event
+	return nil
 }
 
-func (g *PlatformClient) UpdateEvent(ctx context.Context, session Event) (*Event, error) {
+func (p *PlatformClient) UpdateEvent(ctx context.Context, session Event) (*Event, error) {
 	query := `mutation updateEvent($input: EventInput!) { updateEvent(input: $input) { id sessionId } }`
 
 	variables := map[string]interface{}{
@@ -86,7 +92,7 @@ func (g *PlatformClient) UpdateEvent(ctx context.Context, session Event) (*Event
 		},
 	}
 
-	res, err := g.Client.ExecRaw(ctx, query, variables)
+	res, err := p.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return nil, err
 	}

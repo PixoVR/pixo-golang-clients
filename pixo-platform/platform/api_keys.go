@@ -33,7 +33,7 @@ type DeleteAPIKeyResponse struct {
 	Success bool `json:"deleteApiKey"`
 }
 
-func (g *PlatformClient) CreateAPIKey(ctx context.Context, input APIKey) (*APIKey, error) {
+func (p *PlatformClient) CreateAPIKey(ctx context.Context, input APIKey) (*APIKey, error) {
 	query := `mutation createApiKey($input: ApiKeyInput!) { createApiKey(input: $input) { id key userId user { role } } }`
 
 	variables := map[string]interface{}{
@@ -46,7 +46,7 @@ func (g *PlatformClient) CreateAPIKey(ctx context.Context, input APIKey) (*APIKe
 		}
 	}
 
-	res, err := g.Client.ExecRaw(ctx, query, variables)
+	res, err := p.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (g *PlatformClient) CreateAPIKey(ctx context.Context, input APIKey) (*APIKe
 	return &apiKeyResponse.APIKey, nil
 }
 
-func (g *PlatformClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) ([]APIKey, error) {
+func (p *PlatformClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) ([]APIKey, error) {
 	query := `query apiKeys($params: ApiKeyParams) { apiKeys(params: $params) { id key userId user { username email role } } }`
 
 	variables := map[string]interface{}{
@@ -72,7 +72,7 @@ func (g *PlatformClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryPara
 		}
 	}
 
-	res, err := g.Client.ExecRaw(ctx, query, variables)
+	res, err := p.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return nil, err
 	}
@@ -85,14 +85,14 @@ func (g *PlatformClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryPara
 	return apiKeysResponse.APIKeys, nil
 }
 
-func (g *PlatformClient) DeleteAPIKey(ctx context.Context, id int) error {
+func (p *PlatformClient) DeleteAPIKey(ctx context.Context, id int) error {
 	query := `mutation deleteApiKey($id: ID!) { deleteApiKey(id: $id) }`
 
 	variables := map[string]interface{}{
 		"id": id,
 	}
 
-	res, err := g.Client.ExecRaw(ctx, query, variables)
+	res, err := p.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return err
 	}

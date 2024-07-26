@@ -5,8 +5,10 @@ package cmd
 
 import (
 	"encoding/json"
-	primary_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
-	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/config"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/loader"
 	"github.com/spf13/cobra"
 	"time"
@@ -18,27 +20,28 @@ var sessionsEndCmd = &cobra.Command{
 	Short: "End a session",
 	Long:  `End a session to mimic headset interactions`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		sessionID, ok := Ctx.ConfigManager.GetIntConfigValueOrAskUser("session-id", cmd)
-		if !ok {
-			Ctx.Printer.Println(":exclamation: Session ID not provided")
+		questions := []config.Value{
+			{Question: forms.Question{Type: forms.Input, Key: "session-id"}},
+			{Question: forms.Question{Type: forms.Input, Key: "score"}},
+			{Question: forms.Question{Type: forms.Input, Key: "max-score"}},
 		}
 
-		moduleID, ok := Ctx.ConfigManager.GetIntConfigValueOrAskUser("module-id", cmd)
-		if !ok {
-			Ctx.Printer.Println(":exclamation: Module ID not provided")
+		answers, err := Ctx.ConfigManager.GetValuesOrSubmitForm(questions, cmd)
+		if err != nil {
+			return err
 		}
 
-		score, _ := Ctx.ConfigManager.GetIntConfigValueOrAskUser("score", cmd)
-		maxScore, _ := Ctx.ConfigManager.GetIntConfigValueOrAskUser("max-score", cmd)
+		sessionID := forms.Int(answers["session-id"])
+		score := forms.Int(answers["score"])
+		maxScore := forms.Int(answers["max-score"])
 
 		ipAddress, _ := Ctx.PlatformClient.GetIPAddress()
-		input := graphql_api.Session{
+		input := platform.Session{
 			ID:        sessionID,
 			RawScore:  float64(score),
 			MaxScore:  float64(maxScore),
-			Completed: true,
 			IPAddress: ipAddress,
-			ModuleID:  moduleID,
+			Completed: true,
 		}
 
 		spinner := loader.NewLoader(cmd.Context(), "Ending session...", Ctx.Printer)
@@ -56,15 +59,15 @@ var sessionsEndCmd = &cobra.Command{
 		}
 
 		eventInput := struct {
-			SessionID *int                   `json:"sessionID"`
-			IP        string                 `json:"ipAddress,omitempty"`
-			JSONData  *primary_api.JSONEvent `json:"jsonData,omitempty"`
-			DeviceID  string                 `json:"deviceId,omitempty"`
-			UUID      string                 `json:"uuid,omitempty" `
-			EventType string                 `json:"eventType,omitempty"`
-			UserID    int                    `json:"user_id,omitempty"`
-			OrgID     int                    `json:"org_id,omitempty"`
-			ModuleID  int                    `json:"moduleId,omitempty"`
+			SessionID *int              `json:"sessionID"`
+			IP        string            `json:"ipAddress,omitempty"`
+			JSONData  *legacy.JSONEvent `json:"jsonData,omitempty"`
+			DeviceID  string            `json:"deviceId,omitempty"`
+			UUID      string            `json:"uuid,omitempty" `
+			EventType string            `json:"eventType,omitempty"`
+			UserID    int               `json:"user_id,omitempty"`
+			OrgID     int               `json:"org_id,omitempty"`
+			ModuleID  int               `json:"moduleId,omitempty"`
 		}{
 			SessionID: &sessionID,
 			EventType: "PIXOVR_SESSION_COMPLETE",
@@ -74,13 +77,13 @@ var sessionsEndCmd = &cobra.Command{
 			UserID:    session.UserID,
 			OrgID:     session.OrgID,
 			ModuleID:  session.ModuleID,
-			JSONData: &primary_api.JSONEvent{
+			JSONData: &legacy.JSONEvent{
 				LessonStatus:    &[]string{"passed"}[0],
 				SessionDuration: sessionDuration.Seconds(),
 				Score:           &session.RawScore,
 				ScoreMax:        &session.MaxScore,
 				ScoreScaled:     &session.ScaledScore,
-				Result: &primary_api.Result{
+				Result: &legacy.Result{
 					Completion: true,
 					Success:    true,
 					Duration:   session.Duration,
@@ -114,7 +117,7 @@ var sessionsEndCmd = &cobra.Command{
 func init() {
 	sessionsCmd.AddCommand(sessionsEndCmd)
 
-	sessionsEndCmd.Flags().Int("session-id", 0, "Session ID")
-	sessionsEndCmd.Flags().Int("score", 0, "Score for the session")
-	sessionsEndCmd.Flags().Int("max-score", 0, "Max possible score for the session")
+	sessionsEndCmd.Flags().String("session-id", "", "Session ID")
+	sessionsEndCmd.Flags().String("score", "", "Score for the session")
+	sessionsEndCmd.Flags().String("max-score", "", "Max possible score for the session")
 }

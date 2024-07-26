@@ -1,49 +1,49 @@
 package heartbeat
 
 import (
-	abstractClient "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
-	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
+	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 )
 
 type Client interface {
-	abstractClient.AbstractClient
+	abstract.AbstractClient
 	SendPulse(sessionID int) error
 }
 
 // Client is a struct that contains an AbstractServiceClient
 type client struct {
-	abstractClient.AbstractServiceClient
-	platformClient graphql_api.Client
+	abstract.AbstractServiceClient
+	platformClient platform.Client
 }
 
 // NewClient is a function that returns a new Client
 func NewClient(config urlfinder.ClientConfig) Client {
 
-	abstractConfig := abstractClient.AbstractConfig{
+	abstractConfig := abstract.AbstractConfig{
 		ServiceConfig: newServiceConfig(config.Lifecycle, config.Region),
 		Token:         config.Token,
 	}
 
 	return &client{
-		AbstractServiceClient: *abstractClient.NewClient(abstractConfig),
-		platformClient:        graphql_api.NewClient(config),
+		AbstractServiceClient: *abstract.NewClient(abstractConfig),
+		platformClient:        platform.NewClient(config),
 	}
 }
 
 func NewClientWithBasicAuth(username, password string, config urlfinder.ClientConfig) (Client, error) {
-	platformClient, err := graphql_api.NewClientWithBasicAuth(username, password, config)
+	platformClient, err := platform.NewClientWithBasicAuth(username, password, config)
 	if err != nil {
 		return nil, err
 	}
 
-	abstractConfig := abstractClient.AbstractConfig{
+	abstractConfig := abstract.AbstractConfig{
 		ServiceConfig: newServiceConfig(config.Lifecycle, config.Region),
 		Token:         platformClient.GetToken(),
 	}
 
 	return &client{
-		AbstractServiceClient: *abstractClient.NewClient(abstractConfig),
+		AbstractServiceClient: *abstract.NewClient(abstractConfig),
 	}, nil
 }
 

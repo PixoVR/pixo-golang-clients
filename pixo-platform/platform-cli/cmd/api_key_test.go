@@ -37,6 +37,7 @@ var _ = Describe("API Keys", func() {
 		Expect(executor.MockPlatformClient.NumCalledCreateAPIKey).To(Equal(1))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring("API key created"))
+
 		val, ok := executor.ConfigManager.GetConfigValue("api-key")
 		Expect(val).NotTo(BeEmpty())
 		Expect(ok).To(BeTrue())

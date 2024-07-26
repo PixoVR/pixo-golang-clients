@@ -31,6 +31,12 @@ func (f *Handler) AskQuestions(questions []forms.Question) (map[string]interface
 		case forms.Confirm:
 			answer = new(bool)
 			err = f.Confirm(prompt, answer.(*bool))
+		case forms.Select:
+			answer = new(string)
+			err = f.Select(prompt, question.Options, answer.(*string))
+		case forms.SelectID:
+			answer = new(int)
+			err = f.SelectID(prompt, question.Options, answer.(*int))
 		case forms.MultiSelectIDs:
 			answer = new([]int)
 			err = f.MultiSelectIDs(prompt, question.Options, answer.(*[]int))
