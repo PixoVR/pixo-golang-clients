@@ -19,7 +19,7 @@ var _ = Describe("Users Create", func() {
 	})
 
 	It("return an error if unable to get orgs", func() {
-		executor.MockLegacyClient.GetOrgsError = fmt.Errorf("failed to get orgs")
+		executor.MockPlatformClient.GetOrgsError = fmt.Errorf("failed to get orgs")
 		input := bytes.NewBufferString("\n")
 
 		_, err := executor.RunCommandWithInput(
@@ -40,7 +40,7 @@ var _ = Describe("Users Create", func() {
 
 		Expect(err).To(HaveOccurred())
 		Expect(err).To(MatchError("failed to get orgs"))
-		Expect(executor.MockLegacyClient.NumCalledGetOrgs).To(Equal(1))
+		Expect(executor.MockPlatformClient.NumCalledGetOrgs).To(Equal(1))
 		Expect(executor.MockPlatformClient.NumCalledCreateOrg).To(Equal(0))
 	})
 
@@ -93,7 +93,7 @@ var _ = Describe("Users Create", func() {
 
 		Expect(err).To(HaveOccurred())
 		Expect(err).To(MatchError("password is required"))
-		Expect(executor.MockLegacyClient.NumCalledGetOrgs).To(Equal(0))
+		Expect(executor.MockPlatformClient.NumCalledGetOrgs).To(Equal(0))
 	})
 
 	It("returns an error if the create call fails", func() {

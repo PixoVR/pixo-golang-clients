@@ -5,7 +5,6 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/config"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
@@ -34,9 +33,9 @@ var createUserCmd = &cobra.Command{
 			{Question: forms.Question{Type: forms.SensitiveInput, Key: "user-password"}},
 		}
 
-		var orgs []legacy.Org
+		var orgs []platform.Org
 		if _, ok := Ctx.ConfigManager.GetFlagOrConfigValue("org", cmd); !ok {
-			orgs, err = Ctx.LegacyClient.GetOrgs()
+			orgs, err = Ctx.PlatformClient.GetOrgs(cmd.Context())
 			if err != nil {
 				Ctx.Printer.Println(":exclamation: Unable to get orgs")
 				return err
