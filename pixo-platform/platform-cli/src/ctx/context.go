@@ -74,12 +74,8 @@ func (p *Context) SetIO(cmd *cobra.Command) {
 }
 
 func (p *Context) Authenticate(cmd *cobra.Command) error {
-	if p.PlatformClient.IsAuthenticated() {
-		return nil
-	}
-
 	token, ok := p.ConfigManager.GetFlagOrConfigValue("token", cmd)
-	if ok {
+	if ok && token != "" {
 		p.PlatformClient.SetToken(token)
 		p.HeadsetClient.SetToken(token)
 		p.ConfigManager.SetConfigValue("token", token)
@@ -87,19 +83,19 @@ func (p *Context) Authenticate(cmd *cobra.Command) error {
 	}
 
 	apiKey, ok := p.ConfigManager.GetFlagOrConfigValue("api-key", cmd)
-	if ok {
+	if ok && apiKey != "" {
 		p.PlatformClient.SetAPIKey(apiKey)
 		p.ConfigManager.SetConfigValue("api-key", apiKey)
 		return nil
 	}
 
 	username, ok := p.ConfigManager.GetFlagOrConfigValue("username", cmd)
-	if ok {
+	if ok && username != "" {
 		p.ConfigManager.SetConfigValue("username", username)
 	}
 
 	password, ok := p.ConfigManager.GetFlagOrConfigValue("password", cmd)
-	if ok {
+	if ok && password != "" {
 		p.ConfigManager.SetConfigValue("password", password)
 	}
 
@@ -114,10 +110,10 @@ func (p *Context) Authenticate(cmd *cobra.Command) error {
 		if err := p.PlatformClient.Login(username, password); err != nil {
 			return err
 		}
+		p.ConfigManager.SetConfigValue("token", p.PlatformClient.GetToken())
+		p.ConfigManager.SetIntConfigValue("user-id", p.PlatformClient.ActiveUserID())
+		p.ConfigManager.SetIntConfigValue("org", p.PlatformClient.ActiveOrgID())
 	}
 
-	p.ConfigManager.SetConfigValue("token", p.PlatformClient.GetToken())
-	p.ConfigManager.SetIntConfigValue("user-id", p.PlatformClient.ActiveUserID())
-	p.ConfigManager.SetIntConfigValue("org", p.PlatformClient.ActiveOrgID())
 	return nil
 }

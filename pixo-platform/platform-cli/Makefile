@@ -14,7 +14,7 @@ build:
 
 .PHONY: cp
 cp:
-	@echo "🚀 Copying binary to /usr/local/bin/..."
+	@echo "🚀 Copying binary to /usr/local/bin/${NAME}"
 	@sudo cp $(EXECUTABLE) /usr/local/bin/$(NAME)
 
 
