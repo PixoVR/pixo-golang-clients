@@ -28,7 +28,7 @@ var (
 
 	isDebug          bool
 	cfgFileFlagInput string
-	Ctx              *ctx.CLIContext
+	Ctx              *ctx.Context
 )
 
 var rootCmd = &cobra.Command{
@@ -44,7 +44,7 @@ func GetRootCmd() *cobra.Command {
 
 func Execute() {
 
-	Ctx = ctx.NewCLIContextWithConfig(localConfigFile, globalConfigFile)
+	Ctx = ctx.NewContext(localConfigFile, globalConfigFile)
 
 	activeConfigFile = Ctx.FileManager.ConfigFile()
 

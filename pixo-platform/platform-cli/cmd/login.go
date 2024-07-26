@@ -18,23 +18,39 @@ var loginCmd = &cobra.Command{
 	- global config file ~/.pixo/config.yaml
 	Will prioritize in order of the above list, and will prompt the user if none is found.	
 `,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		if err := Ctx.Authenticate(cmd); err != nil {
 			Ctx.Printer.Println(":exclamation: Login failed. Please check your credentials and try again.")
 		}
 
 		msg := ":rocket: Login successful. Here is your API "
 
+		username, ok := Ctx.ConfigManager.GetFlagOrConfigValueOrAskUser("username", cmd)
+		if !ok {
+			Ctx.Printer.Println(":exclamation: Login failed. Username is required.")
+			return nil
+		}
+		Ctx.ConfigManager.SetConfigValue("username", username)
+
+		password, ok := Ctx.ConfigManager.GetSensitiveFlagOrConfigValueOrAskUser("password", cmd)
+		if !ok {
+			Ctx.Printer.Println(":exclamation: Login failed. Password is required.")
+			return nil
+		}
+		Ctx.ConfigManager.SetConfigValue("password", password)
+
 		token, ok := Ctx.ConfigManager.GetConfigValue("token")
 		if ok {
 			Ctx.Printer.Println(msg, "token:\n", token)
-			return
+			return nil
 		}
 
 		apiKey, ok := Ctx.ConfigManager.GetConfigValue("api-key")
 		if ok {
 			Ctx.Printer.Println(msg, "key:\n", apiKey)
 		}
+
+		return nil
 	},
 }
 

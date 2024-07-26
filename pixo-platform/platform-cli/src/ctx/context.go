@@ -17,7 +17,7 @@ import (
 	"os"
 )
 
-type CLIContext struct {
+type Context struct {
 	ConfigManager     *config.ConfigManager
 	FileManager       *config.FileManager
 	FormHandler       forms.FormHandler
@@ -29,7 +29,7 @@ type CLIContext struct {
 	MatchmakingClient matchmaker.Matchmaker
 }
 
-func NewCLIContextWithConfig(configFiles ...string) *CLIContext {
+func NewContext(configFiles ...string) *Context {
 	var configFile string
 	if len(configFiles) > 0 {
 		for _, file := range configFiles {
@@ -54,7 +54,7 @@ func NewCLIContextWithConfig(configFiles ...string) *CLIContext {
 		Region:    configManager.Region(),
 	}
 
-	return &CLIContext{
+	return &Context{
 		FormHandler:       formHandler,
 		ConfigManager:     configManager,
 		FileManager:       fileManager,
@@ -67,13 +67,13 @@ func NewCLIContextWithConfig(configFiles ...string) *CLIContext {
 	}
 }
 
-func (p *CLIContext) SetIO(cmd *cobra.Command) {
+func (p *Context) SetIO(cmd *cobra.Command) {
 	p.Printer.SetWriter(cmd.OutOrStdout())
 	p.FormHandler.SetReader(cmd.InOrStdin())
 	p.FormHandler.SetWriter(cmd.OutOrStdout())
 }
 
-func (p *CLIContext) Authenticate(cmd *cobra.Command) error {
+func (p *Context) Authenticate(cmd *cobra.Command) error {
 	if p.PlatformClient.IsAuthenticated() {
 		return nil
 	}
@@ -93,19 +93,15 @@ func (p *CLIContext) Authenticate(cmd *cobra.Command) error {
 		return nil
 	}
 
-	username, ok := p.ConfigManager.GetFlagOrConfigValueOrAskUser("username", cmd)
-	if !ok {
-		p.Printer.Println(":exclamation: Login failed. Username is required.")
-		return nil
+	username, ok := p.ConfigManager.GetFlagOrConfigValue("username", cmd)
+	if ok {
+		p.ConfigManager.SetConfigValue("username", username)
 	}
-	p.ConfigManager.SetConfigValue("username", username)
 
-	password, ok := p.ConfigManager.GetSensitiveFlagOrConfigValueOrAskUser("password", cmd)
-	if !ok {
-		p.Printer.Println(":exclamation: Login failed. Password is required.")
-		return nil
+	password, ok := p.ConfigManager.GetFlagOrConfigValue("password", cmd)
+	if ok {
+		p.ConfigManager.SetConfigValue("password", password)
 	}
-	p.ConfigManager.SetConfigValue("password", password)
 
 	ctx := context.Background()
 	if cmd != nil {
@@ -114,9 +110,8 @@ func (p *CLIContext) Authenticate(cmd *cobra.Command) error {
 	spinner := loader.NewLoader(ctx, "Logging into the Pixo Platform...", p.Printer)
 	defer spinner.Stop()
 
-	if err := p.PlatformClient.Login(username, password); err != nil {
-		p.Printer.Println(":exclamation: Login failed. Please check your credentials and try again.\nError: ", err)
-		return err
+	if username != "" && password != "" {
+		return p.PlatformClient.Login(username, password)
 	}
 
 	p.ConfigManager.SetConfigValue("token", p.PlatformClient.GetToken())

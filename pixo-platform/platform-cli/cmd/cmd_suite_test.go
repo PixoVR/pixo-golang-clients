@@ -57,7 +57,7 @@ func NewTestExecutor() *TestExecutor {
 	emojiPrinter := printer.NewEmojiPrinter(nil)
 	mockFileOpener := &editor.MockFileOpener{}
 
-	cmd.Ctx = &ctx.CLIContext{
+	cmd.Ctx = &ctx.Context{
 		Printer:           emojiPrinter,
 		FormHandler:       formHandler,
 		ConfigManager:     configManager,
