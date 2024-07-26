@@ -196,8 +196,8 @@ func (m *MockClient) CreateUser(ctx context.Context, user *User) error {
 		return errors.New("user is nil")
 	}
 
-	if user.Username == "" {
-		return commonerrors.ErrorRequired("username")
+	if user.Username == "" && user.Email == "" {
+		return commonerrors.ErrorRequired("username or email")
 	}
 
 	if user.Email == "" {

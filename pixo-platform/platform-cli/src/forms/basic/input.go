@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
 	"github.com/kyokomi/emoji"
-	"github.com/rs/zerolog/log"
 	"gitlab.com/david_mbuvi/go_asterisks"
 	"io"
 	"strings"
@@ -23,19 +22,20 @@ func (f *Handler) ReadLine() (string, error) {
 	return trim(line), nil
 }
 
-func (f *Handler) GetResponseFromUser(question *forms.Question) (err error) {
+func (f *Handler) GetResponseFromUser(question *forms.Question) error {
 	prompt := strings.ReplaceAll(question.Prompt, "-", " ")
 	prompt = emoji.Sprintf(":fountain_pen: Enter %s: ", prompt)
 
-	if _, err = f.writerOrStdout().Write([]byte(prompt)); err != nil {
+	if _, err := f.writerOrStdout().Write([]byte(prompt)); err != nil {
 		return err
 	}
 
-	question.Answer, err = f.ReadLine()
+	line, err := f.ReadLine()
 	if err != nil {
 		return err
 	}
 
+	question.Answer = forms.String(line)
 	return nil
 }
 
@@ -57,11 +57,7 @@ func (f *Handler) GetSensitiveResponseFromUser(question *forms.Question) error {
 		return err
 	}
 
-	question.Answer = strings.Trim(string(val), "\r\n")
-	log.Debug().
-		Str("question", prompt).
-		Interface("answer", question.Answer).
-		Msg("response")
+	question.Answer = trim(string(val))
 	return nil
 }
 

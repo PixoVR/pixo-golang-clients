@@ -4,6 +4,7 @@ Copyright © 2024 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/config"
@@ -21,72 +22,65 @@ var createUserCmd = &cobra.Command{
 		questions := []config.Value{
 			{Question: forms.Question{Type: forms.Input, Key: "first-name"}},
 			{Question: forms.Question{Type: forms.Input, Key: "last-name"}},
-			{Question: forms.Question{Type: forms.Input, Key: "user-email"}},
-			{Question: forms.Question{Type: forms.Input, Key: "user-username"}},
+			{Question: forms.Question{Type: forms.Input, Key: "user-email", Optional: true}},
+			{Question: forms.Question{Type: forms.Input, Key: "user-username", Optional: true}},
 			{Question: forms.Question{Type: forms.SensitiveInput, Key: "user-password"}},
-		}
+			{Question: forms.Question{
+				Type: forms.SelectID,
+				Key:  "role",
+				GetOptionsFunc: func() ([]forms.Option, error) {
+					items, err := Ctx.PlatformClient.GetRoles(cmd.Context())
+					if err != nil {
+						return nil, errors.New("unable to get roles")
+					}
 
-		var orgs []platform.Org
-		if _, ok := Ctx.ConfigManager.GetFlagOrConfigValue("org", cmd); !ok {
-			orgs, err = Ctx.PlatformClient.GetOrgs(cmd.Context())
-			if err != nil {
-				Ctx.Printer.Println(":exclamation: Unable to get orgs")
-				return err
-			}
-		}
+					options := make([]forms.Option, len(items))
+					for i, item := range items {
+						options[i] = forms.Option{
+							Label: item.Name,
+							Value: fmt.Sprint(item.ID),
+						}
+					}
 
-		orgOptions := make([]forms.Option, len(orgs))
-		for i, org := range orgs {
-			labelPrefix := fmt.Sprintf("Org ID %d: %s", org.ID, org.Name)
-			orgOptions[i] = forms.Option{
-				Label: labelPrefix,
-				Value: fmt.Sprint(org.ID),
-			}
-		}
-		questions = append(questions, config.Value{
-			Question: forms.Question{Type: forms.SelectID, Key: "org", Options: orgOptions},
-		})
+					return options, nil
+				},
+			}},
+			{Question: forms.Question{
+				Type: forms.SelectID,
+				Key:  "org",
+				GetOptionsFunc: func() ([]forms.Option, error) {
+					items, err := Ctx.PlatformClient.GetOrgs(cmd.Context())
+					if err != nil {
+						return nil, errors.New("unable to get orgs")
+					}
 
-		var roles []platform.Role
-		if _, ok := Ctx.ConfigManager.GetFlagOrConfigValue("role", cmd); !ok {
-			roles, err = Ctx.PlatformClient.GetRoles(cmd.Context())
-			if err != nil {
-				Ctx.Printer.Println(":exclamation: Unable to get roles")
-				return err
-			}
-		}
+					options := make([]forms.Option, len(items))
+					for i, item := range items {
+						labelPrefix := fmt.Sprintf("Org ID %d: %s", item.ID, item.Name)
+						options[i] = forms.Option{
+							Label: labelPrefix,
+							Value: fmt.Sprint(item.ID),
+						}
+					}
 
-		roleOptions := make([]forms.Option, len(roles))
-		for i, role := range roles {
-			roleOptions[i] = forms.Option{
-				Label: role.Name,
-			}
+					return options, nil
+				},
+			}},
 		}
-		questions = append(questions, config.Value{
-			Question: forms.Question{Type: forms.Select, Key: "role", Options: roleOptions},
-		})
 
 		answers, err := Ctx.ConfigManager.GetValuesOrSubmitForm(questions, cmd)
 		if err != nil {
-			Ctx.Printer.Printf(":exclamation: %v\n", err)
+			return err
 		}
 
-		firstName := forms.String(answers["first-name"])
-		lastName := forms.String(answers["last-name"])
-		email := forms.String(answers["user-email"])
-		username := forms.String(answers["user-username"])
-		password := forms.String(answers["user-password"])
-		orgID := forms.Int(answers["org"])
-		role := forms.String(answers["role"])
-
 		user := &platform.User{
-			FirstName: firstName,
-			LastName:  lastName,
-			Email:     email,
-			Username:  username,
-			OrgID:     orgID,
-			Role:      role,
-			Password:  password,
+			FirstName: forms.String(answers["first-name"]),
+			LastName:  forms.String(answers["last-name"]),
+			Email:     forms.String(answers["user-email"]),
+			Username:  forms.String(answers["user-username"]),
+			OrgID:     forms.Int(answers["org"]),
+			Role:      forms.String(answers["role"]),
+			Password:  forms.String(answers["user-password"]),
 		}
 
 		spinner := loader.NewLoader(cmd.Context(), "Creating user...", Ctx.Printer)

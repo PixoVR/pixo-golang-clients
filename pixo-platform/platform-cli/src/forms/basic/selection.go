@@ -1,6 +1,7 @@
 package basic
 
 import (
+	"errors"
 	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
 	"strconv"
@@ -27,24 +28,12 @@ func (f *Handler) Select(question *forms.Question) error {
 		return fmt.Errorf("question not provided")
 	}
 
-	f.printOptions(question.Prompt, question.Options)
-
-	line, err := f.ReadLine()
-	if err != nil {
-		return err
-	}
-
-	if line == "" {
-		return fmt.Errorf("%s not provided", question.Prompt)
-	}
-
-	question.Answer = strings.Trim(line, "\n")
-	return nil
-}
-
-func (f *Handler) SelectID(question *forms.Question) error {
-	if question == nil {
-		return fmt.Errorf("question not provided")
+	if question.Options == nil && question.GetOptionsFunc != nil {
+		options, err := question.GetOptionsFunc()
+		if err != nil {
+			return err
+		}
+		question.Options = options
 	}
 
 	f.printOptions(question.Prompt, question.Options)
@@ -60,6 +49,37 @@ func (f *Handler) SelectID(question *forms.Question) error {
 
 	for _, option := range question.Options {
 		if line == option.Label {
+			question.Answer = option.Label
+			return nil
+		}
+	}
+
+	return errors.New("invalid option")
+}
+
+func (f *Handler) SelectID(question *forms.Question) error {
+	if question == nil {
+		return fmt.Errorf("question not provided")
+	}
+
+	options, err := question.GetOptions()
+	if err != nil {
+		return err
+	}
+
+	f.printOptions(question.Prompt, options)
+
+	line, err := f.ReadLine()
+	if err != nil {
+		return err
+	}
+
+	if line == "" {
+		return fmt.Errorf("%s not provided", question.Prompt)
+	}
+
+	for _, option := range options {
+		if line == option.Label {
 			id, err := strconv.Atoi(option.Value)
 			if err != nil {
 				return err
@@ -73,18 +93,16 @@ func (f *Handler) SelectID(question *forms.Question) error {
 }
 
 func (f *Handler) MultiSelect(question *forms.Question) error {
-	if _, err := f.writer.Write([]byte(question.Prompt)); err != nil {
+	if question == nil {
+		return fmt.Errorf("question not provided")
+	}
+
+	options, err := question.GetOptions()
+	if err != nil {
 		return err
 	}
 
-	_, _ = f.writer.Write([]byte("\n"))
-
-	for _, option := range question.Options {
-		if _, err := f.writer.Write([]byte(option.Label)); err != nil {
-			return err
-		}
-		_, _ = f.writer.Write([]byte("\n"))
-	}
+	f.printOptions(question.Prompt, options)
 
 	line, err := f.ReadLine()
 	if err != nil {
@@ -95,7 +113,23 @@ func (f *Handler) MultiSelect(question *forms.Question) error {
 		return fmt.Errorf("%s not provided", question.Prompt)
 	}
 
-	question.Answer = strings.Split(strings.Trim(line, "\n"), ",")
+	selectedOptions := strings.Split(strings.Trim(line, "\n"), ",")
+
+	for _, selectedOption := range selectedOptions {
+		found := false
+		for _, option := range options {
+			if selectedOption == option.Label {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			return errors.New("invalid option")
+		}
+	}
+
+	question.Answer = forms.StringSlice(selectedOptions)
 	return nil
 }
 
@@ -104,14 +138,19 @@ func (f *Handler) MultiSelectIDs(question *forms.Question) error {
 		return err
 	}
 
-	answers := question.Answer.([]string)
+	answers := forms.StringSlice(question.Answer)
 	if len(answers) == 0 {
 		return fmt.Errorf("%s not provided", question.Prompt)
 	}
 
+	options, err := question.GetOptions()
+	if err != nil {
+		return err
+	}
+
 	ids := make([]int, len(answers))
 	for i, answer := range answers {
-		for _, option := range question.Options {
+		for _, option := range options {
 			if answer == option.Label {
 				id, err := strconv.Atoi(option.Value)
 				if err != nil {
@@ -122,6 +161,6 @@ func (f *Handler) MultiSelectIDs(question *forms.Question) error {
 		}
 	}
 
-	question.Answer = ids
+	question.Answer = forms.IntSlice(ids)
 	return nil
 }

@@ -21,9 +21,6 @@ var _ = Describe("Basic Forms", func() {
 			{Label: "no", Value: "2"},
 			{Label: "maybe", Value: "3"},
 		}
-		optionsFunc = func() ([]forms.Option, error) {
-			return options, nil
-		}
 	)
 
 	BeforeEach(func() {
@@ -50,10 +47,7 @@ var _ = Describe("Basic Forms", func() {
 
 		It("can ask for sensitive input", func() {
 			input.WriteString("password\n")
-			question := &forms.Question{
-				Type:   forms.SensitiveInput,
-				Prompt: "Enter password:",
-			}
+			question := &forms.Question{Prompt: "Enter password:"}
 
 			Expect(s.GetSensitiveResponseFromUser(question)).To(Succeed())
 
@@ -132,6 +126,15 @@ var _ = Describe("Basic Forms", func() {
 			}
 		})
 
+		It("can return an error if the option is not valid", func() {
+			input.WriteString("probably\n")
+
+			err := s.Select(question)
+
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("invalid option"))
+		})
+
 		It("can ask a single select question", func() {
 			input.WriteString("yes\n")
 			Expect(s.Select(question)).To(Succeed())
@@ -139,13 +142,19 @@ var _ = Describe("Basic Forms", func() {
 		})
 
 		It("can retrieve the options from a function", func() {
-			input.WriteString("yes\n")
+			input.WriteString("functional-no\n")
 			question.Options = nil
-			question.OptionsFunc = optionsFunc
+			question.GetOptionsFunc = func() ([]forms.Option, error) {
+				options := []forms.Option{
+					{Label: "functional-yes", Value: "1"},
+					{Label: "functional-no", Value: "2"},
+				}
+				return options, nil
+			}
 
 			Expect(s.Select(question)).To(Succeed())
 
-			Expect(question.Answer).To(Equal("yes"))
+			Expect(question.Answer).To(Equal("functional-no"))
 		})
 
 		It("can return an error if no option is selected when getting ids", func() {
@@ -167,17 +176,46 @@ var _ = Describe("Basic Forms", func() {
 			Expect(question.Answer).To(Equal(1))
 		})
 
+		It("can retrieve the options for a function with ids", func() {
+			input.WriteString("functional-yes\n")
+			question.Options = nil
+			question.GetOptionsFunc = func() ([]forms.Option, error) {
+				options := []forms.Option{
+					{Label: "functional-yes", Value: "1"},
+					{Label: "functional-no", Value: "2"},
+				}
+				return options, nil
+			}
+
+			Expect(s.SelectID(question)).To(Succeed())
+
+			Expect(question.Answer).To(Equal(1))
+		})
+
 	})
 
 	Context("multiselect", func() {
 
 		var (
+			question *forms.Question
+		)
+
+		BeforeEach(func() {
 			question = &forms.Question{
 				Type:    forms.MultiSelect,
 				Prompt:  "Select multiple",
 				Options: options,
 			}
-		)
+		})
+
+		It("can return an error if one of the options is invalid", func() {
+			input.WriteString("yes,probably\n")
+
+			err := s.MultiSelect(question)
+
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("invalid option"))
+		})
 
 		It("can ask a question with multiple answers", func() {
 			input.WriteString("yes\n")
@@ -190,6 +228,23 @@ var _ = Describe("Basic Forms", func() {
 			for _, option := range question.Options {
 				Expect(output.String()).To(ContainSubstring(option.Label))
 			}
+		})
+
+		It("can retrieve the options from a function", func() {
+			input.WriteString("functional-no\n")
+			question.Options = nil
+			question.GetOptionsFunc = func() ([]forms.Option, error) {
+				options := []forms.Option{
+					{Label: "functional-yes", Value: "1"},
+					{Label: "functional-no", Value: "2"},
+				}
+				return options, nil
+			}
+
+			Expect(s.MultiSelect(question)).To(Succeed())
+
+			Expect(question.Answer).To(HaveLen(1))
+			Expect(question.Answer.([]string)[0]).To(Equal("functional-no"))
 		})
 
 		It("can ask a question with multiple answers and return values as ints", func() {
@@ -221,6 +276,23 @@ var _ = Describe("Basic Forms", func() {
 			Expect(customOutput.String()).To(ContainSubstring(question.Prompt))
 			Expect(customOutput.String()).To(ContainSubstring("yes"))
 			Expect(customOutput.String()).To(ContainSubstring("no"))
+		})
+
+		It("can retrieve the options from a function with ids", func() {
+			input.WriteString("functional-no\n")
+			question.Options = nil
+			question.GetOptionsFunc = func() ([]forms.Option, error) {
+				options := []forms.Option{
+					{Label: "functional-yes", Value: "1"},
+					{Label: "functional-no", Value: "2"},
+				}
+				return options, nil
+			}
+
+			Expect(s.MultiSelectIDs(question)).To(Succeed())
+
+			Expect(question.Answer).To(HaveLen(1))
+			Expect(question.Answer.([]int)[0]).To(Equal(2))
 		})
 
 		It("can display an entire form", func() {

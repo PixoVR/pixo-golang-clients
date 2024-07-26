@@ -305,7 +305,7 @@ var _ = Describe("Config Manager", func() {
 		It("can use a form to get select values from the user if they're not supplied", func() {
 			input.WriteString("one\nthree\n")
 			configManager.SetConfigValue("config-select", "two")
-			configManager.SetConfigValue("config-select-id", "4")
+			configManager.SetConfigValue("config-select-id", "four")
 			questions := []config.Value{
 				{Question: forms.Question{
 					Type:   forms.Select,
@@ -366,7 +366,7 @@ var _ = Describe("Config Manager", func() {
 		It("can use a form to get multiselect values from the user if they're not supplied", func() {
 			input.WriteString("one,two\ntwo,one\n")
 			configManager.SetConfigValue("config-multiselect", "three,four")
-			configManager.SetConfigValue("config-multiselect-ids", "4,3")
+			configManager.SetConfigValue("config-multiselect-ids", "four,three")
 			questions := []config.Value{
 				{Question: forms.Question{
 					Type:   forms.MultiSelect,

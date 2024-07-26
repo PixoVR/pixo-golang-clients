@@ -34,9 +34,20 @@ func (c *ConfigManager) GetValuesOrSubmitForm(values []Value, cmd *cobra.Command
 				questions = append(questions, value.Question)
 			}
 		case forms.SelectID:
-			val, ok := c.GetIntFlagOrConfigValue(value.Question.Key, cmd)
+			val, ok := c.GetFlagOrConfigValue(value.Question.Key, cmd)
 			if ok {
-				vals[value.Question.Key] = forms.Int(val)
+				var id int
+				options, err := value.GetOptions()
+				if err != nil {
+					return nil, err
+				}
+				for _, option := range options {
+					if val == option.Label {
+						id, _ = strconv.Atoi(option.Value)
+						break
+					}
+				}
+				vals[value.Question.Key] = id
 			} else {
 				questions = append(questions, value.Question)
 			}
@@ -50,10 +61,21 @@ func (c *ConfigManager) GetValuesOrSubmitForm(values []Value, cmd *cobra.Command
 		case forms.MultiSelectIDs:
 			val, ok := c.GetFlagOrConfigValue(value.Question.Key, cmd)
 			if ok {
-				intIDs := strings.Split(val, ",")
-				ids := make([]int, len(intIDs))
-				for i, id := range intIDs {
-					ids[i], _ = strconv.Atoi(id)
+				strVals := strings.Split(val, ",")
+				ids := make([]int, len(strVals))
+				for i, strVal := range strVals {
+					var id int
+					options, err := value.GetOptions()
+					if err != nil {
+						return nil, err
+					}
+					for _, option := range options {
+						if strVal == option.Label {
+							id, _ = strconv.Atoi(option.Value)
+							ids[i] = id
+							break
+						}
+					}
 				}
 				vals[value.Question.Key] = forms.IntSlice(ids)
 			} else {

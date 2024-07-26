@@ -22,7 +22,7 @@ var _ = Describe("Users Create", func() {
 		executor.MockPlatformClient.GetOrgsError = fmt.Errorf("failed to get orgs")
 		input := bytes.NewBufferString("\n")
 
-		_, err := executor.RunCommandWithInput(
+		output, err := executor.RunCommandWithInput(
 			input,
 			"users",
 			"create",
@@ -35,11 +35,12 @@ var _ = Describe("Users Create", func() {
 			"--user-password",
 			"test",
 			"--role",
-			"developer",
+			"admin",
 		)
 
 		Expect(err).To(HaveOccurred())
-		Expect(err).To(MatchError("failed to get orgs"))
+		Expect(err).To(MatchError("ORG not provided"))
+		Expect(output).To(ContainSubstring("unable to get orgs"))
 		Expect(executor.MockPlatformClient.NumCalledGetOrgs).To(Equal(1))
 		Expect(executor.MockPlatformClient.NumCalledCreateOrg).To(Equal(0))
 	})
@@ -48,7 +49,7 @@ var _ = Describe("Users Create", func() {
 		executor.MockPlatformClient.GetRolesError = fmt.Errorf("failed to get roles")
 		input := bytes.NewBufferString("\n")
 
-		_, err := executor.RunCommandWithInput(
+		output, err := executor.RunCommandWithInput(
 			input,
 			"users",
 			"create",
@@ -65,7 +66,8 @@ var _ = Describe("Users Create", func() {
 		)
 
 		Expect(err).To(HaveOccurred())
-		Expect(err).To(MatchError("failed to get roles"))
+		Expect(err).To(MatchError("ROLE not provided"))
+		Expect(output).To(ContainSubstring("unable to get roles"))
 		Expect(executor.MockPlatformClient.NumCalledGetRoles).To(Equal(1))
 		Expect(executor.MockPlatformClient.NumCalledCreateOrg).To(Equal(0))
 	})
@@ -88,7 +90,7 @@ var _ = Describe("Users Create", func() {
 			"--org",
 			"1",
 			"--role",
-			"developer",
+			"admin",
 		)
 
 		Expect(err).To(HaveOccurred())
@@ -117,7 +119,7 @@ var _ = Describe("Users Create", func() {
 			"--org",
 			"1",
 			"--role",
-			"developer",
+			"admin",
 		)
 
 		Expect(err).To(HaveOccurred())
@@ -130,7 +132,7 @@ var _ = Describe("Users Create", func() {
 		email := faker.Email()
 		username := faker.Username()
 		orgID := "1"
-		role := "developer"
+		role := "admin"
 		password := faker.Password()
 
 		output, err := executor.RunCommand(
