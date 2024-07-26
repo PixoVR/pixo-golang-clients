@@ -47,8 +47,8 @@ var _ = Describe("Login", func() {
 		)
 
 		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring("Enter username:"))
-		Expect(output).To(ContainSubstring("Enter password:"))
+		Expect(output).To(ContainSubstring("Enter USERNAME:"))
+		Expect(output).To(ContainSubstring("Enter PASSWORD:"))
 		Expect(output).To(ContainSubstring("Login successful. Here is your API token:"))
 
 		output, err = executor.RunCommand("config")

@@ -111,11 +111,13 @@ func (p *Context) Authenticate(cmd *cobra.Command) error {
 	defer spinner.Stop()
 
 	if username != "" && password != "" {
-		return p.PlatformClient.Login(username, password)
+		if err := p.PlatformClient.Login(username, password); err != nil {
+			return err
+		}
 	}
 
 	p.ConfigManager.SetConfigValue("token", p.PlatformClient.GetToken())
 	p.ConfigManager.SetIntConfigValue("user-id", p.PlatformClient.ActiveUserID())
-	p.ConfigManager.SetIntConfigValue("org", p.PlatformClient.ActiveUserID())
+	p.ConfigManager.SetIntConfigValue("org", p.PlatformClient.ActiveOrgID())
 	return nil
 }

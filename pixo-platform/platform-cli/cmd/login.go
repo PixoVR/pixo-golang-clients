@@ -4,6 +4,8 @@ Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/config"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
 	"github.com/spf13/cobra"
 )
 
@@ -23,21 +25,28 @@ var loginCmd = &cobra.Command{
 			Ctx.Printer.Println(":exclamation: Login failed. Please check your credentials and try again.")
 		}
 
-		msg := ":rocket: Login successful. Here is your API "
-
-		username, ok := Ctx.ConfigManager.GetFlagOrConfigValueOrAskUser("username", cmd)
-		if !ok {
-			Ctx.Printer.Println(":exclamation: Login failed. Username is required.")
-			return nil
+		questions := []config.Value{
+			{Question: forms.Question{Type: forms.Input, Key: "username"}},
+			{Question: forms.Question{Type: forms.SensitiveInput, Key: "password"}},
 		}
+
+		answers, err := Ctx.ConfigManager.GetValuesOrSubmitForm(questions, cmd)
+		if err != nil {
+			Ctx.Printer.Println(":exclamation: Login failed")
+			return err
+		}
+
+		username := forms.String(answers["username"])
 		Ctx.ConfigManager.SetConfigValue("username", username)
 
-		password, ok := Ctx.ConfigManager.GetSensitiveFlagOrConfigValueOrAskUser("password", cmd)
-		if !ok {
-			Ctx.Printer.Println(":exclamation: Login failed. Password is required.")
-			return nil
-		}
+		password := forms.String(answers["password"])
 		Ctx.ConfigManager.SetConfigValue("password", password)
+
+		if err := Ctx.Authenticate(cmd); err != nil {
+			Ctx.Printer.Println(":exclamation: Login failed. Please check your credentials and try again.")
+		}
+
+		msg := ":rocket: Login successful. Here is your API "
 
 		token, ok := Ctx.ConfigManager.GetConfigValue("token")
 		if ok {
