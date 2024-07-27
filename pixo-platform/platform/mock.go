@@ -200,10 +200,6 @@ func (m *MockClient) CreateUser(ctx context.Context, user *User) error {
 		return commonerrors.ErrorRequired("username or email")
 	}
 
-	if user.Email == "" {
-		return commonerrors.ErrorRequired("email")
-	}
-
 	if user.Password == "" {
 		return commonerrors.ErrorRequired("password")
 	}
@@ -217,6 +213,7 @@ func (m *MockClient) CreateUser(ctx context.Context, user *User) error {
 	}
 
 	user.ID = 1
+	user.Org = Org{ID: user.OrgID, Name: "test-org"}
 	user.CreatedAt = time.Now().UTC()
 	user.UpdatedAt = time.Now().UTC()
 	return nil
@@ -276,12 +273,14 @@ func (m *MockClient) GetModules(ctx context.Context, params ...ModuleParams) ([]
 
 	return []Module{
 		{
-			ID:   1,
-			Name: "test",
+			ID:           1,
+			Name:         "test",
+			Abbreviation: "TST",
 		},
 		{
-			ID:   2,
-			Name: "test-2",
+			ID:           2,
+			Name:         "test-2",
+			Abbreviation: "TST-2",
 		},
 	}, nil
 }
@@ -315,11 +314,11 @@ func (m *MockClient) GetOrgs(ctx context.Context, params ...*OrgParams) ([]Org, 
 	orgs := []Org{
 		{
 			ID:   1,
-			Name: faker.Name(),
+			Name: "test-org",
 		},
 		{
 			ID:   2,
-			Name: faker.Name(),
+			Name: "test-org-2",
 		},
 	}
 
@@ -430,6 +429,20 @@ func (m *MockClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) 
 	return []APIKey{
 		{
 			ID:        1,
+			UserID:    *params.UserID,
+			Key:       faker.UUIDHyphenated(),
+			CreatedAt: time.Now().UTC(),
+			UpdatedAt: time.Now().UTC(),
+		},
+		{
+			ID:        2,
+			UserID:    *params.UserID,
+			Key:       faker.UUIDHyphenated(),
+			CreatedAt: time.Now().UTC(),
+			UpdatedAt: time.Now().UTC(),
+		},
+		{
+			ID:        3,
 			UserID:    *params.UserID,
 			Key:       faker.UUIDHyphenated(),
 			CreatedAt: time.Now().UTC(),
@@ -602,6 +615,7 @@ func (m *MockClient) CreateSession(ctx context.Context, session *Session) error 
 		ID:        1,
 		UserID:    m.ActiveUserID(),
 		ModuleID:  session.ModuleID,
+		Module:    Module{ID: session.ModuleID, Name: "test", Abbreviation: "TST"},
 		IPAddress: session.IPAddress,
 		DeviceID:  session.DeviceID,
 		CreatedAt: time.Now().UTC(),

@@ -2,6 +2,8 @@ package basic_test
 
 import (
 	"bytes"
+	"context"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms/basic"
 	. "github.com/onsi/ginkgo/v2"
@@ -144,12 +146,31 @@ var _ = Describe("Basic Forms", func() {
 		It("can retrieve the options from a function", func() {
 			input.WriteString("functional-no\n")
 			question.Options = nil
-			question.GetOptionsFunc = func() ([]forms.Option, error) {
-				options := []forms.Option{
+			question.GetItemsFunc = func(ctx context.Context) (interface{}, error) {
+				return []forms.Option{
 					{Label: "functional-yes", Value: "1"},
 					{Label: "functional-no", Value: "2"},
+				}, nil
+			}
+
+			Expect(s.Select(question)).To(Succeed())
+
+			Expect(question.Answer).To(Equal("functional-no"))
+		})
+
+		It("can retrieve the options from a function and format each item", func() {
+			input.WriteString("functional-no\n")
+			question.Options = nil
+			question.GetItemsFunc = func(ctx context.Context) (interface{}, error) {
+				items := []platform.Platform{
+					{ID: 1, Name: "functional-yes"},
+					{ID: 2, Name: "functional-no"},
 				}
-				return options, nil
+				return items, nil
+			}
+			question.LabelFunc = func(item interface{}) string {
+				platform := item.(platform.Platform)
+				return platform.Name
 			}
 
 			Expect(s.Select(question)).To(Succeed())
@@ -179,7 +200,7 @@ var _ = Describe("Basic Forms", func() {
 		It("can retrieve the options for a function with ids", func() {
 			input.WriteString("functional-yes\n")
 			question.Options = nil
-			question.GetOptionsFunc = func() ([]forms.Option, error) {
+			question.GetItemsFunc = func(ctx context.Context) (interface{}, error) {
 				options := []forms.Option{
 					{Label: "functional-yes", Value: "1"},
 					{Label: "functional-no", Value: "2"},
@@ -233,7 +254,7 @@ var _ = Describe("Basic Forms", func() {
 		It("can retrieve the options from a function", func() {
 			input.WriteString("functional-no\n")
 			question.Options = nil
-			question.GetOptionsFunc = func() ([]forms.Option, error) {
+			question.GetItemsFunc = func(ctx context.Context) (interface{}, error) {
 				options := []forms.Option{
 					{Label: "functional-yes", Value: "1"},
 					{Label: "functional-no", Value: "2"},
@@ -281,7 +302,7 @@ var _ = Describe("Basic Forms", func() {
 		It("can retrieve the options from a function with ids", func() {
 			input.WriteString("functional-no\n")
 			question.Options = nil
-			question.GetOptionsFunc = func() ([]forms.Option, error) {
+			question.GetItemsFunc = func(ctx context.Context) (interface{}, error) {
 				options := []forms.Option{
 					{Label: "functional-yes", Value: "1"},
 					{Label: "functional-no", Value: "2"},
@@ -398,9 +419,6 @@ var _ = Describe("Basic Forms", func() {
 			Expect(answers["optional-select"]).To(BeNil())
 			Expect(output.String()).To(ContainSubstring("Enter some optional input"))
 		})
-
-		//It("can run a function to retrieve the data if not provided", func() {
-		//})
 
 	})
 

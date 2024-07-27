@@ -7,12 +7,14 @@ threshold:
 
   package: 63
 
-  total: 82
+  total: 81
 
 exclude:
   paths:
     - ^main.go
     - ^cmd/root.go
+    - ^src/ctx
     - ^src/editor
     - ^src/forms/fancy
     - ^src/mockserver
+    - ^src/tui

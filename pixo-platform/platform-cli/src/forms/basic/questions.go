@@ -44,7 +44,7 @@ func (f *Handler) AskQuestions(questions []forms.Question) (map[string]interface
 		}
 
 		if !question.Optional {
-			if err != nil {
+			if err != nil || question.Answer == nil {
 				return nil, fmt.Errorf("%s not provided", forms.CleanPrompt(question.Key))
 			}
 			answers[question.Key] = question.Answer

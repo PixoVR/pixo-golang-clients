@@ -161,11 +161,11 @@ func (c *ConfigManager) GetConfigValueOrAskUser(key string, cmd *cobra.Command) 
 		if err != nil {
 			return "", false
 		}
-		return question.Answer.(string), err == nil && val != ""
+		return forms.String(question.Answer), err == nil && val != ""
 	}
 
 	err := c.formHandler.GetResponseFromUser(question)
-	val = question.Answer.(string)
+	val = forms.String(question.Answer)
 	return val, err == nil && val != ""
 }
 
@@ -187,7 +187,7 @@ func (c *ConfigManager) GetIntConfigValueOrAskUser(key string, cmd *cobra.Comman
 		return 0, false
 	}
 
-	return ToInt(question.Answer.(string))
+	return ToInt(forms.String(question.Answer))
 }
 
 func (c *ConfigManager) GetBoolConfigValueOrAskUser(key string, cmd *cobra.Command) (bool, bool) {
@@ -208,7 +208,7 @@ func (c *ConfigManager) GetBoolConfigValueOrAskUser(key string, cmd *cobra.Comma
 		return false, false
 	}
 
-	boolVal, err := strconv.ParseBool(question.Answer.(string))
+	boolVal, err := strconv.ParseBool(forms.String(question.Answer))
 	return boolVal, err == nil
 }
 

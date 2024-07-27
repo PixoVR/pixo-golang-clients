@@ -112,7 +112,6 @@ func (p *Context) Authenticate(cmd *cobra.Command) error {
 		}
 		p.ConfigManager.SetConfigValue("token", p.PlatformClient.GetToken())
 		p.ConfigManager.SetIntConfigValue("user-id", p.PlatformClient.ActiveUserID())
-		p.ConfigManager.SetIntConfigValue("org", p.PlatformClient.ActiveOrgID())
 	}
 
 	return nil

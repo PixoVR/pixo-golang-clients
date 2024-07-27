@@ -11,10 +11,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	generateToken bool
-)
-
 // webhooksCreateCmd represents the sessions start command
 var webhooksCreateCmd = &cobra.Command{
 	Use:   "create",
@@ -24,42 +20,20 @@ var webhooksCreateCmd = &cobra.Command{
 		questions := []config.Value{
 			{Question: forms.Question{Type: forms.Input, Key: "url"}},
 			{Question: forms.Question{Type: forms.Input, Key: "description"}},
-		}
-
-		if !generateToken {
-			configValue := config.Value{
-				Question: forms.Question{
-					Type: forms.Input,
-					Key:  "webhook-token",
-				},
-			}
-			questions = append(questions, configValue)
+			{Question: forms.Question{Type: forms.Confirm, Key: "generate-token", Prompt: "Generate token automatically?"}},
 		}
 
 		answers, err := Ctx.ConfigManager.GetValuesOrSubmitForm(questions, cmd)
 		if err != nil {
-			Ctx.Printer.Printf(":exclamation: %v\n", err)
+			return err
 		}
 
 		url := forms.String(answers["url"])
-		if url == "" {
-			Ctx.Printer.Println(":exclamation: URL not provided")
-			return nil
-		}
-
 		description := forms.String(answers["description"])
-		if description == "" {
-			Ctx.Printer.Println(":exclamation: DESCRIPTION not provided")
-			return nil
-		}
+		generateToken := forms.Bool(answers["generate-token"])
 
-		webhookToken := forms.String(answers["webhook-token"])
-		if !generateToken && webhookToken == "" {
-			question := &forms.Question{Prompt: "Generate token automatically?", Answer: &generateToken}
-			generateToken = generateToken || forms.Bool(question.Answer)
-			if err = Ctx.FormHandler.Confirm(question); err != nil || !generateToken {
-				Ctx.Printer.Println(":warning: No token provided. Webhook will be insecure")
-			}
+		if !generateToken {
+			Ctx.Printer.Println(":warning: No token provided. Webhook will be insecure")
 		}
 
 		spinner := loader.NewLoader(cmd.Context(), "Creating webhook...", Ctx.Printer)
@@ -68,12 +42,10 @@ var webhooksCreateCmd = &cobra.Command{
 			URL:           url,
 			Description:   description,
 			GenerateToken: &generateToken,
-			Token:         webhookToken,
 		})
 		spinner.Stop()
 		if err != nil {
-			Ctx.Printer.Println(":exclamation: Unable to create webhook: ", err)
-			return nil
+			return err
 		}
 
 		Ctx.Printer.Println(":white_check_mark: Webhook created")
@@ -89,5 +61,5 @@ func init() {
 
 	webhooksCreateCmd.Flags().String("url", "", "URL of the webhook")
 	webhooksCreateCmd.Flags().String("description", "", "Description of the webhook")
-	webhooksCreateCmd.Flags().BoolVarP(&generateToken, "generate-token", "g", false, "Description of the webhook")
+	webhooksCreateCmd.Flags().StringP("generate-token", "g", "", "Description of the webhook")
 }

@@ -4,6 +4,7 @@ Copyright © 2024 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
@@ -26,44 +27,33 @@ var createUserCmd = &cobra.Command{
 			{Question: forms.Question{Type: forms.Input, Key: "user-username", Optional: true}},
 			{Question: forms.Question{Type: forms.SensitiveInput, Key: "user-password"}},
 			{Question: forms.Question{
-				Type: forms.SelectID,
+				Type: forms.Select,
 				Key:  "role",
-				GetOptionsFunc: func() ([]forms.Option, error) {
+				GetItemsFunc: func(ctx context.Context) (interface{}, error) {
 					items, err := Ctx.PlatformClient.GetRoles(cmd.Context())
 					if err != nil {
+						Ctx.Printer.Println(":exclamation: Unable to get roles")
 						return nil, errors.New("unable to get roles")
 					}
 
-					options := make([]forms.Option, len(items))
-					for i, item := range items {
-						options[i] = forms.Option{
-							Label: item.Name,
-							Value: fmt.Sprint(item.ID),
-						}
-					}
-
-					return options, nil
+					return items, nil
 				},
 			}},
 			{Question: forms.Question{
 				Type: forms.SelectID,
 				Key:  "org",
-				GetOptionsFunc: func() ([]forms.Option, error) {
+				LabelFunc: func(item interface{}) string {
+					org := item.(platform.Org)
+					return fmt.Sprintf("Org ID %d: %s", org.ID, org.Name)
+				},
+				GetItemsFunc: func(ctx context.Context) (interface{}, error) {
 					items, err := Ctx.PlatformClient.GetOrgs(cmd.Context())
 					if err != nil {
+						Ctx.Printer.Println(":exclamation: Unable to get orgs")
 						return nil, errors.New("unable to get orgs")
 					}
 
-					options := make([]forms.Option, len(items))
-					for i, item := range items {
-						labelPrefix := fmt.Sprintf("Org ID %d: %s", item.ID, item.Name)
-						options[i] = forms.Option{
-							Label: labelPrefix,
-							Value: fmt.Sprint(item.ID),
-						}
-					}
-
-					return options, nil
+					return items, nil
 				},
 			}},
 		}

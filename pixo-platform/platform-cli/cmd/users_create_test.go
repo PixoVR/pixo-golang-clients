@@ -40,7 +40,7 @@ var _ = Describe("Users Create", func() {
 
 		Expect(err).To(HaveOccurred())
 		Expect(err).To(MatchError("ORG not provided"))
-		Expect(output).To(ContainSubstring("unable to get orgs"))
+		Expect(output).To(ContainSubstring("Unable to get orgs"))
 		Expect(executor.MockPlatformClient.NumCalledGetOrgs).To(Equal(1))
 		Expect(executor.MockPlatformClient.NumCalledCreateOrg).To(Equal(0))
 	})
@@ -62,12 +62,12 @@ var _ = Describe("Users Create", func() {
 			"--user-password",
 			"test",
 			"--org",
-			"1",
+			"Org ID 1: test-org",
 		)
 
 		Expect(err).To(HaveOccurred())
 		Expect(err).To(MatchError("ROLE not provided"))
-		Expect(output).To(ContainSubstring("unable to get roles"))
+		Expect(output).To(ContainSubstring("Unable to get roles"))
 		Expect(executor.MockPlatformClient.NumCalledGetRoles).To(Equal(1))
 		Expect(executor.MockPlatformClient.NumCalledCreateOrg).To(Equal(0))
 	})
@@ -95,7 +95,7 @@ var _ = Describe("Users Create", func() {
 
 		Expect(err).To(HaveOccurred())
 		Expect(err).To(MatchError("password is required"))
-		Expect(executor.MockPlatformClient.NumCalledGetOrgs).To(Equal(0))
+		Expect(executor.MockPlatformClient.NumCalledGetOrgs).To(Equal(1))
 	})
 
 	It("returns an error if the create call fails", func() {
@@ -117,7 +117,7 @@ var _ = Describe("Users Create", func() {
 			"--user-password",
 			"test",
 			"--org",
-			"1",
+			"Org ID 1: test-org",
 			"--role",
 			"admin",
 		)
@@ -127,27 +127,23 @@ var _ = Describe("Users Create", func() {
 	})
 
 	It("can create a user", func() {
-		firstName := faker.FirstName()
-		lastName := faker.LastName()
 		email := faker.Email()
-		username := faker.Username()
-		orgID := "1"
+		orgID := "Org ID 1: test-org"
 		role := "admin"
-		password := faker.Password()
 
 		output, err := executor.RunCommand(
 			"users",
 			"create",
 			"--first-name",
-			firstName,
+			faker.FirstName(),
 			"--last-name",
-			lastName,
+			faker.LastName(),
 			"--user-username",
-			username,
+			faker.Username(),
 			"--user-email",
 			email,
 			"--user-password",
-			password,
+			faker.Password(),
 			"--org",
 			orgID,
 			"--role",

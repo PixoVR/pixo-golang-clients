@@ -16,16 +16,17 @@ var _ = Describe("Webhooks List", func() {
 		executor.Cleanup()
 	})
 
-	It("can return an error if the api call fails", func() {
-		executor.MockPlatformClient.GetWebhooksError = errors.New("error")
+	It("can return an error if the get webhooks call fails", func() {
+		executor.MockPlatformClient.GetWebhooksError = errors.New("get webhooks error")
 
-		output := executor.RunCommandAndExpectSuccess(
+		output, err := executor.RunCommand(
 			"webhooks",
 			"list",
 		)
 
-		Expect(output).To(ContainSubstring("error"))
-		Expect(output).To(ContainSubstring("Unable to get webhooks"))
+		Expect(err).To(HaveOccurred())
+		Expect(err).To(MatchError("get webhooks error"))
+		Expect(output).To(ContainSubstring("Failed to get webhooks"))
 		Expect(executor.MockPlatformClient.NumCalledGetWebhooks).To(Equal(1))
 	})
 

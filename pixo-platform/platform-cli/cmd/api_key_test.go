@@ -93,7 +93,7 @@ var _ = Describe("API Keys", func() {
 			"keys",
 			"delete",
 			"--key-ids",
-			"1",
+			"Key ID 1",
 		)
 
 		Expect(err).NotTo(HaveOccurred())
@@ -102,13 +102,13 @@ var _ = Describe("API Keys", func() {
 	})
 
 	It("can delete an api key", func() {
-		output := executor.RunCommandAndExpectSuccess("keys", "delete", "--key-ids", "1")
+		output := executor.RunCommandAndExpectSuccess("keys", "delete", "--key-ids", "Key ID 1")
 		Expect(output).To(ContainSubstring("Deleted API key: 1"))
 		Expect(executor.MockPlatformClient.NumCalledDeleteAPIKey).To(Equal(1))
 	})
 
 	It("can delete several api keys", func() {
-		output := executor.RunCommandAndExpectSuccess("keys", "delete", "--key-ids", "1,2,3")
+		output := executor.RunCommandAndExpectSuccess("keys", "delete", "--key-ids", "Key ID 1,Key ID 2,Key ID 3")
 		Expect(output).To(ContainSubstring("Deleted API key: 1"))
 		Expect(output).To(ContainSubstring("Deleted API key: 2"))
 		Expect(output).To(ContainSubstring("Deleted API key: 3"))

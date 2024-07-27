@@ -4,6 +4,8 @@ Copyright © 2024 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/config"
@@ -18,41 +20,35 @@ var deleteApiKeyCmd = &cobra.Command{
 	Short: "Deleting an API key",
 	Long:  `Delete API key with the following command:`,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		var keys []platform.APIKey
-		if _, ok := Ctx.ConfigManager.GetFlagValue("key-ids", cmd); !ok {
-			keys, err = Ctx.PlatformClient.GetAPIKeys(cmd.Context(), nil)
-			if err != nil {
-				return err
-			}
-		}
-
-		options := make([]forms.Option, len(keys))
-		for i, key := range keys {
-			labelPrefix := fmt.Sprintf("Key ID %d: ", key.ID)
-
-			if key.User != nil {
-				if key.User.Email != "" {
-					labelPrefix = fmt.Sprintf("%s%s", labelPrefix, key.User.Email)
-				} else if key.User.Username != "" {
-					labelPrefix = fmt.Sprintf("%s%s", labelPrefix, key.User.Username)
-				}
-				if key.User.Role != "" {
-					labelPrefix = fmt.Sprintf("%s - %s", labelPrefix, key.User.Role)
-				}
-			}
-
-			options[i] = forms.Option{
-				Label: labelPrefix,
-				Value: fmt.Sprint(key.ID),
-			}
-		}
-
 		questions := []config.Value{
 			{Question: forms.Question{
-				Type:    forms.MultiSelectIDs,
-				Key:     "key-ids",
-				Prompt:  "Select API keys to delete",
-				Options: options,
+				Type: forms.MultiSelectIDs,
+				Key:  "key-ids",
+				LabelFunc: func(value interface{}) string {
+					item := value.(platform.APIKey)
+					label := fmt.Sprintf("Key ID %d", item.ID)
+
+					if item.User != nil {
+						label = fmt.Sprintf("%s: ", label)
+						if item.User.Email != "" {
+							label = fmt.Sprintf("%s%s", label, item.User.Email)
+						} else if item.User.Username != "" {
+							label = fmt.Sprintf("%s%s", label, item.User.Username)
+						}
+						if item.User.Role != "" {
+							label = fmt.Sprintf("%s - %s", label, item.User.Role)
+						}
+					}
+
+					return label
+				},
+				GetItemsFunc: func(ctx context.Context) (interface{}, error) {
+					items, err := Ctx.PlatformClient.GetAPIKeys(cmd.Context(), nil)
+					if err != nil {
+						return nil, errors.New("unable to get api keys")
+					}
+					return items, nil
+				},
 			}},
 		}
 

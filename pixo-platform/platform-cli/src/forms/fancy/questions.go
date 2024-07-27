@@ -1,6 +1,7 @@
 package fancy
 
 import (
+	"context"
 	"errors"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
 	"github.com/charmbracelet/huh"
@@ -13,6 +14,10 @@ func (f *Handler) AskQuestions(questions []forms.Question) (map[string]interface
 	for _, question := range questions {
 		if question.Prompt == "" {
 			question.Prompt = forms.CleanPrompt(question.Key)
+		}
+
+		if err := question.GetOptions(context.TODO()); err != nil {
+			return nil, err
 		}
 
 		switch question.Type {

@@ -34,13 +34,14 @@ var _ = Describe("Webhooks Delete", func() {
 	It("can return an error if the get call fails", func() {
 		executor.MockPlatformClient.GetWebhooksError = errors.New("error")
 
-		_, err := executor.RunCommand(
+		output, err := executor.RunCommand(
 			"webhooks",
 			"delete",
 		)
 
 		Expect(err).To(HaveOccurred())
-		Expect(err).To(MatchError("error"))
+		Expect(err).To(MatchError("WEBHOOK IDs not provided"))
+		Expect(output).To(ContainSubstring("Unable to get webhooks"))
 		Expect(executor.MockPlatformClient.NumCalledGetWebhooks).To(Equal(1))
 		Expect(executor.MockPlatformClient.NumCalledDeleteWebhook).To(Equal(0))
 	})
@@ -52,7 +53,7 @@ var _ = Describe("Webhooks Delete", func() {
 			"webhooks",
 			"delete",
 			"--webhook-ids",
-			"1",
+			"Org ID 1: https://example.com",
 		)
 
 		Expect(output).To(ContainSubstring("error"))
@@ -65,7 +66,7 @@ var _ = Describe("Webhooks Delete", func() {
 			"webhooks",
 			"delete",
 			"--webhook-ids",
-			"1",
+			"Org ID 1: https://example.com",
 		)
 
 		Expect(err).NotTo(HaveOccurred())
@@ -77,19 +78,18 @@ var _ = Describe("Webhooks Delete", func() {
 			"webhooks",
 			"delete",
 			"--webhook-ids",
-			"1,2,3",
+			"Org ID 1: https://example.com,Org ID 2: https://example-2.com",
 		)
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring("Webhook 1 deleted"))
 		Expect(output).To(ContainSubstring("Webhook 2 deleted"))
-		Expect(output).To(ContainSubstring("Webhook 3 deleted"))
-		Expect(executor.MockPlatformClient.NumCalledGetWebhooks).To(Equal(0))
-		Expect(executor.MockPlatformClient.NumCalledDeleteWebhook).To(Equal(3))
+		Expect(executor.MockPlatformClient.NumCalledGetWebhooks).To(Equal(1))
+		Expect(executor.MockPlatformClient.NumCalledDeleteWebhook).To(Equal(2))
 	})
 
 	It("can delete several reading from user input", func() {
-		input := bytes.NewBufferString("1: Org ID 1 - https://example.com,2: Org ID 2 - https://example-2.com\n")
+		input := bytes.NewBufferString("Org ID 1: https://example.com,Org ID 2: https://example-2.com\n")
 
 		output, err := executor.RunCommandWithInput(
 			input,

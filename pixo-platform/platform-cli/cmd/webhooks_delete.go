@@ -4,6 +4,8 @@ Copyright © 2024 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/config"
@@ -18,32 +20,29 @@ var webhooksDeleteCmd = &cobra.Command{
 	Short: "Delete webhooks",
 	Long:  `Delete webhooks`,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		var webhooks []platform.Webhook
-		if _, ok := Ctx.ConfigManager.GetFlagValue("webhook-ids", cmd); !ok {
-			webhooks, err = Ctx.PlatformClient.GetWebhooks(cmd.Context(), nil)
-			if err != nil {
-				return err
-			}
-		}
-
-		options := make([]forms.Option, len(webhooks))
-		for i, webhook := range webhooks {
-			labelPrefix := fmt.Sprintf("Org ID %d - ", webhook.OrgID)
-			if webhook.Org != nil {
-				labelPrefix = fmt.Sprintf("%s - ", webhook.Org.Name)
-			}
-			options[i] = forms.Option{
-				Label: fmt.Sprintf("%d: %s%s", webhook.ID, labelPrefix, webhook.URL),
-				Value: fmt.Sprint(webhook.ID),
-			}
-		}
-
 		questions := []config.Value{
 			{Question: forms.Question{
-				Type:    forms.MultiSelectIDs,
-				Key:     "webhook-ids",
-				Prompt:  "Select webhooks to delete",
-				Options: options,
+				Type: forms.MultiSelectIDs,
+				Key:  "webhook-ids",
+				LabelFunc: func(item interface{}) string {
+					webhook := item.(platform.Webhook)
+					label := fmt.Sprintf("Org ID %d: ", webhook.ID)
+
+					if webhook.Org != nil && webhook.Org.Name != "" {
+						label = fmt.Sprintf("%s: ", webhook.Org.Name)
+					}
+
+					return fmt.Sprintf("%s%s", label, webhook.URL)
+				},
+				GetItemsFunc: func(ctx context.Context) (interface{}, error) {
+					items, err := Ctx.PlatformClient.GetWebhooks(cmd.Context(), nil)
+					if err != nil {
+						Ctx.Printer.Println(":exclamation: Unable to get webhooks")
+						return nil, errors.New("unable to get webhooks")
+					}
+
+					return items, nil
+				},
 			}},
 		}
 

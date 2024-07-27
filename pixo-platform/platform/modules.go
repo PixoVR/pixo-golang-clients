@@ -22,11 +22,12 @@ type GitConfig struct {
 }
 
 type Module struct {
-	ID          int    `json:"id,omitempty"`
-	Name        string `json:"name,omitempty"`
-	Description string `json:"description,omitempty"`
-	ImageLink   string `json:"imageLink,omitempty"`
-	ShortDesc   string `json:"shortDesc,omitempty"`
+	ID           int    `json:"id,omitempty"`
+	Name         string `json:"name,omitempty"`
+	Abbreviation string `json:"abbreviation,omitempty"`
+	Description  string `json:"description,omitempty"`
+	ImageLink    string `json:"imageLink,omitempty"`
+	ShortDesc    string `json:"shortDesc,omitempty"`
 
 	GitConfigID int       `json:"gitConfigId,omitempty"`
 	GitConfig   GitConfig `json:"gitConfig,omitempty"`

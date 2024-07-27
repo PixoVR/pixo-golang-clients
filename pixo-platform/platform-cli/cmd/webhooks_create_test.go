@@ -26,9 +26,9 @@ var _ = Describe("Webhooks Create", func() {
 			"create",
 		)
 
-		Expect(err).NotTo(HaveOccurred())
+		Expect(err).To(HaveOccurred())
+		Expect(err).To(MatchError("URL not provided"))
 		Expect(output).To(ContainSubstring("Enter URL:"))
-		Expect(output).To(ContainSubstring("URL not provided"))
 		Expect(executor.MockPlatformClient.NumCalledCreateWebhook).To(Equal(0))
 	})
 
@@ -41,16 +41,16 @@ var _ = Describe("Webhooks Create", func() {
 			"create",
 		)
 
-		Expect(err).NotTo(HaveOccurred())
+		Expect(err).To(HaveOccurred())
+		Expect(err).To(MatchError("DESCRIPTION not provided"))
 		Expect(output).To(ContainSubstring("Enter DESCRIPTION:"))
-		Expect(output).To(ContainSubstring("DESCRIPTION not provided"))
 		Expect(executor.MockPlatformClient.NumCalledCreateWebhook).To(Equal(0))
 	})
 
-	It("can return an error if the api call fails", func() {
-		executor.MockPlatformClient.CreateWebhookError = errors.New("error")
+	It("can return an error if the create call fails", func() {
+		executor.MockPlatformClient.CreateWebhookError = errors.New("create error")
 
-		output := executor.RunCommandAndExpectSuccess(
+		_, err := executor.RunCommand(
 			"webhooks",
 			"create",
 			"--url",
@@ -58,14 +58,16 @@ var _ = Describe("Webhooks Create", func() {
 			"--description",
 			"test",
 			"--generate-token",
+			"true",
 		)
 
-		Expect(output).To(ContainSubstring("error"))
+		Expect(err).To(HaveOccurred())
+		Expect(err).To(MatchError("create error"))
 		Expect(executor.MockPlatformClient.NumCalledCreateWebhook).To(Equal(1))
 	})
 
-	It("asks the user for the token if they don't want it generated", func() {
-		input := bytes.NewBufferString("my-token\n")
+	It("asks the user if they want to generate a token", func() {
+		input := bytes.NewBufferString("yes\n")
 
 		output, err := executor.RunCommandWithInput(
 			input,
@@ -78,14 +80,14 @@ var _ = Describe("Webhooks Create", func() {
 		)
 
 		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring("Enter WEBHOOK TOKEN:"))
+		Expect(output).To(ContainSubstring("Generate token automatically?"))
 		Expect(output).To(ContainSubstring("Webhook created"))
 		Expect(output).To(ContainSubstring("Token: "))
 		Expect(executor.MockPlatformClient.NumCalledCreateWebhook).To(Equal(1))
 	})
 
 	It("asks the user if they want to generate a token if they don't provide one", func() {
-		input := bytes.NewBufferString("\nno\n")
+		input := bytes.NewBufferString("no\n")
 
 		output := executor.RunCommandWithInputAndExpectSuccess(
 			input,
@@ -129,6 +131,7 @@ var _ = Describe("Webhooks Create", func() {
 			"--description",
 			"test",
 			"--generate-token",
+			"true",
 		)
 
 		Expect(output).To(ContainSubstring("Webhook created"))

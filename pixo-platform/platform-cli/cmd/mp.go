@@ -55,5 +55,5 @@ func init() {
 
 	mpCmd.PersistentFlags().StringP("server-version", "v", "", "Semantic SemanticVersion of the multiplayer server version")
 	mpCmd.PersistentFlags().BoolVarP(&connect, "connect", "c", false, "Whether to connect to the gameserver found from a match request")
-	mpCmd.PersistentFlags().IntP("module-id", "m", 0, "Module ID")
+	mpCmd.PersistentFlags().StringP("module-id", "m", "", "Module ID")
 }

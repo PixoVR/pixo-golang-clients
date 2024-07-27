@@ -22,7 +22,7 @@ func (f *Handler) Confirm(question *forms.Question) error {
 	var (
 		isLowercase bool
 		isFirstChar bool
-		answer      = question.Answer.(string)
+		answer      = forms.String(question.Answer)
 	)
 
 	isLowercase = strings.EqualFold(answer, yes)

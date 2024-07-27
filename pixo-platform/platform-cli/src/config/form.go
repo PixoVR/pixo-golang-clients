@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
 	"github.com/spf13/cobra"
@@ -37,11 +38,10 @@ func (c *ConfigManager) GetValuesOrSubmitForm(values []Value, cmd *cobra.Command
 			val, ok := c.GetFlagOrConfigValue(value.Question.Key, cmd)
 			if ok {
 				var id int
-				options, err := value.GetOptions()
-				if err != nil {
+				if err := value.GetOptions(context.TODO()); err != nil {
 					return nil, err
 				}
-				for _, option := range options {
+				for _, option := range value.Options {
 					if val == option.Label {
 						id, _ = strconv.Atoi(option.Value)
 						break
@@ -65,11 +65,10 @@ func (c *ConfigManager) GetValuesOrSubmitForm(values []Value, cmd *cobra.Command
 				ids := make([]int, len(strVals))
 				for i, strVal := range strVals {
 					var id int
-					options, err := value.GetOptions()
-					if err != nil {
+					if err := value.Question.GetOptions(context.TODO()); err != nil {
 						return nil, err
 					}
-					for _, option := range options {
+					for _, option := range value.Question.Options {
 						if strVal == option.Label {
 							id, _ = strconv.Atoi(option.Value)
 							ids[i] = id

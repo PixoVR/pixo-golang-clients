@@ -13,7 +13,7 @@ func (f *Handler) SelectIDInput(question *forms.Question) huh.Field {
 		Value(question.Answer.(*int))
 }
 
-func (f *Handler) SelectID(question *forms.Question) error {
+func (f *Handler) SelectID(question *forms.Question) (err error) {
 	if question == nil {
 		return errors.New("question not provided")
 	}
@@ -27,7 +27,7 @@ func (f *Handler) SelectInput(question *forms.Question) huh.Field {
 		Value(question.Answer.(*string))
 }
 
-func (f *Handler) Select(question *forms.Question) error {
+func (f *Handler) Select(question *forms.Question) (err error) {
 	if question == nil {
 		return errors.New("question not provided")
 	}
@@ -41,7 +41,10 @@ func (f *Handler) MultiSelectIDsInput(question *forms.Question) huh.Field {
 		Value(question.Answer.(*[]int))
 }
 
-func (f *Handler) MultiSelectIDs(question *forms.Question) error {
+func (f *Handler) MultiSelectIDs(question *forms.Question) (err error) {
+	if question == nil {
+		return errors.New("question not provided")
+	}
 	return f.MultiSelectIDsInput(question).Run()
 }
 
@@ -52,6 +55,9 @@ func (f *Handler) MultiSelectInput(question *forms.Question) huh.Field {
 		Value(question.Answer.(*[]string))
 }
 
-func (f *Handler) MultiSelect(question *forms.Question) error {
+func (f *Handler) MultiSelect(question *forms.Question) (err error) {
+	if question == nil {
+		return errors.New("question not provided")
+	}
 	return f.MultiSelectInput(question).Run()
 }

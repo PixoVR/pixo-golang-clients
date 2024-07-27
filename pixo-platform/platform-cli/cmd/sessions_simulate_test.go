@@ -31,21 +31,8 @@ var _ = Describe("Sessions Simulation", func() {
 		Expect(output).To(ContainSubstring("MODULE ID"))
 	})
 
-	It("doesnt get modules if id is provided", func() {
-		output, err := executor.RunCommand(
-			"sessions",
-			"simulate",
-			"--module-id",
-			"1",
-		)
-
-		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring("Session started for module"))
-		Expect(executor.MockPlatformClient.NumCalledGetModules).To(Equal(0))
-	})
-
 	It("gets modules if no id is provided", func() {
-		input := bytes.NewBufferString("test\n")
+		input := bytes.NewBufferString("1: TST - test\n")
 
 		output, err := executor.RunCommandWithInput(
 			input,
@@ -56,7 +43,7 @@ var _ = Describe("Sessions Simulation", func() {
 		Expect(executor.MockPlatformClient.NumCalledGetModules).To(Equal(1))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring("MODULE ID"))
-		Expect(output).To(ContainSubstring("Session started for module test"))
+		Expect(output).To(ContainSubstring("Session started for module TST - test"))
 	})
 
 	It("can ask the user for the ip address if getting the ip fails", func() {
@@ -75,8 +62,8 @@ var _ = Describe("Sessions Simulation", func() {
 	})
 
 	It("can return an error if the create call fails", func() {
-		input := bytes.NewBufferString("test\n")
 		executor.MockPlatformClient.CreateSessionError = errors.New("create error")
+		input := bytes.NewBufferString("1: TST - test\n")
 
 		_, err := executor.RunCommandWithInput(
 			input,
@@ -94,11 +81,10 @@ var _ = Describe("Sessions Simulation", func() {
 			"sessions",
 			"simulate",
 			"--module-id",
-			"1",
+			"1: TST - test",
 		)
-
 		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring("Session started for module"))
+		Expect(output).To(ContainSubstring("Session started for module TST - test"))
 
 		output, err = executor.RunCommand("config")
 		Expect(err).NotTo(HaveOccurred())

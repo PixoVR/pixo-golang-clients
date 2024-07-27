@@ -15,18 +15,20 @@ var webhooksListCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List webhooks",
 	Long:  `List webhooks`,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		spinner := loader.NewLoader(cmd.Context(), "Getting webhooks...", Ctx.Printer)
 		webhooks, err := Ctx.PlatformClient.GetWebhooks(cmd.Context(), &platform.WebhookParams{OrgID: Ctx.PlatformClient.ActiveOrgID()})
 		spinner.Stop()
 		if err != nil {
-			Ctx.Printer.Println(":exclamation: Unable to get webhooks: ", err)
-			return
+			Ctx.Printer.Println(":exclamation: Failed to get webhooks")
+			return err
 		}
 
 		for _, webhook := range webhooks {
 			Ctx.Printer.Println(fmt.Sprintf("%d. Description: %s\n    URL: %s", webhook.ID, webhook.Description, webhook.URL))
 		}
+
+		return nil
 	},
 }
 

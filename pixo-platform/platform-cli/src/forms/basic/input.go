@@ -35,6 +35,11 @@ func (f *Handler) GetResponseFromUser(question *forms.Question) error {
 		return err
 	}
 
+	if line == "" {
+		question.Answer = nil
+		return nil
+	}
+
 	question.Answer = forms.String(line)
 	return nil
 }
