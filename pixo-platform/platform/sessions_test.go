@@ -68,6 +68,7 @@ var _ = Describe("Sessions and Events", func() {
 		Expect(updatedSession.CompletedAt).NotTo(BeNil())
 		Expect(updatedSession.Duration).NotTo(BeNil())
 	})
+
 	It("can return an error if the json is invalid", func() {
 		event := &platform.Event{
 			SessionID: session.ID,
@@ -91,6 +92,7 @@ var _ = Describe("Sessions and Events", func() {
 
 		Expect(event).NotTo(BeNil())
 		Expect(event.ID).NotTo(BeZero())
+		Expect(event.SessionID).To(Equal(session.ID))
 	})
 
 	It("can create an event with a payload", func() {

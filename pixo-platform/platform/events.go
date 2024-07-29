@@ -10,6 +10,7 @@ import (
 type Event struct {
 	ID        int         `json:"id,omitempty"`
 	SessionID int         `json:"sessionId,omitempty"`
+	Session   *Session    `json:"session,omitempty"`
 	Type      string      `json:"eventType,omitempty"`
 	Payload   interface{} `json:"jsonData,omitempty"`
 
@@ -54,7 +55,7 @@ func (p *PlatformClient) CreateEvent(ctx context.Context, event *Event) error {
 		return errors.New("event is nil")
 	}
 
-	query := `mutation createEvent($input: EventInput!) { createEvent(input: $input) { id } }`
+	query := `mutation createEvent($input: EventInput!) { createEvent(input: $input) { id sessionId } }`
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{
