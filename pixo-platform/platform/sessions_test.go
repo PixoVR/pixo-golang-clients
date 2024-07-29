@@ -3,6 +3,7 @@ package platform_test
 import (
 	"context"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
+	"github.com/go-faker/faker/v4"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -10,23 +11,24 @@ import (
 var _ = Describe("Sessions and Events", func() {
 
 	var (
-		ctx       = context.Background()
-		session   *platform.Session
-		ipAddress = "127.0.0.1"
-		deviceID  = "test"
+		ctx      = context.Background()
+		session  *platform.Session
+		deviceID = "test"
 	)
 
 	BeforeEach(func() {
+		uuid := faker.UUIDDigit()
 		session = &platform.Session{
-			ModuleID:  moduleID,
-			IPAddress: ipAddress,
-			DeviceID:  deviceID,
+			ModuleID: moduleID,
+			DeviceID: deviceID,
+			UUID:     uuid,
 		}
 
 		Expect(tokenClient.CreateSession(ctx, session)).To(Succeed())
 
 		Expect(session).NotTo(BeNil())
 		Expect(session.ID).NotTo(BeZero())
+		Expect(session.UUID).To(Equal(uuid))
 		Expect(session.UserID).NotTo(BeZero())
 		Expect(session.ModuleID).To(Equal(moduleID))
 		Expect(session.Module).NotTo(BeNil())

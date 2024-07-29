@@ -23,8 +23,6 @@ type Session struct {
 
 	UserID   int     `json:"userId,omitempty"`
 	User     User    `json:"user,omitempty"`
-	OrgID    int     `json:"orgId,omitempty"`
-	Org      Org     `json:"org,omitempty"`
 	ModuleID int     `json:"moduleId,omitempty"`
 	Module   Module  `json:"module,omitempty"`
 	Events   []Event `json:"events,omitempty"`
@@ -70,13 +68,13 @@ func (p *PlatformClient) CreateSession(ctx context.Context, session *Session) er
 		return errors.New("session is nil")
 	}
 
-	query := `mutation createSession($input: SessionInput!) { createSession(input: $input) { id userId user { orgId } moduleId module { id abbreviation } } }`
+	query := `mutation createSession($input: SessionInput!) { createSession(input: $input) { id uuid userId user { orgId } moduleId module { id abbreviation } } }`
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{
-			"moduleId":  session.ModuleID,
-			"ipAddress": session.IPAddress,
-			"deviceId":  session.DeviceID,
+			"uuid":     session.UUID,
+			"moduleId": session.ModuleID,
+			"deviceId": session.DeviceID,
 		},
 	}
 
