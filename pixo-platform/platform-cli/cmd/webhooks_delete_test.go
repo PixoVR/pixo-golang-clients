@@ -32,16 +32,15 @@ var _ = Describe("Webhooks Delete", func() {
 	})
 
 	It("can return an error if the get call fails", func() {
-		executor.MockPlatformClient.GetWebhooksError = errors.New("error")
+		executor.MockPlatformClient.GetWebhooksError = errors.New("get webhooks error")
 
-		output, err := executor.RunCommand(
+		_, err := executor.RunCommand(
 			"webhooks",
 			"delete",
 		)
 
 		Expect(err).To(HaveOccurred())
-		Expect(err).To(MatchError("WEBHOOK IDs not provided"))
-		Expect(output).To(ContainSubstring("Unable to get webhooks"))
+		Expect(err).To(MatchError("get webhooks error"))
 		Expect(executor.MockPlatformClient.NumCalledGetWebhooks).To(Equal(1))
 		Expect(executor.MockPlatformClient.NumCalledDeleteWebhook).To(Equal(0))
 	})

@@ -46,7 +46,7 @@
 #   Hide                            Hide the subsequent commands from the output
 #   Show                            Show the subsequent commands in the output
 
-Output create-user.gif
+Output session.gif
 
 Require echo
 
@@ -55,15 +55,12 @@ Set FontSize 32
 Set Width 1200
 Set Height 600
 
-Type "pixo users create" Enter
-Sleep 1s
-Type "Test" Sleep 500ms  Enter
-Type "Developer" Sleep 500ms  Enter
-Type "test-developer@pixovr.com" Sleep 500ms  Enter
-Type "testdeveloper" Sleep 500ms  Enter
-Type "" Sleep 500ms  Enter
-Type "/dev" Sleep 500ms  Enter
+Type "pixo sessions simulate" Enter
+Sleep 1500ms
+Type "/Ape" Sleep 500ms Enter
 Sleep 500ms
-Type "/Pixo" Sleep 500ms  Enter
+Type "pixo sessions end" Sleep 500ms Enter
+Type "90" Sleep 500ms Enter
+Type "100" Sleep 500ms Enter
 
 Sleep 5s

@@ -76,7 +76,7 @@ var _ = Describe("Matchmaker", func() {
 		Expect(addr).To(BeNil())
 	})
 
-	It("can retrieve a game server address using the matchmaker and send a message to it", func() {
+	It("can find a match and talk to the gameserver", func() {
 		req := matchmaker.MatchRequest{
 			ModuleID:      43,
 			ServerVersion: "1.03.02",

@@ -31,15 +31,11 @@ var sessionsEndCmd = &cobra.Command{
 			return err
 		}
 
-		sessionID := forms.Int(answers["session-id"])
-		score := forms.Int(answers["score"])
-		maxScore := forms.Int(answers["max-score"])
-
 		ipAddress, _ := Ctx.PlatformClient.GetIPAddress()
 		input := platform.Session{
-			ID:        sessionID,
-			RawScore:  float64(score),
-			MaxScore:  float64(maxScore),
+			ID:        forms.Int(answers["session-id"]),
+			RawScore:  float64(forms.Int(answers["score"])),
+			MaxScore:  float64(forms.Int(answers["max-score"])),
 			IPAddress: ipAddress,
 			Completed: true,
 		}
@@ -69,7 +65,7 @@ var sessionsEndCmd = &cobra.Command{
 			OrgID     int               `json:"org_id,omitempty"`
 			ModuleID  int               `json:"moduleId,omitempty"`
 		}{
-			SessionID: &sessionID,
+			SessionID: &session.ID,
 			EventType: "PIXOVR_SESSION_COMPLETE",
 			IP:        session.IPAddress,
 			DeviceID:  session.DeviceID,
@@ -107,7 +103,7 @@ var sessionsEndCmd = &cobra.Command{
 		percentScore := int(session.ScaledScore * 100)
 
 		Ctx.Printer.Println("\n:white_check_mark: Session completed")
-		Ctx.Printer.Printf(":input_numbers: Score: %d/%d\n", score, maxScore)
+		Ctx.Printer.Printf(":input_numbers: Score: %.2f/%.2f\n", session.RawScore, session.MaxScore)
 		Ctx.Printer.Printf(":hundred_points: Percent: %d%s\n", percentScore, "%")
 		Ctx.Printer.Printf(":hourglass_done: Duration: %s\n", session.Duration)
 		return nil

@@ -47,7 +47,7 @@ var _ = Describe("Sessions Simulation", func() {
 	})
 
 	It("can ask the user for the ip address if getting the ip fails", func() {
-		input := bytes.NewBufferString("test\n")
+		input := bytes.NewBufferString("1: TST - test\n\n")
 		executor.MockPlatformClient.GetIPAddressError = errors.New("ip address not provided")
 
 		output, err := executor.RunCommandWithInput(
@@ -57,7 +57,7 @@ var _ = Describe("Sessions Simulation", func() {
 		)
 
 		Expect(err).To(HaveOccurred())
-		Expect(err).To(MatchError("ip address not provided"))
+		Expect(err).To(MatchError("IP ADDRESS not provided"))
 		Expect(output).To(ContainSubstring("IP ADDRESS:"))
 	})
 
@@ -77,7 +77,10 @@ var _ = Describe("Sessions Simulation", func() {
 	})
 
 	It("can simulate a session", func() {
-		output, err := executor.RunCommand(
+		input := bytes.NewBufferString("1: TST - test\n")
+
+		output, err := executor.RunCommandWithInput(
+			input,
 			"sessions",
 			"simulate",
 			"--module-id",
@@ -85,6 +88,7 @@ var _ = Describe("Sessions Simulation", func() {
 		)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring("Session started for module TST - test"))
+		//Expect(output).To(ContainSubstring("Create event?"))
 
 		output, err = executor.RunCommand("config")
 		Expect(err).NotTo(HaveOccurred())

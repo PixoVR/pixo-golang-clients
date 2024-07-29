@@ -46,7 +46,7 @@
 #   Hide                            Hide the subsequent commands from the output
 #   Show                            Show the subsequent commands in the output
 
-Output login.gif
+Output delete-key.gif
 
 Require echo
 
@@ -55,8 +55,12 @@ Set FontSize 32
 Set Width 1200
 Set Height 600
 
-Type "pixo auth login" Sleep 500ms  Enter
-Type "walker.obrien@pixovr.com" Sleep 500ms  Enter
-Type "jwu*aha7KJT4wdp_mqg" Sleep 500ms  Enter
+Type "pixo keys delete" Enter
+Sleep 1s
+Type "x" Sleep 500ms
+Down 1 Type "x" Sleep 500ms
+Down 1 Type "x" Sleep 500ms
+Down 1 Type "x" Sleep 500ms
+Sleep 500ms Enter
 
 Sleep 5s

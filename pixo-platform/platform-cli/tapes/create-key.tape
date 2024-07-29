@@ -46,7 +46,7 @@
 #   Hide                            Hide the subsequent commands from the output
 #   Show                            Show the subsequent commands in the output
 
-Output login.gif
+Output create-key.gif
 
 Require echo
 
@@ -55,6 +55,6 @@ Set FontSize 32
 Set Width 1200
 Set Height 600
 
-Type "pixo keys create" Sleep 500ms  Enter
+Type "pixo keys create" Sleep 500ms Enter
 
 Sleep 5s

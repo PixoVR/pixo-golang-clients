@@ -105,3 +105,32 @@ func StringSlice(sliceOrPtr interface{}) []string {
 
 	return nil
 }
+
+func IsEmpty(item interface{}) bool {
+	if item == nil {
+		return true
+	}
+
+	v := reflect.ValueOf(item)
+
+	if v.Kind() == reflect.Ptr {
+		if v.IsNil() {
+			return true
+		}
+		v = v.Elem()
+	}
+
+	if v.Kind() == reflect.String {
+		return v.String() == ""
+	}
+
+	if v.Kind() == reflect.Slice {
+		return v.Len() == 0
+	}
+
+	if v.Kind() == reflect.Int {
+		return v.Int() == 0
+	}
+
+	return false
+}

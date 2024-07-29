@@ -5,7 +5,6 @@ package cmd
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/config"
@@ -35,13 +34,7 @@ var webhooksDeleteCmd = &cobra.Command{
 					return fmt.Sprintf("%s%s", label, webhook.URL)
 				},
 				GetItemsFunc: func(ctx context.Context) (interface{}, error) {
-					items, err := Ctx.PlatformClient.GetWebhooks(cmd.Context(), nil)
-					if err != nil {
-						Ctx.Printer.Println(":exclamation: Unable to get webhooks")
-						return nil, errors.New("unable to get webhooks")
-					}
-
-					return items, nil
+					return Ctx.PlatformClient.GetWebhooks(cmd.Context(), nil)
 				},
 			}},
 		}

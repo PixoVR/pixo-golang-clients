@@ -44,12 +44,15 @@ var _ = Describe("Config", Ordered, func() {
 		username := faker.Username()
 		password := faker.Password()
 		executor.ExpectLoginToSucceed(username, password)
-		token, ok := executor.ConfigManager.GetConfigValue("token")
+
+		token, ok := executor.ConfigManager.GetConfigValue("auth-token")
 		Expect(ok).To(BeTrue())
 		Expect(token).NotTo(BeEmpty())
-		userID, ok := executor.ConfigManager.GetIntConfigValue("user-id")
+
+		userID, ok := executor.ConfigManager.GetIntConfigValue("auth-user-id")
 		Expect(ok).To(BeTrue())
 		Expect(userID).NotTo(BeZero())
+
 		_ = executor.RunCommandAndExpectSuccess("config", "set", "-k", "test", "-v", "testvalue")
 		_ = executor.RunCommandAndExpectSuccess("config", "set", "-k", "api-key", "-v", "testapikey")
 
@@ -63,6 +66,9 @@ var _ = Describe("Config", Ordered, func() {
 		Expect(output).To(ContainSubstring("Username: " + username))
 		Expect(output).To(ContainSubstring("API Key: ********"))
 		Expect(output).NotTo(ContainSubstring("testapikey"))
+		Expect(output).To(ContainSubstring("Password: ********"))
+		Expect(output).NotTo(ContainSubstring(password))
+		Expect(output).To(ContainSubstring("Token: ********"))
 		Expect(output).To(ContainSubstring("Test: testvalue"))
 	})
 

@@ -44,7 +44,8 @@ func NewContext(configFiles ...string) *Context {
 	//formHandler := basic.NewFormHandler(os.Stdin, os.Stdout)
 
 	fileManager := config.NewFileConfigManager(configFile, formHandler)
-	configManager := config.NewConfigManager(fileManager, formHandler)
+	emojiPrinter := printer.NewEmojiPrinter(os.Stdout)
+	configManager := config.NewConfigManager(fileManager, emojiPrinter, formHandler)
 
 	token, _ := configManager.GetConfigValue("token")
 
@@ -58,7 +59,7 @@ func NewContext(configFiles ...string) *Context {
 		FormHandler:       formHandler,
 		ConfigManager:     configManager,
 		FileManager:       fileManager,
-		Printer:           printer.NewEmojiPrinter(os.Stdout),
+		Printer:           emojiPrinter,
 		HeadsetClient:     headset.NewClient(clientConfig),
 		PlatformClient:    platform.NewClient(clientConfig),
 		MatchmakingClient: matchmaker.NewClient(clientConfig),
@@ -74,35 +75,43 @@ func (p *Context) SetIO(cmd *cobra.Command) {
 }
 
 func (p *Context) Authenticate(cmd *cobra.Command) error {
-	token, ok := p.ConfigManager.GetFlagOrConfigValue("token", cmd)
-	if ok && token != "" {
-		p.PlatformClient.SetToken(token)
-		p.HeadsetClient.SetToken(token)
-		p.ConfigManager.SetConfigValue("token", token)
-		return nil
-	}
-
-	apiKey, ok := p.ConfigManager.GetFlagOrConfigValue("api-key", cmd)
-	if ok && apiKey != "" {
-		p.PlatformClient.SetAPIKey(apiKey)
-		p.ConfigManager.SetConfigValue("api-key", apiKey)
-		return nil
-	}
-
-	username, ok := p.ConfigManager.GetFlagOrConfigValue("username", cmd)
-	if ok && username != "" {
-		p.ConfigManager.SetConfigValue("username", username)
-	}
-
-	password, ok := p.ConfigManager.GetFlagOrConfigValue("password", cmd)
-	if ok && password != "" {
-		p.ConfigManager.SetConfigValue("password", password)
-	}
-
 	ctx := context.Background()
 	if cmd != nil {
 		ctx = cmd.Context()
 	}
+
+	token, ok := p.ConfigManager.GetFlagOrConfigValue("auth-token", cmd)
+	if ok {
+		if _, err := p.PlatformClient.GetPlatforms(ctx); err == nil {
+			return nil
+		}
+
+		p.PlatformClient.SetToken(token)
+		p.MatchmakingClient.SetToken(token)
+		p.HeadsetClient.SetToken(token)
+		p.ConfigManager.SetConfigValue("auth-token", token)
+		return nil
+	}
+
+	apiKey, ok := p.ConfigManager.GetFlagOrConfigValue("api-key", cmd)
+	if ok {
+		p.PlatformClient.SetAPIKey(apiKey)
+		p.ConfigManager.SetConfigValue("api-key", apiKey)
+		if _, err := p.PlatformClient.GetPlatforms(ctx); err == nil {
+			return nil
+		}
+	}
+
+	username, ok := p.ConfigManager.GetFlagOrConfigValue("auth-username", cmd)
+	if ok {
+		p.ConfigManager.SetConfigValue("auth-username", username)
+	}
+
+	password, ok := p.ConfigManager.GetFlagOrConfigValue("auth-password", cmd)
+	if ok {
+		p.ConfigManager.SetConfigValue("auth-password", password)
+	}
+
 	spinner := loader.NewLoader(ctx, "Logging into the Pixo Platform...", p.Printer)
 	defer spinner.Stop()
 
@@ -110,8 +119,8 @@ func (p *Context) Authenticate(cmd *cobra.Command) error {
 		if err := p.PlatformClient.Login(username, password); err != nil {
 			return err
 		}
-		p.ConfigManager.SetConfigValue("token", p.PlatformClient.GetToken())
-		p.ConfigManager.SetIntConfigValue("user-id", p.PlatformClient.ActiveUserID())
+		p.ConfigManager.SetConfigValue("auth-token", p.PlatformClient.GetToken())
+		p.ConfigManager.SetIntConfigValue("auth-user-id", p.PlatformClient.ActiveUserID())
 	}
 
 	return nil

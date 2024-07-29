@@ -1,9 +1,11 @@
 package basic
 
 import (
+	"errors"
 	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
 	"github.com/rs/zerolog/log"
+	"io"
 )
 
 func (f *Handler) AskQuestions(questions []forms.Question) (map[string]interface{}, error) {
@@ -44,9 +46,12 @@ func (f *Handler) AskQuestions(questions []forms.Question) (map[string]interface
 		}
 
 		if !question.Optional {
-			if err != nil || question.Answer == nil {
+			if err != nil && !errors.Is(err, io.EOF) {
+				return nil, err
+			} else if forms.IsEmpty(question.Answer) {
 				return nil, fmt.Errorf("%s not provided", forms.CleanPrompt(question.Key))
 			}
+
 			answers[question.Key] = question.Answer
 		}
 	}

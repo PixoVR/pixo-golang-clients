@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/config"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms/basic"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/printer"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/spf13/cobra"
@@ -14,6 +15,10 @@ import (
 )
 
 var _ = Describe("File Manager", func() {
+
+	var (
+		emojiPrinter = printer.NewEmojiPrinter(nil)
+	)
 
 	Context("when the config file does not exist", func() {
 
@@ -27,7 +32,7 @@ var _ = Describe("File Manager", func() {
 			filename = fmt.Sprintf("./test-config-%d.yaml", rand.Intn(100000))
 			fileManager = config.NewFileConfigManager(filename)
 			Expect(fileManager).NotTo(BeNil())
-			configManager = config.NewConfigManager(fileManager)
+			configManager = config.NewConfigManager(fileManager, emojiPrinter)
 			Expect(configManager).NotTo(BeNil())
 		})
 
@@ -105,7 +110,7 @@ var _ = Describe("File Manager", func() {
 			Expect(fileManager.SetConfigFile(configFilePath)).To(Succeed())
 			Expect(fileManager.ConfigFile()).To(Equal(configFilePath))
 
-			configManager = config.NewConfigManager(fileManager, formHandler)
+			configManager = config.NewConfigManager(fileManager, emojiPrinter, formHandler)
 			Expect(configManager).NotTo(BeNil())
 
 			config := configManager.Config()

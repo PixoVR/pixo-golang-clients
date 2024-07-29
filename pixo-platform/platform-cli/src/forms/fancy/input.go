@@ -6,6 +6,9 @@ import (
 )
 
 func (f *Handler) InputField(question *forms.Question) huh.Field {
+	if question.Answer == nil {
+		question.Answer = new(string)
+	}
 	return huh.NewInput().
 		Title(question.Prompt).
 		Value(question.Answer.(*string))
@@ -16,6 +19,9 @@ func (f *Handler) GetResponseFromUser(question *forms.Question) error {
 }
 
 func (f *Handler) SensitiveInputField(question *forms.Question) huh.Field {
+	if question.Answer == nil {
+		question.Answer = new(string)
+	}
 	return huh.NewInput().
 		Title(question.Prompt).
 		EchoMode(huh.EchoModePassword).

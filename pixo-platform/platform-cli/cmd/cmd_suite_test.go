@@ -47,14 +47,14 @@ type TestExecutor struct {
 func NewTestExecutor() *TestExecutor {
 	formHandler := basic.NewFormHandler(nil, nil)
 	inMemoryConfigManager := config.NewInMemoryConfigManager()
-	configManager := config.NewConfigManager(inMemoryConfigManager)
+	emojiPrinter := printer.NewEmojiPrinter(nil)
+	configManager := config.NewConfigManager(inMemoryConfigManager, emojiPrinter, formHandler)
 
 	mockPlatformClient := &platform.MockClient{}
 	mockLegacyClient := &legacy.MockClient{}
 	mockHeadsetClient := &headset.MockClient{}
 	mockMatchmaker := matchmaker.NewMockMatchmaker()
 
-	emojiPrinter := printer.NewEmojiPrinter(nil)
 	mockFileOpener := &editor.MockFileOpener{}
 
 	cmd.Ctx = &ctx.Context{

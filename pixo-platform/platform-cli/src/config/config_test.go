@@ -6,6 +6,7 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/config"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms/basic"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/printer"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/spf13/cobra"
@@ -34,14 +35,14 @@ var _ = Describe("Config Manager", func() {
 		BeforeEach(func() {
 			fileManager = config.NewFileConfigManager("./test-config.yaml")
 			Expect(fileManager).NotTo(BeNil())
-			configManager = config.NewConfigManager(fileManager)
+			emojiPrinter := printer.NewEmojiPrinter(nil)
+			configManager = config.NewConfigManager(fileManager, emojiPrinter)
 			Expect(configManager).NotTo(BeNil())
 		})
 
 		AfterEach(func() {
 			viper.Reset()
-			err := os.Remove("./test-config.yaml")
-			Expect(err).NotTo(HaveOccurred())
+			Expect(os.Remove("./test-config.yaml")).To(Succeed())
 		})
 
 		It("can initialize the config manager when setting the active environment", func() {
@@ -112,7 +113,8 @@ var _ = Describe("Config Manager", func() {
 			Expect(fileManager.SetConfigFile(configFilePath)).To(Succeed())
 			Expect(fileManager.ConfigFile()).To(Equal(configFilePath))
 
-			configManager = config.NewConfigManager(fileManager, formHandler)
+			emojiPrinter := printer.NewEmojiPrinter(output)
+			configManager = config.NewConfigManager(fileManager, emojiPrinter, formHandler)
 			Expect(configManager).NotTo(BeNil())
 
 			config := configManager.Config()

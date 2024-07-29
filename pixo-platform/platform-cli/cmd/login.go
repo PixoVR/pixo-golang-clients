@@ -4,8 +4,10 @@ Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
+	"errors"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/config"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/loader"
 	"github.com/spf13/cobra"
 )
 
@@ -21,13 +23,34 @@ var loginCmd = &cobra.Command{
 	Will prioritize in order of the above list, and will prompt the user if none is found.	
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if err := Ctx.Authenticate(cmd); err != nil {
-			Ctx.Printer.Println(":exclamation: Login failed. Please check your credentials and try again.")
+		apiKey, ok := Ctx.ConfigManager.GetFlagValue("key", cmd)
+		if ok {
+			Ctx.PlatformClient.SetAPIKey(apiKey)
+			if _, err := Ctx.PlatformClient.GetControlTypes(cmd.Context()); err != nil {
+				return errors.New("invalid API key")
+			}
+
+			Ctx.ConfigManager.UnsetConfigValue("auth-token")
+			Ctx.ConfigManager.UnsetConfigValue("auth-username")
+			Ctx.ConfigManager.UnsetConfigValue("auth-password")
+			Ctx.ConfigManager.SetConfigValue("api-key", apiKey)
+			Ctx.Printer.Println(":rocket: Login with API key successful.")
+			return nil
 		}
 
+		Ctx.ConfigManager.UnsetConfigValue("api-key")
+		Ctx.ConfigManager.UnsetConfigValue("auth-username")
+		Ctx.ConfigManager.UnsetConfigValue("auth-password")
+
 		questions := []config.Value{
-			{Question: forms.Question{Type: forms.Input, Key: "username"}},
-			{Question: forms.Question{Type: forms.SensitiveInput, Key: "password"}},
+			{Question: forms.Question{
+				Type: forms.Input,
+				Key:  "username",
+			}},
+			{Question: forms.Question{
+				Type: forms.SensitiveInput,
+				Key:  "password",
+			}},
 		}
 
 		answers, err := Ctx.ConfigManager.GetValuesOrSubmitForm(questions, cmd)
@@ -37,32 +60,28 @@ var loginCmd = &cobra.Command{
 		}
 
 		username := forms.String(answers["username"])
-		Ctx.ConfigManager.SetConfigValue("username", username)
+		Ctx.ConfigManager.SetConfigValue("auth-username", username)
 
 		password := forms.String(answers["password"])
-		Ctx.ConfigManager.SetConfigValue("password", password)
+		Ctx.ConfigManager.SetConfigValue("auth-password", password)
 
-		if err := Ctx.Authenticate(cmd); err != nil {
-			Ctx.Printer.Println(":exclamation: Login failed. Please check your credentials and try again.")
+		spinner := loader.NewLoader(cmd.Context(), "Logging into the Pixo Platform...", Ctx.Printer)
+		defer spinner.Stop()
+
+		if err := Ctx.PlatformClient.Login(username, password); err != nil {
+			return err
 		}
 
-		msg := ":rocket: Login successful. Here is your API "
+		Ctx.ConfigManager.SetConfigValue("auth-token", Ctx.PlatformClient.GetToken())
+		Ctx.ConfigManager.SetIntConfigValue("auth-user-id", Ctx.PlatformClient.ActiveUserID())
 
-		token, ok := Ctx.ConfigManager.GetConfigValue("token")
-		if ok {
-			Ctx.Printer.Println(msg, "token:\n", token)
-			return nil
-		}
-
-		apiKey, ok := Ctx.ConfigManager.GetConfigValue("api-key")
-		if ok {
-			Ctx.Printer.Println(msg, "key:\n", apiKey)
-		}
-
+		msg := ":rocket: Login successful. Here is your API token:\n"
+		Ctx.Printer.Println(msg, Ctx.PlatformClient.GetToken())
 		return nil
 	},
 }
 
 func init() {
 	authCmd.AddCommand(loginCmd)
+	loginCmd.Flags().StringP("key", "k", "", "API key")
 }

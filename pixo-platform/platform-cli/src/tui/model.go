@@ -52,15 +52,7 @@ func NewStyles(lg *lipgloss.Renderer) *Styles {
 	return &s
 }
 
-type state int
-
-const (
-	statusNormal state = iota
-	stateDone
-)
-
 type Model struct {
-	state  state
 	lg     *lipgloss.Renderer
 	styles *Styles
 	form   *huh.Form

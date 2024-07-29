@@ -22,7 +22,7 @@ var _ = Describe("Users Create", func() {
 		executor.MockPlatformClient.GetOrgsError = fmt.Errorf("failed to get orgs")
 		input := bytes.NewBufferString("\n")
 
-		output, err := executor.RunCommandWithInput(
+		_, err := executor.RunCommandWithInput(
 			input,
 			"users",
 			"create",
@@ -30,17 +30,16 @@ var _ = Describe("Users Create", func() {
 			"test",
 			"--last-name",
 			"test",
-			"--user-email",
+			"--email",
 			"test",
-			"--user-password",
+			"--password",
 			"test",
 			"--role",
 			"admin",
 		)
 
 		Expect(err).To(HaveOccurred())
-		Expect(err).To(MatchError("ORG not provided"))
-		Expect(output).To(ContainSubstring("Unable to get orgs"))
+		Expect(err).To(MatchError("failed to get orgs"))
 		Expect(executor.MockPlatformClient.NumCalledGetOrgs).To(Equal(1))
 		Expect(executor.MockPlatformClient.NumCalledCreateOrg).To(Equal(0))
 	})
@@ -49,7 +48,7 @@ var _ = Describe("Users Create", func() {
 		executor.MockPlatformClient.GetRolesError = fmt.Errorf("failed to get roles")
 		input := bytes.NewBufferString("\n")
 
-		output, err := executor.RunCommandWithInput(
+		_, err := executor.RunCommandWithInput(
 			input,
 			"users",
 			"create",
@@ -57,17 +56,16 @@ var _ = Describe("Users Create", func() {
 			"test",
 			"--last-name",
 			"test",
-			"--user-email",
+			"--email",
 			"test",
-			"--user-password",
+			"--password",
 			"test",
 			"--org",
 			"Org ID 1: test-org",
 		)
 
 		Expect(err).To(HaveOccurred())
-		Expect(err).To(MatchError("ROLE not provided"))
-		Expect(output).To(ContainSubstring("Unable to get roles"))
+		Expect(err).To(MatchError("failed to get roles"))
 		Expect(executor.MockPlatformClient.NumCalledGetRoles).To(Equal(1))
 		Expect(executor.MockPlatformClient.NumCalledCreateOrg).To(Equal(0))
 	})
@@ -83,18 +81,18 @@ var _ = Describe("Users Create", func() {
 			"test",
 			"--last-name",
 			"test",
-			"--user-email",
+			"--email",
 			"test",
-			"--user-username",
+			"--username",
 			"test",
 			"--org",
-			"1",
+			"Org ID 1: test-org",
 			"--role",
 			"admin",
 		)
 
 		Expect(err).To(HaveOccurred())
-		Expect(err).To(MatchError("password is required"))
+		Expect(err).To(MatchError("PASSWORD not provided"))
 		Expect(executor.MockPlatformClient.NumCalledGetOrgs).To(Equal(1))
 	})
 
@@ -110,11 +108,11 @@ var _ = Describe("Users Create", func() {
 			"test",
 			"--last-name",
 			"test",
-			"--user-email",
+			"--email",
 			"test",
-			"--user-username",
+			"--username",
 			"test",
-			"--user-password",
+			"--password",
 			"test",
 			"--org",
 			"Org ID 1: test-org",
@@ -128,7 +126,7 @@ var _ = Describe("Users Create", func() {
 
 	It("can create a user", func() {
 		email := faker.Email()
-		orgID := "Org ID 1: test-org"
+		org := "Org ID 1: test-org"
 		role := "admin"
 
 		output, err := executor.RunCommand(
@@ -138,14 +136,14 @@ var _ = Describe("Users Create", func() {
 			faker.FirstName(),
 			"--last-name",
 			faker.LastName(),
-			"--user-username",
+			"--username",
 			faker.Username(),
-			"--user-email",
+			"--email",
 			email,
-			"--user-password",
+			"--password",
 			faker.Password(),
 			"--org",
-			orgID,
+			org,
 			"--role",
 			role,
 		)

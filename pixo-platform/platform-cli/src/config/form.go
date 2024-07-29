@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/loader"
 	"github.com/spf13/cobra"
 	"reflect"
 	"strconv"
@@ -65,9 +66,12 @@ func (c *ConfigManager) GetValuesOrSubmitForm(values []Value, cmd *cobra.Command
 				ids := make([]int, len(strVals))
 				for i, strVal := range strVals {
 					var id int
+					spinner := loader.NewLoader(context.TODO(), "", c.printer)
 					if err := value.Question.GetOptions(context.TODO()); err != nil {
+						spinner.Stop()
 						return nil, err
 					}
+					spinner.Stop()
 					for _, option := range value.Question.Options {
 						if strVal == option.Label {
 							id, _ = strconv.Atoi(option.Value)

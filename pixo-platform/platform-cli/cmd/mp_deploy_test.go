@@ -2,8 +2,10 @@ package cmd_test
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/k8s/agones"
+	"github.com/kyokomi/emoji"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"math/rand"
@@ -24,70 +26,99 @@ var _ = Describe("Server Deploy", func() {
 		executor.Cleanup()
 	})
 
-	It("can deploy a server version", func() {
+	It("should return an error if the modules get call fails", func() {
+		executor.MockPlatformClient.GetModulesError = errors.New("failed to get modules")
+
 		output, err := executor.RunCommand(
 			"mp",
 			"servers",
 			"deploy",
-			"--module-id",
-			"1",
-			"--server-version",
-			semanticVersion,
-			"--image",
-			agones.SimpleGameServerImage,
-		)
-
-		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring(fmt.Sprintf("Deployed version: %s", semanticVersion)))
-	})
-
-	It("can tell if a server version exists", func() {
-		_, err := executor.RunCommand(
-			"mp",
-			"servers",
-			"deploy",
 			"--pre-check",
-			"--module-id",
-			"1",
-			"--server-version",
-			"1.00.00",
 		)
+
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring("already exists"))
+		Expect(err).To(MatchError("failed to get modules"))
+		Expect(output).To(BeEmpty())
 	})
 
-	It("can tell if a server version does not exist", func() {
-		executor.MockPlatformClient.GetMultiplayerServerVersionsEmpty = true
-		output, err := executor.RunCommand(
-			"mp",
-			"servers",
-			"deploy",
-			"--pre-check",
-			"--module-id",
-			"1",
-			"--server-version",
-			"99.99.99",
-		)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring("does not exist"))
-	})
-
-	It("can ask the user for the docker image to use if not provided", func() {
-		input := bytes.NewBufferString("test\n")
+	It("should ask for the module id and server version if it is not provided", func() {
+		input := bytes.NewBufferString("1: TST - test\n")
 
 		output, err := executor.RunCommandWithInput(
 			input,
 			"mp",
 			"servers",
 			"deploy",
+			"--pre-check",
+		)
+
+		Expect(err).To(HaveOccurred())
+		Expect(err).To(MatchError("SERVER VERSION not provided"))
+		Expect(output).To(ContainSubstring("MODULE ID"))
+		Expect(output).To(ContainSubstring("SERVER VERSION"))
+	})
+
+	It("can tell if a server version exists", func() {
+		output, err := executor.RunCommand(
+			"mp",
+			"servers",
+			"deploy",
+			"--pre-check",
 			"--module-id",
-			"1",
+			"1: TST - test",
+			"--server-version",
+			"1.00.00",
+		)
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("server version 1.00.00 already exists"))
+		Expect(output).To(Equal(emoji.Sprint("\b:exclamation: server version 1.00.00 already exists\n")))
+	})
+
+	It("can tell if a server version does not exist", func() {
+		executor.MockPlatformClient.GetMultiplayerServerVersionsEmpty = true
+		output := executor.RunCommandAndExpectSuccess(
+			"mp",
+			"servers",
+			"deploy",
+			"--pre-check",
+			"--module-id",
+			"1: TST - test",
+			"--server-version",
+			"99.99.99",
+		)
+		Expect(output).To(Equal(emoji.Sprint("\b:heavy_check_mark: Server version does not exist yet: 99.99.99\n")))
+	})
+
+	It("can ask the user for the docker image to use if not provided", func() {
+		input := bytes.NewBufferString("test\n")
+
+		output := executor.RunCommandWithInputAndExpectSuccess(
+			input,
+			"mp",
+			"servers",
+			"deploy",
+			"--module-id",
+			"1: TST - test",
 			"--server-version",
 			semanticVersion,
 		)
 
-		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring("Enter DOCKER IMAGE:"))
+		Expect(output).To(ContainSubstring(fmt.Sprintf("Deployed version: %s", semanticVersion)))
+	})
+
+	It("can deploy a server version", func() {
+		output := executor.RunCommandAndExpectSuccess(
+			"mp",
+			"servers",
+			"deploy",
+			"--module-id",
+			"1: TST - test",
+			"--server-version",
+			semanticVersion,
+			"--image",
+			agones.SimpleGameServerImage,
+		)
 		Expect(output).To(ContainSubstring(fmt.Sprintf("Deployed version: %s", semanticVersion)))
 	})
 
@@ -107,7 +138,7 @@ var _ = Describe("Server Deploy", func() {
 			"servers",
 			"deploy",
 			"--module-id",
-			"1",
+			"1: TST - test",
 			"--server-version",
 			semanticVersion,
 			"--zip-file",

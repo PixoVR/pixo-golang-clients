@@ -18,7 +18,7 @@ var _ = Describe("Module", func() {
 	})
 
 	It("can return an error if the semantic version is not provided", func() {
-		input := bytes.NewBufferString("TST - test\n")
+		input := bytes.NewBufferString("1: TST - test\n")
 
 		output, err := executor.RunCommandWithInput(
 			input,
@@ -131,7 +131,7 @@ var _ = Describe("Module", func() {
 	})
 
 	It("can return an error if the platform options cant be found", func() {
-		executor.MockPlatformClient.GetPlatformsError = errors.New("error")
+		executor.MockPlatformClient.GetPlatformsError = errors.New("get platforms error")
 		input := bytes.NewBufferString("")
 
 		_, err := executor.RunCommandWithInput(
@@ -149,7 +149,7 @@ var _ = Describe("Module", func() {
 		)
 
 		Expect(err).To(HaveOccurred())
-		Expect(err).To(MatchError("PLATFORMS not provided"))
+		Expect(err).To(MatchError("get platforms error"))
 		Expect(executor.MockPlatformClient.NumCalledGetPlatforms).To(Equal(1))
 	})
 
@@ -179,7 +179,7 @@ var _ = Describe("Module", func() {
 	})
 
 	It("can return an error if the control types options cant be found", func() {
-		executor.MockPlatformClient.GetControlTypesError = errors.New("error")
+		executor.MockPlatformClient.GetControlTypesError = errors.New("get controls error")
 		input := bytes.NewBufferString("nonexistent\n")
 
 		_, err := executor.RunCommandWithInput(
@@ -199,7 +199,7 @@ var _ = Describe("Module", func() {
 		)
 
 		Expect(err).To(HaveOccurred())
-		Expect(err).To(MatchError("CONTROLS not provided"))
+		Expect(err).To(MatchError("get controls error"))
 		Expect(executor.MockPlatformClient.NumCalledGetControlTypes).To(Equal(1))
 	})
 

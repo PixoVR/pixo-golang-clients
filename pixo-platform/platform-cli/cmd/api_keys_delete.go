@@ -5,7 +5,6 @@ package cmd
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/config"
@@ -43,11 +42,7 @@ var deleteApiKeyCmd = &cobra.Command{
 					return label
 				},
 				GetItemsFunc: func(ctx context.Context) (interface{}, error) {
-					items, err := Ctx.PlatformClient.GetAPIKeys(cmd.Context(), nil)
-					if err != nil {
-						return nil, errors.New("unable to get api keys")
-					}
-					return items, nil
+					return Ctx.PlatformClient.GetAPIKeys(cmd.Context(), nil)
 				},
 			}},
 		}

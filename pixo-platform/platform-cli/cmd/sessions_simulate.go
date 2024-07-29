@@ -29,11 +29,7 @@ var sessionsSimulateCmd = &cobra.Command{
 					return fmt.Sprintf("%d: %s - %s", module.ID, module.Abbreviation, module.Name)
 				},
 				GetItemsFunc: func(ctx context.Context) (interface{}, error) {
-					items, err := Ctx.PlatformClient.GetModules(cmd.Context())
-					if err != nil {
-						return nil, errors.New("unable to get modules")
-					}
-					return items, nil
+					return Ctx.PlatformClient.GetModules(cmd.Context())
 				},
 			}},
 		}
@@ -52,7 +48,7 @@ var sessionsSimulateCmd = &cobra.Command{
 			var ok bool
 			ipAddress, ok = Ctx.ConfigManager.GetConfigValueOrAskUser("ip-address", cmd)
 			if !ok {
-				return errors.New("ip address not provided")
+				return errors.New("IP ADDRESS not provided")
 			}
 		}
 
@@ -67,7 +63,7 @@ var sessionsSimulateCmd = &cobra.Command{
 			return err
 		}
 
-		Ctx.Printer.Printf(":white_check_mark: Session started for module %s - %s", session.Module.Abbreviation, session.Module.Name)
+		Ctx.Printer.Printf(":white_check_mark: Session started for module %s - %s\n", session.Module.Abbreviation, session.Module.Name)
 		Ctx.ConfigManager.SetIntConfigValue("session-id", session.ID)
 		return nil
 	},

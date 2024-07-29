@@ -19,7 +19,7 @@ var upgrader = websocket.Upgrader{
 }
 
 func Run(port string, printer printer.Printer, endpoint string, mockResponse []byte) {
-	gin.SetMode(gin.DebugMode)
+	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 	_ = router.SetTrustedProxies(nil)
 

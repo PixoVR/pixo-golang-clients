@@ -56,7 +56,7 @@ Set Width 1200
 Set Height 600
 
 Type "pixo auth login" Sleep 500ms  Enter
-Type "test.user@pixovr.com" Sleep 500ms  Enter
+Type "testuser" Sleep 500ms  Enter
 Type "" Sleep 500ms  Enter
 
 Sleep 5s

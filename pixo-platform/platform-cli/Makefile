@@ -1,5 +1,5 @@
 
-NAME = pixo-dev
+NAME = pixo
 EXECUTABLE = ./bin/$(NAME)
 
 all: lint build coverage docker cp
@@ -14,8 +14,8 @@ build:
 
 .PHONY: cp
 cp:
-	@echo "🚀 Copying binary to /usr/local/bin/${NAME}"
-	@sudo cp $(EXECUTABLE) /usr/local/bin/$(NAME)
+	@echo "🚀 Copying binary to /usr/local/bin/pixo-dev..."
+	@sudo cp $(EXECUTABLE) /usr/local/bin/pixo-dev
 
 
 .PHONY: lint

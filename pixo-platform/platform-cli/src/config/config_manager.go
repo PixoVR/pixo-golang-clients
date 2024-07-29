@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms/basic"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/printer"
 	"github.com/spf13/cobra"
 	"io"
 	"os"
@@ -13,9 +14,10 @@ import (
 type ConfigManager struct {
 	formHandler forms.FormHandler
 	manager     Manager
+	printer     printer.Printer
 }
 
-func NewConfigManager(manager Manager, formHandlers ...forms.FormHandler) *ConfigManager {
+func NewConfigManager(manager Manager, printer printer.Printer, formHandlers ...forms.FormHandler) *ConfigManager {
 	var formHandler forms.FormHandler
 	if len(formHandlers) > 0 {
 		formHandler = formHandlers[0]
@@ -25,6 +27,7 @@ func NewConfigManager(manager Manager, formHandlers ...forms.FormHandler) *Confi
 
 	return &ConfigManager{
 		formHandler: formHandler,
+		printer:     printer,
 		manager:     manager,
 	}
 }
