@@ -31,12 +31,10 @@ var sessionsEndCmd = &cobra.Command{
 			return err
 		}
 
-		ipAddress, _ := Ctx.PlatformClient.GetIPAddress()
 		input := platform.Session{
 			ID:        forms.Int(answers["session-id"]),
 			RawScore:  float64(forms.Int(answers["score"])),
 			MaxScore:  float64(forms.Int(answers["max-score"])),
-			IPAddress: ipAddress,
 			Completed: true,
 		}
 
@@ -55,25 +53,16 @@ var sessionsEndCmd = &cobra.Command{
 		}
 
 		eventInput := struct {
-			SessionID *int              `json:"sessionID"`
-			IP        string            `json:"ipAddress,omitempty"`
-			JSONData  *legacy.JSONEvent `json:"jsonData,omitempty"`
-			DeviceID  string            `json:"deviceId,omitempty"`
-			UUID      string            `json:"uuid,omitempty" `
-			EventType string            `json:"eventType,omitempty"`
-			UserID    int               `json:"user_id,omitempty"`
-			OrgID     int               `json:"org_id,omitempty"`
-			ModuleID  int               `json:"moduleId,omitempty"`
+			SessionID *int                 `json:"sessionID"`
+			UUID      string               `json:"uuid,omitempty" `
+			DeviceID  string               `json:"deviceId,omitempty"`
+			Type      string               `json:"eventType,omitempty"`
+			Payload   *legacy.EventPayload `json:"jsonData,omitempty"`
 		}{
 			SessionID: &session.ID,
-			EventType: "PIXOVR_SESSION_COMPLETE",
-			IP:        session.IPAddress,
+			Type:      "PIXOVR_SESSION_COMPLETE",
 			DeviceID:  session.DeviceID,
-			UUID:      session.UUID,
-			UserID:    session.UserID,
-			OrgID:     session.OrgID,
-			ModuleID:  session.ModuleID,
-			JSONData: &legacy.JSONEvent{
+			Payload: &legacy.EventPayload{
 				LessonStatus:    &[]string{"passed"}[0],
 				SessionDuration: sessionDuration.Seconds(),
 				Score:           &session.RawScore,

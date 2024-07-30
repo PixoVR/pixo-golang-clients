@@ -10,7 +10,7 @@ import (
 type Session struct {
 	ID int `json:"id,omitempty"`
 
-	UUID         string  `json:"uuid,omitempty"`
+	UUID         *string `json:"uuid,omitempty"`
 	IPAddress    string  `json:"ipAddress,omitempty"`
 	DeviceID     string  `json:"deviceId,omitempty"`
 	RawScore     float64 `json:"rawScore,omitempty"`
@@ -99,12 +99,12 @@ func (p *PlatformClient) UpdateSession(ctx context.Context, session Session) (*S
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{
-			"id":     session.ID,
-			"status": session.Status,
-			//"lessonStatus": session.LessonStatus,
-			"completed": session.Completed,
-			"rawScore":  session.RawScore,
-			"maxScore":  session.MaxScore,
+			"id":           session.ID,
+			"status":       session.Status,
+			"lessonStatus": session.LessonStatus,
+			"completed":    session.Completed,
+			"rawScore":     session.RawScore,
+			"maxScore":     session.MaxScore,
 		},
 	}
 

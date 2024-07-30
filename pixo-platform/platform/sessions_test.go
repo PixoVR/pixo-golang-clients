@@ -21,14 +21,15 @@ var _ = Describe("Sessions and Events", func() {
 		session = &platform.Session{
 			ModuleID: moduleID,
 			DeviceID: deviceID,
-			UUID:     uuid,
+			UUID:     &uuid,
 		}
 
 		Expect(tokenClient.CreateSession(ctx, session)).To(Succeed())
 
 		Expect(session).NotTo(BeNil())
 		Expect(session.ID).NotTo(BeZero())
-		Expect(session.UUID).To(Equal(uuid))
+		Expect(session.UUID).NotTo(BeNil())
+		Expect(*session.UUID).To(Equal(uuid))
 		Expect(session.UserID).NotTo(BeZero())
 		Expect(session.ModuleID).To(Equal(moduleID))
 		Expect(session.Module).NotTo(BeNil())

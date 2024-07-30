@@ -22,7 +22,7 @@ type Webhook struct {
 	Token       string `json:"token,omitempty"`
 }
 
-type JSONEvent struct {
+type EventPayload struct {
 	ID              string  `json:"id,omitempty"`
 	SessionDuration float64 `json:"sessionDuration,omitempty"`
 	LessonStatus    *string `json:"lessonStatus,omitempty"`

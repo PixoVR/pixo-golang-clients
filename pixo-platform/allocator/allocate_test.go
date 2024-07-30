@@ -27,7 +27,7 @@ var _ = Describe("Allocate", Ordered, func() {
 		Expect(allocatorClient.IsAuthenticated()).To(BeTrue())
 	})
 
-	It("should be able make a health check against the allocator", func() {
+	It("can check the health of the allocator", func() {
 		client := NewClient(config)
 		res, err := client.Get("health")
 		Expect(err).NotTo(HaveOccurred())
@@ -35,7 +35,20 @@ var _ = Describe("Allocate", Ordered, func() {
 		Expect(res.StatusCode()).To(Equal(http.StatusOK))
 	})
 
-	It("should be able to allocate a multiplayer server", func() {
+	It("should return an error if the server allocation failed", func() {
+		allocationReq := AllocationRequest{
+			ModuleID:      1,
+			OrgID:         1,
+			ImageRegistry: "invalid",
+		}
+
+		res, err := allocatorClient.AllocateGameserver(allocationReq)
+
+		Expect(err).To(HaveOccurred())
+		Expect(res).To(BeNil())
+	})
+
+	It("can allocate a multiplayer server", func() {
 		req := AllocationRequest{
 			ModuleID:           1,
 			OrgID:              1,
@@ -44,25 +57,14 @@ var _ = Describe("Allocate", Ordered, func() {
 			AllocateGameServer: true,
 		}
 
-		res := allocatorClient.AllocateGameserver(req)
+		res, err := allocatorClient.AllocateGameserver(req)
 
-		Expect(res.Error).NotTo(HaveOccurred())
-		Expect(res.Results.Name).NotTo(BeEmpty())
-		Expect(res.Results.IP).NotTo(BeEmpty())
-		Expect(res.Results.Port).NotTo(BeEmpty())
-		Expect(res.Results.CreatedAt).NotTo(BeEmpty())
-	})
-
-	It("should throw an error if the server allocation failed", func() {
-		allocationReq := AllocationRequest{
-			ModuleID:      1,
-			OrgID:         1,
-			ImageRegistry: "invalid",
-		}
-		res := allocatorClient.AllocateGameserver(allocationReq)
-
+		Expect(err).NotTo(HaveOccurred())
 		Expect(res).NotTo(BeNil())
-		Expect(res.Error).To(HaveOccurred())
+		Expect(res.Name).NotTo(BeEmpty())
+		Expect(res.IP).NotTo(BeEmpty())
+		Expect(res.Port).NotTo(BeEmpty())
+		Expect(res.CreatedAt).NotTo(BeEmpty())
 	})
 
 })

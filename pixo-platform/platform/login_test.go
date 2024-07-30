@@ -19,14 +19,10 @@ var _ = Describe("Platform API", func() {
 		Expect(client.IsAuthenticated()).To(BeTrue())
 		Expect(client.GetToken()).NotTo(BeEmpty())
 
-		session := &Session{
-			ModuleID:  moduleID,
-			IPAddress: "localhost",
-		}
-		err := client.CreateSession(context.Background(), session)
+		platforms, err := client.GetPlatforms(context.Background())
 		Expect(err).NotTo(HaveOccurred())
-		Expect(session).NotTo(BeNil())
-		Expect(session.ID).NotTo(BeZero())
+		Expect(platforms).NotTo(BeNil())
+		Expect(len(platforms)).To(BeNumerically(">", 0))
 	})
 
 })

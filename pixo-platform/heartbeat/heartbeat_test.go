@@ -48,15 +48,14 @@ var _ = Describe("Heartbeat", Ordered, func() {
 		platformClient, err := platform.NewClientWithBasicAuth(username, password, config)
 		Expect(err).NotTo(HaveOccurred())
 		session := &platform.Session{
-			ModuleID:  moduleID,
-			IPAddress: "localhost",
-			DeviceID:  "test",
+			ModuleID: moduleID,
+			DeviceID: "test",
 		}
 		Expect(platformClient.CreateSession(context.Background(), session)).To(Succeed())
 		Expect(err).NotTo(HaveOccurred())
 		Expect(session).NotTo(BeNil())
 
-		Expect(heartbeatClient.SendPulse(session.ID)).NotTo(HaveOccurred())
+		Expect(heartbeatClient.SendPulse(session.ID)).To(Succeed())
 	})
 
 })
