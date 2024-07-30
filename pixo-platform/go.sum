@@ -231,8 +231,8 @@ github.com/grpc-ecosystem/grpc-gateway/v2 v2.17.1 h1:LSsiG61v9IzzxMkqEr6nrix4miJ
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.17.1/go.mod h1:Hbb13e3/WtqQ8U5hLGkek9gJvBLasHuPFI0UEGfnQ10=
 github.com/hashicorp/hcl v1.0.1-vault-5 h1:kI3hhbbyzr4dldA8UdTb7ZlVVlI2DACdCfz31RPDgJM=
 github.com/hashicorp/hcl v1.0.1-vault-5/go.mod h1:XYhtn6ijBSAj6n4YqAaf7RBPS4I06AItNorpy+MoQNM=
-github.com/hasura/go-graphql-client v0.12.2 h1:cYeQK/CELtvFy2jvik4kG0b5UMGngQRYWTTXQkbGHDo=
-github.com/hasura/go-graphql-client v0.12.2/go.mod h1:17qYcHgGSensF/wMAHKUhtMYaRZwZa3TyD7biqH9L3k=
+github.com/hasura/go-graphql-client v0.13.0 h1:mPYtqToLttIk/89hIHJYQgPShdBffrloCk6Pn4QqNfo=
+github.com/hasura/go-graphql-client v0.13.0/go.mod h1:17qYcHgGSensF/wMAHKUhtMYaRZwZa3TyD7biqH9L3k=
 github.com/imdario/mergo v0.3.16 h1:wwQJbIsHYGMUyLSPrEq1CT16AhnhNJQ51+4fdHUnCl4=
 github.com/imdario/mergo v0.3.16/go.mod h1:WBLT9ZmE3lPoWsEzCh9LPo3TiwVN+ZKEjmz+hD27ysY=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=
