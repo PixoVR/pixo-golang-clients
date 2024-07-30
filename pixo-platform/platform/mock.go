@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
-	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
 	commonerrors "github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/commonerrors"
 	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/k8s/agones"
 	"github.com/go-faker/faker/v4"
@@ -27,6 +26,12 @@ type MockClient struct {
 
 	NumCalledDeleteUser int
 	DeleteUserError     error
+
+	NumCalledGetRoles int
+	GetRolesError     error
+
+	NumCalledGetOrgs int
+	GetOrgsError     error
 
 	NumCalledGetOrg int
 	GetOrgError     error
@@ -54,6 +59,10 @@ type MockClient struct {
 
 	NumCalledDeleteWebhook int
 	DeleteWebhookError     error
+
+	NumCalledGetModules int
+	GetModulesEmpty     bool
+	GetModulesError     error
 
 	NumCalledGetAPIKeys int
 	GetAPIKeysEmpty     bool
@@ -113,6 +122,9 @@ func (m *MockClient) Reset() {
 	m.NumCalledUpdateOrg = 0
 	m.NumCalledDeleteUser = 0
 
+	m.NumCalledGetRoles = 0
+
+	m.NumCalledGetOrgs = 0
 	m.NumCalledGetOrg = 0
 	m.NumCalledCreateOrg = 0
 	m.NumCalledUpdateUser = 0
@@ -155,7 +167,7 @@ func (m *MockClient) ActiveOrgID() int {
 	return 1
 }
 
-func (m *MockClient) GetUserByUsername(ctx context.Context, username string) (*platform.User, error) {
+func (m *MockClient) GetUserByUsername(ctx context.Context, username string) (*User, error) {
 	m.NumCalledGetUser++
 
 	if username == "" {
@@ -166,7 +178,7 @@ func (m *MockClient) GetUserByUsername(ctx context.Context, username string) (*p
 		return nil, m.GetUserError
 	}
 
-	return &platform.User{
+	return &User{
 		ID:        1,
 		FirstName: faker.FirstName(),
 		LastName:  faker.LastName(),
@@ -177,52 +189,61 @@ func (m *MockClient) GetUserByUsername(ctx context.Context, username string) (*p
 	}, nil
 }
 
-func (m *MockClient) CreateUser(ctx context.Context, user platform.User) (*platform.User, error) {
+func (m *MockClient) CreateUser(ctx context.Context, user *User) error {
 	m.NumCalledCreateUser++
 
-	if user.Username == "" {
-		return nil, commonerrors.ErrorRequired("username")
+	if user == nil {
+		return errors.New("user is nil")
+	}
+
+	if user.Username == "" && user.Email == "" {
+		return commonerrors.ErrorRequired("username or email")
 	}
 
 	if user.Password == "" {
-		return nil, commonerrors.ErrorRequired("password")
+		return commonerrors.ErrorRequired("password")
 	}
 
 	if user.OrgID <= 0 {
-		return nil, errors.New("invalid org id")
+		return errors.New("invalid org id")
 	}
 
 	if m.CreateUserError != nil {
-		return nil, m.CreateUserError
+		return m.CreateUserError
 	}
 
 	user.ID = 1
+	user.Org = Org{ID: user.OrgID, Name: "test-org"}
 	user.CreatedAt = time.Now().UTC()
 	user.UpdatedAt = time.Now().UTC()
-	return &user, nil
+	return nil
 }
 
-func (m *MockClient) UpdateUser(ctx context.Context, user platform.User) (*platform.User, error) {
+func (m *MockClient) UpdateUser(ctx context.Context, user *User) error {
 	m.NumCalledUpdateUser++
 
+	if user == nil {
+		return errors.New("user is nil")
+	}
+
 	if user.ID <= 0 {
-		return nil, errors.New("invalid user id")
+		return errors.New("invalid user id")
 	}
 
 	if user.Username == "" {
-		return nil, commonerrors.ErrorRequired("username")
+		return commonerrors.ErrorRequired("username")
 	}
 
 	if user.OrgID <= 0 {
-		return nil, errors.New("invalid org id")
+		return errors.New("invalid org id")
 	}
 
 	if m.UpdateUserError != nil {
-		return nil, m.UpdateUserError
+		return m.UpdateUserError
 	}
 
 	user.UpdatedAt = time.Now().UTC()
-	return &user, nil
+	return nil
 }
 
 func (m *MockClient) DeleteUser(ctx context.Context, id int) error {
@@ -237,6 +258,75 @@ func (m *MockClient) DeleteUser(ctx context.Context, id int) error {
 	}
 
 	return nil
+}
+
+func (m *MockClient) GetModules(ctx context.Context, params ...ModuleParams) ([]Module, error) {
+	m.NumCalledGetModules++
+
+	if m.GetModulesError != nil {
+		return nil, m.GetModulesError
+	}
+
+	if m.GetModulesEmpty {
+		return []Module{}, nil
+	}
+
+	return []Module{
+		{
+			ID:           1,
+			Name:         "test",
+			Abbreviation: "TST",
+		},
+		{
+			ID:           2,
+			Name:         "test-2",
+			Abbreviation: "TST-2",
+		},
+	}, nil
+}
+
+func (m *MockClient) GetRoles(ctx context.Context) ([]Role, error) {
+	m.NumCalledGetRoles++
+
+	if m.GetRolesError != nil {
+		return nil, m.GetRolesError
+	}
+
+	return []Role{
+		{
+			ID:   1,
+			Name: "admin",
+		},
+		{
+			ID:   2,
+			Name: "user",
+		},
+	}, nil
+}
+
+func (m *MockClient) GetOrgs(ctx context.Context, params ...*OrgParams) ([]Org, error) {
+	m.NumCalledGetOrgs++
+
+	if m.GetOrgsError != nil {
+		return nil, m.GetOrgsError
+	}
+
+	orgs := []Org{
+		{
+			ID:   1,
+			Name: "test-org",
+		},
+		{
+			ID:   2,
+			Name: "test-org-2",
+		},
+	}
+
+	if len(params) > 0 && params[0] != nil {
+		orgs[0].Name = params[0].Name
+	}
+
+	return orgs, nil
 }
 
 func (m *MockClient) GetOrg(ctx context.Context, id int) (*Org, error) {
@@ -302,7 +392,7 @@ func (m *MockClient) DeleteOrg(ctx context.Context, id int) error {
 	return nil
 }
 
-func (m *MockClient) CreateAPIKey(ctx context.Context, input platform.APIKey) (*platform.APIKey, error) {
+func (m *MockClient) CreateAPIKey(ctx context.Context, input APIKey) (*APIKey, error) {
 	m.NumCalledCreateAPIKey++
 
 	if m.CreateAPIKeyError != nil {
@@ -317,7 +407,7 @@ func (m *MockClient) CreateAPIKey(ctx context.Context, input platform.APIKey) (*
 	return &input, nil
 }
 
-func (m *MockClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) ([]*platform.APIKey, error) {
+func (m *MockClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) ([]APIKey, error) {
 	m.NumCalledGetAPIKeys++
 
 	if m.GetAPIKeysError != nil {
@@ -325,16 +415,34 @@ func (m *MockClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) 
 	}
 
 	if m.GetAPIKeysEmpty {
-		return []*platform.APIKey{}, nil
+		return []APIKey{}, nil
+	}
+
+	if params == nil {
+		params = &APIKeyQueryParams{}
 	}
 
 	if params.UserID == nil {
 		params.UserID = &[]int{1}[0]
 	}
 
-	return []*platform.APIKey{
+	return []APIKey{
 		{
 			ID:        1,
+			UserID:    *params.UserID,
+			Key:       faker.UUIDHyphenated(),
+			CreatedAt: time.Now().UTC(),
+			UpdatedAt: time.Now().UTC(),
+		},
+		{
+			ID:        2,
+			UserID:    *params.UserID,
+			Key:       faker.UUIDHyphenated(),
+			CreatedAt: time.Now().UTC(),
+			UpdatedAt: time.Now().UTC(),
+		},
+		{
+			ID:        3,
 			UserID:    *params.UserID,
 			Key:       faker.UUIDHyphenated(),
 			CreatedAt: time.Now().UTC(),
@@ -412,6 +520,10 @@ func (m *MockClient) CreateWebhook(ctx context.Context, input Webhook) (*Webhook
 		return nil, commonerrors.ErrorRequired("url")
 	}
 
+	if input.GenerateToken != nil && *input.GenerateToken {
+		input.Token = faker.UUIDHyphenated()
+	}
+
 	if m.CreateWebhookError != nil {
 		return nil, m.CreateWebhookError
 	}
@@ -480,28 +592,37 @@ func (m *MockClient) GetSession(ctx context.Context, id int) (*Session, error) {
 	}, nil
 }
 
-func (m *MockClient) CreateSession(ctx context.Context, moduleID int, ipAddress, deviceId string) (*Session, error) {
+func (m *MockClient) CreateSession(ctx context.Context, session *Session) error {
 	m.NumCalledCreateSession++
 
-	if moduleID <= 0 {
-		return nil, errors.New("invalid module id")
+	if session == nil {
+		return errors.New("session details are required")
 	}
 
-	if ipAddress == "" {
-		return nil, commonerrors.ErrorRequired("ip address")
+	if session.ModuleID <= 0 {
+		return errors.New("invalid module id")
+	}
+
+	if session.IPAddress == "" {
+		return commonerrors.ErrorRequired("ip address")
 	}
 
 	if m.CreateSessionError != nil {
-		return nil, m.CreateSessionError
+		return m.CreateSessionError
 	}
 
-	return &Session{
+	*session = Session{
 		ID:        1,
-		UserID:    1,
-		ModuleID:  moduleID,
-		IPAddress: ipAddress,
-		DeviceID:  deviceId,
-	}, nil
+		UserID:    m.ActiveUserID(),
+		ModuleID:  session.ModuleID,
+		Module:    Module{ID: session.ModuleID, Name: "test", Abbreviation: "TST"},
+		IPAddress: session.IPAddress,
+		DeviceID:  session.DeviceID,
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+	}
+
+	return nil
 }
 
 func (m *MockClient) UpdateSession(ctx context.Context, session Session) (*Session, error) {
@@ -524,23 +645,25 @@ func (m *MockClient) UpdateSession(ctx context.Context, session Session) (*Sessi
 	return &session, nil
 }
 
-func (m *MockClient) CreateEvent(ctx context.Context, event Event) (*Event, error) {
+func (m *MockClient) CreateEvent(ctx context.Context, event *Event) error {
 	m.NumCalledCreateEvent++
 
-	if event.SessionID <= 0 {
-		return nil, InvalidSessionError
+	noSessionID := event.SessionID == nil || *event.SessionID <= 0
+	noSessionUUID := event.SessionUUID == nil || *event.SessionUUID == ""
+	if noSessionID && noSessionUUID {
+		return errors.New("session id or session uuid required")
 	}
 
 	if event.Type == "" {
-		return nil, commonerrors.ErrorRequired("event type")
+		return commonerrors.ErrorRequired("type")
 	}
 
 	if m.CreateEventError != nil {
-		return nil, m.CreateEventError
+		return m.CreateEventError
 	}
 
 	event.CreatedAt = time.Now().UTC()
-	return &event, nil
+	return nil
 }
 
 func (m *MockClient) GetPlatforms(ctx context.Context) ([]*Platform, error) {

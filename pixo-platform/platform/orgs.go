@@ -19,6 +19,14 @@ type Org struct {
 	UpdatedAt   time.Time `json:"updatedAt"`
 }
 
+type OrgParams struct {
+	Name string `json:"name"`
+}
+
+type GetOrgsResponse struct {
+	Orgs []Org `json:"orgs"`
+}
+
 type GetOrgResponse struct {
 	Org Org `json:"org"`
 }
@@ -35,14 +43,39 @@ type DeleteOrgResponse struct {
 	Success bool `json:"deleteOrg"`
 }
 
-func (g *PlatformClient) GetOrg(ctx context.Context, id int) (*Org, error) {
+func (p *PlatformClient) GetOrgs(ctx context.Context, params ...*OrgParams) ([]Org, error) {
+	query := `query orgs { orgs { id name type openAccess logoLink hubLogoLink } }`
+
+	variables := map[string]interface{}{
+		"params": map[string]interface{}{},
+	}
+	if len(params) > 0 && params[0] != nil {
+		if params[0].Name != "" {
+			variables["params"].(map[string]interface{})["name"] = params[0].Name
+		}
+	}
+
+	res, err := p.Client.ExecRaw(ctx, query, variables)
+	if err != nil {
+		return nil, err
+	}
+
+	var orgsResponse GetOrgsResponse
+	if err = json.Unmarshal(res, &orgsResponse); err != nil {
+		return nil, err
+	}
+
+	return orgsResponse.Orgs, nil
+}
+
+func (p *PlatformClient) GetOrg(ctx context.Context, id int) (*Org, error) {
 	query := `query org($id: ID!) { org(id: $id) { id name type openAccess logoLink hubLogoLink } }`
 
 	variables := map[string]interface{}{
 		"id": id,
 	}
 
-	res, err := g.Client.ExecRaw(ctx, query, variables)
+	res, err := p.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +88,7 @@ func (g *PlatformClient) GetOrg(ctx context.Context, id int) (*Org, error) {
 	return &orgResponse.Org, nil
 }
 
-func (g *PlatformClient) CreateOrg(ctx context.Context, org Org) (*Org, error) {
+func (p *PlatformClient) CreateOrg(ctx context.Context, org Org) (*Org, error) {
 	query := `mutation createOrg($input: OrgInput!) { createOrg(input: $input) { id name } }`
 
 	variables := map[string]interface{}{
@@ -66,7 +99,7 @@ func (g *PlatformClient) CreateOrg(ctx context.Context, org Org) (*Org, error) {
 		},
 	}
 
-	res, err := g.Client.ExecRaw(ctx, query, variables)
+	res, err := p.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +112,7 @@ func (g *PlatformClient) CreateOrg(ctx context.Context, org Org) (*Org, error) {
 	return &orgResponse.Org, nil
 }
 
-func (g *PlatformClient) UpdateOrg(ctx context.Context, org Org) (*Org, error) {
+func (p *PlatformClient) UpdateOrg(ctx context.Context, org Org) (*Org, error) {
 
 	if org.ID == 0 {
 		return nil, errors.New("org id is required")
@@ -97,7 +130,7 @@ func (g *PlatformClient) UpdateOrg(ctx context.Context, org Org) (*Org, error) {
 		variables["input"].(map[string]interface{})["name"] = org.Name
 	}
 
-	res, err := g.Client.ExecRaw(ctx, query, variables)
+	res, err := p.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return nil, err
 	}
@@ -110,14 +143,14 @@ func (g *PlatformClient) UpdateOrg(ctx context.Context, org Org) (*Org, error) {
 	return &userResponse.Org, nil
 }
 
-func (g *PlatformClient) DeleteOrg(ctx context.Context, id int) error {
+func (p *PlatformClient) DeleteOrg(ctx context.Context, id int) error {
 	query := `mutation deleteOrg($id: ID!) { deleteOrg(id: $id) }`
 
 	variables := map[string]interface{}{
 		"id": id,
 	}
 
-	res, err := g.Client.ExecRaw(ctx, query, variables)
+	res, err := p.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return err
 	}

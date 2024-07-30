@@ -4,7 +4,7 @@ Copyright © 2024 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
-	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/loader"
 	"github.com/spf13/cobra"
 )
@@ -18,20 +18,14 @@ var createApiKeyCmd = &cobra.Command{
 		spinner := loader.NewLoader(cmd.Context(), ":key: Creating API Key...", Ctx.Printer)
 		defer spinner.Stop()
 
-		input := platform.APIKey{
-			//UserID: input.GetIntValue(cmd, "user-id", "PIXO_USER_ID"),
-		}
-
-		apiKey, err := Ctx.PlatformClient.CreateAPIKey(cmd.Context(), input)
+		apiKey, err := Ctx.PlatformClient.CreateAPIKey(cmd.Context(), platform.APIKey{})
 		if err != nil {
-			Ctx.Printer.Println("Error creating API key: ", err)
-
 			return err
 		}
 
 		Ctx.ConfigManager.SetConfigValue("api-key", apiKey.Key)
-
 		Ctx.Printer.Println(":heavy_check_mark: API key created: ", apiKey.Key)
+		//Ctx.Printer.Println(":heavy_check_mark: API key created: ", "*********") // use this when running the tape, --safe flag ?
 		return nil
 	},
 }

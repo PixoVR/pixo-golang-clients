@@ -40,14 +40,14 @@ type DeleteWebhookResponse struct {
 	Success bool `json:"deleteWebhook"`
 }
 
-func (g *PlatformClient) GetWebhooks(ctx context.Context, params *WebhookParams) ([]Webhook, error) {
+func (p *PlatformClient) GetWebhooks(ctx context.Context, params *WebhookParams) ([]Webhook, error) {
 	query := `query webhooks($params: WebhookParams) { webhooks(params: $params) { id orgId org { name } url token description } }`
 
 	variables := map[string]interface{}{
 		"params": params,
 	}
 
-	res, err := g.Client.ExecRaw(ctx, query, variables)
+	res, err := p.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return nil, err
 	}
@@ -61,14 +61,14 @@ func (g *PlatformClient) GetWebhooks(ctx context.Context, params *WebhookParams)
 	return webhooksResponse.Webhooks, nil
 }
 
-func (g *PlatformClient) GetWebhook(ctx context.Context, id int) (*Webhook, error) {
+func (p *PlatformClient) GetWebhook(ctx context.Context, id int) (*Webhook, error) {
 	query := `query webhook($id: ID) { webhook(id: $id) { id url description token orgId org { name } }`
 
 	variables := map[string]interface{}{
 		"id": id,
 	}
 
-	res, err := g.Client.ExecRaw(ctx, query, variables)
+	res, err := p.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func (g *PlatformClient) GetWebhook(ctx context.Context, id int) (*Webhook, erro
 	return &webhookResponse.Webhook, nil
 }
 
-func (g *PlatformClient) CreateWebhook(ctx context.Context, webhook Webhook) (*Webhook, error) {
+func (p *PlatformClient) CreateWebhook(ctx context.Context, webhook Webhook) (*Webhook, error) {
 	query := `mutation createWebhook($input: WebhookInput!) {
   createWebhook(input: $input) {
     id
@@ -103,14 +103,15 @@ func (g *PlatformClient) CreateWebhook(ctx context.Context, webhook Webhook) (*W
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{
-			"orgId":       webhook.OrgID,
-			"url":         webhook.URL,
-			"token":       webhook.Token,
-			"description": webhook.Description,
+			"orgId":         webhook.OrgID,
+			"url":           webhook.URL,
+			"token":         webhook.Token,
+			"description":   webhook.Description,
+			"generateToken": webhook.GenerateToken,
 		},
 	}
 
-	res, err := g.Client.ExecRaw(ctx, query, variables)
+	res, err := p.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +124,7 @@ func (g *PlatformClient) CreateWebhook(ctx context.Context, webhook Webhook) (*W
 	return &webhookResponse.Webhook, nil
 }
 
-func (g *PlatformClient) UpdateWebhook(ctx context.Context, webhook Webhook) (*Webhook, error) {
+func (p *PlatformClient) UpdateWebhook(ctx context.Context, webhook Webhook) (*Webhook, error) {
 
 	if webhook.ID == 0 {
 		return nil, errors.New("webhook id is required")
@@ -153,7 +154,7 @@ func (g *PlatformClient) UpdateWebhook(ctx context.Context, webhook Webhook) (*W
 		variables["input"].(map[string]interface{})["description"] = webhook.Description
 	}
 
-	res, err := g.Client.ExecRaw(ctx, query, variables)
+	res, err := p.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return nil, err
 	}
@@ -166,14 +167,14 @@ func (g *PlatformClient) UpdateWebhook(ctx context.Context, webhook Webhook) (*W
 	return &updateWebhookResponse.Webhook, nil
 }
 
-func (g *PlatformClient) DeleteWebhook(ctx context.Context, id int) error {
+func (p *PlatformClient) DeleteWebhook(ctx context.Context, id int) error {
 	query := `mutation deleteWebhook($id: ID!) { deleteWebhook(id: $id) }`
 
 	variables := map[string]interface{}{
 		"id": id,
 	}
 
-	res, err := g.Client.ExecRaw(ctx, query, variables)
+	res, err := p.Client.ExecRaw(ctx, query, variables)
 	if err != nil {
 		return err
 	}

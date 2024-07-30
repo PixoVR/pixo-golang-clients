@@ -4,13 +4,13 @@ Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/config"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/loader"
 	"github.com/spf13/cobra"
-	"strconv"
-	"strings"
 )
 
 // modulesDeployCmd represents the modules deploy rootCmd
@@ -19,136 +19,69 @@ var modulesDeployCmd = &cobra.Command{
 	Short: "Deploy module versions",
 	Long: `Deploy module versions
 `,
-	Run: func(cmd *cobra.Command, args []string) {
-
-		moduleID, ok := Ctx.ConfigManager.GetIntConfigValueOrAskUser("module-id", cmd)
-		if !ok {
-			Ctx.Printer.Println(":exclamation: Module ID not provided")
-			return
+	RunE: func(cmd *cobra.Command, args []string) error {
+		questions := []config.Value{
+			{Question: forms.Question{
+				Type: forms.SelectID,
+				Key:  "module-id",
+				LabelFunc: func(i interface{}) string {
+					item := i.(platform.Module)
+					return fmt.Sprintf("%d: %s - %s", item.ID, item.Abbreviation, item.Name)
+				},
+				GetItemsFunc: func(ctx context.Context) (interface{}, error) {
+					return Ctx.PlatformClient.GetModules(cmd.Context())
+				},
+			}},
+			{Question: forms.Question{Type: forms.Input, Key: "semantic-version"}},
+			{Question: forms.Question{Type: forms.Input, Key: "package"}},
+			{Question: forms.Question{Type: forms.Input, Key: "zip-file"}},
+			{Question: forms.Question{
+				Type: forms.MultiSelectIDs,
+				Key:  "platforms",
+				GetItemsFunc: func(ctx context.Context) (interface{}, error) {
+					return Ctx.PlatformClient.GetPlatforms(cmd.Context())
+				},
+			}},
+			{Question: forms.Question{
+				Type: forms.MultiSelectIDs,
+				Key:  "controls",
+				GetItemsFunc: func(ctx context.Context) (interface{}, error) {
+					return Ctx.PlatformClient.GetControlTypes(cmd.Context())
+				},
+			}},
 		}
 
-		semVer, ok := Ctx.ConfigManager.GetConfigValueOrAskUser("semantic-version", cmd)
-		if !ok {
-			Ctx.Printer.Println(":exclamation: Semantic version not provided")
-			return
+		answers, err := Ctx.ConfigManager.GetValuesOrSubmitForm(questions, cmd)
+		if err != nil {
+			return err
 		}
 
-		packageName, ok := Ctx.ConfigManager.GetConfigValueOrAskUser("package", cmd)
-		if !ok {
-			Ctx.Printer.Println(":exclamation: Package name not provided")
-			return
-		}
-
-		zipFilepath, ok := Ctx.ConfigManager.GetConfigValueOrAskUser("zip-file", cmd)
-		if !ok {
-			Ctx.Printer.Println(":exclamation: Zip file not provided")
-			return
-		}
-
-		var selectedPlatforms []int
-		platformsInput, ok := Ctx.ConfigManager.GetFlagValue("platforms", cmd)
-		if !ok {
-			platforms, err := Ctx.PlatformClient.GetPlatforms(cmd.Context())
-			if err != nil {
-				Ctx.Printer.Printf(":exclamation: %s\n", err.Error())
-				return
-			}
-
-			platformOptions := make([]forms.Option, len(platforms))
-			for i, platform := range platforms {
-				platformOptions[i] = forms.Option{
-					Value: fmt.Sprint(platform.ID),
-					Label: platform.Name,
-				}
-			}
-
-			selectedPlatforms, err = Ctx.FormHandler.MultiSelectIDs("Select PLATFORMS:\n", platformOptions)
-			if err != nil || len(selectedPlatforms) == 0 {
-				Ctx.Printer.Println(":exclamation: Platforms not provided")
-				return
-			}
-		} else {
-			selectedPlatformStrings := strings.Split(platformsInput, ",")
-			if len(selectedPlatformStrings) == 0 {
-				Ctx.Printer.Println(":exclamation: Platforms not provided")
-				return
-			}
-
-			for _, selectedPlatformString := range selectedPlatformStrings {
-				selectedPlatform, err := strconv.Atoi(selectedPlatformString)
-				if err != nil {
-					Ctx.Printer.Println(":exclamation: Invalid platform ID")
-					return
-				}
-				selectedPlatforms = append(selectedPlatforms, selectedPlatform)
-			}
-		}
-
-		var selectedControlTypes []int
-		controlTypesInput, ok := Ctx.ConfigManager.GetFlagValue("controls", cmd)
-		if !ok {
-			controlTypes, err := Ctx.PlatformClient.GetControlTypes(cmd.Context())
-			if err != nil {
-				Ctx.Printer.Printf(":exclamation: %s\n", err.Error())
-				return
-			}
-
-			controlTypeOptions := make([]forms.Option, len(controlTypes))
-			for i, controlType := range controlTypes {
-				controlTypeOptions[i] = forms.Option{
-					Label: controlType.Name,
-					Value: fmt.Sprint(controlType.ID),
-				}
-			}
-
-			selectedControlTypes, err = Ctx.FormHandler.MultiSelectIDs("Select CONTROL TYPES:\n", controlTypeOptions)
-			if err != nil || len(selectedControlTypes) == 0 {
-				Ctx.Printer.Println(":exclamation: Control types not provided")
-				return
-			}
-		} else {
-			selectedControlTypeStrings := strings.Split(controlTypesInput, ",")
-			if len(selectedControlTypeStrings) == 0 {
-				Ctx.Printer.Println(":exclamation: Control types not provided")
-				return
-			}
-
-			for _, selectedControlTypeString := range selectedControlTypeStrings {
-				selectedControlType, err := strconv.Atoi(selectedControlTypeString)
-				if err != nil {
-					Ctx.Printer.Println(":exclamation: Invalid control type ID")
-					return
-				}
-				selectedControlTypes = append(selectedControlTypes, selectedControlType)
-			}
-		}
+		moduleID := forms.Int(answers["module-id"])
+		semVer := forms.String(answers["semantic-version"])
+		packageName := forms.String(answers["package"])
+		zipfilePath := forms.String(answers["zip-file"])
+		platforms := forms.IntSlice(answers["platforms"])
+		controlTypes := forms.IntSlice(answers["control"])
 
 		input := platform.ModuleVersion{
 			ModuleID:        moduleID,
-			LocalFilePath:   zipFilepath,
+			LocalFilePath:   zipfilePath,
 			SemanticVersion: semVer,
 			Package:         packageName,
-			PlatformIds:     selectedPlatforms,
-			ControlIds:      selectedControlTypes,
+			PlatformIds:     platforms,
+			ControlIds:      controlTypes,
 		}
 
 		spinner := loader.NewLoader(cmd.Context(), "Deploying module version...", Ctx.Printer)
-		//ctx, cancel := context.WithCancel(context.Background())
-		//err := spinner.New().
-		//	Type(spinner.Line).
-		//	Title("Deploying module version...").
-		//	Context(ctx).
-		//	Run()
+		defer spinner.Stop()
 
 		moduleVersion, err := Ctx.PlatformClient.CreateModuleVersion(cmd.Context(), input)
-		//cancel()
-		spinner.Stop()
 		if err != nil {
-			Ctx.Printer.Printf(":exclamation: %s\n", err.Error())
-			return
+			return err
 		}
 
 		Ctx.Printer.Printf("Deployed version %s for module %d\n", moduleVersion.SemanticVersion, moduleVersion.ModuleID)
+		return nil
 	},
 }
 

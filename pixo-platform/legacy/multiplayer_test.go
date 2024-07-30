@@ -12,8 +12,8 @@ import (
 var _ = Describe("Multiplayer", func() {
 
 	var (
-		tokenClient     *LegacyAPIClient
-		secretKeyClient *LegacyAPIClient
+		tokenClient     *Client
+		secretKeyClient *Client
 	)
 
 	BeforeEach(func() {

@@ -20,16 +20,22 @@ var _ = Describe("Webhooks", func() {
 		ctx = context.Background()
 
 		webhookInput = Webhook{
-			OrgID:       1,
-			URL:         "http://example.com",
-			Token:       "token",
-			Description: faker.Sentence(),
+			OrgID:         1,
+			URL:           "http://example.com",
+			GenerateToken: &[]bool{true}[0],
+			Description:   faker.Sentence(),
 		}
 		var err error
 		testWebhook, err = tokenClient.CreateWebhook(ctx, webhookInput)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(testWebhook).NotTo(BeNil())
 		Expect(testWebhook.ID).NotTo(BeZero())
+		Expect(testWebhook.OrgID).To(Equal(webhookInput.OrgID))
+		Expect(testWebhook.Org).NotTo(BeNil())
+		Expect(testWebhook.Org.ID).To(Equal(webhookInput.OrgID))
+		Expect(testWebhook.URL).To(Equal(webhookInput.URL))
+		Expect(testWebhook.Description).To(Equal(webhookInput.Description))
+		Expect(testWebhook.Token).NotTo(BeEmpty())
 	})
 
 	AfterEach(func() {

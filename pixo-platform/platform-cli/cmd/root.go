@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	cliVersion = "0.1.16"
+	cliVersion = "0.1.36"
 
 	homeDir          = os.Getenv("HOME")
 	configDirName    = ".pixo"
@@ -28,7 +28,7 @@ var (
 
 	isDebug          bool
 	cfgFileFlagInput string
-	Ctx              *ctx.CLIContext
+	Ctx              *ctx.Context
 )
 
 var rootCmd = &cobra.Command{
@@ -36,6 +36,16 @@ var rootCmd = &cobra.Command{
 	Version: cliVersion,
 	Short:   "A CLI for the Pixo Platform",
 	Long:    `A CLI tool used to streamline interactions with the Pixo Platform`,
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		initLogger()
+		Ctx.SetIO(cmd)
+	},
+	RunE: func(cmd *cobra.Command, args []string) error {
+		//if _, err := tea.NewProgram(tui.NewModel()).Run(); err != nil {
+		//	return err
+		//}
+		return nil
+	},
 }
 
 func GetRootCmd() *cobra.Command {
@@ -43,14 +53,10 @@ func GetRootCmd() *cobra.Command {
 }
 
 func Execute() {
-
-	Ctx = ctx.NewCLIContextWithConfig(localConfigFile, globalConfigFile)
+	Ctx = ctx.NewContext(localConfigFile, globalConfigFile)
+	_ = Ctx.Authenticate(nil)
 
 	activeConfigFile = Ctx.FileManager.ConfigFile()
-
-	if err := Ctx.Authenticate(nil); err != nil {
-		log.Error().Err(err).Msg("Failed to authenticate")
-	}
 
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
@@ -66,15 +72,9 @@ func init() {
 
 	configCmd.PersistentFlags().StringP("lifecycle", "l", "", "Lifecycle of Pixo Platform to use (dev, stage, prod)")
 	configCmd.PersistentFlags().StringP("region", "r", "", "Region of Pixo Platform to use (na, saudi)")
-	rootCmd.PersistentFlags().IntP("module-id", "m", 0, "Module ID")
 
 	if cfgFileFlagInput == "" {
 		cfgFileFlagInput = globalConfigFile
-	}
-
-	rootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
-		initLogger()
-		Ctx.SetIO(cmd)
 	}
 }
 

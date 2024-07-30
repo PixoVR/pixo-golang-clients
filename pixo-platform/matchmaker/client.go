@@ -1,25 +1,25 @@
 package matchmaker
 
 import (
-	abstractClient "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
-	graphql_api "github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
+	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"net"
 	"sync"
 )
 
 type MultiplayerMatchmaker struct {
-	*abstractClient.AbstractServiceClient
+	*abstract.AbstractServiceClient
 	*sync.Mutex
 
-	platformClient graphql_api.Client
+	platformClient platform.Client
 
 	gameserverAddress    *net.UDPAddr
 	gameserverConnection *net.UDPConn
 }
 
 func NewClientWithBasicAuth(username, password string, config urlfinder.ClientConfig, timeoutSeconds ...int) (*MultiplayerMatchmaker, error) {
-	platformClient, err := graphql_api.NewClientWithBasicAuth(username, password, config)
+	platformClient, err := platform.NewClientWithBasicAuth(username, password, config)
 	if err != nil {
 		return nil, err
 	}
@@ -35,15 +35,15 @@ func NewClient(config urlfinder.ClientConfig, timeoutSeconds ...int) *Multiplaye
 	}
 
 	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
-	abstractConfig := abstractClient.AbstractConfig{
+	abstractConfig := abstract.AbstractConfig{
 		ServiceConfig:  serviceConfig,
 		Token:          config.Token,
 		TimeoutSeconds: timeoutSeconds[0],
 	}
 
 	return &MultiplayerMatchmaker{
-		AbstractServiceClient: abstractClient.NewClient(abstractConfig),
-		platformClient:        graphql_api.NewClient(config),
+		AbstractServiceClient: abstract.NewClient(abstractConfig),
+		platformClient:        platform.NewClient(config),
 		Mutex:                 &sync.Mutex{},
 	}
 }

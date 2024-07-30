@@ -41,15 +41,15 @@ var configCmd = &cobra.Command{
 
 		Ctx.Printer.Println()
 
-		if userID, ok := Ctx.ConfigManager.GetConfigValue("user-id"); ok {
+		if userID, ok := Ctx.ConfigManager.GetConfigValue("auth-user-id"); ok {
 			Ctx.Printer.Println(":id: User ID: ", userID)
 		}
 
-		if username, ok := Ctx.ConfigManager.GetConfigValue("username"); ok {
+		if username, ok := Ctx.ConfigManager.GetConfigValue("auth-username"); ok {
 			Ctx.Printer.Println(":bust_in_silhouette: Username: ", username)
 		}
 
-		if _, ok := Ctx.ConfigManager.GetConfigValue("password"); ok {
+		if _, ok := Ctx.ConfigManager.GetConfigValue("auth-password"); ok {
 			Ctx.Printer.Println(":lock: Password: ********")
 		}
 
@@ -57,7 +57,7 @@ var configCmd = &cobra.Command{
 			Ctx.Printer.Println(":key: API Key: ********")
 		}
 
-		if _, ok := Ctx.ConfigManager.GetConfigValue("token"); ok {
+		if _, ok := Ctx.ConfigManager.GetConfigValue("auth-token"); ok {
 			Ctx.Printer.Println(":coin: Token: ********")
 		}
 

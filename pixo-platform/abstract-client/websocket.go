@@ -1,6 +1,7 @@
 package abstract_client
 
 import (
+	"fmt"
 	"github.com/gorilla/websocket"
 	"net/http"
 	"time"
@@ -8,14 +9,15 @@ import (
 
 func (a *AbstractServiceClient) DialWebsocket(endpoint string) (*websocket.Conn, *http.Response, error) {
 
-	httpHeader := http.Header{}
+	header := http.Header{}
 	if a.token != "" {
-		httpHeader.Add("Authorization", "Bearer "+a.token)
+		header.Add("Authorization", "Bearer "+a.token)
 	}
 
-	conn, httpResponse, err := websocket.DefaultDialer.Dial(a.GetURLWithPath(endpoint, "ws"), httpHeader)
+	url := a.GetURLWithPath(endpoint, "ws")
+	conn, response, err := websocket.DefaultDialer.Dial(url, header)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("%w - %s", err, response.Status)
 	}
 
 	if err = conn.SetReadDeadline(time.Now().Add(a.timeoutDuration())); err != nil {
@@ -23,7 +25,7 @@ func (a *AbstractServiceClient) DialWebsocket(endpoint string) (*websocket.Conn,
 	}
 
 	a.websocketConn = conn
-	return conn, httpResponse, nil
+	return conn, response, nil
 }
 
 func (a *AbstractServiceClient) WriteToWebsocket(message []byte) error {

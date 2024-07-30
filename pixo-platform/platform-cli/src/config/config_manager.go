@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms/basic"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/printer"
 	"github.com/spf13/cobra"
 	"io"
 	"os"
@@ -13,9 +14,10 @@ import (
 type ConfigManager struct {
 	formHandler forms.FormHandler
 	manager     Manager
+	printer     printer.Printer
 }
 
-func NewConfigManager(manager Manager, formHandlers ...forms.FormHandler) *ConfigManager {
+func NewConfigManager(manager Manager, printer printer.Printer, formHandlers ...forms.FormHandler) *ConfigManager {
 	var formHandler forms.FormHandler
 	if len(formHandlers) > 0 {
 		formHandler = formHandlers[0]
@@ -25,6 +27,7 @@ func NewConfigManager(manager Manager, formHandlers ...forms.FormHandler) *Confi
 
 	return &ConfigManager{
 		formHandler: formHandler,
+		printer:     printer,
 		manager:     manager,
 	}
 }
@@ -154,15 +157,18 @@ func (c *ConfigManager) GetConfigValueOrAskUser(key string, cmd *cobra.Command) 
 	}
 
 	displayKey := strings.ReplaceAll(strings.ToUpper(key), "-", " ")
+	question := &forms.Question{Prompt: displayKey}
+
 	if strings.ToLower(key) == "password" {
-		response, err := c.formHandler.GetSensitiveResponseFromUser(displayKey)
+		err := c.formHandler.GetSensitiveResponseFromUser(question)
 		if err != nil {
 			return "", false
 		}
-		return response, response != ""
+		return forms.String(question.Answer), err == nil && val != ""
 	}
 
-	val, err := c.formHandler.GetResponseFromUser(displayKey)
+	err := c.formHandler.GetResponseFromUser(question)
+	val = forms.String(question.Answer)
 	return val, err == nil && val != ""
 }
 
@@ -178,13 +184,13 @@ func (c *ConfigManager) GetIntConfigValueOrAskUser(key string, cmd *cobra.Comman
 	}
 
 	displayKey := strings.ReplaceAll(strings.ToUpper(key), "-", " ")
+	question := &forms.Question{Prompt: displayKey}
 
-	strVal, err := c.formHandler.GetResponseFromUser(displayKey)
-	if err != nil {
+	if err := c.formHandler.GetResponseFromUser(question); err != nil {
 		return 0, false
 	}
 
-	return ToInt(strVal)
+	return ToInt(forms.String(question.Answer))
 }
 
 func (c *ConfigManager) GetBoolConfigValueOrAskUser(key string, cmd *cobra.Command) (bool, bool) {
@@ -199,12 +205,13 @@ func (c *ConfigManager) GetBoolConfigValueOrAskUser(key string, cmd *cobra.Comma
 	}
 
 	displayKey := strings.ReplaceAll(strings.ToUpper(key), "-", " ")
-	strVal, err := c.formHandler.GetResponseFromUser(displayKey)
-	if err != nil {
+	question := &forms.Question{Prompt: displayKey}
+
+	if err := c.formHandler.GetResponseFromUser(question); err != nil {
 		return false, false
 	}
 
-	boolVal, err := strconv.ParseBool(strVal)
+	boolVal, err := strconv.ParseBool(forms.String(question.Answer))
 	return boolVal, err == nil
 }
 
@@ -274,8 +281,13 @@ func (c *ConfigManager) GetSensitiveConfigValueOrAskUser(key string, cmd *cobra.
 		return val, true
 	}
 
-	val, err := c.formHandler.GetSensitiveResponseFromUser(key)
-	return val, err == nil
+	question := &forms.Question{
+		Type:   forms.SensitiveInput,
+		Prompt: key,
+	}
+	err := c.formHandler.GetSensitiveResponseFromUser(question)
+	val = question.Answer.(string)
+	return val, err == nil && val != ""
 }
 
 func (c *ConfigManager) GetFlagOrConfigValueOrAskUser(key string, cmd *cobra.Command) (string, bool) {
@@ -284,8 +296,13 @@ func (c *ConfigManager) GetFlagOrConfigValueOrAskUser(key string, cmd *cobra.Com
 		return val, true
 	}
 
-	val, err := c.formHandler.GetResponseFromUser(key)
-	return val, err == nil
+	question := &forms.Question{
+		Type:   forms.Input,
+		Prompt: key,
+	}
+	err := c.formHandler.GetResponseFromUser(question)
+	val = question.Answer.(string)
+	return val, err == nil && val != ""
 }
 
 func (c *ConfigManager) GetSensitiveFlagOrConfigValueOrAskUser(key string, cmd *cobra.Command) (string, bool) {
@@ -294,18 +311,26 @@ func (c *ConfigManager) GetSensitiveFlagOrConfigValueOrAskUser(key string, cmd *
 		return val, true
 	}
 
-	val, err := c.formHandler.GetSensitiveResponseFromUser(key)
-	return val, err == nil
+	question := &forms.Question{
+		Type:   forms.SensitiveInput,
+		Prompt: key,
+	}
+	err := c.formHandler.GetSensitiveResponseFromUser(question)
+	val = question.Answer.(string)
+	return val, err == nil && val != ""
 }
 
 func (c *ConfigManager) GetIntFlagOrConfigValueOrAskUser(key string, cmd *cobra.Command) (int, bool) {
 	val, ok := c.GetFlagOrConfigValue(key, cmd)
 	if !ok {
-		var err error
-		val, err = c.formHandler.GetResponseFromUser(key)
-		if err != nil {
+		question := &forms.Question{
+			Type:   forms.Input,
+			Prompt: key,
+		}
+		if err := c.formHandler.GetResponseFromUser(question); err != nil {
 			return 0, false
 		}
+		val = question.Answer.(string)
 	}
 
 	return ToInt(val)
@@ -314,11 +339,14 @@ func (c *ConfigManager) GetIntFlagOrConfigValueOrAskUser(key string, cmd *cobra.
 func (c *ConfigManager) GetBoolFlagOrConfigValueOrAskUser(key string, cmd *cobra.Command) (bool, bool) {
 	val, ok := c.GetFlagOrConfigValue(key, cmd)
 	if !ok {
-		var err error
-		val, err = c.formHandler.GetResponseFromUser(key)
-		if err != nil {
+		question := &forms.Question{
+			Type:   forms.Confirm,
+			Prompt: key,
+		}
+		if err := c.formHandler.GetResponseFromUser(question); err != nil {
 			return false, false
 		}
+		val = question.Answer.(string)
 	}
 
 	return ToBool(val)

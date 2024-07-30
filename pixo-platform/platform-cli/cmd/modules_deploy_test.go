@@ -17,8 +17,8 @@ var _ = Describe("Module", func() {
 		executor.Cleanup()
 	})
 
-	It("can create a module version", func() {
-		input := bytes.NewBufferString("1\n")
+	It("can return an error if the semantic version is not provided", func() {
+		input := bytes.NewBufferString("1: TST - test\n")
 
 		output, err := executor.RunCommandWithInput(
 			input,
@@ -26,30 +26,34 @@ var _ = Describe("Module", func() {
 			"deploy",
 		)
 
-		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring("Enter MODULE ID:"))
-		Expect(output).To(ContainSubstring("Enter SEMANTIC VERSION:"))
-		Expect(output).To(ContainSubstring("Semantic version not provided"))
+		Expect(err).To(HaveOccurred())
+		Expect(err).To(MatchError("SEMANTIC VERSION not provided"))
+		Expect(output).To(ContainSubstring("MODULE ID"))
+		Expect(output).To(ContainSubstring("SEMANTIC VERSION"))
 	})
 
 	It("can return an error if module id is missing", func() {
-		input := bytes.NewBufferString("0\n")
+		input := bytes.NewBufferString("\n")
 
 		output, err := executor.RunCommandWithInput(
 			input,
 			"modules",
 			"deploy",
-			"--module-id",
-			"0",
+			"--package",
+			"package",
+			"--semantic-version",
+			"1.0.0",
+			"--zip-file",
+			"test.zip",
+			"--platforms",
+			"android",
+			"--controls",
+			"keyboard/mouse",
 		)
 
-		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring("Enter MODULE ID:"))
-		Expect(output).To(ContainSubstring("Module ID not provided"))
-		Expect(executor.MockMatchmakingClient.NumCalledDialWebsocket).To(Equal(0))
-		Expect(executor.MockMatchmakingClient.NumCalledWriteToWebsocketError).To(Equal(0))
-		Expect(executor.MockMatchmakingClient.NumCalledReadFromWebsocket).To(Equal(0))
-		Expect(executor.MockMatchmakingClient.NumCalledCloseWebsocket).To(Equal(0))
+		Expect(err).To(HaveOccurred())
+		Expect(err).To(MatchError("MODULE ID not provided"))
+		Expect(output).To(ContainSubstring("MODULE ID"))
 	})
 
 	It("can return an error if semantic version is missing", func() {
@@ -60,20 +64,20 @@ var _ = Describe("Module", func() {
 			"modules",
 			"deploy",
 			"--module-id",
-			"1",
+			"1: TST - test",
 			"--package",
 			"pixovr.com",
 			"--platforms",
-			"1",
+			"android",
 			"--controls",
-			"1",
+			"keyboard/mouse",
 			"--zip-file",
 			"test.zip",
 		)
 
-		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring("Enter SEMANTIC VERSION:"))
-		Expect(output).To(ContainSubstring("Semantic version not provided"))
+		Expect(err).To(HaveOccurred())
+		Expect(err).To(MatchError("SEMANTIC VERSION not provided"))
+		Expect(output).To(ContainSubstring("SEMANTIC VERSION"))
 	})
 
 	It("can return an error if package name is missing", func() {
@@ -84,14 +88,20 @@ var _ = Describe("Module", func() {
 			"modules",
 			"deploy",
 			"--module-id",
-			"1",
+			"1: TST - test",
 			"--semantic-version",
 			"1.0.0",
+			"--zip-file",
+			"test.zip",
+			"--platforms",
+			"android",
+			"--controls",
+			"keyboard/mouse",
 		)
 
-		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring("Enter PACKAGE:"))
-		Expect(output).To(ContainSubstring("Package name not provided"))
+		Expect(err).To(HaveOccurred())
+		Expect(err).To(MatchError("PACKAGE not provided"))
+		Expect(output).To(ContainSubstring("PACKAGE"))
 	})
 
 	It("can return an error if zip file path is missing", func() {
@@ -102,30 +112,34 @@ var _ = Describe("Module", func() {
 			"modules",
 			"deploy",
 			"--module-id",
-			"1",
+			"1: TST - test",
 			"--semantic-version",
 			"1.0.0",
 			"--package",
 			"test",
+			"--platforms",
+			"android",
+			"--controls",
+			"keyboard/mouse",
 			"--zip-file",
 			"",
 		)
 
-		Expect(err).NotTo(HaveOccurred())
+		Expect(err).To(HaveOccurred())
+		Expect(err).To(MatchError("ZIP FILE not provided"))
 		Expect(output).To(ContainSubstring("Enter ZIP FILE:"))
-		Expect(output).To(ContainSubstring("Zip file not provided"))
 	})
 
 	It("can return an error if the platform options cant be found", func() {
-		executor.MockPlatformClient.GetPlatformsError = errors.New("error")
+		executor.MockPlatformClient.GetPlatformsError = errors.New("get platforms error")
 		input := bytes.NewBufferString("")
 
-		output, err := executor.RunCommandWithInput(
+		_, err := executor.RunCommandWithInput(
 			input,
 			"modules",
 			"deploy",
 			"--module-id",
-			"1",
+			"1: TST - test",
 			"--semantic-version",
 			"1.0.0",
 			"--package",
@@ -134,8 +148,8 @@ var _ = Describe("Module", func() {
 			"test.zip",
 		)
 
-		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring("error"))
+		Expect(err).To(HaveOccurred())
+		Expect(err).To(MatchError("get platforms error"))
 		Expect(executor.MockPlatformClient.NumCalledGetPlatforms).To(Equal(1))
 	})
 
@@ -147,77 +161,33 @@ var _ = Describe("Module", func() {
 			"modules",
 			"deploy",
 			"--module-id",
-			"1",
+			"1: TST - test",
 			"--semantic-version",
 			"1.0.0",
 			"--package",
 			"test",
 			"--zip-file",
 			"test.zip",
+			"--controls",
+			"keyboard/mouse",
 		)
 
-		Expect(err).NotTo(HaveOccurred())
+		Expect(err).To(HaveOccurred())
+		Expect(err).To(MatchError("PLATFORMS not provided"))
 		Expect(executor.MockPlatformClient.NumCalledGetPlatforms).To(Equal(1))
-		Expect(output).To(ContainSubstring("Select PLATFORMS:"))
-		Expect(output).To(ContainSubstring("Platforms not provided"))
+		Expect(output).To(ContainSubstring("PLATFORMS"))
 	})
 
 	It("can return an error if the control types options cant be found", func() {
-		executor.MockPlatformClient.GetControlTypesError = errors.New("error")
-		input := bytes.NewBufferString("1\n")
+		executor.MockPlatformClient.GetControlTypesError = errors.New("get controls error")
+		input := bytes.NewBufferString("nonexistent\n")
 
-		output, err := executor.RunCommandWithInput(
+		_, err := executor.RunCommandWithInput(
 			input,
 			"modules",
 			"deploy",
 			"--module-id",
-			"1",
-			"--semantic-version",
-			"1.0.0",
-			"--package",
-			"test",
-			"--zip-file",
-			"test.zip",
-		)
-
-		Expect(err).NotTo(HaveOccurred())
-		Expect(executor.MockPlatformClient.NumCalledGetControlTypes).To(Equal(1))
-		Expect(output).To(ContainSubstring("error"))
-	})
-
-	It("can return an error if control types are missing", func() {
-		input := bytes.NewBufferString("1\n")
-
-		output, err := executor.RunCommandWithInput(
-			input,
-			"modules",
-			"deploy",
-			"--module-id",
-			"1",
-			"--semantic-version",
-			"1.0.0",
-			"--package",
-			"test",
-			"--zip-file",
-			"test.zip",
-		)
-
-		Expect(err).NotTo(HaveOccurred())
-		Expect(executor.MockPlatformClient.NumCalledGetControlTypes).To(Equal(1))
-		Expect(output).To(ContainSubstring("Select CONTROL TYPES:"))
-		Expect(output).To(ContainSubstring("Control types not provided"))
-	})
-
-	It("can return an error if the api call fails", func() {
-		executor.MockPlatformClient.CreateModuleVersionError = errors.New("error")
-		input := bytes.NewBufferString("1\n1\n")
-
-		output, err := executor.RunCommandWithInput(
-			input,
-			"modules",
-			"deploy",
-			"--module-id",
-			"1",
+			"1: TST - test",
 			"--semantic-version",
 			"1.0.0",
 			"--package",
@@ -225,13 +195,63 @@ var _ = Describe("Module", func() {
 			"--zip-file",
 			"test.zip",
 			"--platforms",
-			"1",
-			"--controls",
-			"1",
+			"android",
 		)
 
-		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring("error"))
+		Expect(err).To(HaveOccurred())
+		Expect(err).To(MatchError("get controls error"))
+		Expect(executor.MockPlatformClient.NumCalledGetControlTypes).To(Equal(1))
+	})
+
+	It("can return an error if control types are missing", func() {
+		input := bytes.NewBufferString("\n")
+
+		output, err := executor.RunCommandWithInput(
+			input,
+			"modules",
+			"deploy",
+			"--module-id",
+			"1: TST - test",
+			"--semantic-version",
+			"1.0.0",
+			"--package",
+			"test",
+			"--zip-file",
+			"test.zip",
+			"--platforms",
+			"android",
+		)
+
+		Expect(err).To(HaveOccurred())
+		Expect(err).To(MatchError("CONTROLS not provided"))
+		Expect(executor.MockPlatformClient.NumCalledGetControlTypes).To(Equal(1))
+		Expect(output).To(ContainSubstring("CONTROLS"))
+	})
+
+	It("can return an error if the create call fails", func() {
+		executor.MockPlatformClient.CreateModuleVersionError = errors.New("error")
+		input := bytes.NewBufferString("\n")
+
+		_, err := executor.RunCommandWithInput(
+			input,
+			"modules",
+			"deploy",
+			"--module-id",
+			"1: TST - test",
+			"--semantic-version",
+			"1.0.0",
+			"--package",
+			"test",
+			"--zip-file",
+			"test.zip",
+			"--platforms",
+			"android",
+			"--controls",
+			"keyboard/mouse",
+		)
+
+		Expect(err).To(HaveOccurred())
+		Expect(err).To(MatchError("error"))
 		Expect(executor.MockPlatformClient.NumCalledCreateModuleVersion).To(Equal(1))
 	})
 
@@ -240,7 +260,7 @@ var _ = Describe("Module", func() {
 			"modules",
 			"deploy",
 			"--module-id",
-			"1",
+			"1: TST - test",
 			"--semantic-version",
 			"1.0.0",
 			"--package",
@@ -248,9 +268,9 @@ var _ = Describe("Module", func() {
 			"--zip-file",
 			"test.zip",
 			"--platforms",
-			"1",
+			"android",
 			"--controls",
-			"1",
+			"keyboard/mouse",
 		)
 
 		Expect(err).NotTo(HaveOccurred())

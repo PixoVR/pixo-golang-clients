@@ -57,20 +57,17 @@ with the platform, deploying gameserver versions, and simplifying the testing of
 ```bash
 brew tap PixoVR/pixo-golang-clients
 brew install pixo-cli
-
-pixo help
 ```
+
+### Go
+```bash
+go install github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli@latest
+````
 
 ### Windows
 Unfortunately the Pixo CLI is not yet available on Windows via package manager.
 The CLI can be installed by downloading the latest release from the [releases page](https://github.com/PixoVR/pixo-golang-clients/releases)
 or building from source.
-```
-git clone git@github.com:PixoVR/pixo-golang-clients.git
-cd pixo-golang-clients/pixo-platform/platform-cli
-make build
-./bin/pixo help
-```
 
 ### Build from Source
 ```bash
@@ -145,7 +142,7 @@ pixo config
 ### Edit Configuration File
 Editor can be set via the `EDITOR` environment variable. Defaults to `vim`.
 ```bash
-pixo config --edit
+pixo config --edit # or -e
 ```
 
 ### Get Platform Service URLs
@@ -180,6 +177,8 @@ pixo auth login --username <username> --password <password>
 🚀 Login successful. Here is your API token: 
 <token>
 ```
+Token redacted for security reasons.
+![Made with VHS](https://vhs.charm.sh/vhs-6w7a14WEgRuEIG3400Zazf.gif)
 
 
 ## Users
@@ -187,13 +186,15 @@ pixo auth login --username <username> --password <password>
 ### Create
 ```bash
 pixo users create \
-    --username testuser \
-    --password testpassword \
     --first-name Test \
     --last-name User \
-    --org-id 1 \
+    --user-email testuser@example.com \
+    --user-username testuser \
+    --user-password testpassword \
+    --org "My Org" \
     --role developer
 ```
+![Made with VHS](https://vhs.charm.sh/vhs-4IQGJes6OQQoWTN8dt3e8A.gif)
 
 ## API Keys
 
@@ -204,6 +205,8 @@ pixo keys create
 # Or for a specific user
 pixo keys create --user-id 1
 ```
+![Made with VHS](https://vhs.charm.sh/vhs-DBpsz1KVGCMzMHkEgF4Gg.gif)
+
 
 ### List
 ```bash
@@ -215,8 +218,9 @@ pixo keys list --user-id 1
 
 ### Delete
 ```bash
-pixo keys delete --key-id 1
+pixo keys delete --key-ids 1
 ```
+![Made with VHS](https://vhs.charm.sh/vhs-3vojsRNWUrNJH6lwC7ozQT.gif)
 
 ## Modules
 
@@ -224,9 +228,11 @@ pixo keys delete --key-id 1
 ```bash
 pixo modules deploy \
     --module-id 1 \
-    --server-version 1.00.00 \
-    --package com.pixovr.test \
-    --zip-file /path/to/zip
+    --server-version "1.00.00" \
+    --package "com.pixovr.test" \
+    --platforms "android" \
+    --controls "keyboard/mouse" \
+    --zip-file "/path/to/zip"
 ```
 
 ## Webhooks
@@ -252,28 +258,29 @@ pixo webhooks delete --webhook-id 1
 
 ### Start a Session
 ```bash
-pixo sessions start --module-id 1
+pixo sessions simulate --module-id 1
 ```
 
 ### End a Session
 ```bash
-# Using current session ID
+# Using current session id stored in config after starting a session
 pixo sessions end \
   --score 1 \
   --max-score 2
 ```
 
 ```bash
-# Or with session ID as input
+# Or with session id as input
 pixo sessions end \
   --session-id 123 \
   --score 1 \
   --max-score 2
 ```
+![Made with VHS](https://vhs.charm.sh/vhs-2Aj37Cccs1fWY4M3EWT1qY.gif)
 
 
 ## Run Mock Servers
-### Platform
+### Platform - WIP
 Run a mock server that mimics the Pixo Platform API to test functionality locally.
 It has the following REST endpoints available. See the [Swagger API Docs](https://apex.pixovr.com/v2/swagger/index.html) for more details.
 
@@ -286,17 +293,15 @@ It has the following REST endpoints available. See the [Swagger API Docs](https:
 
 ### Matchmaking 
 
-Run a mock server that mimics the Pixo Matchmaking API to test matchmaking functionality locally.
+Run a mock server that mimics the Pixo Matchmaking Service to test matchmaking functionality locally.
 It has a single websocket endpoint, `/matchmaking/matchmake`, that accepts a message (which it ignores)
 and sends a message back containing the IP and port of the game server to connect to.
 
 ```bash
 # Run the server - Ctrl-C to stop
 pixo mp mockserver
-
-# Expected output:
-Mon, 02 Jan 2006 15:04:05 MST INF Starting mock server serving endpoint matchmaking/matchmake on port 8080
 ```
+![Made with VHS](https://vhs.charm.sh/vhs-5dl0kD5DaiSDukQrfLI6Q.gif)
 
 To customize the response, use the command line flags when starting the server
 ```bash
@@ -315,7 +320,7 @@ session-id: FB0HIFBMY8NAME99IS7C3WALKERB4D76
 owning-user-name: PixoServer
 server-version: 1.00.00
 module-id: 1
-org-id: 1
+org: 1
 ```
 
 You could even use the Pixo CLI to test the mock server (run [simple agones server](https://github.com/PixoVR/multiplayer-gameservers/tree/dev/simple-server) locally to test the example below):
@@ -358,8 +363,7 @@ pixo mp servers deploy \
 
 
 ### Gameserver Build Pipeline (e.g. Cloud Build)
-If no `server-version` configuration value is found, it will search for an ini file  
-The ini used file can be set with the flag `--ini` and defaults to `Config/DefaultGame.ini`
+`server-version` can be configured via an ini file via the flag `--ini`
 
 #### Sample Ini Configuration
 ```ini
@@ -370,7 +374,7 @@ ServerMatchVersion=1.00.00
 #### Sample `cloudbuild.yaml`
 ```yaml
 steps:
-  - name: "gcr.io/pixo-bootstrap/pixo-platform-cli:0.0.177"
+  - name: "gcr.io/pixo-bootstrap/pixo-platform-cli:0.1.28"
     id: "Version Pre-Check"
     args:
       - mp
@@ -390,8 +394,10 @@ steps:
       - build
       - -t
       - gcr.io/${PROJECT_ID}/${_LIFECYCLE}/${_PROJECT_NAME}:latest
+      - -t
+      - gcr.io/${PROJECT_ID}/${_LIFECYCLE}/${_PROJECT_NAME}:${COMMIT_SHA}
 
-  - name: "gcr.io/pixo-bootstrap/pixo-platform-cli:0.0.177"
+  - name: "gcr.io/pixo-bootstrap/pixo-platform-cli:0.1.28"
     id: "Deploy MP Server Version"
     args:
       - mp
@@ -410,10 +416,17 @@ availableSecrets:
   secretManager:
     - versionName: projects/$PROJECT_ID/secrets/$SECRET_NAME/versions/latest
       env: PIXO_API_KEY
+      
+images:
+  - gcr.io/${PROJECT_ID}/${_LIFECYCLE}/${_PROJECT_NAME}:${COMMIT_SHA}
+
+
 ```
 
 
 ## Test Multiplayer Matchmaking
+
+![Made with VHS](https://vhs.charm.sh/vhs-1vPC2fJWNNr9v9Smnmzshh.gif)
 
 ### Request a Match
 ```bash

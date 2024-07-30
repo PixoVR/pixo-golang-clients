@@ -9,9 +9,9 @@ func ToInt(val string) (int, bool) {
 
 func ToBool(val string) (bool, bool) {
 	if val == "yes" {
-		return true, false
+		return true, true
 	} else if val == "no" {
-		return false, false
+		return false, true
 	}
 
 	b, err := strconv.ParseBool(val)

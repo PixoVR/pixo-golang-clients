@@ -10,7 +10,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o pixo platform-cli/main.go
 
 
-FROM gcr.io/distroless/static-debian12
+FROM gcr.io/distroless/static-debian12:nonroot
 
 WORKDIR /client
 

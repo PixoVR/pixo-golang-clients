@@ -3,6 +3,7 @@ package cmd_test
 import (
 	"bytes"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/headset"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/cmd"
@@ -33,10 +34,11 @@ func TestCLI(t *testing.T) {
 type TestExecutor struct {
 	rootCmd               *cobra.Command
 	Printer               *printer.EmojiPrinter
-	FormHandler           *basic.FormHandler
+	FormHandler           *basic.Handler
 	ConfigManager         *config.ConfigManager
 	InMemoryConfig        *config.InMemoryConfigManager
 	MockPlatformClient    *platform.MockClient
+	MockLegacyClient      *legacy.MockClient
 	MockHeadsetClient     *headset.MockClient
 	MockMatchmakingClient *matchmaker.MockMatchmaker
 	MockFileOpener        *editor.MockFileOpener
@@ -45,20 +47,22 @@ type TestExecutor struct {
 func NewTestExecutor() *TestExecutor {
 	formHandler := basic.NewFormHandler(nil, nil)
 	inMemoryConfigManager := config.NewInMemoryConfigManager()
-	configManager := config.NewConfigManager(inMemoryConfigManager)
+	emojiPrinter := printer.NewEmojiPrinter(nil)
+	configManager := config.NewConfigManager(inMemoryConfigManager, emojiPrinter, formHandler)
 
 	mockPlatformClient := &platform.MockClient{}
+	mockLegacyClient := &legacy.MockClient{}
 	mockHeadsetClient := &headset.MockClient{}
 	mockMatchmaker := matchmaker.NewMockMatchmaker()
 
-	emojiPrinter := printer.NewEmojiPrinter(nil)
 	mockFileOpener := &editor.MockFileOpener{}
 
-	cmd.Ctx = &ctx.CLIContext{
+	cmd.Ctx = &ctx.Context{
 		Printer:           emojiPrinter,
 		FormHandler:       formHandler,
 		ConfigManager:     configManager,
 		PlatformClient:    mockPlatformClient,
+		LegacyClient:      mockLegacyClient,
 		HeadsetClient:     mockHeadsetClient,
 		MatchmakingClient: mockMatchmaker,
 		FileOpener:        mockFileOpener,
@@ -72,6 +76,7 @@ func NewTestExecutor() *TestExecutor {
 		InMemoryConfig:        inMemoryConfigManager,
 		ConfigManager:         configManager,
 		MockPlatformClient:    mockPlatformClient,
+		MockLegacyClient:      mockLegacyClient,
 		MockHeadsetClient:     mockHeadsetClient,
 		MockMatchmakingClient: mockMatchmaker,
 		MockFileOpener:        mockFileOpener,
@@ -83,7 +88,6 @@ func (t *TestExecutor) Cleanup() {
 	t.MockPlatformClient.Reset()
 	t.rootCmd.SetArgs(nil)
 	t.clearFlagValues(t.rootCmd)
-
 }
 
 func (t *TestExecutor) clearFlagValues(cmd *cobra.Command) {

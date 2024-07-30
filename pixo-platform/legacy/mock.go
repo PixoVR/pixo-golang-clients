@@ -1,6 +1,9 @@
 package legacy
 
 type MockClient struct {
+	NumCalledGetOrgs int
+	GetOrgsError     error
+
 	NumCalledLogin int
 	LoginError     error
 
@@ -20,6 +23,19 @@ func (m *MockClient) Login(username, password string) error {
 		return m.LoginError
 	}
 	return nil
+}
+
+func (m *MockClient) GetOrgs() ([]Org, error) {
+	m.NumCalledGetOrgs++
+	if m.GetOrgsError != nil {
+		return nil, m.GetOrgsError
+	}
+	return []Org{
+		{
+			ID:   1,
+			Name: "test",
+		},
+	}, nil
 }
 
 func (m *MockClient) CreateWebhook(webhook Webhook) error {

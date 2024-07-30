@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/config"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms/basic"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/printer"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/spf13/cobra"
@@ -15,7 +16,7 @@ var _ = Describe("Config Manager", func() {
 	var (
 		input           *bytes.Buffer
 		output          *bytes.Buffer
-		formHandler     *basic.FormHandler
+		formHandler     *basic.Handler
 		inMemoryManager *config.InMemoryConfigManager
 		configManager   *config.ConfigManager
 	)
@@ -25,7 +26,8 @@ var _ = Describe("Config Manager", func() {
 		output = bytes.NewBufferString("")
 		formHandler = basic.NewFormHandler(input, output)
 		inMemoryManager = config.NewInMemoryConfigManager()
-		configManager = config.NewConfigManager(inMemoryManager, formHandler)
+		emojiPrinter := printer.NewEmojiPrinter(nil)
+		configManager = config.NewConfigManager(inMemoryManager, emojiPrinter, formHandler)
 		Expect(configManager).NotTo(BeNil())
 	})
 
@@ -77,6 +79,7 @@ var _ = Describe("Config Manager", func() {
 		input.WriteString(apiKey + "\n")
 
 		val, ok := configManager.GetConfigValueOrAskUser("api-key", nil)
+
 		Expect(ok).To(BeTrue())
 		Expect(val).To(Equal(apiKey))
 		Expect(output.String()).To(ContainSubstring("Enter API KEY: "))

@@ -2,6 +2,7 @@ package config_test
 
 import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/config"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/printer"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -16,7 +17,8 @@ var _ = Describe("In Memory Manager", func() {
 	BeforeEach(func() {
 		inMemoryConfigManager = config.NewInMemoryConfigManager()
 		Expect(inMemoryConfigManager).NotTo(BeNil())
-		configManager = config.NewConfigManager(inMemoryConfigManager)
+		emojiPrinter := printer.NewEmojiPrinter(nil)
+		configManager = config.NewConfigManager(inMemoryConfigManager, emojiPrinter)
 		Expect(configManager).NotTo(BeNil())
 	})
 

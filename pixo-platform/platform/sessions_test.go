@@ -3,26 +3,34 @@ package platform_test
 import (
 	"context"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
+	"github.com/go-faker/faker/v4"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"gorm.io/datatypes"
 )
 
 var _ = Describe("Sessions and Events", func() {
 
 	var (
-		ctx     = context.Background()
-		session *platform.Session
+		ctx      = context.Background()
+		session  *platform.Session
+		deviceID = "test"
 	)
 
 	BeforeEach(func() {
-		ctx = context.Background()
-		var err error
+		uuid := faker.UUIDDigit()
+		session = &platform.Session{
+			ModuleID: moduleID,
+			DeviceID: deviceID,
+			UUID:     &uuid,
+		}
 
-		session, err = tokenClient.CreateSession(ctx, moduleID, "127.0.0.1", "test")
+		Expect(tokenClient.CreateSession(ctx, session)).To(Succeed())
 
-		Expect(err).NotTo(HaveOccurred())
 		Expect(session).NotTo(BeNil())
 		Expect(session.ID).NotTo(BeZero())
+		Expect(session.UUID).NotTo(BeNil())
+		Expect(*session.UUID).To(Equal(uuid))
 		Expect(session.UserID).NotTo(BeZero())
 		Expect(session.ModuleID).To(Equal(moduleID))
 		Expect(session.Module).NotTo(BeNil())
@@ -42,11 +50,12 @@ var _ = Describe("Sessions and Events", func() {
 
 	It("can update a session", func() {
 		input := platform.Session{
-			ID:        session.ID,
-			Status:    "TERMINATED",
-			Completed: true,
-			RawScore:  0.5,
-			MaxScore:  1.0,
+			ID:           session.ID,
+			Status:       "TERMINATED",
+			LessonStatus: "FAILED",
+			Completed:    true,
+			RawScore:     0.5,
+			MaxScore:     1.0,
 		}
 
 		updatedSession, err := tokenClient.UpdateSession(ctx, input)
@@ -54,54 +63,54 @@ var _ = Describe("Sessions and Events", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(updatedSession).NotTo(BeNil())
 		Expect(updatedSession.ID).To(Equal(session.ID))
-		Expect(updatedSession.UserID).To(Equal(session.UserID))
-		Expect(updatedSession.UserID).To(Equal(session.UserID))
-		Expect(updatedSession.User.OrgID).To(Equal(session.User.OrgID))
-		Expect(updatedSession.ModuleID).To(Equal(session.ModuleID))
+		Expect(updatedSession.Status).To(Equal(input.Status))
+		Expect(updatedSession.LessonStatus).To(Equal(input.LessonStatus))
 		Expect(updatedSession.RawScore).To(Equal(input.RawScore))
 		Expect(updatedSession.MaxScore).To(Equal(input.MaxScore))
 		Expect(updatedSession.ScaledScore).To(BeNumerically("~", input.RawScore/input.MaxScore, 0.01))
 		Expect(updatedSession.CompletedAt).NotTo(BeNil())
 		Expect(updatedSession.Duration).NotTo(BeNil())
-	})
-
-	It("can create an event without a payload", func() {
-		input := platform.Event{
-			SessionID: session.ID,
-			Type:      "PIXOVR_SESSION_JOIN",
-		}
-
-		event, err := tokenClient.CreateEvent(ctx, input)
-
-		Expect(err).NotTo(HaveOccurred())
-		Expect(event).NotTo(BeNil())
-		Expect(event.ID).NotTo(BeZero())
+		Expect(updatedSession.UserID).To(Equal(session.UserID))
+		Expect(updatedSession.UserID).To(Equal(session.UserID))
+		Expect(updatedSession.User.OrgID).To(Equal(session.User.OrgID))
+		Expect(updatedSession.ModuleID).To(Equal(session.ModuleID))
 	})
 
 	It("can return an error if the json is invalid", func() {
-		input := platform.Event{
-			SessionID: session.ID,
-			Type:      "PIXOVR_SESSION_JOIN",
-			Payload:   `{"missing": "end bracket"`,
+		event := &platform.Event{
+			SessionID: &[]int{session.ID}[0],
+			Type:      "PIXOVR_SESSION_JOINED",
+			Payload:   datatypes.JSON(`{"missing": "end bracket"`),
 		}
 
-		event, err := tokenClient.CreateEvent(ctx, input)
+		err := tokenClient.CreateEvent(ctx, event)
 
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("invalid json"))
-		Expect(event).To(BeNil())
+	})
+
+	It("can create an event without a payload", func() {
+		event := &platform.Event{
+			SessionID: &[]int{session.ID}[0],
+			Type:      "PIXOVR_SESSION_JOINED",
+		}
+
+		Expect(tokenClient.CreateEvent(ctx, event)).To(Succeed())
+
+		Expect(event).NotTo(BeNil())
+		Expect(event.ID).NotTo(BeZero())
+		Expect(event.SessionID).To(Equal(session.ID))
 	})
 
 	It("can create an event with a payload", func() {
-		input := platform.Event{
-			SessionID: session.ID,
-			Type:      "PIXOVR_SESSION_JOIN",
-			Payload:   `{"score": 1}`,
+		event := &platform.Event{
+			SessionID: &[]int{session.ID}[0],
+			Type:      "PIXOVR_SESSION_JOINED",
+			Payload:   datatypes.JSON(`{"action": "something-cool"}`),
 		}
 
-		event, err := tokenClient.CreateEvent(ctx, input)
+		Expect(tokenClient.CreateEvent(ctx, event)).To(Succeed())
 
-		Expect(err).NotTo(HaveOccurred())
 		Expect(event).NotTo(BeNil())
 		Expect(event.ID).NotTo(BeZero())
 	})

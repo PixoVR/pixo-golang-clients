@@ -7,7 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (p *LegacyAPIClient) DeployMultiplayerServerVersion(moduleID int, image, semanticVersion string) (*resty.Response, error) {
+func (p *Client) DeployMultiplayerServerVersion(moduleID int, image, semanticVersion string) (*resty.Response, error) {
 	multiplayerServerVersion := MultiplayerServerVersion{
 		ModuleID:        moduleID,
 		Status:          "enabled",
@@ -27,7 +27,7 @@ func (p *LegacyAPIClient) DeployMultiplayerServerVersion(moduleID int, image, se
 	return p.Post(path, body)
 }
 
-func (p *LegacyAPIClient) UpdateMultiplayerServerVersion(versionID int, image string) (*resty.Response, error) {
+func (p *Client) UpdateMultiplayerServerVersion(versionID int, image string) (*resty.Response, error) {
 	multiplayerPatch := MultiplayerServerVersion{
 		Status:        "enabled",
 		ImageRegistry: image,
@@ -44,7 +44,7 @@ func (p *LegacyAPIClient) UpdateMultiplayerServerVersion(versionID int, image st
 	return p.Patch(path, body)
 }
 
-func (p *LegacyAPIClient) GetMatchmakingProfiles() ([]*GameProfileMetadata, error) {
+func (p *Client) GetMatchmakingProfiles() ([]*GameProfileMetadata, error) {
 	path := "api/openmatch/configurations"
 
 	p.SetHeader("x-openmatch-header", p.GetToken())
