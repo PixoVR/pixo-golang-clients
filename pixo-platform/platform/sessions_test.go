@@ -6,6 +6,7 @@ import (
 	"github.com/go-faker/faker/v4"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"gorm.io/datatypes"
 )
 
 var _ = Describe("Sessions and Events", func() {
@@ -77,9 +78,9 @@ var _ = Describe("Sessions and Events", func() {
 
 	It("can return an error if the json is invalid", func() {
 		event := &platform.Event{
-			SessionID: session.ID,
+			SessionID: &[]int{session.ID}[0],
 			Type:      "PIXOVR_SESSION_JOINED",
-			Payload:   `{"missing": "end bracket"`,
+			Payload:   datatypes.JSON(`{"missing": "end bracket"`),
 		}
 
 		err := tokenClient.CreateEvent(ctx, event)
@@ -90,7 +91,7 @@ var _ = Describe("Sessions and Events", func() {
 
 	It("can create an event without a payload", func() {
 		event := &platform.Event{
-			SessionID: session.ID,
+			SessionID: &[]int{session.ID}[0],
 			Type:      "PIXOVR_SESSION_JOINED",
 		}
 
@@ -103,9 +104,9 @@ var _ = Describe("Sessions and Events", func() {
 
 	It("can create an event with a payload", func() {
 		event := &platform.Event{
-			SessionID: session.ID,
+			SessionID: &[]int{session.ID}[0],
 			Type:      "PIXOVR_SESSION_JOINED",
-			Payload:   `{"score": 1}`,
+			Payload:   datatypes.JSON(`{"action": "something-cool"}`),
 		}
 
 		Expect(tokenClient.CreateEvent(ctx, event)).To(Succeed())

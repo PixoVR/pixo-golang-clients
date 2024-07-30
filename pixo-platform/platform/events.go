@@ -9,11 +9,12 @@ import (
 )
 
 type Event struct {
-	ID        int            `json:"id,omitempty"`
-	SessionID int            `json:"sessionId,omitempty"`
-	Session   *Session       `json:"session,omitempty"`
-	Type      string         `json:"type,omitempty"`
-	Payload   datatypes.JSON `json:"jsonData,omitempty"`
+	ID          int            `json:"id,omitempty"`
+	SessionID   *int           `json:"sessionId,omitempty"`
+	SessionUUID *string        `json:"sessionUuid,omitempty"`
+	Session     *Session       `json:"session,omitempty"`
+	Type        string         `json:"type,omitempty"`
+	Payload     datatypes.JSON `json:"jsonData,omitempty"`
 
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	UpdatedAt time.Time `json:"updatedAt,omitempty"`
@@ -60,8 +61,9 @@ func (p *PlatformClient) CreateEvent(ctx context.Context, event *Event) error {
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{
-			"sessionId": event.SessionID,
-			"type":      event.Type,
+			"sessionId":   event.SessionID,
+			"sessionUuid": event.SessionUUID,
+			"type":        event.Type,
 		},
 	}
 

@@ -648,12 +648,14 @@ func (m *MockClient) UpdateSession(ctx context.Context, session Session) (*Sessi
 func (m *MockClient) CreateEvent(ctx context.Context, event *Event) error {
 	m.NumCalledCreateEvent++
 
-	if event.SessionID <= 0 {
-		return InvalidSessionError
+	noSessionID := event.SessionID == nil || *event.SessionID <= 0
+	noSessionUUID := event.SessionUUID == nil || *event.SessionUUID == ""
+	if noSessionID && noSessionUUID {
+		return errors.New("session id or session uuid required")
 	}
 
 	if event.Type == "" {
-		return commonerrors.ErrorRequired("event type")
+		return commonerrors.ErrorRequired("type")
 	}
 
 	if m.CreateEventError != nil {
