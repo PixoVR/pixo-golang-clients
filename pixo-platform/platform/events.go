@@ -4,15 +4,16 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"gorm.io/datatypes"
 	"time"
 )
 
 type Event struct {
-	ID        int         `json:"id,omitempty"`
-	SessionID int         `json:"sessionId,omitempty"`
-	Session   *Session    `json:"session,omitempty"`
-	Type      string      `json:"type,omitempty"`
-	Payload   interface{} `json:"jsonData,omitempty"`
+	ID        int            `json:"id,omitempty"`
+	SessionID int            `json:"sessionId,omitempty"`
+	Session   *Session       `json:"session,omitempty"`
+	Type      string         `json:"type,omitempty"`
+	Payload   datatypes.JSON `json:"jsonData,omitempty"`
 
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	UpdatedAt time.Time `json:"updatedAt,omitempty"`
