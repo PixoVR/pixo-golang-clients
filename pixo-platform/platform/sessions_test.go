@@ -48,11 +48,12 @@ var _ = Describe("Sessions and Events", func() {
 
 	It("can update a session", func() {
 		input := platform.Session{
-			ID:        session.ID,
-			Status:    "TERMINATED",
-			Completed: true,
-			RawScore:  0.5,
-			MaxScore:  1.0,
+			ID:           session.ID,
+			Status:       "TERMINATED",
+			LessonStatus: "FAILED",
+			Completed:    true,
+			RawScore:     0.5,
+			MaxScore:     1.0,
 		}
 
 		updatedSession, err := tokenClient.UpdateSession(ctx, input)
@@ -60,21 +61,23 @@ var _ = Describe("Sessions and Events", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(updatedSession).NotTo(BeNil())
 		Expect(updatedSession.ID).To(Equal(session.ID))
-		Expect(updatedSession.UserID).To(Equal(session.UserID))
-		Expect(updatedSession.UserID).To(Equal(session.UserID))
-		Expect(updatedSession.User.OrgID).To(Equal(session.User.OrgID))
-		Expect(updatedSession.ModuleID).To(Equal(session.ModuleID))
+		Expect(updatedSession.Status).To(Equal(input.Status))
+		Expect(updatedSession.LessonStatus).To(Equal(input.LessonStatus))
 		Expect(updatedSession.RawScore).To(Equal(input.RawScore))
 		Expect(updatedSession.MaxScore).To(Equal(input.MaxScore))
 		Expect(updatedSession.ScaledScore).To(BeNumerically("~", input.RawScore/input.MaxScore, 0.01))
 		Expect(updatedSession.CompletedAt).NotTo(BeNil())
 		Expect(updatedSession.Duration).NotTo(BeNil())
+		Expect(updatedSession.UserID).To(Equal(session.UserID))
+		Expect(updatedSession.UserID).To(Equal(session.UserID))
+		Expect(updatedSession.User.OrgID).To(Equal(session.User.OrgID))
+		Expect(updatedSession.ModuleID).To(Equal(session.ModuleID))
 	})
 
 	It("can return an error if the json is invalid", func() {
 		event := &platform.Event{
 			SessionID: session.ID,
-			Type:      "PIXOVR_SESSION_JOIN",
+			Type:      "PIXOVR_SESSION_JOINED",
 			Payload:   `{"missing": "end bracket"`,
 		}
 
@@ -87,7 +90,7 @@ var _ = Describe("Sessions and Events", func() {
 	It("can create an event without a payload", func() {
 		event := &platform.Event{
 			SessionID: session.ID,
-			Type:      "PIXOVR_SESSION_JOIN",
+			Type:      "PIXOVR_SESSION_JOINED",
 		}
 
 		Expect(tokenClient.CreateEvent(ctx, event)).To(Succeed())
@@ -100,7 +103,7 @@ var _ = Describe("Sessions and Events", func() {
 	It("can create an event with a payload", func() {
 		event := &platform.Event{
 			SessionID: session.ID,
-			Type:      "PIXOVR_SESSION_JOIN",
+			Type:      "PIXOVR_SESSION_JOINED",
 			Payload:   `{"score": 1}`,
 		}
 

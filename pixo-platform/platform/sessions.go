@@ -10,16 +10,17 @@ import (
 type Session struct {
 	ID int `json:"id,omitempty"`
 
-	UUID        string  `json:"uuid,omitempty"`
-	IPAddress   string  `json:"ipAddress,omitempty"`
-	DeviceID    string  `json:"deviceId,omitempty"`
-	RawScore    float64 `json:"rawScore,omitempty"`
-	MaxScore    float64 `json:"maxScore,omitempty"`
-	ScaledScore float64 `json:"scaledScore,omitempty"`
-	Status      string  `json:"status,omitempty"`
-	Completed   bool    `json:"completed,omitempty"`
-	CompletedAt string  `json:"completedAt,omitempty"`
-	Duration    string  `json:"duration,omitempty"`
+	UUID         string  `json:"uuid,omitempty"`
+	IPAddress    string  `json:"ipAddress,omitempty"`
+	DeviceID     string  `json:"deviceId,omitempty"`
+	RawScore     float64 `json:"rawScore,omitempty"`
+	MaxScore     float64 `json:"maxScore,omitempty"`
+	ScaledScore  float64 `json:"scaledScore,omitempty"`
+	Status       string  `json:"status,omitempty"`
+	LessonStatus string  `json:"lessonStatus,omitempty"`
+	Completed    bool    `json:"completed,omitempty"`
+	CompletedAt  string  `json:"completedAt,omitempty"`
+	Duration     string  `json:"duration,omitempty"`
 
 	UserID   int     `json:"userId,omitempty"`
 	User     User    `json:"user,omitempty"`
@@ -44,7 +45,7 @@ type SessionResponse struct {
 }
 
 func (p *PlatformClient) GetSession(ctx context.Context, id int) (*Session, error) {
-	query := `query session($id: ID!) { session(id: $id) { id userId user { orgId } moduleId } }`
+	query := `query session($id: ID!) { session(id: $id) { id uuid deviceId status lessonStatus completedAt userId user { orgId } moduleId } }`
 
 	variables := map[string]interface{}{
 		"id": id,
@@ -68,7 +69,7 @@ func (p *PlatformClient) CreateSession(ctx context.Context, session *Session) er
 		return errors.New("session is nil")
 	}
 
-	query := `mutation createSession($input: SessionInput!) { createSession(input: $input) { id uuid userId user { orgId } moduleId module { id abbreviation } } }`
+	query := `mutation createSession($input: SessionInput!) { createSession(input: $input) { id uuid status lessonStatus userId user { orgId } moduleId module { id abbreviation } } }`
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{
@@ -94,12 +95,13 @@ func (p *PlatformClient) CreateSession(ctx context.Context, session *Session) er
 }
 
 func (p *PlatformClient) UpdateSession(ctx context.Context, session Session) (*Session, error) {
-	query := `mutation updateSession($input: SessionInput!) { updateSession(input: $input) { id rawScore maxScore scaledScore completedAt duration moduleId userId user { orgId } } }`
+	query := `mutation updateSession($input: SessionInput!) { updateSession(input: $input) { id status lessonStatus rawScore maxScore scaledScore completedAt duration moduleId userId user { orgId } } }`
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{
-			"id":        session.ID,
-			"status":    session.Status,
+			"id":     session.ID,
+			"status": session.Status,
+			//"lessonStatus": session.LessonStatus,
 			"completed": session.Completed,
 			"rawScore":  session.RawScore,
 			"maxScore":  session.MaxScore,
