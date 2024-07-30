@@ -11,7 +11,7 @@ type Event struct {
 	ID        int         `json:"id,omitempty"`
 	SessionID int         `json:"sessionId,omitempty"`
 	Session   *Session    `json:"session,omitempty"`
-	Type      string      `json:"eventType,omitempty"`
+	Type      string      `json:"type,omitempty"`
 	Payload   interface{} `json:"jsonData,omitempty"`
 
 	CreatedAt time.Time `json:"createdAt,omitempty"`
@@ -60,14 +60,14 @@ func (p *PlatformClient) CreateEvent(ctx context.Context, event *Event) error {
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{
 			"sessionId": event.SessionID,
-			"eventType": event.Type,
+			"type":      event.Type,
 		},
 	}
 
 	if event.Payload != nil {
-		variables["input"].(map[string]interface{})["jsonData"] = event.Payload
+		variables["input"].(map[string]interface{})["payload"] = event.Payload
 	} else {
-		variables["input"].(map[string]interface{})["jsonData"] = "{}"
+		variables["input"].(map[string]interface{})["payload"] = "{}"
 	}
 
 	res, err := p.Client.ExecRaw(ctx, query, variables)
