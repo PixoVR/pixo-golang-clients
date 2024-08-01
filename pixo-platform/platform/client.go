@@ -25,7 +25,7 @@ type PlatformClient struct {
 // NewClient is a function that returns a PlatformClient
 func NewClient(config urlfinder.ClientConfig) *PlatformClient {
 
-	if config.APIKey == "" {
+	if config.Token == "" && config.APIKey == "" {
 		config.APIKey = os.Getenv("PIXO_API_KEY")
 	}
 
