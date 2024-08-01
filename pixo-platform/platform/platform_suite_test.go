@@ -30,7 +30,7 @@ var (
 )
 
 var _ = BeforeSuite(func() {
-	lifecycle = config2.GetEnvOrReturn("TEST_PIXO_LIFECYCLE", "dev")
+	lifecycle = config2.GetEnvOrReturn("FTEST_PIXO_LIFECYCLE", "local")
 	username = os.Getenv("TEST_PIXO_USERNAME")
 	password = os.Getenv("TEST_PIXO_PASSWORD")
 	apiKey = os.Getenv("TEST_PIXO_API_KEY")

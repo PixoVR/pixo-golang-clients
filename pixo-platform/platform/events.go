@@ -4,17 +4,16 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"gorm.io/datatypes"
 	"time"
 )
 
 type Event struct {
-	ID          int            `json:"id,omitempty"`
-	SessionID   *int           `json:"sessionId,omitempty"`
-	SessionUUID *string        `json:"sessionUuid,omitempty"`
-	Session     *Session       `json:"session,omitempty"`
-	Type        string         `json:"type,omitempty"`
-	Payload     datatypes.JSON `json:"jsonData,omitempty"`
+	ID          int      `json:"id,omitempty"`
+	SessionID   *int     `json:"sessionId,omitempty"`
+	SessionUUID *string  `json:"sessionUuid,omitempty"`
+	Session     *Session `json:"session,omitempty"`
+	Type        string   `json:"type,omitempty"`
+	Payload     string   `json:"jsonData,omitempty"`
 
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	UpdatedAt time.Time `json:"updatedAt,omitempty"`
@@ -67,10 +66,8 @@ func (p *PlatformClient) CreateEvent(ctx context.Context, event *Event) error {
 		},
 	}
 
-	if event.Payload != nil {
+	if event.Payload != "" {
 		variables["input"].(map[string]interface{})["payload"] = event.Payload
-	} else {
-		variables["input"].(map[string]interface{})["payload"] = "{}"
 	}
 
 	res, err := p.Client.ExecRaw(ctx, query, variables)
