@@ -28,6 +28,7 @@ type Module struct {
 	Description  string `json:"description,omitempty"`
 	ImageLink    string `json:"imageLink,omitempty"`
 	ShortDesc    string `json:"shortDesc,omitempty"`
+	ExternalID   string `json:"externalId,omitempty"`
 
 	GitConfigID int       `json:"gitConfigId,omitempty"`
 	GitConfig   GitConfig `json:"gitConfig,omitempty"`

@@ -46,6 +46,11 @@ var _ = Describe("Sessions and Events", func() {
 		Expect(retrievedSession).NotTo(BeNil())
 		Expect(retrievedSession.ID).To(Equal(session.ID))
 		Expect(retrievedSession.UserID).NotTo(BeZero())
+		Expect(retrievedSession.UserID).NotTo(BeZero())
+		Expect(retrievedSession.Module).NotTo(BeNil())
+		Expect(retrievedSession.Module.Abbreviation).NotTo(BeNil())
+		Expect(retrievedSession.Module.Description).NotTo(BeNil())
+		Expect(retrievedSession.Module.ExternalID).NotTo(BeNil())
 	})
 
 	It("can update a session", func() {

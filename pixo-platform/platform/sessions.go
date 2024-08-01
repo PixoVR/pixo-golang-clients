@@ -45,7 +45,7 @@ type SessionResponse struct {
 }
 
 func (p *PlatformClient) GetSession(ctx context.Context, id int) (*Session, error) {
-	query := `query session($id: ID!) { session(id: $id) { id uuid deviceId status lessonStatus completedAt userId user { orgId } moduleId } }`
+	query := `query session($id: ID!) { session(id: $id) { id uuid deviceId status lessonStatus completedAt userId user { orgId } moduleId module { abbreviation description externalId } }`
 
 	variables := map[string]interface{}{
 		"id": id,
