@@ -24,6 +24,8 @@ type Session struct {
 
 	UserID   int     `json:"userId,omitempty"`
 	User     User    `json:"user,omitempty"`
+	OrgID    int     `json:"orgId,omitempty"`
+	Org      Org     `json:"org,omitempty"`
 	ModuleID int     `json:"moduleId,omitempty"`
 	Module   Module  `json:"module,omitempty"`
 	Events   []Event `json:"events,omitempty"`
@@ -45,7 +47,7 @@ type SessionResponse struct {
 }
 
 func (p *PlatformClient) GetSession(ctx context.Context, id int) (*Session, error) {
-	query := `query session($id: ID!) { session(id: $id) { id uuid deviceId status lessonStatus completedAt userId user { orgId } moduleId module { abbreviation description externalId } } }`
+	query := `query session($id: ID!) { session(id: $id) { id uuid deviceId status lessonStatus completedAt orgId org { id name } userId user { id orgId firstName lastName } moduleId module { id abbreviation description externalId } } }`
 
 	variables := map[string]interface{}{
 		"id": id,
