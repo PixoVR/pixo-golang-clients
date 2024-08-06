@@ -152,7 +152,7 @@ func (p *PlatformClient) DeleteUser(ctx context.Context, id int) error {
 }
 
 func (p *PlatformClient) GetUser(ctx context.Context, id int) (*User, error) {
-	query := `query user($id: ID, $username: String) { user(id: $id, username: $username) { id username email firstName lastName orgId role } }`
+	query := `query user($id: ID, $username: String) { user(id: $id, username: $username) { id username email firstName lastName orgId org { id name type } role } }`
 
 	variables := map[string]interface{}{
 		"id": id,

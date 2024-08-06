@@ -66,6 +66,8 @@ var _ = Describe("Users", func() {
 		Expect(retrievedUser.FirstName).To(Equal(user.FirstName))
 		Expect(retrievedUser.LastName).To(Equal(user.LastName))
 		Expect(retrievedUser.OrgID).To(Equal(user.OrgID))
+		Expect(retrievedUser.Org).NotTo(BeNil())
+		Expect(retrievedUser.Org.Type).NotTo(BeEmpty())
 	})
 
 	It("can get a user by username", func() {
