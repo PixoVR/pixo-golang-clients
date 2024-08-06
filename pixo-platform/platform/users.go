@@ -151,6 +151,26 @@ func (p *PlatformClient) DeleteUser(ctx context.Context, id int) error {
 	return nil
 }
 
+func (p *PlatformClient) GetUser(ctx context.Context, id int) (*User, error) {
+	query := `query user($id: ID, $username: String) { user(id: $id, username: $username) { id username email firstName lastName orgId role } }`
+
+	variables := map[string]interface{}{
+		"id": id,
+	}
+
+	res, err := p.Client.ExecRaw(ctx, query, variables)
+	if err != nil {
+		return nil, err
+	}
+
+	var userResponse GetUserResponse
+	if err = json.Unmarshal(res, &userResponse); err != nil {
+		return nil, err
+	}
+
+	return &userResponse.User, nil
+}
+
 func (p *PlatformClient) GetUserByUsername(ctx context.Context, username string) (*User, error) {
 	query := `query user($id: ID, $username: String) { user(id: $id, username: $username) { id username firstName lastName orgId role } }`
 

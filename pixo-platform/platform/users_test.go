@@ -57,6 +57,17 @@ var _ = Describe("Users", func() {
 		Expect(client.ActiveOrgID()).To(Equal(user.OrgID))
 	})
 
+	It("can get a user by id", func() {
+		retrievedUser, err := tokenClient.GetUser(ctx, user.ID)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(retrievedUser).NotTo(BeNil())
+		Expect(retrievedUser.ID).To(Equal(user.ID))
+		Expect(retrievedUser.Username).To(Equal(user.Username))
+		Expect(retrievedUser.FirstName).To(Equal(user.FirstName))
+		Expect(retrievedUser.LastName).To(Equal(user.LastName))
+		Expect(retrievedUser.OrgID).To(Equal(user.OrgID))
+	})
+
 	It("can get a user by username", func() {
 		retrievedUser, err := tokenClient.GetUserByUsername(ctx, user.Username)
 		Expect(err).NotTo(HaveOccurred())
