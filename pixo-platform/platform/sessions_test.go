@@ -82,7 +82,35 @@ var _ = Describe("Sessions and Events", func() {
 		Expect(updatedSession.CompletedAt).NotTo(BeNil())
 		Expect(updatedSession.Duration).NotTo(BeNil())
 		Expect(updatedSession.UserID).To(Equal(session.UserID))
+		Expect(updatedSession.User).NotTo(BeNil())
+		Expect(updatedSession.User.OrgID).To(Equal(session.User.OrgID))
+		Expect(updatedSession.ModuleID).To(Equal(session.ModuleID))
+	})
+
+	It("can update a session with uuid", func() {
+		input := platform.Session{
+			UUID:         session.UUID,
+			Status:       "COMPLETED",
+			LessonStatus: "PASSED",
+			Completed:    true,
+			RawScore:     0.5,
+			MaxScore:     2.0,
+		}
+
+		updatedSession, err := tokenClient.UpdateSession(ctx, input)
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(updatedSession).NotTo(BeNil())
+		Expect(updatedSession.ID).To(Equal(session.ID))
+		Expect(updatedSession.Status).To(Equal(input.Status))
+		Expect(updatedSession.LessonStatus).To(Equal(input.LessonStatus))
+		Expect(updatedSession.RawScore).To(Equal(input.RawScore))
+		Expect(updatedSession.MaxScore).To(Equal(input.MaxScore))
+		Expect(updatedSession.ScaledScore).To(BeNumerically("~", input.RawScore/input.MaxScore, 0.01))
+		Expect(updatedSession.CompletedAt).NotTo(BeNil())
+		Expect(updatedSession.Duration).NotTo(BeNil())
 		Expect(updatedSession.UserID).To(Equal(session.UserID))
+		Expect(updatedSession.User).NotTo(BeNil())
 		Expect(updatedSession.User.OrgID).To(Equal(session.User.OrgID))
 		Expect(updatedSession.ModuleID).To(Equal(session.ModuleID))
 	})

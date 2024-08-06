@@ -101,13 +101,22 @@ func (p *PlatformClient) UpdateSession(ctx context.Context, session Session) (*S
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{
-			"id":           session.ID,
+			//"id":           session.ID,
+			//"uuid":         session.UUID,
 			"status":       session.Status,
 			"lessonStatus": session.LessonStatus,
 			"completed":    session.Completed,
 			"rawScore":     session.RawScore,
 			"maxScore":     session.MaxScore,
 		},
+	}
+
+	if session.ID != 0 {
+		variables["input"].(map[string]interface{})["id"] = session.ID
+	} else if session.UUID != nil {
+		variables["input"].(map[string]interface{})["uuid"] = session.UUID
+	} else {
+		return nil, errors.New("id or uuid is required")
 	}
 
 	res, err := p.Client.ExecRaw(ctx, query, variables)
