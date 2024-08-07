@@ -27,6 +27,8 @@ func Run(port string, printer printer.Printer, endpoint string, mockResponse []b
 		requestHandler(c.Writer, c.Request, mockResponse)
 	})
 
+	log.Info().Msgf("🚀 Starting mock server on port %s", port)
+
 	if err := router.Run(fmt.Sprintf(":%s", port)); err != nil {
 		printer.Printf("Failed to start mock server: %s", err.Error())
 		return
