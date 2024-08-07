@@ -19,9 +19,12 @@ var _ = Describe("Sessions and Events", func() {
 	BeforeEach(func() {
 		uuid := faker.UUIDHyphenated()
 		session = &platform.Session{
-			ModuleID: moduleID,
-			DeviceID: deviceID,
-			UUID:     &uuid,
+			ModuleID:       moduleID,
+			DeviceID:       deviceID,
+			UUID:           &uuid,
+			PlayMode:       "practice",
+			Specialization: "specialization1",
+			Focus:          "focus1",
 		}
 
 		Expect(tokenClient.CreateSession(ctx, session)).To(Succeed())
@@ -36,6 +39,10 @@ var _ = Describe("Sessions and Events", func() {
 		Expect(session.Module.ID).To(Equal(moduleID))
 		Expect(session.User).NotTo(BeNil())
 		Expect(session.User.OrgID).NotTo(BeZero())
+		Expect(session.DeviceID).To(Equal(deviceID))
+		Expect(session.PlayMode).To(Equal("practice"))
+		Expect(session.Specialization).To(Equal("specialization1"))
+		Expect(session.Focus).To(Equal("focus1"))
 	})
 
 	It("can get a session", func() {

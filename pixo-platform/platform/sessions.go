@@ -74,17 +74,13 @@ func (p *PlatformClient) CreateSession(ctx context.Context, session *Session) er
 		return errors.New("session is nil")
 	}
 
-	query := `mutation createSession($input: SessionInput!) { createSession(input: $input) { id uuid status lessonStatus playMode focus specialization maxScore userId user { orgId } moduleId module { id abbreviation } } }`
+	query := `mutation createSession($input: SessionInput!) { createSession(input: $input) { id uuid status lessonStatus playMode focus specialization maxScore deviceId userId user { orgId } moduleId module { id abbreviation } } }`
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{
 			"uuid":     session.UUID,
 			"moduleId": session.ModuleID,
 		},
-	}
-
-	if session.ID == 0 && session.UUID == nil {
-		return errors.New("id or uuid is required")
 	}
 
 	if session.ModuleID == 0 {
