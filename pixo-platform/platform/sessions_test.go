@@ -17,7 +17,7 @@ var _ = Describe("Sessions and Events", func() {
 	)
 
 	BeforeEach(func() {
-		uuid := faker.UUIDDigit()
+		uuid := faker.UUIDHyphenated()
 		session = &platform.Session{
 			ModuleID: moduleID,
 			DeviceID: deviceID,

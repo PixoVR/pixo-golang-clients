@@ -6,7 +6,6 @@ import (
 )
 
 func (a *Client) AllocateGameserver(request AllocationRequest) (*GameServer, error) {
-
 	body, err := json.Marshal(request)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to marshal allocate server request")

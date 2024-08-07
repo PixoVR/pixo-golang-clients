@@ -1,6 +1,7 @@
 package headset_test
 
 import (
+	"context"
 	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/headset"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -10,6 +11,7 @@ var _ = Describe("Headset Client", func() {
 
 	var (
 		headsetClient Client
+		ctx           = context.Background()
 	)
 
 	BeforeEach(func() {
@@ -27,14 +29,42 @@ var _ = Describe("Headset Client", func() {
 		Expect(anonymousClient.IsAuthenticated()).To(BeTrue())
 	})
 
-	//It("should throw an error if the session module exist", func() {
-	//	session := &platform.Session{
-	//		ModuleID: moduleID,
-	//	}
-	//	err := headsetClient.StartSession(9999999999)
-	//	Expect(err).To(HaveOccurred())
-	//	Expect(err.Error()).To(ContainSubstring("invalid session"))
-	//	Expect(session).NotTo(BeNil())
-	//})
+	It("can perform a session", func() {
+		input := EventRequest{
+			ModuleID: moduleID,
+		}
+
+		response, err := headsetClient.StartSession(ctx, input)
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(response).NotTo(BeNil())
+		Expect(response.ID).NotTo(BeZero())
+		Expect(response.SessionID).NotTo(BeZero())
+
+		input.SessionID = response.SessionID
+		//input.Payload = map[string]interface{}{}
+
+		//response, err = headsetClient.SendEvent(ctx, input)
+		//
+		//Expect(err).NotTo(HaveOccurred())
+		//Expect(response).NotTo(BeNil())
+		//Expect(response.ID).NotTo(BeZero())
+		//Expect(response.SessionID).NotTo(BeZero())
+
+		input.Payload = map[string]interface{}{
+			"score":        190,
+			"scoreMax":     200,
+			"lessonStatus": "passed",
+		}
+
+		response, err = headsetClient.EndSession(ctx, input)
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(response).NotTo(BeNil())
+		Expect(response.ID).NotTo(BeZero())
+		Expect(response.SessionID).NotTo(BeZero())
+		Expect(response.LessonStatus).NotTo(BeNil())
+		Expect(*response.LessonStatus).To(Equal("passed"))
+	})
 
 })
