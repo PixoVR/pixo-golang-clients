@@ -10,6 +10,7 @@ import (
 type Client interface {
 	abstractClient.AbstractClient
 	StartSession(ctx context.Context, request EventRequest) (*EventResponse, error)
+	SendEvent(ctx context.Context, request EventRequest) (*EventResponse, error)
 	EndSession(ctx context.Context, request EventRequest) (*EventResponse, error)
 }
 

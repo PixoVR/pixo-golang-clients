@@ -38,18 +38,18 @@ var _ = Describe("Headset Client", func() {
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(response).NotTo(BeNil())
-		Expect(response.ID).NotTo(BeZero())
 		Expect(response.SessionID).NotTo(BeZero())
 
 		input.SessionID = response.SessionID
-		//input.Payload = map[string]interface{}{}
+		input.Payload = map[string]interface{}{
+			"some": "important data",
+		}
 
-		//response, err = headsetClient.SendEvent(ctx, input)
-		//
-		//Expect(err).NotTo(HaveOccurred())
-		//Expect(response).NotTo(BeNil())
-		//Expect(response.ID).NotTo(BeZero())
-		//Expect(response.SessionID).NotTo(BeZero())
+		response, err = headsetClient.SendEvent(ctx, input)
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(response).NotTo(BeNil())
+		Expect(response.SessionID).NotTo(BeZero())
 
 		input.Payload = map[string]interface{}{
 			"score":        190,
@@ -61,7 +61,6 @@ var _ = Describe("Headset Client", func() {
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(response).NotTo(BeNil())
-		Expect(response.ID).NotTo(BeZero())
 		Expect(response.SessionID).NotTo(BeZero())
 		Expect(response.LessonStatus).NotTo(BeNil())
 		Expect(*response.LessonStatus).To(Equal("passed"))

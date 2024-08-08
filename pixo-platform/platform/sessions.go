@@ -18,6 +18,7 @@ type Session struct {
 	ScaledScore    float64 `json:"scaledScore,omitempty"`
 	Status         string  `json:"status,omitempty"`
 	LessonStatus   string  `json:"lessonStatus,omitempty"`
+	Scenario       string  `json:"scenario,omitempty"`
 	PlayMode       string  `json:"playMode,omitempty"`
 	Focus          string  `json:"focus,omitempty"`
 	Specialization string  `json:"specialization,omitempty"`
@@ -50,7 +51,7 @@ type SessionResponse struct {
 }
 
 func (p *PlatformClient) GetSession(ctx context.Context, id int) (*Session, error) {
-	query := `query session($id: ID!) { session(id: $id) { id uuid deviceId status lessonStatus playMode focus specialization rawScore maxScore scaledScore completedAt orgId org { id name } userId user { id orgId firstName lastName } moduleId module { id abbreviation description externalId } } }`
+	query := `query session($id: ID!) { session(id: $id) { id uuid deviceId status lessonStatus scenario playMode focus specialization rawScore maxScore scaledScore completedAt orgId org { id name } userId user { id orgId firstName lastName } moduleId module { id abbreviation description externalId } } }`
 
 	variables := map[string]interface{}{
 		"id": id,
@@ -74,7 +75,7 @@ func (p *PlatformClient) CreateSession(ctx context.Context, session *Session) er
 		return errors.New("session is nil")
 	}
 
-	query := `mutation createSession($input: SessionInput!) { createSession(input: $input) { id uuid status lessonStatus playMode focus specialization maxScore deviceId userId user { orgId } moduleId module { id abbreviation } } }`
+	query := `mutation createSession($input: SessionInput!) { createSession(input: $input) { id uuid status lessonStatus scenario playMode focus specialization maxScore deviceId userId user { orgId } moduleId module { id abbreviation } } }`
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{
@@ -83,12 +84,16 @@ func (p *PlatformClient) CreateSession(ctx context.Context, session *Session) er
 		},
 	}
 
-	if session.ModuleID == 0 {
+	if session.ModuleID <= 0 {
 		return errors.New("module id is required")
 	}
 
 	if session.DeviceID != "" {
 		variables["input"].(map[string]interface{})["deviceId"] = session.DeviceID
+	}
+
+	if session.Scenario != "" {
+		variables["input"].(map[string]interface{})["scenario"] = session.Scenario
 	}
 
 	if session.PlayMode != "" {
@@ -119,7 +124,7 @@ func (p *PlatformClient) CreateSession(ctx context.Context, session *Session) er
 }
 
 func (p *PlatformClient) UpdateSession(ctx context.Context, session Session) (*Session, error) {
-	query := `mutation updateSession($input: SessionInput!) { updateSession(input: $input) { id status lessonStatus playMode focus specialization rawScore maxScore scaledScore completedAt duration moduleId userId user { orgId } } }`
+	query := `mutation updateSession($input: SessionInput!) { updateSession(input: $input) { id status lessonStatus scenario playMode focus specialization rawScore maxScore scaledScore completedAt duration moduleId userId user { orgId } } }`
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{
