@@ -131,8 +131,6 @@ func (p *PlatformClient) UpdateSession(ctx context.Context, session Session) (*S
 			"status":       session.Status,
 			"lessonStatus": session.LessonStatus,
 			"completed":    session.Completed,
-			"rawScore":     session.RawScore,
-			"maxScore":     session.MaxScore,
 		},
 	}
 
@@ -142,6 +140,18 @@ func (p *PlatformClient) UpdateSession(ctx context.Context, session Session) (*S
 		variables["input"].(map[string]interface{})["uuid"] = session.UUID
 	} else {
 		return nil, errors.New("id or uuid is required")
+	}
+
+	if session.RawScore != 0 {
+		variables["input"].(map[string]interface{})["rawScore"] = session.RawScore
+	}
+
+	if session.MaxScore != 0 {
+		variables["input"].(map[string]interface{})["maxScore"] = session.MaxScore
+	}
+
+	if session.Scenario != "" {
+		variables["input"].(map[string]interface{})["scenario"] = session.Scenario
 	}
 
 	res, err := p.Client.ExecRaw(ctx, query, variables)
