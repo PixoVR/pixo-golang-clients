@@ -8,12 +8,12 @@ import (
 )
 
 type Event struct {
-	ID          int      `json:"id,omitempty"`
-	SessionID   *int     `json:"sessionId,omitempty"`
-	SessionUUID *string  `json:"sessionUuid,omitempty"`
-	Session     *Session `json:"session,omitempty"`
-	Type        string   `json:"type,omitempty"`
-	Payload     string   `json:"jsonData,omitempty"`
+	ID          int                    `json:"id,omitempty"`
+	SessionID   *int                   `json:"sessionId,omitempty"`
+	SessionUUID *string                `json:"sessionUuid,omitempty"`
+	Session     *Session               `json:"session,omitempty"`
+	Type        string                 `json:"type,omitempty"`
+	Payload     map[string]interface{} `json:"jsonData,omitempty"`
 
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	UpdatedAt time.Time `json:"updatedAt,omitempty"`
@@ -66,8 +66,13 @@ func (p *PlatformClient) CreateEvent(ctx context.Context, event *Event) error {
 		},
 	}
 
-	if event.Payload != "" {
-		variables["input"].(map[string]interface{})["payload"] = event.Payload
+	if event.Payload != nil {
+		payload, err := json.Marshal(event.Payload)
+		if err != nil {
+			return errors.New("invalid json")
+		}
+
+		variables["input"].(map[string]interface{})["payload"] = string(payload)
 	}
 
 	res, err := p.Client.ExecRaw(ctx, query, variables)

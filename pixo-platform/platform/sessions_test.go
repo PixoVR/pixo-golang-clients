@@ -129,23 +129,10 @@ var _ = Describe("Sessions and Events", func() {
 		Expect(updatedSession.ModuleID).To(Equal(session.ModuleID))
 	})
 
-	It("can return an error if the json is invalid", func() {
-		event := &platform.Event{
-			SessionID: &[]int{session.ID}[0],
-			Type:      "PIXOVR_SESSION_JOINED",
-			Payload:   `{"missing": "end bracket"`,
-		}
-
-		err := tokenClient.CreateEvent(ctx, event)
-
-		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring("invalid json"))
-	})
-
 	It("can create an event without a payload", func() {
 		event := &platform.Event{
 			SessionID: &[]int{session.ID}[0],
-			Type:      "PIXOVR_SESSION_JOINED",
+			Type:      "some-event-type",
 		}
 
 		Expect(tokenClient.CreateEvent(ctx, event)).To(Succeed())
@@ -156,11 +143,24 @@ var _ = Describe("Sessions and Events", func() {
 		Expect(*event.SessionID).To(Equal(session.ID))
 	})
 
+	It("can return an error if the json is invalid", func() {
+		event := &platform.Event{
+			SessionID: &[]int{session.ID}[0],
+			Type:      "PIXOVR_SESSION_JOINED",
+			Payload:   map[string]interface{}{"invalid": make(chan int)},
+		}
+
+		err := tokenClient.CreateEvent(ctx, event)
+		Expect(err).To(MatchError("invalid json"))
+	})
+
 	It("can create an event with a payload", func() {
 		event := &platform.Event{
 			SessionID: &[]int{session.ID}[0],
 			Type:      "PIXOVR_SESSION_JOINED",
-			Payload:   `{"action": "something-cool"}`,
+			Payload: map[string]interface{}{
+				"action": "something-cool",
+			},
 		}
 
 		Expect(tokenClient.CreateEvent(ctx, event)).To(Succeed())
