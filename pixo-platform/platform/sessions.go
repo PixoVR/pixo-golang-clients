@@ -97,6 +97,14 @@ func (p *PlatformClient) CreateSession(ctx context.Context, session *Session) er
 		variables["input"].(map[string]interface{})["deviceId"] = session.DeviceID
 	}
 
+	if session.Status != "" {
+		variables["input"].(map[string]interface{})["status"] = session.Status
+	}
+
+	if session.LessonStatus != "" {
+		variables["input"].(map[string]interface{})["lessonStatus"] = session.LessonStatus
+	}
+
 	if session.Scenario != "" {
 		variables["input"].(map[string]interface{})["scenario"] = session.Scenario
 	}
