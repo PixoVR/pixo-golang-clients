@@ -140,11 +140,7 @@ func (p *PlatformClient) UpdateSession(ctx context.Context, session Session) (*S
 	query := `mutation updateSession($input: SessionInput!) { updateSession(input: $input) { id moduleVersion status lessonStatus scenario mode focus specialization rawScore maxScore scaledScore completedAt duration moduleId userId user { orgId } } }`
 
 	variables := map[string]interface{}{
-		"input": map[string]interface{}{
-			"status":       session.Status,
-			"lessonStatus": session.LessonStatus,
-			"completed":    session.Completed,
-		},
+		"input": map[string]interface{}{},
 	}
 
 	if session.ID != 0 {
