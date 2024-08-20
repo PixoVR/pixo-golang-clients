@@ -155,6 +155,22 @@ func (p *PlatformClient) UpdateSession(ctx context.Context, session Session) (*S
 		return nil, errors.New("id or uuid is required")
 	}
 
+	if session.Status != "" {
+		variables["input"].(map[string]interface{})["status"] = session.Status
+	}
+
+	if session.LessonStatus != "" {
+		variables["input"].(map[string]interface{})["lessonStatus"] = session.LessonStatus
+	}
+
+	if session.Completed {
+		variables["input"].(map[string]interface{})["completed"] = session.Completed
+	}
+
+	if session.CompletedAt != "" {
+		variables["input"].(map[string]interface{})["completedAt"] = session.CompletedAt
+	}
+
 	if session.RawScore != 0 {
 		variables["input"].(map[string]interface{})["rawScore"] = session.RawScore
 	}
