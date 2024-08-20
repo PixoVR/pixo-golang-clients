@@ -23,7 +23,7 @@ var _ = Describe("Sessions and Events", func() {
 			DeviceID:       deviceID,
 			UUID:           &uuid,
 			Scenario:       "something",
-			PlayMode:       "practice",
+			Mode:           "practice",
 			Specialization: "specialization1",
 			Focus:          "focus1",
 		}
@@ -42,7 +42,7 @@ var _ = Describe("Sessions and Events", func() {
 		Expect(session.User.OrgID).NotTo(BeZero())
 		Expect(session.DeviceID).To(Equal(deviceID))
 		Expect(session.Scenario).To(Equal("something"))
-		Expect(session.PlayMode).To(Equal("practice"))
+		Expect(session.Mode).To(Equal("practice"))
 		Expect(session.Specialization).To(Equal("specialization1"))
 		Expect(session.Focus).To(Equal("focus1"))
 	})
@@ -68,7 +68,7 @@ var _ = Describe("Sessions and Events", func() {
 		Expect(retrievedSession.Module.ExternalID).NotTo(BeNil())
 		Expect(retrievedSession.Module.ID).NotTo(BeZero())
 		Expect(retrievedSession.Scenario).NotTo(BeEmpty())
-		Expect(retrievedSession.PlayMode).NotTo(BeEmpty())
+		Expect(retrievedSession.Mode).NotTo(BeEmpty())
 		Expect(retrievedSession.Specialization).NotTo(BeEmpty())
 		Expect(retrievedSession.Focus).NotTo(BeEmpty())
 	})
@@ -76,8 +76,8 @@ var _ = Describe("Sessions and Events", func() {
 	It("can update a session", func() {
 		input := platform.Session{
 			ID:           session.ID,
-			Status:       "TERMINATED",
-			LessonStatus: "FAILED",
+			Status:       "terminated",
+			LessonStatus: "failed",
 			Completed:    true,
 			RawScore:     0.5,
 			MaxScore:     1.0,
@@ -104,8 +104,8 @@ var _ = Describe("Sessions and Events", func() {
 	It("can update a session with uuid", func() {
 		input := platform.Session{
 			UUID:         session.UUID,
-			Status:       "COMPLETED",
-			LessonStatus: "PASSED",
+			Status:       "completed",
+			LessonStatus: "passed",
 			Completed:    true,
 			RawScore:     0.5,
 			MaxScore:     2.0,
