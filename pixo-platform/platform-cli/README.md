@@ -37,8 +37,7 @@ with the platform, deploying gameserver versions, and simplifying the testing of
   - [List](#list-webhook)
   - [Delete](#delete-webhook)
 - [Sessions](#sessions)
-  - [Start a Session](#start-a-session)
-  - [End a Session](#end-a-session)
+  - [Simulate a Session](#simulate-a-session)
 - [Running Mock Servers](#run-mock-servers)
   - [Platform](#platform)
   - [Matchmaking](#matchmaking)
@@ -256,27 +255,11 @@ pixo webhooks delete --webhook-id 1
 
 ## Sessions
 
-### Start a Session
+### Simulate a Session
 ```bash
-pixo sessions simulate --module-id 1
+pixo sessions simulate
 ```
-
-### End a Session
-```bash
-# Using current session id stored in config after starting a session
-pixo sessions end \
-  --score 1 \
-  --max-score 2
-```
-
-```bash
-# Or with session id as input
-pixo sessions end \
-  --session-id 123 \
-  --score 1 \
-  --max-score 2
-```
-![Made with VHS](https://vhs.charm.sh/vhs-2Aj37Cccs1fWY4M3EWT1qY.gif)
+![Made with VHS](https://vhs.charm.sh/vhs-424AzRmHaYF3Re5f6Yl6U.gif)
 
 
 ## Run Mock Servers
