@@ -46,6 +46,7 @@ var sessionsSimulateCmd = &cobra.Command{
 					{Label: "Practice", Value: "practice"},
 					{Label: "Challenge", Value: "challenge"},
 				},
+				Optional: true,
 			}},
 			{Question: forms.Question{
 				Type:     forms.Input,
@@ -320,7 +321,7 @@ var sessionsSimulateCmd = &cobra.Command{
 func init() {
 	sessionsCmd.AddCommand(sessionsSimulateCmd)
 	sessionsSimulateCmd.Flags().StringP("module-id", "m", "", "Module ID")
-	sessionsSimulateCmd.Flags().String("mode", "practice", "Session mode: tutorial, practice, challenge")
+	sessionsSimulateCmd.Flags().String("mode", "", "Session mode: tutorial, practice, challenge")
 	sessionsSimulateCmd.Flags().String("scenario", "", "Module Scenario")
 	sessionsSimulateCmd.Flags().String("focus", "", "Area of focus")
 	sessionsSimulateCmd.Flags().String("specialization", "", "Fine grained specialization within focus")

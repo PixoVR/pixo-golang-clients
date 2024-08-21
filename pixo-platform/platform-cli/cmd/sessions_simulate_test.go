@@ -88,7 +88,7 @@ var _ = Describe("Sessions Simulation", func() {
 
 	It("can return an error if the update session api call fails", func() {
 		executor.MockPlatformClient.UpdateSessionError = errors.New("update error")
-		input := bytes.NewBufferString("\n\n\n\nn\n100\n200\n")
+		input := bytes.NewBufferString("\n\n\n\n\nn\n100\n200\n")
 
 		_, err := executor.RunCommandWithInput(
 			input,
@@ -103,7 +103,7 @@ var _ = Describe("Sessions Simulation", func() {
 	})
 
 	It("can ask the user if the session was passed", func() {
-		input := bytes.NewBufferString("\n\n\nn\n\n\n\n")
+		input := bytes.NewBufferString("\n\n\n\nn\n\n\n\n")
 
 		output := executor.RunCommandWithInputAndExpectSuccess(
 			input,
@@ -118,7 +118,7 @@ var _ = Describe("Sessions Simulation", func() {
 	})
 
 	It("can simulate a session with no events", func() {
-		input := bytes.NewBufferString("\n\n\nn\n1\n3\n")
+		input := bytes.NewBufferString("\n\n\n\nn\n1\n3\n")
 
 		output, err := executor.RunCommandWithInput(
 			input,
@@ -144,7 +144,7 @@ var _ = Describe("Sessions Simulation", func() {
 
 	It("can return an error if theres an error creating event", func() {
 		executor.MockPlatformClient.CreateEventError = errors.New("create event error")
-		input := bytes.NewBufferString("\n\n\ny\nsome-type\n\n")
+		input := bytes.NewBufferString("\n\n\n\ny\nsome-type\n\n")
 
 		output, err := executor.RunCommandWithInput(
 			input,
@@ -161,7 +161,7 @@ var _ = Describe("Sessions Simulation", func() {
 	})
 
 	It("can simulate a session with an event and payload", func() {
-		input := bytes.NewBufferString("\n\n\ny\nsome-event-type\n{\"some\":\"data\"}\n\n1\n3\ny\n")
+		input := bytes.NewBufferString("\n\n\n\ny\nsome-event-type\n{\"some\":\"data\"}\n\n1\n3\ny\n")
 
 		output, err := executor.RunCommandWithInput(
 			input,
@@ -183,7 +183,7 @@ var _ = Describe("Sessions Simulation", func() {
 	})
 
 	It("can simulate a session with multiple events", func() {
-		input := bytes.NewBufferString("\n\n\ny\nsome-event-type\n\ny\nsome-event-type\n\nn\n1\n3\n")
+		input := bytes.NewBufferString("\n\n\n\ny\nsome-event-type\n\ny\nsome-event-type\n\nn\n1\n3\n")
 
 		output, err := executor.RunCommandWithInput(
 			input,
@@ -206,7 +206,7 @@ var _ = Describe("Sessions Simulation", func() {
 
 		It("can return an error if the joined event create call fails", func() {
 			executor.MockHeadsetClient.StartSessionError = errors.New("start session error")
-			input := bytes.NewBufferString("\n\n\n")
+			input := bytes.NewBufferString("")
 
 			_, err := executor.RunCommandWithInput(
 				input,
@@ -224,7 +224,7 @@ var _ = Describe("Sessions Simulation", func() {
 
 		It("can return an error if the end session call fails", func() {
 			executor.MockHeadsetClient.EndSessionError = errors.New("end session error")
-			input := bytes.NewBufferString("\n\n\nn\n1\n3\n")
+			input := bytes.NewBufferString("\n\n\n\nn\n1\n3\n")
 
 			_, err := executor.RunCommandWithInput(
 				input,
@@ -240,7 +240,7 @@ var _ = Describe("Sessions Simulation", func() {
 		})
 
 		It("can simulate a session with no events", func() {
-			input := bytes.NewBufferString("\n\n\nn\n1\n3\n")
+			input := bytes.NewBufferString("\n\n\n\nn\n1\n3\n")
 
 			output, err := executor.RunCommandWithInput(
 				input,
@@ -259,7 +259,7 @@ var _ = Describe("Sessions Simulation", func() {
 		})
 
 		It("can simulate a session with an event and payload", func() {
-			input := bytes.NewBufferString("\n\n\ny\nsome-event-type\n{\"some\":\"data\"}\n1\n3\n")
+			input := bytes.NewBufferString("\n\n\n\ny\nsome-event-type\n{\"some\":\"data\"}\n1\n3\n")
 
 			output, err := executor.RunCommandWithInput(
 				input,
