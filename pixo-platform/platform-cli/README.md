@@ -289,7 +289,8 @@ and sends a message back containing the IP and port of the game server to connec
 # Run the server - Ctrl-C to stop
 pixo mp mockserver
 ```
-![Made with VHS](https://vhs.charm.sh/vhs-5dl0kD5DaiSDukQrfLI6Q.gif)
+![Made with VHS](https://vhs.charm.sh/vhs-2qOnNiisC4uI3ld6mwUewG.gif)
+
 
 To customize the response, use the command line flags when starting the server
 ```bash
