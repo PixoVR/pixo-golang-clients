@@ -38,6 +38,7 @@ with the platform, deploying gameserver versions, and simplifying the testing of
   - [Delete](#delete-webhook)
 - [Sessions](#sessions)
   - [Simulate a Session](#simulate-a-session)
+  - [Using Legacy Headset API](#using-legacy-headset-api)
 - [Running Mock Servers](#run-mock-servers)
   - [Platform](#platform)
   - [Matchmaking](#matchmaking)
@@ -261,6 +262,10 @@ pixo sessions simulate
 ```
 ![Made with VHS](https://vhs.charm.sh/vhs-424AzRmHaYF3Re5f6Yl6U.gif)
 
+#### Using Legacy Headset API
+```bash
+pixo sessions simulate --legacy
+```
 
 ## Run Mock Servers
 ### Platform - WIP
