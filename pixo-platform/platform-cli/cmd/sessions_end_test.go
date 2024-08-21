@@ -49,7 +49,7 @@ var _ = Describe("Sessions End", func() {
 	})
 
 	It("can return an error if the create event api call fails", func() {
-		executor.MockPlatformClient.PostError = errors.New("error")
+		executor.MockPlatformClient.PostError = errors.New("create event error")
 		input := bytes.NewBufferString("100\n200\n")
 
 		output := executor.RunCommandWithInputAndExpectSuccess(
@@ -60,7 +60,7 @@ var _ = Describe("Sessions End", func() {
 			"1",
 		)
 
-		Expect(output).To(ContainSubstring("error"))
+		Expect(output).To(ContainSubstring("create event error"))
 		Expect(executor.MockPlatformClient.NumCalledPost).To(Equal(1))
 	})
 

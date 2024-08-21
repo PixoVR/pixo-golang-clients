@@ -71,7 +71,7 @@ var _ = Describe("Server Deploy", func() {
 		)
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("server version 1.00.00 already exists"))
-		Expect(output).To(Equal(emoji.Sprint("\b:exclamation: server version 1.00.00 already exists\n")))
+		Expect(output).To(ContainSubstring(emoji.Sprint("\b:exclamation: server version 1.00.00 already exists\n")))
 	})
 
 	It("can tell if a server version does not exist", func() {

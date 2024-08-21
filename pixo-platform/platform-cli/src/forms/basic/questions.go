@@ -53,6 +53,8 @@ func (f *Handler) AskQuestions(questions []forms.Question) (map[string]interface
 			}
 
 			answers[question.Key] = question.Answer
+		} else if !forms.IsEmpty(question.Answer) {
+			answers[question.Key] = question.Answer
 		}
 	}
 

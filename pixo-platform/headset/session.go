@@ -26,6 +26,7 @@ type EventRequest struct {
 }
 
 type EventResponse struct {
+	platform.Session
 	platform.Event
 	LessonStatus *string `json:"lessonStatus,omitempty"`
 }

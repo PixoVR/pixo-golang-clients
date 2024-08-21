@@ -655,15 +655,11 @@ func (m *MockClient) CreateSession(ctx context.Context, session *Session) error 
 	m.NumCalledCreateSession++
 
 	if session == nil {
-		return errors.New("session details are required")
+		return errors.New("session can not be nil")
 	}
 
 	if session.ModuleID <= 0 {
 		return errors.New("invalid module id")
-	}
-
-	if session.IPAddress == "" {
-		return commonerrors.ErrorRequired("ip address")
 	}
 
 	if m.CreateSessionError != nil {
@@ -711,10 +707,6 @@ func (m *MockClient) CreateEvent(ctx context.Context, event *Event) error {
 	noSessionUUID := event.SessionUUID == nil || *event.SessionUUID == ""
 	if noSessionID && noSessionUUID {
 		return errors.New("session id or session uuid required")
-	}
-
-	if event.Type == "" {
-		return commonerrors.ErrorRequired("type")
 	}
 
 	if m.CreateEventError != nil {
