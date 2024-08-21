@@ -22,6 +22,7 @@ var (
 	username     string
 	password     string
 	clientConfig urlfinder.ClientConfig
+	moduleID     = 43
 )
 
 var _ = BeforeSuite(func() {

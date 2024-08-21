@@ -8,7 +8,7 @@ dev: build cp
 
 .PHONY: build
 build:
-	@echo "🚧 Building..."
+	@echo "📦 Building..."
 	@go build -o $(EXECUTABLE) main.go
 
 

@@ -325,6 +325,8 @@ var _ = Describe("Basic Forms", func() {
 				"no,yes",
 				"one",
 				"two",
+				"",
+				"optional-but-used-input-value",
 			}
 			input.WriteString(strings.Join(inputLines, "\n") + "\n")
 
@@ -386,13 +388,19 @@ var _ = Describe("Basic Forms", func() {
 					Type:     forms.Input,
 					Optional: true,
 				},
+				{
+					Key:      "optional-but-used-input",
+					Prompt:   "Enter some optional but used input",
+					Type:     forms.Input,
+					Optional: true,
+				},
 			}
 
 			answers, err := s.AskQuestions(questions)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(answers).NotTo(BeNil())
-			Expect(answers).To(HaveLen(len(questions) - 1))
+			Expect(answers).To(HaveLen(len(questions) - 1)) // -1 for the optional question
 
 			Expect(forms.String(answers["something"])).To(Equal(inputLines[0]))
 			Expect(output.String()).To(ContainSubstring("Enter some input"))
@@ -416,8 +424,11 @@ var _ = Describe("Basic Forms", func() {
 			Expect(forms.Int(answers["select-id"])).To(Equal(2))
 			Expect(output.String()).To(ContainSubstring("Select ID"))
 
-			Expect(answers["optional-select"]).To(BeNil())
+			Expect(answers["optional-input"]).To(BeNil())
 			Expect(output.String()).To(ContainSubstring("Enter some optional input"))
+
+			Expect(answers["optional-but-used-input"]).To(Equal("optional-but-used-input-value"))
+			Expect(output.String()).To(ContainSubstring("Enter some optional but used input"))
 		})
 
 	})

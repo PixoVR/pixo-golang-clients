@@ -11,6 +11,7 @@ type Client interface {
 	ActiveUserID() int
 	ActiveOrgID() int
 
+	GetUser(ctx context.Context, id int) (*User, error)
 	GetUserByUsername(ctx context.Context, username string) (*User, error)
 	CreateUser(ctx context.Context, user *User) error
 	UpdateUser(ctx context.Context, user *User) error

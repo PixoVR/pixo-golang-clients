@@ -18,6 +18,12 @@ type MockClient struct {
 	NumCalledGetUser int
 	GetUserError     error
 
+	NumCalledGetUserByUsername int
+	GetUserByUsernameError     error
+
+	NumCalledGetUsers int
+	GetUsersError     error
+
 	NumCalledCreateUser int
 	CreateUserError     error
 
@@ -118,41 +124,72 @@ func (m *MockClient) Reset() {
 	m.NumCalledCreateSession = 0
 
 	m.NumCalledGetUser = 0
+	m.GetUserError = nil
+	m.NumCalledGetUserByUsername = 0
+	m.GetUserByUsernameError = nil
+	m.NumCalledGetUsers = 0
+	m.GetUsersError = nil
 	m.NumCalledCreateUser = 0
-	m.NumCalledUpdateOrg = 0
+	m.CreateUserError = nil
+	m.NumCalledUpdateUser = 0
+	m.UpdateUserError = nil
 	m.NumCalledDeleteUser = 0
+	m.DeleteUserError = nil
 
 	m.NumCalledGetRoles = 0
+	m.GetRolesError = nil
 
 	m.NumCalledGetOrgs = 0
+	m.GetOrgsError = nil
 	m.NumCalledGetOrg = 0
+	m.GetOrgError = nil
 	m.NumCalledCreateOrg = 0
-	m.NumCalledUpdateUser = 0
+	m.CreateOrgError = nil
+	m.NumCalledUpdateOrg = 0
+	m.UpdateOrgError = nil
 	m.NumCalledDeleteOrg = 0
+	m.DeleteOrgError = nil
 
 	m.NumCalledGetAPIKeys = 0
+	m.GetAPIKeysError = nil
 	m.NumCalledCreateAPIKey = 0
+	m.CreateAPIKeyError = nil
 	m.NumCalledDeleteAPIKey = 0
+	m.DeleteAPIKeyError = nil
 
 	m.NumCalledGetWebhooks = 0
+	m.GetWebhooksError = nil
 	m.NumCalledGetWebhook = 0
+	m.GetWebhookError = nil
 	m.NumCalledCreateWebhook = 0
+	m.CreateWebhookError = nil
 	m.NumCalledUpdateWebhook = 0
+	m.UpdateWebhookError = nil
 	m.NumCalledDeleteWebhook = 0
+	m.DeleteWebhookError = nil
 
 	m.NumCalledGetSession = 0
+	m.GetSessionError = nil
 	m.NumCalledUpdateSession = 0
+	m.UpdateSessionError = nil
 
 	m.NumCalledGetPlatforms = 0
+	m.GetPlatformsError = nil
 
 	m.NumCalledGetControlTypes = 0
+	m.GetControlTypesError = nil
 
 	m.NumCalledCreateModuleVersion = 0
+	m.CreateModuleVersionError = nil
 
 	m.NumCalledGetMultiplayerServerConfigs = 0
+	m.GetMultiplayerServerConfigsError = nil
 	m.NumCalledGetMultiplayerServerVersions = 0
+	m.GetMultiplayerServerVersionsError = nil
 	m.NumCalledGetMultiplayerServerVersion = 0
+	m.GetMultiplayerServerVersionError = nil
 	m.NumCalledCreateMultiplayerServerVersion = 0
+	m.CreateMultiplayerServerVersionError = nil
 }
 
 func (m *MockClient) Path() string {
@@ -167,15 +204,37 @@ func (m *MockClient) ActiveOrgID() int {
 	return 1
 }
 
-func (m *MockClient) GetUserByUsername(ctx context.Context, username string) (*User, error) {
+func (m *MockClient) GetUser(ctx context.Context, id int) (*User, error) {
 	m.NumCalledGetUser++
+
+	if id <= 0 {
+		return nil, errors.New("invalid user id")
+	}
+
+	if m.GetUserError != nil {
+		return nil, m.GetUserError
+	}
+
+	return &User{
+		ID:        id,
+		FirstName: faker.FirstName(),
+		LastName:  faker.LastName(),
+		Username:  faker.Username(),
+		OrgID:     1,
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+	}, nil
+}
+
+func (m *MockClient) GetUserByUsername(ctx context.Context, username string) (*User, error) {
+	m.NumCalledGetUserByUsername++
 
 	if username == "" {
 		return nil, commonerrors.ErrorRequired("username")
 	}
 
-	if m.GetUserError != nil {
-		return nil, m.GetUserError
+	if m.GetUserByUsernameError != nil {
+		return nil, m.GetUserByUsernameError
 	}
 
 	return &User{
@@ -596,15 +655,11 @@ func (m *MockClient) CreateSession(ctx context.Context, session *Session) error 
 	m.NumCalledCreateSession++
 
 	if session == nil {
-		return errors.New("session details are required")
+		return errors.New("session can not be nil")
 	}
 
 	if session.ModuleID <= 0 {
 		return errors.New("invalid module id")
-	}
-
-	if session.IPAddress == "" {
-		return commonerrors.ErrorRequired("ip address")
 	}
 
 	if m.CreateSessionError != nil {
@@ -652,10 +707,6 @@ func (m *MockClient) CreateEvent(ctx context.Context, event *Event) error {
 	noSessionUUID := event.SessionUUID == nil || *event.SessionUUID == ""
 	if noSessionID && noSessionUUID {
 		return errors.New("session id or session uuid required")
-	}
-
-	if event.Type == "" {
-		return commonerrors.ErrorRequired("type")
 	}
 
 	if m.CreateEventError != nil {
