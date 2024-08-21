@@ -8,7 +8,7 @@ require (
 	github.com/PixoVR/pixo-golang-server-utilities/pixo-platform v0.0.0-20240723035322-19af31d1c0aa
 	github.com/charmbracelet/bubbletea v0.26.6
 	github.com/charmbracelet/huh v0.5.2
-	github.com/charmbracelet/lipgloss v0.12.1
+	github.com/charmbracelet/lipgloss v0.13.0
 	github.com/fatih/color v1.17.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-faker/faker/v4 v4.4.2
