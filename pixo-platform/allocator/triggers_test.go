@@ -1,21 +1,10 @@
 package allocator_test
 
-//
-//import (
-//	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/multiplayer-allocator"
-//	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/primary-api"
-//	. "github.com/onsi/ginkgo/v2"
-//	. "github.com/onsi/gomega"
-//	"net/http"
-//	"os"
-//)
-//
 //var _ = Describe("Triggers", Ordered, func() {
 //
 //	var (
 //		allocatorClient *Client
 //		trigger         = platform.MultiplayerServerTrigger{
-//			ID:       1,
 //			ModuleID: 1,
 //			Module: &platform.Module{
 //				ID: 1,
@@ -32,8 +21,12 @@ package allocator_test
 //	)
 //
 //	BeforeEach(func() {
-//		allocatorClient = NewClient(os.Getenv("SECRET_KEY"), "dev", "")
-//		Expect(allocatorClient.isAuthenticated()).To(BeTrue())
+//		lifecycle := config2.GetEnvOrReturn("TEST_PIXO_LIFECYCLE", "dev")
+//		apiKey := os.Getenv("TEST_PIXO_API_KEY")
+//
+//		config := urlfinder.ClientConfig{Lifecycle: lifecycle, APIKey: apiKey}
+//		allocatorClient = NewClient(config)
+//		Expect(allocatorClient.IsAuthenticated()).To(BeTrue())
 //	})
 //
 //	It("can register a multiplayer server trigger", func() {

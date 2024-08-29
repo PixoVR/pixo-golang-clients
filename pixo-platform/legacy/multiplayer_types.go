@@ -18,23 +18,6 @@ type MultiplayerServerConfig struct {
 	//UpdatedAt time.Time `json:"updatedAt,omitempty"`
 }
 
-type MultiplayerServerTrigger struct {
-	ID         int    `json:"id,omitempty"`
-	Revision   string `json:"revision,omitempty"`
-	Dockerfile string `json:"dockerfile,omitempty"`
-	Context    string `json:"context,omitempty"`
-	Config     string `json:"config,omitempty"`
-
-	Module   *Module `json:"module,omitempty"`
-	ModuleID int     `json:"moduleId,omitempty"`
-
-	CreatedBy string `json:"createdBy,omitempty"`
-	UpdatedBy string `json:"updatedBy,omitempty"`
-
-	CreatedAt string `json:"createdAt,omitempty"`
-	UpdatedAt string `json:"updatedAt,omitempty"`
-}
-
 type MultiplayerServerVersion struct {
 	ID              int    `json:"id,omitempty" graphql:"id"`
 	Engine          string `json:"engine,omitempty" graphql:"engine"`

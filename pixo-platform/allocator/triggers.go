@@ -3,7 +3,7 @@ package allocator
 import (
 	"encoding/json"
 	"fmt"
-	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/rs/zerolog/log"
 )
 
@@ -15,7 +15,7 @@ func (a *Client) RegisterTrigger(trigger platform.MultiplayerServerTrigger) Resp
 		return Response{Error: err}
 	}
 
-	path := "allocator/build/triggers"
+	path := "build/triggers"
 
 	res, err := a.Post(path, body)
 	if err != nil {
@@ -37,7 +37,7 @@ func (a *Client) UpdateTrigger(trigger platform.MultiplayerServerTrigger) Respon
 		return Response{Error: err}
 	}
 
-	path := fmt.Sprintf("allocator/build/triggers/%d", trigger.ID)
+	path := fmt.Sprintf("build/triggers/%d", trigger.ID)
 
 	res, err := a.Put(path, body)
 	if err != nil {
@@ -53,7 +53,7 @@ func (a *Client) UpdateTrigger(trigger platform.MultiplayerServerTrigger) Respon
 
 func (a *Client) DeleteTrigger(id int) Response {
 
-	path := fmt.Sprintf("allocator/build/triggers/%d", id)
+	path := fmt.Sprintf("build/triggers/%d", id)
 
 	res, err := a.Delete(path)
 	if err != nil {

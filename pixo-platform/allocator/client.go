@@ -31,6 +31,7 @@ func NewClient(config urlfinder.ClientConfig) *Client {
 
 	abstractConfig := abstractClient.AbstractConfig{
 		ServiceConfig: serviceConfig,
+		APIKey:        config.APIKey,
 		Token:         config.Token,
 	}
 

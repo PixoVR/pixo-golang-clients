@@ -2,7 +2,7 @@ package allocator
 
 import (
 	"fmt"
-	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/go-resty/resty/v2"
 	"net/http"
 )
