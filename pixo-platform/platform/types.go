@@ -1,15 +1,15 @@
 package platform
 
 type MultiplayerServerConfigQuery struct {
-	MultiplayerServerConfigs []*MultiplayerServerConfigQueryParams `graphql:"multiplayerServerConfigs(params: $params)"`
+	MultiplayerServerConfigs []MultiplayerServerConfigQueryParams `graphql:"multiplayerServerConfigs(params: $params)"`
 }
 
 type MultiplayerServerConfigParams struct {
-	ModuleID       int                         `json:"moduleId,omitempty"`
-	OrgID          int                         `json:"orgId,omitempty"`
-	ServerVersion  string                      `json:"serverVersion,omitempty"`
-	Capacity       int                         `json:"capacity,omitempty"`
-	ServerVersions []*MultiplayerServerVersion `json:"serverVersions,omitempty"`
+	ModuleID       int                        `json:"moduleId,omitempty"`
+	OrgID          int                        `json:"orgId,omitempty"`
+	ServerVersion  string                     `json:"serverVersion,omitempty"`
+	Capacity       int                        `json:"capacity,omitempty"`
+	ServerVersions []MultiplayerServerVersion `json:"serverVersions,omitempty"`
 }
 
 type MultiplayerServerConfigQueryParams struct {
@@ -21,7 +21,7 @@ type MultiplayerServerConfigQueryParams struct {
 		ID   int    `json:"id" graphql:"id"`
 		Name string `json:"name" graphql:"name"`
 	}
-	ServerVersions []*MultiplayerServerVersion `json:"serverVersions" graphql:"serverVersions"`
+	ServerVersions []MultiplayerServerVersion `json:"serverVersions" graphql:"serverVersions"`
 }
 
 type MultiplayerServerVersionQueryParams struct {

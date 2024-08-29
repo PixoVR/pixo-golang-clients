@@ -768,7 +768,7 @@ func (m *MockClient) CreateModuleVersion(ctx context.Context, input ModuleVersio
 	}, nil
 }
 
-func (m *MockClient) GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]*MultiplayerServerConfigQueryParams, error) {
+func (m *MockClient) GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]MultiplayerServerConfigQueryParams, error) {
 	m.NumCalledGetMultiplayerServerConfigs++
 
 	if m.GetMultiplayerServerConfigsError != nil {
@@ -776,11 +776,11 @@ func (m *MockClient) GetMultiplayerServerConfigs(ctx context.Context, params *Mu
 	}
 
 	if m.GetMultiplayerServerConfigsEmpty {
-		return []*MultiplayerServerConfigQueryParams{}, nil
+		return []MultiplayerServerConfigQueryParams{}, nil
 	}
 
 	if m.GetMultiplayerServerConfigsEmptyVersions {
-		return []*MultiplayerServerConfigQueryParams{
+		return []MultiplayerServerConfigQueryParams{
 			{
 				ModuleID: 1,
 				Capacity: 5,
@@ -788,11 +788,11 @@ func (m *MockClient) GetMultiplayerServerConfigs(ctx context.Context, params *Mu
 		}, nil
 	}
 
-	return []*MultiplayerServerConfigQueryParams{
+	return []MultiplayerServerConfigQueryParams{
 		{
 			ModuleID: 1,
 			Capacity: 5,
-			ServerVersions: []*MultiplayerServerVersion{
+			ServerVersions: []MultiplayerServerVersion{
 				{
 					Engine:          "unreal",
 					ImageRegistry:   "gcr.io/pixo-bootstrap/multiplayer/gameservers/simple-server:latest",
@@ -804,7 +804,7 @@ func (m *MockClient) GetMultiplayerServerConfigs(ctx context.Context, params *Mu
 	}, nil
 }
 
-func (m *MockClient) GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionQueryParams) ([]*MultiplayerServerVersion, error) {
+func (m *MockClient) GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionQueryParams) ([]MultiplayerServerVersion, error) {
 	m.NumCalledGetMultiplayerServerVersions++
 
 	if m.GetMultiplayerServerVersionsError != nil {
@@ -812,10 +812,10 @@ func (m *MockClient) GetMultiplayerServerVersions(ctx context.Context, params *M
 	}
 
 	if m.GetMultiplayerServerVersionsEmpty {
-		return []*MultiplayerServerVersion{}, nil
+		return []MultiplayerServerVersion{}, nil
 	}
 
-	return []*MultiplayerServerVersion{
+	return []MultiplayerServerVersion{
 		{
 			ModuleID:        1,
 			SemanticVersion: "1.0.0",

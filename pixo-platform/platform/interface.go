@@ -46,8 +46,8 @@ type Client interface {
 	UpdateSession(ctx context.Context, session Session) (*Session, error)
 	CreateEvent(ctx context.Context, event *Event) error
 
-	GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]*MultiplayerServerConfigQueryParams, error)
-	GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionQueryParams) ([]*MultiplayerServerVersion, error)
+	GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]MultiplayerServerConfigQueryParams, error)
+	GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionQueryParams) ([]MultiplayerServerVersion, error)
 	GetMultiplayerServerVersion(ctx context.Context, id int) (*MultiplayerServerVersion, error)
 	CreateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error)
 }

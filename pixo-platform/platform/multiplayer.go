@@ -25,7 +25,7 @@ type MultiplayerServerConfig struct {
 	ModuleID int     `json:"moduleId,omitempty"`
 	Module   *Module `json:"module,omitempty"`
 
-	ServerVersions []*MultiplayerServerVersion `json:"serverVersions,omitempty"`
+	ServerVersions []MultiplayerServerVersion `json:"serverVersions,omitempty"`
 
 	CreatedBy string `json:"createdBy,omitempty"`
 	UpdatedBy string `json:"updatedBy,omitempty"`
@@ -70,7 +70,7 @@ type MultiplayerServerVersion struct {
 	UpdatedAt *time.Time `json:"updatedAt,omitempty" graphql:"updatedAt"`
 }
 
-func (p *PlatformClient) GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]*MultiplayerServerConfigQueryParams, error) {
+func (p *PlatformClient) GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]MultiplayerServerConfigQueryParams, error) {
 
 	variables := map[string]interface{}{
 		"params": params,
@@ -84,7 +84,7 @@ func (p *PlatformClient) GetMultiplayerServerConfigs(ctx context.Context, params
 	return query.MultiplayerServerConfigs, nil
 }
 
-func (p *PlatformClient) GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionQueryParams) ([]*MultiplayerServerVersion, error) {
+func (p *PlatformClient) GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionQueryParams) ([]MultiplayerServerVersion, error) {
 
 	configs, err := p.GetMultiplayerServerConfigs(ctx, &MultiplayerServerConfigParams{
 		ModuleID:      params.ModuleID,
@@ -98,10 +98,10 @@ func (p *PlatformClient) GetMultiplayerServerVersions(ctx context.Context, param
 		return nil, errors.New("no multiplayer server configurations found")
 	}
 
-	res := make([]*MultiplayerServerVersion, len(configs[0].ServerVersions))
+	res := make([]MultiplayerServerVersion, len(configs[0].ServerVersions))
 
 	for i := range configs[0].ServerVersions {
-		res[i] = &MultiplayerServerVersion{
+		res[i] = MultiplayerServerVersion{
 			ModuleID:        configs[0].ModuleID,
 			ImageRegistry:   configs[0].ServerVersions[i].ImageRegistry,
 			SemanticVersion: configs[0].ServerVersions[i].SemanticVersion,
