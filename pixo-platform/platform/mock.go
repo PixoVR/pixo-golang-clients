@@ -827,6 +827,7 @@ func (m *MockClient) GetMultiplayerServerVersions(ctx context.Context, params *M
 			SemanticVersion: "1.0.0",
 			Status:          "enabled",
 			Engine:          "unreal",
+			FilePath:        "module-1/version-1/file.zip",
 		},
 	}, nil
 }
