@@ -807,14 +807,6 @@ func (m *MockClient) GetMultiplayerServerConfigs(ctx context.Context, params *Mu
 func (m *MockClient) GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionQueryParams) ([]*MultiplayerServerVersion, error) {
 	m.NumCalledGetMultiplayerServerVersions++
 
-	if params.ModuleID == 0 {
-		return nil, errors.New("invalid module id")
-	}
-
-	if params.SemanticVersion == "" {
-		return nil, errors.New("invalid semantic version")
-	}
-
 	if m.GetMultiplayerServerVersionsError != nil {
 		return nil, m.GetMultiplayerServerVersionsError
 	}
