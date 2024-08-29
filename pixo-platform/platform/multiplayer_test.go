@@ -43,14 +43,25 @@ var _ = Describe("Multiplayer Resources", func() {
 		Expect(err.Error()).To(ContainSubstring("image or file path must be provided"))
 	})
 
-	It("can get the multiplayer server versions", func() {
-		mpServerVersions, err := tokenClient.GetMultiplayerServerVersions(ctx, &platform.MultiplayerServerVersionQueryParams{
+	It("can get the multiplayer server versions with a config", func() {
+		mpServerVersions, err := tokenClient.GetMultiplayerServerVersionsWithConfig(ctx, &platform.MultiplayerServerVersionParams{
 			ModuleID:        moduleID,
 			SemanticVersion: serverVersion,
 		})
 		Expect(err).NotTo(HaveOccurred())
-		Expect(mpServerVersions).NotTo(BeNil())
-		Expect(mpServerVersions).NotTo(BeEmpty())
+		Expect(len(mpServerVersions)).To(BeNumerically(">", 0))
+		for _, mpServerVersion := range mpServerVersions {
+			Expect(mpServerVersion.ID).NotTo(BeZero())
+			Expect(mpServerVersion.ModuleID).To(Equal(moduleID))
+			Expect(mpServerVersion.SemanticVersion).To(Equal(serverVersion))
+			Expect(mpServerVersion.ImageRegistry).NotTo(BeEmpty())
+		}
+	})
+
+	It("can get multiplayer server versions", func() {
+		mpServerVersions, err := tokenClient.GetMultiplayerServerVersions(ctx, nil)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(len(mpServerVersions)).To(BeNumerically(">", 0))
 	})
 
 	It("can create and get a multiplayer server version", func() {

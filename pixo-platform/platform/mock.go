@@ -804,7 +804,7 @@ func (m *MockClient) GetMultiplayerServerConfigs(ctx context.Context, params *Mu
 	}, nil
 }
 
-func (m *MockClient) GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionQueryParams) ([]MultiplayerServerVersion, error) {
+func (m *MockClient) GetMultiplayerServerVersionsWithConfig(ctx context.Context, params *MultiplayerServerVersionParams) ([]MultiplayerServerVersion, error) {
 	m.NumCalledGetMultiplayerServerVersions++
 
 	if m.GetMultiplayerServerVersionsError != nil {

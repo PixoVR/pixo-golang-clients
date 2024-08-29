@@ -75,14 +75,14 @@ var mpDeployCmd = &cobra.Command{
 		}
 
 		if isPrecheck {
-			params := &platform.MultiplayerServerVersionQueryParams{
+			params := &platform.MultiplayerServerVersionParams{
 				ModuleID:        moduleID,
 				SemanticVersion: semVer,
 			}
 
 			spinner := loader.NewLoader(cmd.Context(), "Getting multiplayer server versions...", Ctx.Printer)
 
-			if versions, err := Ctx.PlatformClient.GetMultiplayerServerVersions(cmd.Context(), params); err != nil {
+			if versions, err := Ctx.PlatformClient.GetMultiplayerServerVersionsWithConfig(cmd.Context(), params); err != nil {
 				Ctx.Printer.Println(":negative_squared_cross_mark: Unable to retrieve server versions from the Pixo Platform")
 				spinner.Stop()
 				return err

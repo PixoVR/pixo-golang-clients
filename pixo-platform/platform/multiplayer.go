@@ -84,7 +84,21 @@ func (p *PlatformClient) GetMultiplayerServerConfigs(ctx context.Context, params
 	return query.MultiplayerServerConfigs, nil
 }
 
-func (p *PlatformClient) GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionQueryParams) ([]MultiplayerServerVersion, error) {
+func (p *PlatformClient) GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionParams) ([]MultiplayerServerVersion, error) {
+
+	variables := map[string]interface{}{
+		"params": params,
+	}
+
+	var query MultiplayerServerVersionQuery
+	if err := p.Client.Query(ctx, &query, variables); err != nil {
+		return nil, err
+	}
+
+	return query.MultiplayerServerVersions, nil
+}
+
+func (p *PlatformClient) GetMultiplayerServerVersionsWithConfig(ctx context.Context, params *MultiplayerServerVersionParams) ([]MultiplayerServerVersion, error) {
 
 	configs, err := p.GetMultiplayerServerConfigs(ctx, &MultiplayerServerConfigParams{
 		ModuleID:      params.ModuleID,
@@ -102,6 +116,7 @@ func (p *PlatformClient) GetMultiplayerServerVersions(ctx context.Context, param
 
 	for i := range configs[0].ServerVersions {
 		res[i] = MultiplayerServerVersion{
+			ID:              configs[0].ServerVersions[i].ID,
 			ModuleID:        configs[0].ModuleID,
 			ImageRegistry:   configs[0].ServerVersions[i].ImageRegistry,
 			SemanticVersion: configs[0].ServerVersions[i].SemanticVersion,
