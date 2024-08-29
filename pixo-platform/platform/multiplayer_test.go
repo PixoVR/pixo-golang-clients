@@ -62,6 +62,11 @@ var _ = Describe("Multiplayer Resources", func() {
 		mpServerVersions, err := tokenClient.GetMultiplayerServerVersions(ctx, nil)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(len(mpServerVersions)).To(BeNumerically(">", 0))
+		for _, mpServerVersion := range mpServerVersions {
+			Expect(mpServerVersion.ID).NotTo(BeZero())
+			Expect(mpServerVersion.ModuleID).NotTo(BeZero())
+			Expect(mpServerVersion.SemanticVersion).NotTo(BeEmpty())
+		}
 	})
 
 	It("can create and get a multiplayer server version", func() {

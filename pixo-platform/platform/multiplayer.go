@@ -55,16 +55,17 @@ type MultiplayerServerVersion struct {
 	ID              int    `json:"id,omitempty" graphql:"id"`
 	Engine          string `json:"engine,omitempty" graphql:"engine"`
 	Status          string `json:"status,omitempty" graphql:"status"`
-	ImageRegistry   string `json:"imageRegistry" graphql:"imageRegistry"`
+	ImageRegistry   string `json:"imageRegistry,omitempty" graphql:"imageRegistry"`
 	SemanticVersion string `json:"semanticVersion,omitempty" graphql:"semanticVersion"`
 	FileLink        string `json:"fileLink,omitempty" graphql:"fileLink"`
+	FilePath        string `json:"filePath,omitempty" graphql:"filePath"`
 	LocalFilePath   string `json:"-" graphql:"-"`
 
 	ModuleID int     `json:"moduleId,omitempty" graphql:"moduleId"`
 	Module   *Module `json:"module,omitempty" graphql:"module"`
 
-	CreatedBy string `json:"createdBy" graphql:"createdBy"`
-	UpdatedBy string `json:"updatedBy" graphql:"updatedBy"`
+	CreatedBy string `json:"createdBy,omitempty" graphql:"createdBy"`
+	UpdatedBy string `json:"updatedBy,omitempty" graphql:"updatedBy"`
 
 	CreatedAt *time.Time `json:"createdAt,omitempty" graphql:"createdAt"`
 	UpdatedAt *time.Time `json:"updatedAt,omitempty" graphql:"updatedAt"`
