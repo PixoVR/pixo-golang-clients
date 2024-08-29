@@ -105,6 +105,10 @@ type MockClient struct {
 	GetMultiplayerServerConfigsEmpty         bool
 	GetMultiplayerServerConfigsEmptyVersions bool
 
+	NumCalledGetMultiplayerServerVersionsWithConfig int
+	GetMultiplayerServerVersionsWithConfigError     error
+	GetMultiplayerServerVersionsWithConfigEmpty     bool
+
 	NumCalledGetMultiplayerServerVersions int
 	GetMultiplayerServerVersionsError     error
 	GetMultiplayerServerVersionsEmpty     bool
@@ -185,6 +189,8 @@ func (m *MockClient) Reset() {
 	m.GetMultiplayerServerConfigsError = nil
 	m.NumCalledGetMultiplayerServerVersions = 0
 	m.GetMultiplayerServerVersionsError = nil
+	m.NumCalledGetMultiplayerServerVersionsWithConfig = 0
+	m.GetMultiplayerServerVersionsWithConfigError = nil
 	m.NumCalledGetMultiplayerServerVersion = 0
 	m.GetMultiplayerServerVersionError = nil
 	m.NumCalledCreateMultiplayerServerVersion = 0
@@ -804,7 +810,7 @@ func (m *MockClient) GetMultiplayerServerConfigs(ctx context.Context, params *Mu
 	}, nil
 }
 
-func (m *MockClient) GetMultiplayerServerVersionsWithConfig(ctx context.Context, params *MultiplayerServerVersionParams) ([]MultiplayerServerVersion, error) {
+func (m *MockClient) GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionParams) ([]MultiplayerServerVersion, error) {
 	m.NumCalledGetMultiplayerServerVersions++
 
 	if m.GetMultiplayerServerVersionsError != nil {
@@ -812,6 +818,27 @@ func (m *MockClient) GetMultiplayerServerVersionsWithConfig(ctx context.Context,
 	}
 
 	if m.GetMultiplayerServerVersionsEmpty {
+		return []MultiplayerServerVersion{}, nil
+	}
+
+	return []MultiplayerServerVersion{
+		{
+			ModuleID:        1,
+			SemanticVersion: "1.0.0",
+			Status:          "enabled",
+			Engine:          "unreal",
+		},
+	}, nil
+}
+
+func (m *MockClient) GetMultiplayerServerVersionsWithConfig(ctx context.Context, params *MultiplayerServerVersionParams) ([]MultiplayerServerVersion, error) {
+	m.NumCalledGetMultiplayerServerVersionsWithConfig++
+
+	if m.GetMultiplayerServerVersionsWithConfigError != nil {
+		return nil, m.GetMultiplayerServerVersionsWithConfigError
+	}
+
+	if m.GetMultiplayerServerVersionsWithConfigEmpty {
 		return []MultiplayerServerVersion{}, nil
 	}
 
