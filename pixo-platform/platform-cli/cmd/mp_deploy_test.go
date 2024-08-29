@@ -75,7 +75,7 @@ var _ = Describe("Server Deploy", func() {
 	})
 
 	It("can tell if a server version does not exist", func() {
-		executor.MockPlatformClient.GetMultiplayerServerVersionsEmpty = true
+		executor.MockPlatformClient.GetMultiplayerServerVersionsWithConfigEmpty = true
 		output := executor.RunCommandAndExpectSuccess(
 			"mp",
 			"servers",
