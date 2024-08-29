@@ -112,6 +112,7 @@ type MockClient struct {
 	NumCalledGetMultiplayerServerVersions int
 	GetMultiplayerServerVersionsError     error
 	GetMultiplayerServerVersionsEmpty     bool
+	GetMultiplayerServerVersionsResponse  []MultiplayerServerVersion
 
 	NumCalledGetMultiplayerServerVersion int
 	GetMultiplayerServerVersionError     error
@@ -187,12 +188,17 @@ func (m *MockClient) Reset() {
 
 	m.NumCalledGetMultiplayerServerConfigs = 0
 	m.GetMultiplayerServerConfigsError = nil
+
 	m.NumCalledGetMultiplayerServerVersions = 0
 	m.GetMultiplayerServerVersionsError = nil
+	m.GetMultiplayerServerVersionsResponse = nil
+
 	m.NumCalledGetMultiplayerServerVersionsWithConfig = 0
 	m.GetMultiplayerServerVersionsWithConfigError = nil
+
 	m.NumCalledGetMultiplayerServerVersion = 0
 	m.GetMultiplayerServerVersionError = nil
+
 	m.NumCalledCreateMultiplayerServerVersion = 0
 	m.CreateMultiplayerServerVersionError = nil
 }
@@ -819,6 +825,10 @@ func (m *MockClient) GetMultiplayerServerVersions(ctx context.Context, params *M
 
 	if m.GetMultiplayerServerVersionsEmpty {
 		return []MultiplayerServerVersion{}, nil
+	}
+
+	if m.GetMultiplayerServerVersionsResponse != nil {
+		return m.GetMultiplayerServerVersionsResponse, nil
 	}
 
 	return []MultiplayerServerVersion{
