@@ -3,8 +3,8 @@ package platform_test
 import (
 	"context"
 	"fmt"
-	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
-	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/k8s/agones"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/allocator"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/rs/zerolog/log"
@@ -27,7 +27,7 @@ var _ = Describe("Multiplayer Resources", func() {
 	})
 
 	It("can get the multiplayer server configs", func() {
-		mpServerConfigs, err := tokenClient.GetMultiplayerServerConfigs(ctx, &MultiplayerServerConfigParams{
+		mpServerConfigs, err := tokenClient.GetMultiplayerServerConfigs(ctx, &platform.MultiplayerServerConfigParams{
 			ModuleID:      moduleID,
 			OrgID:         orgID,
 			ServerVersion: serverVersion,
@@ -38,13 +38,13 @@ var _ = Describe("Multiplayer Resources", func() {
 	})
 
 	It("can return an error if no image or file are given", func() {
-		_, err := tokenClient.CreateMultiplayerServerVersion(ctx, MultiplayerServerVersion{})
+		_, err := tokenClient.CreateMultiplayerServerVersion(ctx, platform.MultiplayerServerVersion{})
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("image or file path must be provided"))
 	})
 
 	It("can get the multiplayer server versions", func() {
-		mpServerVersions, err := tokenClient.GetMultiplayerServerVersions(ctx, &MultiplayerServerVersionQueryParams{
+		mpServerVersions, err := tokenClient.GetMultiplayerServerVersions(ctx, &platform.MultiplayerServerVersionQueryParams{
 			ModuleID:        moduleID,
 			SemanticVersion: serverVersion,
 		})
@@ -54,10 +54,10 @@ var _ = Describe("Multiplayer Resources", func() {
 	})
 
 	It("can create and get a multiplayer server version", func() {
-		input := MultiplayerServerVersion{
+		input := platform.MultiplayerServerVersion{
 			ModuleID:        moduleID,
 			SemanticVersion: randVersion,
-			ImageRegistry:   agones.SimpleGameServerImage,
+			ImageRegistry:   allocator.SimpleGameServerImage,
 			Engine:          "unreal",
 		}
 
@@ -73,7 +73,7 @@ var _ = Describe("Multiplayer Resources", func() {
 		Expect(mpServerVersion.ID).To(Equal(serverVersion.ID))
 		Expect(mpServerVersion.ModuleID).To(Equal(moduleID))
 		Expect(mpServerVersion.SemanticVersion).To(Equal(randVersion))
-		Expect(mpServerVersion.ImageRegistry).To(Equal(agones.SimpleGameServerImage))
+		Expect(mpServerVersion.ImageRegistry).To(Equal(allocator.SimpleGameServerImage))
 		Expect(mpServerVersion.Engine).To(Equal(input.Engine))
 		Expect(mpServerVersion.Status).To(Equal("enabled"))
 	})
@@ -88,7 +88,7 @@ var _ = Describe("Multiplayer Resources", func() {
 		}()
 		Expect(err).NotTo(HaveOccurred())
 		Expect(n).To(Equal(4))
-		serverVersionInput := MultiplayerServerVersion{
+		serverVersionInput := platform.MultiplayerServerVersion{
 			ModuleID:        moduleID,
 			SemanticVersion: randVersion,
 			Engine:          "unreal",

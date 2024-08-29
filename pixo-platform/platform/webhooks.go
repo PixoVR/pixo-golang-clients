@@ -7,13 +7,14 @@ import (
 )
 
 type Webhook struct {
-	ID            int    `json:"id,omitempty"`
-	URL           string `json:"url,omitempty"`
-	Description   string `json:"description,omitempty"`
-	Token         string `json:"token,omitempty"`
-	GenerateToken *bool  `json:"generateToken,omitempty"`
-	OrgID         int    `json:"orgId,omitempty"`
-	Org           *Org   `json:"org,omitempty"`
+	ID            int      `json:"id,omitempty"`
+	URL           string   `json:"url,omitempty"`
+	EventTypes    []string `json:"eventTypes,omitempty"`
+	Description   string   `json:"description,omitempty"`
+	Token         string   `json:"token,omitempty"`
+	GenerateToken *bool    `json:"generateToken,omitempty"`
+	OrgID         int      `json:"orgId,omitempty"`
+	Org           *Org     `json:"org,omitempty"`
 }
 
 type WebhookParams struct {
@@ -108,6 +109,7 @@ func (p *PlatformClient) CreateWebhook(ctx context.Context, webhook Webhook) (*W
 			"token":         webhook.Token,
 			"description":   webhook.Description,
 			"generateToken": webhook.GenerateToken,
+			"eventTypes":    webhook.EventTypes,
 		},
 	}
 

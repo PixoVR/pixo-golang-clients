@@ -4,7 +4,7 @@ all: lint coverage
 .PHONY: update
 update:
 	@echo "🔄 Updating Pixo utilities..."
-	@go get github.com/PixoVR/pixo-golang-server-utilities/pixo-platform@0.1.83
+	@go get github.com/PixoVR/pixo-golang-server-utilities/pixo-platform@0.1.98
 	@go mod tidy
 
 

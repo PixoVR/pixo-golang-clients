@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/allocator"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/mockserver"
 	"github.com/spf13/cobra"
@@ -63,9 +64,9 @@ var mockserverCmd = &cobra.Command{
 func init() {
 	mpCmd.AddCommand(mockserverCmd)
 
-	mockserverCmd.Flags().String("gameserver-ip", matchmaker.Localhost, "IP address of the game server to be returned in the response")
+	mockserverCmd.Flags().String("gameserver-ip", allocator.Localhost, "IP address of the game server to be returned in the response")
 	mockserverCmd.Flags().String("server-version", "1.00.00", "SemanticVersion of the server to be returned in the response")
-	mockserverCmd.Flags().Int("gameserver-port", matchmaker.DefaultGameserverPort, "Port of the game server to be returned in the response")
+	mockserverCmd.Flags().Int("gameserver-port", allocator.DefaultGameserverPort, "Port of the game server to be returned in the response")
 	mockserverCmd.Flags().Int("matchmaker-port", 8080, "Port of the mock matchmaker server")
 	mockserverCmd.Flags().String("map-name", "Default", "Name of the map to be returned in the response")
 	mockserverCmd.Flags().StringP("session-name", "n", "Test", "Name of the session to be returned in the response")

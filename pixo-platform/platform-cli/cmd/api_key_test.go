@@ -43,12 +43,30 @@ var _ = Describe("API Keys", func() {
 		Expect(ok).To(BeTrue())
 	})
 
-	//It("can create an api key for a user", func() {
-	//	output, err := executor.RunCommand("keys", "create", "--user-id", "9999999")
-	//	Expect(err).NotTo(HaveOccurred())
-	//	Expect(output).To(ContainSubstring("API key created for user: 9999999"))
-	//	Expect(executor.ConfigManager.APIKey()).NotTo(BeEmpty())
-	//})
+	It("returns an error if the username isnt found", func() {
+		executor.MockPlatformClient.GetUserByUsernameError = errors.New("get users by username error")
+
+		_, err := executor.RunCommand(
+			"keys",
+			"create",
+			"--username",
+			"walker",
+		)
+
+		Expect(err).To(MatchError("get users by username error"))
+	})
+
+	It("can create an api key for another user", func() {
+		output, err := executor.RunCommand("keys", "create", "--username", "walker")
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(executor.MockPlatformClient.NumCalledGetUserByUsername).To(Equal(1))
+		Expect(executor.MockPlatformClient.NumCalledCreateAPIKey).To(Equal(1))
+		Expect(output).To(ContainSubstring("API key created for walker"))
+		val, ok := executor.ConfigManager.GetConfigValue("api-key")
+		Expect(val).NotTo(BeEmpty())
+		Expect(ok).To(BeTrue())
+	})
 
 	It("can return an error if the get call fails", func() {
 		executor.MockPlatformClient.GetAPIKeysError = errors.New("error")
@@ -73,9 +91,10 @@ var _ = Describe("API Keys", func() {
 
 	It("can list api keys for a user", func() {
 		executor.MockPlatformClient.GetAPIKeysEmpty = true
-		output, err := executor.RunCommand("keys", "list", "--user-id", "9999999")
+
+		output := executor.RunCommandAndExpectSuccess("keys", "list", "--username", "test")
+
 		Expect(executor.MockPlatformClient.NumCalledGetAPIKeys).To(Equal(1))
-		Expect(err).NotTo(HaveOccurred())
 		Expect(output).To(ContainSubstring("No API keys found"))
 	})
 

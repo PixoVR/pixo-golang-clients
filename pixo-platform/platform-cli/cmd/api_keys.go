@@ -20,5 +20,5 @@ var apiKeyCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(apiKeyCmd)
 
-	apiKeyCmd.PersistentFlags().StringP("user-id", "u", "", "User ID")
+	apiKeyCmd.PersistentFlags().StringP("username", "u", "", "Username to manage API keys for")
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	abstract_client "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/allocator"
 	"github.com/gorilla/websocket"
 	"net"
 	"net/http"
@@ -36,8 +37,8 @@ func NewMockMatchmaker() *MockMatchmaker {
 	mockResponse := MatchResponse{
 		Message: "Match found",
 		MatchDetails: MatchDetails{
-			IP:   Localhost,
-			Port: fmt.Sprint(DefaultGameserverPort),
+			IP:   allocator.Localhost,
+			Port: fmt.Sprint(allocator.DefaultGameserverPort),
 		},
 	}
 
@@ -84,8 +85,8 @@ func (m *MockMatchmaker) FindMatch(request MatchRequest) (*net.UDPAddr, error) {
 	}
 
 	return &net.UDPAddr{
-		IP:   net.ParseIP(Localhost),
-		Port: DefaultGameserverPort,
+		IP:   net.ParseIP(allocator.Localhost),
+		Port: allocator.DefaultGameserverPort,
 	}, nil
 }
 
@@ -115,8 +116,8 @@ func (m *MockMatchmaker) ReadResponse(conn *websocket.Conn) (MatchResponse, erro
 	return MatchResponse{
 		Message: "Match found",
 		MatchDetails: MatchDetails{
-			IP:   Localhost,
-			Port: fmt.Sprint(DefaultGameserverPort),
+			IP:   allocator.Localhost,
+			Port: fmt.Sprint(allocator.DefaultGameserverPort),
 		},
 	}, nil
 }

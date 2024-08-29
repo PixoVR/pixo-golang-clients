@@ -19,9 +19,13 @@ var listApiKeyCmd = &cobra.Command{
 
 		apiKeyParams := &graphql_api.APIKeyQueryParams{}
 
-		userIDVal, _ := Ctx.ConfigManager.GetIntConfigValue("user-id")
-		if userIDVal != 0 {
-			apiKeyParams.UserID = &userIDVal
+		username, _ := Ctx.ConfigManager.GetFlagValue("username", cmd)
+		if username != "" {
+			user, err := Ctx.PlatformClient.GetUserByUsername(cmd.Context(), username)
+			if err != nil {
+				return err
+			}
+			apiKeyParams.UserID = &user.ID
 		}
 
 		apiKeys, err := Ctx.PlatformClient.GetAPIKeys(cmd.Context(), apiKeyParams)

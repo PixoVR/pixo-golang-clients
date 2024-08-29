@@ -4,7 +4,6 @@ import (
 	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/allocator"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	config2 "github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/config"
-	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/k8s/agones"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"net/http"
@@ -53,7 +52,7 @@ var _ = Describe("Allocate", Ordered, func() {
 			ModuleID:           1,
 			OrgID:              1,
 			ServerVersion:      "1.0.0",
-			ImageRegistry:      agones.SimpleGameServerImage,
+			ImageRegistry:      SimpleGameServerImage,
 			AllocateGameServer: true,
 		}
 

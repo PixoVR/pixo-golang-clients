@@ -22,6 +22,7 @@ var _ = Describe("Webhooks", func() {
 		webhookInput = Webhook{
 			OrgID:         1,
 			URL:           "http://example.com",
+			EventTypes:    []string{"SessionCompleted"},
 			GenerateToken: &[]bool{true}[0],
 			Description:   faker.Sentence(),
 		}
@@ -61,28 +62,21 @@ var _ = Describe("Webhooks", func() {
 	})
 
 	It("can update a webhook", func() {
-		webhookToUpdateInput := Webhook{
-			OrgID:       1,
-			URL:         "http://example.com",
-			Description: "client test",
-			Token:       "token",
-		}
-		webhookToUpdate, err := tokenClient.CreateWebhook(ctx, webhookToUpdateInput)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(webhookToUpdate).NotTo(BeNil())
-		Expect(webhookToUpdate.ID).NotTo(BeZero())
-		webhookToUpdateInput.ID = webhookToUpdate.ID
-		webhookToUpdateInput.URL = "http://example.com/updated"
-		webhookToUpdateInput.Description = "updated description"
+		webhookInput.ID = testWebhook.ID
+		webhookInput.URL = "http://example.com/updated"
+		webhookInput.Description = "updated description"
+		webhookInput.GenerateToken = &[]bool{false}[0]
+		webhookInput.Token = "updated-token"
+		webhookInput.EventTypes = []string{"UserCreated"}
 
-		updatedWebhook, err := tokenClient.UpdateWebhook(ctx, webhookToUpdateInput)
+		updatedWebhook, err := tokenClient.UpdateWebhook(ctx, webhookInput)
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(updatedWebhook).NotTo(BeNil())
-		Expect(updatedWebhook.ID).To(Equal(webhookToUpdateInput.ID))
-		Expect(updatedWebhook.URL).To(Equal(webhookToUpdateInput.URL))
-		Expect(updatedWebhook.Description).To(Equal(webhookToUpdateInput.Description))
-		Expect(updatedWebhook.Token).To(Equal(webhookToUpdateInput.Token))
+		Expect(updatedWebhook.ID).To(Equal(webhookInput.ID))
+		Expect(updatedWebhook.URL).To(Equal(webhookInput.URL))
+		Expect(updatedWebhook.Description).To(Equal(webhookInput.Description))
+		Expect(updatedWebhook.Token).To(Equal(webhookInput.Token))
 	})
 
 })

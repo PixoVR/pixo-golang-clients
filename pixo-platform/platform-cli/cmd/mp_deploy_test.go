@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/k8s/agones"
+	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/allocator"
 	"github.com/kyokomi/emoji"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -117,7 +117,7 @@ var _ = Describe("Server Deploy", func() {
 			"--server-version",
 			semanticVersion,
 			"--image",
-			agones.SimpleGameServerImage,
+			SimpleGameServerImage,
 		)
 		Expect(output).To(ContainSubstring(fmt.Sprintf("Deployed version: %s", semanticVersion)))
 	})

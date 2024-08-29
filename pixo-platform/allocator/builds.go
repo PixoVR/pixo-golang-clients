@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/k8s/argo"
 	"github.com/rs/zerolog/log"
 	"net/http"
 	"strings"
@@ -20,6 +19,11 @@ type Workflow struct {
 	Name      string    `json:"name"`
 	Status    string    `json:"status"`
 	CreatedAt time.Time `json:"createdAt"`
+}
+
+type Log struct {
+	Step  string `json:"step"`
+	Lines string `json:"lines"`
 }
 
 func (a *Client) GetBuildWorkflows() ([]Workflow, error) {
@@ -45,7 +49,7 @@ func (a *Client) GetBuildWorkflows() ([]Workflow, error) {
 	return workflowsResponse.Workflows, nil
 }
 
-func (a *Client) GetBuildWorkflowLogs(workflowName string) (chan *argo.Log, error) {
+func (a *Client) GetBuildWorkflowLogs(workflowName string) (chan *Log, error) {
 	path := fmt.Sprintf("build/workflows/%s/logs", workflowName)
 
 	req := a.FormatRequest()
@@ -58,7 +62,7 @@ func (a *Client) GetBuildWorkflowLogs(workflowName string) (chan *argo.Log, erro
 		return nil, err
 	}
 
-	logs := make(chan *argo.Log, 100)
+	logs := make(chan *Log, 100)
 
 	go func() {
 		for {
@@ -72,7 +76,7 @@ func (a *Client) GetBuildWorkflowLogs(workflowName string) (chan *argo.Log, erro
 
 			data := strings.Trim(string(line), "\n")
 			if data != "event:message" {
-				var workflowLog argo.Log
+				var workflowLog Log
 
 				workflowLog.Step = workflowName
 				workflowLog.Lines = data

@@ -5,7 +5,6 @@ import (
 	"errors"
 	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
 	commonerrors "github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/commonerrors"
-	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/k8s/agones"
 	"github.com/go-faker/faker/v4"
 	"time"
 )
@@ -796,7 +795,7 @@ func (m *MockClient) GetMultiplayerServerConfigs(ctx context.Context, params *Mu
 			ServerVersions: []*MultiplayerServerVersion{
 				{
 					Engine:          "unreal",
-					ImageRegistry:   agones.SimpleGameServerImage,
+					ImageRegistry:   "gcr.io/pixo-bootstrap/multiplayer/gameservers/simple-server:latest",
 					Status:          "enabled",
 					SemanticVersion: "1.0.0",
 				},

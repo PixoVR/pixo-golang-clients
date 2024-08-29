@@ -3,7 +3,6 @@ package allocator
 import (
 	"fmt"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
 	"github.com/go-resty/resty/v2"
 	"net/http"
 )
@@ -31,8 +30,8 @@ func (a *Spy) AllocateGameserver(request AllocationRequest) AllocationResponse {
 	return AllocationResponse{
 		Results: GameServer{
 			Name: "test-gameserver",
-			IP:   matchmaker.Localhost,
-			Port: fmt.Sprint(matchmaker.DefaultGameserverPort),
+			IP:   Localhost,
+			Port: fmt.Sprint(DefaultGameserverPort),
 		},
 	}
 }
