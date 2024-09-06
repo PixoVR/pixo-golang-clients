@@ -3,8 +3,8 @@ module github.com/PixoVR/pixo-golang-clients/pixo-platform
 go 1.23.0
 
 require (
-	github.com/PixoVR/pixo-golang-server-utilities/pixo-platform v0.0.0-20240829053304-f1d077aec847
-	github.com/charmbracelet/bubbletea v1.0.0
+	github.com/PixoVR/pixo-golang-server-utilities/pixo-platform v0.0.0-20240904200001-99920749c214
+	github.com/charmbracelet/bubbletea v1.1.0
 	github.com/charmbracelet/huh v0.5.3
 	github.com/charmbracelet/lipgloss v0.13.0
 	github.com/fatih/color v1.17.0
@@ -33,11 +33,11 @@ require (
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/bytedance/sonic v1.11.6 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
-	github.com/casbin/casbin/v2 v2.97.0 // indirect
-	github.com/casbin/govaluate v1.1.0 // indirect
+	github.com/casbin/casbin/v2 v2.98.0 // indirect
+	github.com/casbin/govaluate v1.2.0 // indirect
 	github.com/catppuccin/go v0.2.0 // indirect
 	github.com/charmbracelet/bubbles v0.19.0 // indirect
-	github.com/charmbracelet/x/ansi v0.2.2 // indirect
+	github.com/charmbracelet/x/ansi v0.2.3 // indirect
 	github.com/charmbracelet/x/exp/strings v0.0.0-20240722160745-212f7b056ed0 // indirect
 	github.com/charmbracelet/x/term v0.2.0 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect

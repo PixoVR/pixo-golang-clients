@@ -69,7 +69,7 @@ type CreateModuleVersionResponse struct {
 }
 
 func (p *PlatformClient) GetModules(ctx context.Context, params ...ModuleParams) ([]Module, error) {
-	query := `query modules { modules { id name description imageLink shortDesc gitConfigId gitConfig { provider orgName repoName } createdAt updatedAt } }`
+	query := `query modules { modules { id abbreviation description imageLink shortDesc gitConfigId gitConfig { provider orgName repoName } createdAt updatedAt } }`
 
 	res, err := p.Client.ExecRaw(ctx, query, nil)
 	if err != nil {

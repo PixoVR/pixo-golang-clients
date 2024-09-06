@@ -44,7 +44,7 @@ func (p *Client) UpdateMultiplayerServerVersion(versionID int, image string) (*r
 	return p.Patch(path, body)
 }
 
-func (p *Client) GetMatchmakingProfiles() ([]*GameProfileMetadata, error) {
+func (p *Client) GetMatchmakingProfiles() ([]GameProfileMetadata, error) {
 	path := "api/openmatch/configurations"
 
 	p.SetHeader("x-openmatch-header", p.GetToken())

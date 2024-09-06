@@ -1,10 +1,10 @@
 
-all: lint coverage
+all: update lint coverage
 
 .PHONY: update
 update:
 	@echo "🔄 Updating Pixo utilities..."
-	@go get github.com/PixoVR/pixo-golang-server-utilities/pixo-platform@0.1.98
+	@go get github.com/PixoVR/pixo-golang-server-utilities/pixo-platform@0.2.5
 	@go mod tidy
 
 
@@ -14,8 +14,8 @@ lint:
 	@golangci-lint run --timeout 5m
 
 
-.PHONY: unit
-unit:
+.PHONY: test
+test:
 	@echo "🧪 Running tests with coverage..."
 	@go test ./... -coverprofile=./cover.out -covermode=atomic -coverpkg=./...
 
@@ -26,7 +26,7 @@ calc:
 	@go-test-coverage --config=./.coverage.yaml
 
 
-coverage: unit calc
+coverage: test calc
 cov: coverage
 
 

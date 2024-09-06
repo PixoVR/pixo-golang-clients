@@ -4,7 +4,6 @@ Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
@@ -18,6 +17,7 @@ import (
 
 var (
 	isPrecheck bool
+	isUpdate   bool
 )
 
 // mpDeployCmd represents the mp server versions deploy command
@@ -29,17 +29,7 @@ var mpDeployCmd = &cobra.Command{
 	SilenceErrors: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		questions := []config.Value{
-			{Question: forms.Question{
-				Type: forms.SelectID,
-				Key:  "module-id",
-				LabelFunc: func(item interface{}) string {
-					module := item.(platform.Module)
-					return fmt.Sprintf("%d: %s - %s", module.ID, module.Abbreviation, module.Name)
-				},
-				GetItemsFunc: func(ctx context.Context) (interface{}, error) {
-					return Ctx.PlatformClient.GetModules(cmd.Context())
-				},
-			}},
+			{Question: moduleQuestion()},
 			{Question: forms.Question{Type: forms.Input, Key: "server-version", Optional: true}},
 		}
 
@@ -48,7 +38,7 @@ var mpDeployCmd = &cobra.Command{
 			return err
 		}
 
-		moduleID := forms.Int(answers["module-id"])
+		moduleID := forms.Int(answers["module"])
 
 		semVer := forms.String(answers["server-version"])
 		if semVer == "" {
@@ -89,7 +79,7 @@ var mpDeployCmd = &cobra.Command{
 
 			} else if len(versions) > 0 {
 				spinner.Stop()
-				msg := emoji.Sprintf(":exclamation: server version %s already exists", semVer)
+				msg := emoji.Sprintf(":exclamation: server version %s already exists\n", semVer)
 				Ctx.Printer.Println(msg)
 				return errors.New(msg)
 			}
@@ -99,40 +89,54 @@ var mpDeployCmd = &cobra.Command{
 			return nil
 		}
 
-		var filePath string
-		image, ok := Ctx.ConfigManager.GetFlagOrConfigValue("image", cmd)
-		if !ok || image == "" {
-			filePath, ok = Ctx.ConfigManager.GetFlagOrConfigValue("zip-file", cmd)
-			if !ok || filePath == "" {
-				question := &forms.Question{Prompt: "DOCKER IMAGE"}
-				if err := Ctx.FormHandler.GetResponseFromUser(question); err != nil {
-					return err
-				}
-				if question.Answer == "" {
-					return errors.New("no image or zip file provided")
-				}
-				image = forms.String(question.Answer)
-			}
-		}
+		var image string
 
-		msg := fmt.Sprint("Deploying server version: ", semVer)
-		spinner := loader.NewLoader(cmd.Context(), msg, Ctx.Printer)
+		filePath, ok := Ctx.ConfigManager.GetFlagOrConfigValue("zip-file", cmd)
+		if !ok || filePath == "" {
+			question := forms.Question{Type: forms.Input, Key: "image"}
+			answers, err := Ctx.ConfigManager.GetValuesOrSubmitForm([]config.Value{{Question: question}}, cmd)
+			if err != nil {
+				return err
+			}
+			image = forms.String(answers["image"])
+		}
 
 		input := platform.MultiplayerServerVersion{
 			ModuleID:        moduleID,
+			SemanticVersion: semVer,
 			ImageRegistry:   image,
 			LocalFilePath:   filePath,
-			SemanticVersion: semVer,
 			Engine:          "unreal",
 		}
-		if _, err := Ctx.PlatformClient.CreateMultiplayerServerVersion(cmd.Context(), input); err != nil {
-			msg := fmt.Sprintf("Failed to deploy multiplayer server version: %s - %s", semVer, err.Error())
-			return errors.New(msg)
+
+		if isUpdate {
+			msg := fmt.Sprint("Updating server version: ", semVer)
+			spinner := loader.NewLoader(cmd.Context(), msg, Ctx.Printer)
+			serverVersion, err := Ctx.PlatformClient.UpdateMultiplayerServerVersion(cmd.Context(), platform.MultiplayerServerVersion{
+				ModuleID:        moduleID,
+				SemanticVersion: semVer,
+				ImageRegistry:   image,
+			})
+			spinner.Stop()
+			if err != nil {
+				msg := fmt.Sprintf("Failed to update multiplayer server version: %s - %s", semVer, err.Error())
+				return errors.New(msg)
+			}
+			Ctx.Printer.Printf(":cruise_ship: Updated server version: %s - %s\n", serverVersion.Module.Abbreviation, semVer)
+			return nil
+		} else {
+			msg := fmt.Sprint("Deploying server version: ", semVer)
+			spinner := loader.NewLoader(cmd.Context(), msg, Ctx.Printer)
+			serverVersion, err := Ctx.PlatformClient.CreateMultiplayerServerVersion(cmd.Context(), input)
+			spinner.Stop()
+			if err != nil {
+				msg := fmt.Sprintf("Failed to deploy multiplayer server version: %s - %s", semVer, err.Error())
+				return errors.New(msg)
+			}
+			Ctx.Printer.Printf(":cruise_ship: Deployed version: %s - %s\n", serverVersion.Module.Abbreviation, semVer)
+			return nil
 		}
 
-		spinner.Stop()
-		Ctx.Printer.Println(":cruise_ship: Deployed version: ", semVer)
-		return nil
 	},
 }
 
@@ -143,4 +147,5 @@ func init() {
 	mpDeployCmd.Flags().StringP("ini", "f", "", "Path to the ini file to use for the semantic version")
 	mpDeployCmd.Flags().StringP("zip-file", "z", "", "Path to the zip file to use for the upload")
 	mpDeployCmd.Flags().BoolVarP(&isPrecheck, "pre-check", "p", false, "Check if server version exists already")
+	mpDeployCmd.Flags().BoolVarP(&isUpdate, "update", "u", false, "Update an existing server version")
 }

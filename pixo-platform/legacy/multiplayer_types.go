@@ -9,7 +9,7 @@ type MultiplayerServerConfig struct {
 	ModuleID int     `json:"moduleId,omitempty"`
 	Module   *Module `json:"module,omitempty"`
 
-	ServerVersions []*MultiplayerServerVersion `json:"serverVersions,omitempty"`
+	ServerVersions []MultiplayerServerVersion `json:"serverVersions,omitempty"`
 
 	CreatedBy string `json:"createdBy,omitempty"`
 	UpdatedBy string `json:"updatedBy,omitempty"`
@@ -37,10 +37,10 @@ type MultiplayerServerVersion struct {
 }
 
 type GameProfileMetaDataResponse struct {
-	Error      bool                   `json:"error"`
-	StatusCode int                    `json:"statusCode"`
-	Message    string                 `json:"message"`
-	Profiles   []*GameProfileMetadata `json:"profiles"`
+	Error      bool                  `json:"error"`
+	StatusCode int                   `json:"statusCode"`
+	Message    string                `json:"message"`
+	Profiles   []GameProfileMetadata `json:"profiles"`
 
 	CreatedBy string `json:"createdBy"`
 	UpdatedBy string `json:"updatedBy"`

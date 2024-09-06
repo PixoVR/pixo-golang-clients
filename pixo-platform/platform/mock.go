@@ -6,6 +6,7 @@ import (
 	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
 	commonerrors "github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/commonerrors"
 	"github.com/go-faker/faker/v4"
+	"sync"
 	"time"
 )
 
@@ -13,8 +14,10 @@ var _ Client = (*MockClient)(nil)
 
 type MockClient struct {
 	abstract.MockAbstractClient
+	lock sync.Mutex
 
 	NumCalledGetUser int
+	GetUserResponse  *User
 	GetUserError     error
 
 	NumCalledGetUserByUsername int
@@ -120,6 +123,9 @@ type MockClient struct {
 
 	NumCalledCreateMultiplayerServerVersion int
 	CreateMultiplayerServerVersionError     error
+
+	NumCalledUpdateMultiplayerServerVersion int
+	UpdateMultiplayerServerVersionError     error
 }
 
 func (m *MockClient) Reset() {
@@ -201,6 +207,9 @@ func (m *MockClient) Reset() {
 
 	m.NumCalledCreateMultiplayerServerVersion = 0
 	m.CreateMultiplayerServerVersionError = nil
+
+	m.NumCalledUpdateMultiplayerServerVersion = 0
+	m.UpdateMultiplayerServerVersionError = nil
 }
 
 func (m *MockClient) Path() string {
@@ -216,6 +225,9 @@ func (m *MockClient) ActiveOrgID() int {
 }
 
 func (m *MockClient) GetUser(ctx context.Context, id int) (*User, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledGetUser++
 
 	if id <= 0 {
@@ -224,6 +236,10 @@ func (m *MockClient) GetUser(ctx context.Context, id int) (*User, error) {
 
 	if m.GetUserError != nil {
 		return nil, m.GetUserError
+	}
+
+	if m.GetUserResponse != nil {
+		return m.GetUserResponse, nil
 	}
 
 	return &User{
@@ -238,6 +254,9 @@ func (m *MockClient) GetUser(ctx context.Context, id int) (*User, error) {
 }
 
 func (m *MockClient) GetUserByUsername(ctx context.Context, username string) (*User, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledGetUserByUsername++
 
 	if username == "" {
@@ -260,6 +279,9 @@ func (m *MockClient) GetUserByUsername(ctx context.Context, username string) (*U
 }
 
 func (m *MockClient) CreateUser(ctx context.Context, user *User) error {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledCreateUser++
 
 	if user == nil {
@@ -290,6 +312,9 @@ func (m *MockClient) CreateUser(ctx context.Context, user *User) error {
 }
 
 func (m *MockClient) UpdateUser(ctx context.Context, user *User) error {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledUpdateUser++
 
 	if user == nil {
@@ -317,6 +342,9 @@ func (m *MockClient) UpdateUser(ctx context.Context, user *User) error {
 }
 
 func (m *MockClient) DeleteUser(ctx context.Context, id int) error {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledDeleteUser++
 
 	if id <= 0 {
@@ -331,6 +359,9 @@ func (m *MockClient) DeleteUser(ctx context.Context, id int) error {
 }
 
 func (m *MockClient) GetModules(ctx context.Context, params ...ModuleParams) ([]Module, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledGetModules++
 
 	if m.GetModulesError != nil {
@@ -344,18 +375,19 @@ func (m *MockClient) GetModules(ctx context.Context, params ...ModuleParams) ([]
 	return []Module{
 		{
 			ID:           1,
-			Name:         "test",
 			Abbreviation: "TST",
 		},
 		{
 			ID:           2,
-			Name:         "test-2",
 			Abbreviation: "TST-2",
 		},
 	}, nil
 }
 
 func (m *MockClient) GetRoles(ctx context.Context) ([]Role, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledGetRoles++
 
 	if m.GetRolesError != nil {
@@ -375,6 +407,9 @@ func (m *MockClient) GetRoles(ctx context.Context) ([]Role, error) {
 }
 
 func (m *MockClient) GetOrgs(ctx context.Context, params ...*OrgParams) ([]Org, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledGetOrgs++
 
 	if m.GetOrgsError != nil {
@@ -400,6 +435,9 @@ func (m *MockClient) GetOrgs(ctx context.Context, params ...*OrgParams) ([]Org, 
 }
 
 func (m *MockClient) GetOrg(ctx context.Context, id int) (*Org, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledGetOrg++
 
 	if id <= 0 {
@@ -417,6 +455,9 @@ func (m *MockClient) GetOrg(ctx context.Context, id int) (*Org, error) {
 }
 
 func (m *MockClient) CreateOrg(ctx context.Context, org Org) (*Org, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledCreateOrg++
 
 	if org.Name == "" {
@@ -434,6 +475,9 @@ func (m *MockClient) CreateOrg(ctx context.Context, org Org) (*Org, error) {
 }
 
 func (m *MockClient) UpdateOrg(ctx context.Context, org Org) (*Org, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledUpdateOrg++
 
 	if org.ID <= 0 {
@@ -449,6 +493,9 @@ func (m *MockClient) UpdateOrg(ctx context.Context, org Org) (*Org, error) {
 }
 
 func (m *MockClient) DeleteOrg(ctx context.Context, id int) error {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledDeleteOrg++
 
 	if id <= 0 {
@@ -463,6 +510,9 @@ func (m *MockClient) DeleteOrg(ctx context.Context, id int) error {
 }
 
 func (m *MockClient) CreateAPIKey(ctx context.Context, input APIKey) (*APIKey, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledCreateAPIKey++
 
 	if m.CreateAPIKeyError != nil {
@@ -478,6 +528,9 @@ func (m *MockClient) CreateAPIKey(ctx context.Context, input APIKey) (*APIKey, e
 }
 
 func (m *MockClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) ([]APIKey, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledGetAPIKeys++
 
 	if m.GetAPIKeysError != nil {
@@ -522,6 +575,9 @@ func (m *MockClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) 
 }
 
 func (m *MockClient) DeleteAPIKey(ctx context.Context, id int) error {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledDeleteAPIKey++
 
 	if id <= 0 {
@@ -536,6 +592,9 @@ func (m *MockClient) DeleteAPIKey(ctx context.Context, id int) error {
 }
 
 func (m *MockClient) GetWebhooks(ctx context.Context, params *WebhookParams) ([]Webhook, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledGetWebhooks++
 
 	if m.GetWebhooksError != nil {
@@ -561,6 +620,9 @@ func (m *MockClient) GetWebhooks(ctx context.Context, params *WebhookParams) ([]
 }
 
 func (m *MockClient) GetWebhook(ctx context.Context, id int) (*Webhook, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledGetWebhook++
 
 	if id <= 0 {
@@ -580,6 +642,9 @@ func (m *MockClient) GetWebhook(ctx context.Context, id int) (*Webhook, error) {
 }
 
 func (m *MockClient) CreateWebhook(ctx context.Context, input Webhook) (*Webhook, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledCreateWebhook++
 
 	if input.OrgID <= 0 {
@@ -603,6 +668,9 @@ func (m *MockClient) CreateWebhook(ctx context.Context, input Webhook) (*Webhook
 }
 
 func (m *MockClient) UpdateWebhook(ctx context.Context, input Webhook) (*Webhook, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledUpdateWebhook++
 
 	if input.ID <= 0 {
@@ -629,6 +697,9 @@ func (m *MockClient) UpdateWebhook(ctx context.Context, input Webhook) (*Webhook
 }
 
 func (m *MockClient) DeleteWebhook(ctx context.Context, id int) error {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledDeleteWebhook++
 
 	if id <= 0 {
@@ -643,6 +714,9 @@ func (m *MockClient) DeleteWebhook(ctx context.Context, id int) error {
 }
 
 func (m *MockClient) GetSession(ctx context.Context, id int) (*Session, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledGetSession++
 
 	if id <= 0 {
@@ -663,6 +737,9 @@ func (m *MockClient) GetSession(ctx context.Context, id int) (*Session, error) {
 }
 
 func (m *MockClient) CreateSession(ctx context.Context, session *Session) error {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledCreateSession++
 
 	if session == nil {
@@ -681,7 +758,7 @@ func (m *MockClient) CreateSession(ctx context.Context, session *Session) error 
 		ID:        1,
 		UserID:    m.ActiveUserID(),
 		ModuleID:  session.ModuleID,
-		Module:    Module{ID: session.ModuleID, Name: "test", Abbreviation: "TST"},
+		Module:    Module{ID: session.ModuleID, Abbreviation: "TST"},
 		IPAddress: session.IPAddress,
 		DeviceID:  session.DeviceID,
 		CreatedAt: time.Now().UTC(),
@@ -692,6 +769,9 @@ func (m *MockClient) CreateSession(ctx context.Context, session *Session) error 
 }
 
 func (m *MockClient) UpdateSession(ctx context.Context, session Session) (*Session, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledUpdateSession++
 
 	if session.ID <= 0 {
@@ -712,6 +792,9 @@ func (m *MockClient) UpdateSession(ctx context.Context, session Session) (*Sessi
 }
 
 func (m *MockClient) CreateEvent(ctx context.Context, event *Event) error {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledCreateEvent++
 
 	noSessionID := event.SessionID == nil || *event.SessionID <= 0
@@ -728,33 +811,42 @@ func (m *MockClient) CreateEvent(ctx context.Context, event *Event) error {
 	return nil
 }
 
-func (m *MockClient) GetPlatforms(ctx context.Context) ([]*Platform, error) {
+func (m *MockClient) GetPlatforms(ctx context.Context) ([]Platform, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledGetPlatforms++
 
 	if m.GetPlatformsError != nil {
 		return nil, m.GetPlatformsError
 	}
 
-	return []*Platform{{
+	return []Platform{{
 		ID:   1,
 		Name: "android",
 	}}, nil
 }
 
-func (m *MockClient) GetControlTypes(ctx context.Context) ([]*ControlType, error) {
+func (m *MockClient) GetControlTypes(ctx context.Context) ([]ControlType, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledGetControlTypes++
 
 	if m.GetControlTypesError != nil {
 		return nil, m.GetControlTypesError
 	}
 
-	return []*ControlType{{
+	return []ControlType{{
 		ID:   1,
 		Name: "keyboard/mouse",
 	}}, nil
 }
 
 func (m *MockClient) CreateModuleVersion(ctx context.Context, input ModuleVersion) (*ModuleVersion, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledCreateModuleVersion++
 
 	if input.ModuleID == 0 {
@@ -781,6 +873,9 @@ func (m *MockClient) CreateModuleVersion(ctx context.Context, input ModuleVersio
 }
 
 func (m *MockClient) GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]MultiplayerServerConfigQueryParams, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledGetMultiplayerServerConfigs++
 
 	if m.GetMultiplayerServerConfigsError != nil {
@@ -817,6 +912,9 @@ func (m *MockClient) GetMultiplayerServerConfigs(ctx context.Context, params *Mu
 }
 
 func (m *MockClient) GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionParams) ([]MultiplayerServerVersion, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledGetMultiplayerServerVersions++
 
 	if m.GetMultiplayerServerVersionsError != nil {
@@ -843,6 +941,9 @@ func (m *MockClient) GetMultiplayerServerVersions(ctx context.Context, params *M
 }
 
 func (m *MockClient) GetMultiplayerServerVersionsWithConfig(ctx context.Context, params *MultiplayerServerVersionParams) ([]MultiplayerServerVersion, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledGetMultiplayerServerVersionsWithConfig++
 
 	if m.GetMultiplayerServerVersionsWithConfigError != nil {
@@ -864,6 +965,9 @@ func (m *MockClient) GetMultiplayerServerVersionsWithConfig(ctx context.Context,
 }
 
 func (m *MockClient) GetMultiplayerServerVersion(ctx context.Context, versionID int) (*MultiplayerServerVersion, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledGetMultiplayerServerVersion++
 
 	if m.GetMultiplayerServerVersionError != nil {
@@ -884,6 +988,9 @@ func (m *MockClient) GetMultiplayerServerVersion(ctx context.Context, versionID 
 }
 
 func (m *MockClient) CreateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	m.NumCalledCreateMultiplayerServerVersion++
 
 	if input.ModuleID == 0 {
@@ -904,8 +1011,36 @@ func (m *MockClient) CreateMultiplayerServerVersion(ctx context.Context, input M
 
 	return &MultiplayerServerVersion{
 		ModuleID:        input.ModuleID,
+		Module:          &Module{ID: input.ModuleID, Abbreviation: "TST"},
 		SemanticVersion: input.SemanticVersion,
 		Status:          input.Status,
 		Engine:          input.Engine,
+	}, nil
+}
+
+func (m *MockClient) UpdateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
+	m.NumCalledUpdateMultiplayerServerVersion++
+
+	if input.ID == 0 && input.ModuleID == 0 && input.SemanticVersion == "" {
+		return nil, errors.New("id, or module id and semantic version is required")
+	}
+
+	if m.UpdateMultiplayerServerVersionError != nil {
+		return nil, m.UpdateMultiplayerServerVersionError
+	}
+
+	return &MultiplayerServerVersion{
+		ID:              input.ID,
+		ModuleID:        input.ModuleID,
+		SemanticVersion: input.SemanticVersion,
+		ImageRegistry:   input.ImageRegistry,
+		Status:          input.Status,
+		Engine:          input.Engine,
+		Module: &Module{
+			Abbreviation: "TST",
+		},
 	}, nil
 }

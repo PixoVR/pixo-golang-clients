@@ -4,8 +4,6 @@ Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
-	"context"
-	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/config"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
@@ -21,34 +19,12 @@ var modulesDeployCmd = &cobra.Command{
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		questions := []config.Value{
-			{Question: forms.Question{
-				Type: forms.SelectID,
-				Key:  "module-id",
-				LabelFunc: func(i interface{}) string {
-					item := i.(platform.Module)
-					return fmt.Sprintf("%d: %s - %s", item.ID, item.Abbreviation, item.Name)
-				},
-				GetItemsFunc: func(ctx context.Context) (interface{}, error) {
-					return Ctx.PlatformClient.GetModules(cmd.Context())
-				},
-			}},
+			{Question: moduleQuestion()},
 			{Question: forms.Question{Type: forms.Input, Key: "semantic-version"}},
 			{Question: forms.Question{Type: forms.Input, Key: "package"}},
 			{Question: forms.Question{Type: forms.Input, Key: "zip-file"}},
-			{Question: forms.Question{
-				Type: forms.MultiSelectIDs,
-				Key:  "platforms",
-				GetItemsFunc: func(ctx context.Context) (interface{}, error) {
-					return Ctx.PlatformClient.GetPlatforms(cmd.Context())
-				},
-			}},
-			{Question: forms.Question{
-				Type: forms.MultiSelectIDs,
-				Key:  "controls",
-				GetItemsFunc: func(ctx context.Context) (interface{}, error) {
-					return Ctx.PlatformClient.GetControlTypes(cmd.Context())
-				},
-			}},
+			{Question: modulePlatformQuestion()},
+			{Question: moduleControlQuestion()},
 		}
 
 		answers, err := Ctx.ConfigManager.GetValuesOrSubmitForm(questions, cmd)
@@ -56,7 +32,7 @@ var modulesDeployCmd = &cobra.Command{
 			return err
 		}
 
-		moduleID := forms.Int(answers["module-id"])
+		moduleID := forms.Int(answers["module"])
 		semVer := forms.String(answers["semantic-version"])
 		packageName := forms.String(answers["package"])
 		zipfilePath := forms.String(answers["zip-file"])

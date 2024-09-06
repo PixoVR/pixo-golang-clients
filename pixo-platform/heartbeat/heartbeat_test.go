@@ -11,7 +11,7 @@ import (
 	"os"
 )
 
-var _ = Describe("Heartbeat", Ordered, func() {
+var _ = Describe("Heartbeat Client", Ordered, func() {
 
 	var (
 		heartbeatClient Client
@@ -31,17 +31,16 @@ var _ = Describe("Heartbeat", Ordered, func() {
 		Expect(heartbeatClient.IsAuthenticated()).To(BeTrue())
 	})
 
-	It("can create a heartbeatClient and login afterwords", func() {
+	It("can create a heartbeat client and login afterwords", func() {
 		anonymousClient := NewClient(config)
 		Expect(anonymousClient.IsAuthenticated()).To(BeFalse())
 		Expect(anonymousClient.Login(username, password)).NotTo(HaveOccurred())
 		Expect(anonymousClient.IsAuthenticated()).To(BeTrue())
 	})
 
-	It("should throw an error if the session doesnt exist", func() {
+	It("should return an error if the session doesnt exist", func() {
 		err := heartbeatClient.SendPulse(9999999999)
-		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring("invalid session"))
+		Expect(err).To(MatchError("invalid session"))
 	})
 
 	It("should be able to create a session and send a pulse", func() {

@@ -127,6 +127,42 @@ func (p *PlatformClient) GetMultiplayerServerVersionsWithConfig(ctx context.Cont
 	return res, nil
 }
 
+func (p *PlatformClient) UpdateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error) {
+	query := `mutation updateMultiplayerServerVersion($input: MultiplayerServerVersionInput!) { updateMultiplayerServerVersion(input: $input) { id moduleId imageRegistry engine status semanticVersion module { name } } }`
+
+	variables := map[string]interface{}{
+		"input": map[string]interface{}{
+			"id":              input.ID,
+			"moduleId":        input.ModuleID,
+			"semanticVersion": input.SemanticVersion,
+			"imageRegistry":   input.ImageRegistry,
+		},
+	}
+
+	if input.Status != "" {
+		variables["input"].(map[string]interface{})["status"] = input.Status
+	}
+
+	if input.Engine != "" {
+		variables["input"].(map[string]interface{})["engine"] = input.Engine
+	}
+
+	res, err := p.Client.ExecRaw(ctx, query, variables)
+	if err != nil {
+		return nil, err
+	}
+
+	var response struct {
+		ServerVersion *MultiplayerServerVersion `json:"updateMultiplayerServerVersion"`
+	}
+
+	if err = json.Unmarshal(res, &response); err != nil {
+		return nil, err
+	}
+
+	return response.ServerVersion, nil
+}
+
 func (p *PlatformClient) GetMultiplayerServerVersion(ctx context.Context, versionID int) (*MultiplayerServerVersion, error) {
 	query := `query multiplayerServerVersion($id: ID!) { multiplayerServerVersion(id: $id) { id moduleId imageRegistry engine status semanticVersion module { name } } }`
 

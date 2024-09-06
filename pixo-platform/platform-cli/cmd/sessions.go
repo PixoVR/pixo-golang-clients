@@ -11,7 +11,7 @@ import (
 var sessionsCmd = &cobra.Command{
 	Use:   "sessions",
 	Short: "Manage user sessions",
-	Long:  `Start and end sessions to mimic headset interactions`,
+	Long:  `start and end sessions to mimic headset interactions`,
 	Run: func(cmd *cobra.Command, args []string) {
 		_ = cmd.Help()
 	},

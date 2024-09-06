@@ -41,8 +41,8 @@ var _ = Describe("Server Deploy", func() {
 		Expect(output).To(BeEmpty())
 	})
 
-	It("should ask for the module id and server version if it is not provided", func() {
-		input := bytes.NewBufferString("1: TST - test\n")
+	It("should ask for the module and server version if it is not provided", func() {
+		input := bytes.NewBufferString("TST\n")
 
 		output, err := executor.RunCommandWithInput(
 			input,
@@ -52,9 +52,8 @@ var _ = Describe("Server Deploy", func() {
 			"--pre-check",
 		)
 
-		Expect(err).To(HaveOccurred())
 		Expect(err).To(MatchError("SERVER VERSION not provided"))
-		Expect(output).To(ContainSubstring("MODULE ID"))
+		Expect(output).To(ContainSubstring("MODULE"))
 		Expect(output).To(ContainSubstring("SERVER VERSION"))
 	})
 
@@ -64,14 +63,14 @@ var _ = Describe("Server Deploy", func() {
 			"servers",
 			"deploy",
 			"--pre-check",
-			"--module-id",
-			"1: TST - test",
+			"--module",
+			"TST",
 			"--server-version",
 			"1.00.00",
 		)
-		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring("server version 1.00.00 already exists"))
-		Expect(output).To(ContainSubstring(emoji.Sprint("\b:exclamation: server version 1.00.00 already exists\n")))
+		expectedErr := emoji.Sprint(":exclamation: server version 1.00.00 already exists\n")
+		Expect(err).To(MatchError(expectedErr))
+		Expect(output).To(ContainSubstring(expectedErr))
 	})
 
 	It("can tell if a server version does not exist", func() {
@@ -81,8 +80,8 @@ var _ = Describe("Server Deploy", func() {
 			"servers",
 			"deploy",
 			"--pre-check",
-			"--module-id",
-			"1: TST - test",
+			"--module",
+			"TST",
 			"--server-version",
 			"99.99.99",
 		)
@@ -97,14 +96,14 @@ var _ = Describe("Server Deploy", func() {
 			"mp",
 			"servers",
 			"deploy",
-			"--module-id",
-			"1: TST - test",
+			"--module",
+			"TST",
 			"--server-version",
 			semanticVersion,
 		)
 
-		Expect(output).To(ContainSubstring("Enter DOCKER IMAGE:"))
-		Expect(output).To(ContainSubstring(fmt.Sprintf("Deployed version: %s", semanticVersion)))
+		Expect(output).To(ContainSubstring("Enter IMAGE:"))
+		Expect(output).To(ContainSubstring(fmt.Sprintf("Deployed version: TST - %s", semanticVersion)))
 	})
 
 	It("can deploy a server version", func() {
@@ -112,14 +111,14 @@ var _ = Describe("Server Deploy", func() {
 			"mp",
 			"servers",
 			"deploy",
-			"--module-id",
-			"1: TST - test",
+			"--module",
+			"TST",
 			"--server-version",
 			semanticVersion,
 			"--image",
 			SimpleGameServerImage,
 		)
-		Expect(output).To(ContainSubstring(fmt.Sprintf("Deployed version: %s", semanticVersion)))
+		Expect(output).To(ContainSubstring(fmt.Sprintf("Deployed version: TST - %s", semanticVersion)))
 	})
 
 	It("can upload a server version with a zip file", func() {
@@ -137,8 +136,8 @@ var _ = Describe("Server Deploy", func() {
 			"mp",
 			"servers",
 			"deploy",
-			"--module-id",
-			"1: TST - test",
+			"--module",
+			"TST",
 			"--server-version",
 			semanticVersion,
 			"--zip-file",
@@ -146,8 +145,45 @@ var _ = Describe("Server Deploy", func() {
 		)
 
 		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring(fmt.Sprintf("Deployed version: %s", semanticVersion)))
+		Expect(output).To(ContainSubstring(fmt.Sprintf("Deployed version: TST - %s", semanticVersion)))
 		Expect(executor.MockPlatformClient.NumCalledCreateMultiplayerServerVersion).To(Equal(1))
 	})
 
+	Context("updating an existing server version image", func() {
+
+		It("returns an error if unable to update", func() {
+			executor.MockPlatformClient.UpdateMultiplayerServerVersionError = errors.New("failed to update")
+			_, err := executor.RunCommand(
+				"mp",
+				"servers",
+				"deploy",
+				"--update",
+				"--module",
+				"TST",
+				"--server-version",
+				semanticVersion,
+				"--image",
+				SimpleGameServerImage,
+			)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("failed to update"))
+		})
+
+		It("can update an existing server version image", func() {
+			output := executor.RunCommandAndExpectSuccess(
+				"mp",
+				"servers",
+				"deploy",
+				"--update",
+				"--module",
+				"TST",
+				"--server-version",
+				semanticVersion,
+				"--image",
+				SimpleGameServerImage,
+			)
+			Expect(output).To(ContainSubstring(emoji.Sprintf("\b:cruise_ship: Updated server version: TST - %s\n", semanticVersion)))
+			Expect(executor.MockPlatformClient.NumCalledUpdateMultiplayerServerVersion).To(Equal(1))
+		})
+	})
 })

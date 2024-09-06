@@ -26,13 +26,12 @@ var _ = Describe("Sessions Simulation", func() {
 			"simulate",
 		)
 
-		Expect(err).To(HaveOccurred())
-		Expect(err).To(MatchError("MODULE ID not provided"))
-		Expect(output).To(ContainSubstring("MODULE ID"))
+		Expect(err).To(MatchError("MODULE not provided"))
+		Expect(output).To(ContainSubstring("MODULE"))
 	})
 
 	It("asks for module if none is provided", func() {
-		input := bytes.NewBufferString("1: TST - test\n")
+		input := bytes.NewBufferString("TST\n")
 
 		output, err := executor.RunCommandWithInput(
 			input,
@@ -42,13 +41,13 @@ var _ = Describe("Sessions Simulation", func() {
 
 		Expect(executor.MockPlatformClient.NumCalledGetModules).To(Equal(1))
 		Expect(err).NotTo(HaveOccurred())
-		Expect(output).To(ContainSubstring("MODULE ID"))
+		Expect(output).To(ContainSubstring("MODULE"))
 		Expect(output).To(ContainSubstring("Session started for module TST"))
 	})
 
 	It("can return an error if the create session call fails", func() {
 		executor.MockPlatformClient.CreateSessionError = errors.New("create error")
-		input := bytes.NewBufferString("1: TST - test\n")
+		input := bytes.NewBufferString("TST\n")
 
 		_, err := executor.RunCommandWithInput(
 			input,
@@ -68,8 +67,8 @@ var _ = Describe("Sessions Simulation", func() {
 			input,
 			"sessions",
 			"simulate",
-			"--module-id",
-			"1: TST - test",
+			"--module",
+			"TST",
 			"--mode",
 			"Challenge",
 			"--scenario",
@@ -94,8 +93,8 @@ var _ = Describe("Sessions Simulation", func() {
 			input,
 			"sessions",
 			"simulate",
-			"--module-id",
-			"1: TST - test",
+			"--module",
+			"TST",
 		)
 
 		Expect(err).To(MatchError("update error"))
@@ -109,8 +108,8 @@ var _ = Describe("Sessions Simulation", func() {
 			input,
 			"sessions",
 			"simulate",
-			"--module-id",
-			"1: TST - test",
+			"--module",
+			"TST",
 		)
 
 		Expect(output).To(ContainSubstring("Session completed"))
@@ -124,8 +123,8 @@ var _ = Describe("Sessions Simulation", func() {
 			input,
 			"sessions",
 			"simulate",
-			"--module-id",
-			"1: TST - test",
+			"--module",
+			"TST",
 		)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(executor.MockPlatformClient.NumCalledCreateSession).To(Equal(1))
@@ -150,8 +149,8 @@ var _ = Describe("Sessions Simulation", func() {
 			input,
 			"sessions",
 			"simulate",
-			"--module-id",
-			"1: TST - test",
+			"--module",
+			"TST",
 		)
 
 		Expect(output).To(ContainSubstring("Create event?"))
@@ -167,8 +166,8 @@ var _ = Describe("Sessions Simulation", func() {
 			input,
 			"sessions",
 			"simulate",
-			"--module-id",
-			"1: TST - test",
+			"--module",
+			"TST",
 		)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(executor.MockPlatformClient.NumCalledCreateSession).To(Equal(1))
@@ -189,8 +188,8 @@ var _ = Describe("Sessions Simulation", func() {
 			input,
 			"sessions",
 			"simulate",
-			"--module-id",
-			"1: TST - test",
+			"--module",
+			"TST",
 		)
 
 		Expect(err).NotTo(HaveOccurred())
@@ -212,8 +211,8 @@ var _ = Describe("Sessions Simulation", func() {
 				input,
 				"sessions",
 				"simulate",
-				"--module-id",
-				"1: TST - test",
+				"--module",
+				"TST",
 				"--legacy",
 			)
 
@@ -230,8 +229,8 @@ var _ = Describe("Sessions Simulation", func() {
 				input,
 				"sessions",
 				"simulate",
-				"--module-id",
-				"1: TST - test",
+				"--module",
+				"TST",
 				"--legacy",
 			)
 
@@ -246,8 +245,8 @@ var _ = Describe("Sessions Simulation", func() {
 				input,
 				"sessions",
 				"simulate",
-				"--module-id",
-				"1: TST - test",
+				"--module",
+				"TST",
 				"--legacy",
 			)
 
@@ -265,8 +264,8 @@ var _ = Describe("Sessions Simulation", func() {
 				input,
 				"sessions",
 				"simulate",
-				"--module-id",
-				"1: TST - test",
+				"--module",
+				"TST",
 				"--legacy",
 			)
 

@@ -18,10 +18,10 @@ import (
 )
 
 type Context struct {
+	printer.Printer
 	ConfigManager     *config.ConfigManager
 	FileManager       *config.FileManager
 	FormHandler       forms.FormHandler
-	Printer           printer.Printer
 	FileOpener        editor.FileOpener
 	HeadsetClient     headset.Client
 	PlatformClient    platform.Client
@@ -56,10 +56,10 @@ func NewContext(configFiles ...string) *Context {
 	}
 
 	return &Context{
+		Printer:           emojiPrinter,
 		FormHandler:       formHandler,
 		ConfigManager:     configManager,
 		FileManager:       fileManager,
-		Printer:           emojiPrinter,
 		HeadsetClient:     headset.NewClient(clientConfig),
 		PlatformClient:    platform.NewClient(clientConfig),
 		MatchmakingClient: matchmaker.NewClient(clientConfig),

@@ -18,7 +18,7 @@ var _ = Describe("Module", func() {
 	})
 
 	It("can return an error if the semantic version is not provided", func() {
-		input := bytes.NewBufferString("1: TST - test\n")
+		input := bytes.NewBufferString("TST\n")
 
 		output, err := executor.RunCommandWithInput(
 			input,
@@ -28,11 +28,11 @@ var _ = Describe("Module", func() {
 
 		Expect(err).To(HaveOccurred())
 		Expect(err).To(MatchError("SEMANTIC VERSION not provided"))
-		Expect(output).To(ContainSubstring("MODULE ID"))
+		Expect(output).To(ContainSubstring("MODULE"))
 		Expect(output).To(ContainSubstring("SEMANTIC VERSION"))
 	})
 
-	It("can return an error if module id is missing", func() {
+	It("can return an error if module is missing", func() {
 		input := bytes.NewBufferString("\n")
 
 		output, err := executor.RunCommandWithInput(
@@ -52,8 +52,8 @@ var _ = Describe("Module", func() {
 		)
 
 		Expect(err).To(HaveOccurred())
-		Expect(err).To(MatchError("MODULE ID not provided"))
-		Expect(output).To(ContainSubstring("MODULE ID"))
+		Expect(err).To(MatchError("MODULE not provided"))
+		Expect(output).To(ContainSubstring("MODULE"))
 	})
 
 	It("can return an error if semantic version is missing", func() {
@@ -63,8 +63,8 @@ var _ = Describe("Module", func() {
 			input,
 			"modules",
 			"deploy",
-			"--module-id",
-			"1: TST - test",
+			"--module",
+			"TST",
 			"--package",
 			"pixovr.com",
 			"--platforms",
@@ -87,8 +87,8 @@ var _ = Describe("Module", func() {
 			input,
 			"modules",
 			"deploy",
-			"--module-id",
-			"1: TST - test",
+			"--module",
+			"TST",
 			"--semantic-version",
 			"1.0.0",
 			"--zip-file",
@@ -111,8 +111,8 @@ var _ = Describe("Module", func() {
 			input,
 			"modules",
 			"deploy",
-			"--module-id",
-			"1: TST - test",
+			"--module",
+			"TST",
 			"--semantic-version",
 			"1.0.0",
 			"--package",
@@ -138,8 +138,8 @@ var _ = Describe("Module", func() {
 			input,
 			"modules",
 			"deploy",
-			"--module-id",
-			"1: TST - test",
+			"--module",
+			"TST",
 			"--semantic-version",
 			"1.0.0",
 			"--package",
@@ -160,8 +160,8 @@ var _ = Describe("Module", func() {
 			input,
 			"modules",
 			"deploy",
-			"--module-id",
-			"1: TST - test",
+			"--module",
+			"TST",
 			"--semantic-version",
 			"1.0.0",
 			"--package",
@@ -186,8 +186,8 @@ var _ = Describe("Module", func() {
 			input,
 			"modules",
 			"deploy",
-			"--module-id",
-			"1: TST - test",
+			"--module",
+			"TST",
 			"--semantic-version",
 			"1.0.0",
 			"--package",
@@ -210,8 +210,8 @@ var _ = Describe("Module", func() {
 			input,
 			"modules",
 			"deploy",
-			"--module-id",
-			"1: TST - test",
+			"--module",
+			"TST",
 			"--semantic-version",
 			"1.0.0",
 			"--package",
@@ -236,8 +236,8 @@ var _ = Describe("Module", func() {
 			input,
 			"modules",
 			"deploy",
-			"--module-id",
-			"1: TST - test",
+			"--module",
+			"TST",
 			"--semantic-version",
 			"1.0.0",
 			"--package",
@@ -259,8 +259,8 @@ var _ = Describe("Module", func() {
 		output, err := executor.RunCommand(
 			"modules",
 			"deploy",
-			"--module-id",
-			"1: TST - test",
+			"--module",
+			"TST",
 			"--semantic-version",
 			"1.0.0",
 			"--package",

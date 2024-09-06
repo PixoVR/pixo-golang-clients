@@ -4,9 +4,7 @@ Copyright © 2024 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
-	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/headset"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/config"
@@ -23,21 +21,10 @@ var useLegacyAPI bool
 var sessionsSimulateCmd = &cobra.Command{
 	Use:   "simulate",
 	Short: "Simulate a session in headset",
-	Long:  `Start a session, create events, and end the session to mimic headset interactions`,
+	Long:  `start a session, create events, and end the session to mimic headset interactions`,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-
 		questions := []config.Value{
-			{Question: forms.Question{
-				Type: forms.SelectID,
-				Key:  "module-id",
-				LabelFunc: func(item interface{}) string {
-					module := item.(platform.Module)
-					return fmt.Sprintf("%d: %s - %s", module.ID, module.Abbreviation, module.Name)
-				},
-				GetItemsFunc: func(ctx context.Context) (interface{}, error) {
-					return Ctx.PlatformClient.GetModules(cmd.Context())
-				},
-			}},
+			{Question: moduleQuestion()},
 			{Question: forms.Question{
 				Type: forms.Select,
 				Key:  "mode",
@@ -70,7 +57,7 @@ var sessionsSimulateCmd = &cobra.Command{
 			return err
 		}
 
-		moduleID := forms.Int(answers["module-id"])
+		moduleID := forms.Int(answers["module"])
 		mode := strings.ToLower(forms.String(answers["mode"]))
 		scenario := forms.String(answers["scenario"])
 		focus := forms.String(answers["focus"])
@@ -320,10 +307,10 @@ var sessionsSimulateCmd = &cobra.Command{
 
 func init() {
 	sessionsCmd.AddCommand(sessionsSimulateCmd)
-	sessionsSimulateCmd.Flags().StringP("module-id", "m", "", "Module ID")
+	sessionsSimulateCmd.Flags().StringP("module", "m", "", "Module Abbreviation")
 	sessionsSimulateCmd.Flags().String("mode", "", "Session mode: tutorial, practice, challenge")
 	sessionsSimulateCmd.Flags().String("scenario", "", "Module Scenario")
 	sessionsSimulateCmd.Flags().String("focus", "", "Area of focus")
 	sessionsSimulateCmd.Flags().String("specialization", "", "Fine grained specialization within focus")
-	sessionsSimulateCmd.Flags().BoolVarP(&useLegacyAPI, "legacy", "l", false, "Uses legacy Headset API")
+	sessionsSimulateCmd.Flags().BoolVar(&useLegacyAPI, "legacy", false, "Uses legacy Headset API")
 }

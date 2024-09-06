@@ -15,10 +15,10 @@ import (
 var _ = Describe("Multiplayer Resources", func() {
 
 	var (
-		ctx           context.Context
-		serverVersion = "1.03.02"
-		randVersion   string
-		localFilePath = "./test.zip"
+		ctx             context.Context
+		semanticVersion = "1.03.02"
+		randVersion     string
+		localFilePath   = "./test.zip"
 	)
 
 	BeforeEach(func() {
@@ -30,7 +30,7 @@ var _ = Describe("Multiplayer Resources", func() {
 		mpServerConfigs, err := tokenClient.GetMultiplayerServerConfigs(ctx, &platform.MultiplayerServerConfigParams{
 			ModuleID:      moduleID,
 			OrgID:         orgID,
-			ServerVersion: serverVersion,
+			ServerVersion: semanticVersion,
 		})
 		Expect(err).NotTo(HaveOccurred())
 		Expect(mpServerConfigs).NotTo(BeEmpty())
@@ -46,14 +46,14 @@ var _ = Describe("Multiplayer Resources", func() {
 	It("can get the multiplayer server versions with a config", func() {
 		mpServerVersions, err := tokenClient.GetMultiplayerServerVersionsWithConfig(ctx, &platform.MultiplayerServerVersionParams{
 			ModuleID:        moduleID,
-			SemanticVersion: serverVersion,
+			SemanticVersion: semanticVersion,
 		})
 		Expect(err).NotTo(HaveOccurred())
 		Expect(len(mpServerVersions)).To(BeNumerically(">", 0))
 		for _, mpServerVersion := range mpServerVersions {
 			Expect(mpServerVersion.ID).NotTo(BeZero())
 			Expect(mpServerVersion.ModuleID).To(Equal(moduleID))
-			Expect(mpServerVersion.SemanticVersion).To(Equal(serverVersion))
+			Expect(mpServerVersion.SemanticVersion).To(Equal(semanticVersion))
 			Expect(mpServerVersion.ImageRegistry).NotTo(BeEmpty())
 		}
 	})
@@ -69,29 +69,57 @@ var _ = Describe("Multiplayer Resources", func() {
 		}
 	})
 
-	It("can create and get a multiplayer server version", func() {
-		input := platform.MultiplayerServerVersion{
-			ModuleID:        moduleID,
-			SemanticVersion: randVersion,
-			ImageRegistry:   allocator.SimpleGameServerImage,
-			Engine:          "unreal",
-		}
+	Context("managing server versions", func() {
 
-		serverVersion, err := tokenClient.CreateMultiplayerServerVersion(ctx, input)
+		var (
+			serverVersion *platform.MultiplayerServerVersion
+			input         platform.MultiplayerServerVersion
+		)
 
-		Expect(err).NotTo(HaveOccurred())
-		Expect(serverVersion).NotTo(BeNil())
+		BeforeEach(func() {
+			input = platform.MultiplayerServerVersion{
+				ModuleID:        moduleID,
+				SemanticVersion: randVersion,
+				ImageRegistry:   allocator.SimpleGameServerImage,
+				Engine:          "unreal",
+			}
 
-		mpServerVersion, err := tokenClient.GetMultiplayerServerVersion(ctx, serverVersion.ID)
+			var err error
+			serverVersion, err = tokenClient.CreateMultiplayerServerVersion(ctx, input)
 
-		Expect(err).NotTo(HaveOccurred())
-		Expect(mpServerVersion).NotTo(BeNil())
-		Expect(mpServerVersion.ID).To(Equal(serverVersion.ID))
-		Expect(mpServerVersion.ModuleID).To(Equal(moduleID))
-		Expect(mpServerVersion.SemanticVersion).To(Equal(randVersion))
-		Expect(mpServerVersion.ImageRegistry).To(Equal(allocator.SimpleGameServerImage))
-		Expect(mpServerVersion.Engine).To(Equal(input.Engine))
-		Expect(mpServerVersion.Status).To(Equal("enabled"))
+			Expect(err).NotTo(HaveOccurred())
+			Expect(serverVersion).NotTo(BeNil())
+		})
+
+		It("can get a multiplayer server version by id", func() {
+			retrievedServerVersion, err := tokenClient.GetMultiplayerServerVersion(ctx, serverVersion.ID)
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(retrievedServerVersion).NotTo(BeNil())
+			Expect(retrievedServerVersion.ID).To(Equal(serverVersion.ID))
+			Expect(retrievedServerVersion.ModuleID).To(Equal(moduleID))
+			Expect(retrievedServerVersion.SemanticVersion).To(Equal(randVersion))
+			Expect(retrievedServerVersion.ImageRegistry).To(Equal(input.ImageRegistry))
+			Expect(retrievedServerVersion.Engine).To(Equal(input.Engine))
+			Expect(retrievedServerVersion.Status).To(Equal("enabled"))
+		})
+
+		It("can update a multiplayer server version", func() {
+			input.ImageRegistry = "gcr.io/pixo-bootstrap/multiplayer/gameservers/simple-server:latest"
+			input.Status = "disabled"
+
+			updatedServerVersion, err := tokenClient.UpdateMultiplayerServerVersion(ctx, input)
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(updatedServerVersion).NotTo(BeNil())
+			Expect(updatedServerVersion.ID).To(Equal(serverVersion.ID))
+			Expect(updatedServerVersion.ModuleID).To(Equal(moduleID))
+			Expect(updatedServerVersion.SemanticVersion).To(Equal(randVersion))
+			Expect(updatedServerVersion.ImageRegistry).To(Equal(input.ImageRegistry))
+			Expect(updatedServerVersion.Engine).To(Equal(input.Engine))
+			Expect(updatedServerVersion.Status).To(Equal(input.Status))
+		})
+
 	})
 
 	It("can upload a gameserver build", func() {

@@ -29,8 +29,8 @@ type Client interface {
 
 	GetRoles(ctx context.Context) ([]Role, error)
 
-	GetPlatforms(ctx context.Context) ([]*Platform, error)
-	GetControlTypes(ctx context.Context) ([]*ControlType, error)
+	GetPlatforms(ctx context.Context) ([]Platform, error)
+	GetControlTypes(ctx context.Context) ([]ControlType, error)
 
 	GetModules(ctx context.Context, params ...ModuleParams) ([]Module, error)
 	CreateModuleVersion(ctx context.Context, input ModuleVersion) (*ModuleVersion, error)
@@ -51,4 +51,5 @@ type Client interface {
 	GetMultiplayerServerVersionsWithConfig(ctx context.Context, params *MultiplayerServerVersionParams) ([]MultiplayerServerVersion, error)
 	GetMultiplayerServerVersion(ctx context.Context, id int) (*MultiplayerServerVersion, error)
 	CreateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error)
+	UpdateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error)
 }

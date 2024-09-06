@@ -49,25 +49,28 @@ with the platform, deploying gameserver versions, and simplifying the testing of
 - [Test Multiplayer Matchmaking](#test-multiplayer-matchmaking)
     - [Request a Match](#request-a-match)
     - [Connect to the Game Server](#connect-to-the-game-server)
-    - [Load Testing](#load-testing)
-
+- [Load Testing](#load-testing)
+  - [Sessions](#sessions)
+  - [Matchmaking](#matchmaking)
 
 ## Installation
-### MacOS - HomeBrew
+### Go - recommended
+```bash
+go install github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli@latest
+````
+
+### HomeBrew
 ```bash
 brew tap PixoVR/pixo-golang-clients
 brew install pixo-cli
 ```
 
-### Go
-```bash
-go install github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli@latest
-````
-
 ### Windows
 Unfortunately the Pixo CLI is not yet available on Windows via package manager.
 The CLI can be installed by downloading the latest release from the [releases page](https://github.com/PixoVR/pixo-golang-clients/releases)
 or building from source.
+
+### Download from [Releases page](https://github.com/PixoVR/pixo-golang-clients/releases)
 
 ### Build from Source
 ```bash
@@ -115,7 +118,7 @@ export PIXO_REGION=saudi
 ```bash
 pixo config set --region saudi
 pixo config set --lifecycle dev
-pixo config set --key module-id --val 1
+pixo config set --key module --val TST
 ```
 
 ### Show Configuration File
@@ -134,7 +137,7 @@ pixo config
 🪙  Token: ********
 
 
-➡️  Module ID: 1
+➡️  Module: TST
 ➡️  Server Version: 1.00.00
 ➡️  Gameserver: 127.0.0.1:7777
 ```
@@ -203,7 +206,7 @@ pixo users create \
 pixo keys create
 
 # Or for a specific user
-pixo keys create --user-id 1
+pixo keys create --username testuser
 ```
 ![Made with VHS](https://vhs.charm.sh/vhs-DBpsz1KVGCMzMHkEgF4Gg.gif)
 
@@ -213,7 +216,7 @@ pixo keys create --user-id 1
 pixo keys list
 
 # Or for a specific user
-pixo keys list --user-id 1
+pixo keys list --username testuser
 ```
 
 ### Delete
@@ -227,7 +230,7 @@ pixo keys delete --key-ids 1
 ### Create Module Version
 ```bash
 pixo modules deploy \
-    --module-id 1 \
+    --module TST \
     --server-version "1.00.00" \
     --package "com.pixovr.test" \
     --platforms "android" \
@@ -268,16 +271,13 @@ pixo sessions simulate --legacy
 ```
 
 ## Run Mock Servers
-### Platform - WIP
+### Platform
 Run a mock server that mimics the Pixo Platform API to test functionality locally.
 It has the following REST endpoints available. See the [Swagger API Docs](https://apex.pixovr.com/v2/swagger/index.html) for more details.
 
-#### GET
-- `/v2/assets`
-- `/v2/assets/download`
- 
-#### POST
-- `/v2/assets`
+- GET - `/v2/assets`
+- GET - `/v2/assets/download`
+- POST - `/v2/assets`
 
 ### Matchmaking 
 
@@ -294,8 +294,7 @@ pixo mp mockserver
 
 To customize the response, use the command line flags when starting the server
 ```bash
-pixo mp mockserver \
-    --gameserver-port 7654
+pixo mp mockserver --gameserver-port 7654
 ```
 
 Defaults to the following values:
@@ -320,7 +319,7 @@ pixo mp mockserver
 # In another terminal, request a match
 pixo config set --lifecycle local
 pixo mp matchmake \
-    --module-id 1 \
+    --module TST \
     --server-version 1.00.00 \
     --connect
 ```
@@ -330,14 +329,14 @@ pixo mp matchmake \
 # Check if version with matching semantic version already exists
 pixo mp servers deploy \
     --pre-check \
-    --module-id 1 \
+    --module TST \
     --server-version 1.00.00
 ```
 
 ```bash
 # Deploy a new version with image
 pixo mp servers deploy \
-    --module-id 1 \
+    --module TST \
     --server-version 1.00.00 \
     --image gcr.io/pixo-bootstrap/multiplayer/gameservers/simple-server:latest
 ```
@@ -345,9 +344,18 @@ pixo mp servers deploy \
 ```bash
 # Deploy a new version with zipfile
 pixo mp servers deploy \
-    --module-id 1 \
+    --module TST \
     --server-version 1.00.00 \
     --zip-file /path/to/zipfile
+```
+
+```bash
+# Update existing version
+pixo mp servers deploy \
+    --update \
+    --module TST \
+    --server-version 1.00.00 \
+    --image gcr.io/pixo-bootstrap/multiplayer/gameservers/simple-server:0.0.6
 ```
 
 
@@ -363,14 +371,14 @@ ServerMatchVersion=1.00.00
 #### Sample `cloudbuild.yaml`
 ```yaml
 steps:
-  - name: "gcr.io/pixo-bootstrap/pixo-platform-cli:0.1.28"
+  - name: "gcr.io/pixo-bootstrap/pixo-platform-cli:0.1.68"
     id: "Version Pre-Check"
     args:
       - mp
       - servers
       - deploy
-      - --module-id
-      - ${_MODULE_ID}
+      - --module
+      - ${_MODULE_ABBREVIATION}
       - --pre-check
     env:
       - "PIXO_REGION=${_PIXO_REGION}"
@@ -386,14 +394,14 @@ steps:
       - -t
       - gcr.io/${PROJECT_ID}/${_LIFECYCLE}/${_PROJECT_NAME}:${COMMIT_SHA}
 
-  - name: "gcr.io/pixo-bootstrap/pixo-platform-cli:0.1.28"
+  - name: "gcr.io/pixo-bootstrap/pixo-platform-cli:0.1.68"
     id: "Deploy MP Server Version"
     args:
       - mp
       - servers
       - deploy
-      - --module-id
-      - ${_MP_MODULE_ID}
+      - --moduled
+      - ${_MP_MODULE_ABBREVIATION}
       - --image
       - gcr.io/${PROJECT_ID}/${_LIFECYCLE}/${_PROJECT_NAME}:${COMMIT_SHA}
     env:
@@ -421,7 +429,7 @@ images:
 ```bash
 # Request a match
 pixo mp matchmake \
-    --module-id 1 \
+    --module TST \
     --server-version 1.00.00
 ```
 
@@ -429,7 +437,7 @@ pixo mp matchmake \
 ```bash
 # Request a match and connect to the game server
 pixo mp matchmake \
-    --module-id 1 \
+    --module TST \
     --server-version 1.00.00 \
     --connect
     
@@ -441,45 +449,100 @@ pixo mp --connect
 ```
 
 
-### Load Testing
-```
-pixo mp matchmake \
-    --module-id 1 \
-    --server-version 1.00.00 \
-    --load 5
+## Load Testing
+
+### Sessions
+```bash
+pixo cannon sessions \
+    --module TST \
+    --amount 5 \
+    --concurrent 2
     
-# Example output
-🚀  Starting load test with 5 connections to wss://apex.dev.pixovr.com/matchmaking...
+# Sample output
+🚀  Starting load test with 5 requests and 2 concurrent workers
 
-✅  Connection 5: established
-✅  Connection 4: established
-✅  Connection 2: established
-✅  Connection 3: established
-✅  Connection 1: established
-🏁  Connection 1: Match found - gameserver -> 34.1.2.3:7566
-🏁  Connection 2: Match found - gameserver -> 34.1.2.3:7566
-🏁  Connection 4: Match found - gameserver -> 34.1.2.3:7566
-🏁  Connection 5: Match found - gameserver -> 34.1.2.3:7756
-🏁  Connection 3: Match found - gameserver -> 34.1.2.3:7756
+✅  2: session started for module TST
+✅  1: session started for module TST
+✅  2: event created for session 1
+✅  1: event created for session 2
+✅  2: session completed for module TST
+✅  1: session completed for module TST
+✅  3: session started for module TST
+✅  3: event created for session 3
+✅  4: session started for module TST
+✅  4: event created for session 4
+✅  3: session completed for module TST
+✅  4: session completed for module TST
+✅  5: session started for module TST
+✅  5: event created for session 5
+✅  5: session completed for module TST
 
-Matchmaking Load Test Summary
-==============================
-Max Test Duration:       10m0s
-Actual Test Duration:    13.6s
-Connections:             5
-Total Messages Sent:     5
+Load Test Summary
+===========================
+Concurrent Workers:     2
+Amount Requested:       5
+Amount Completed:       5
+Max Test Duration:      2m0s
+Actual Test Duration:   4.25s
 
-Total Messages Received: 5
-Connection Errors:       0
-Matching Errors:         0
-Matches Received:        5
-Gameservers Received:    2
+┌───────────────┬────────────┐
+│ Stat          │ Value      │
+├───────────────┼────────────┤
+│ Avg Latency   │ 1.45s      │
+│ Max Latency   │ 1.65s      │
+│ Req / Sec     │ 1.18       │
+└───────────────┴────────────┘
 
-┌─────────────┬────────────┐
-│ Stat        │ Value      │
-├─────────────┼────────────┤
-│ Avg Latency │ 6.58 s     │
-│ Max Latency │ 13.52 s    │
-│ Msgs/Sec    │ 0.37       │
-└─────────────┴────────────┘
+Start Session Errors:           0
+Create Event Errors:            0
+Complete Session Errors:        0
+Unsuccessful Sessions:          0
+Sessions Started:               5
+Events Created:                 5
+Sessions Completed:             5
+```
+
+```bash
+pixo cannon matchmake \
+    --module TST \
+    --server-version 1.00.00 \
+    --amount 5 \
+    --concurrent 2
+    
+# Sample output
+
+🚀  Starting load test with 5 requests and 2 concurrent workers
+
+✅  2: Connection established
+✅  1: Connection established
+🏁  Match found - gameserver -> 34.1.2.3:7728
+🏁  Match found - gameserver -> 34.1.2.3:7728
+✅  3: Connection established
+✅  4: Connection established
+🏁  Match found - gameserver -> 34.1.2.3:7728
+🏁  Match found - gameserver -> 34.1.2.3:7728
+✅  5: Connection established
+🏁  Match found - gameserver -> 34.1.2.3:7728
+
+Load Test Summary
+===========================
+Concurrent Workers:     2
+Amount Requested:       5
+Amount Completed:       5
+Max Test Duration:      2m0s
+Actual Test Duration:   16.15s
+
+┌───────────────┬────────────┐
+│ Stat          │ Value      │
+├───────────────┼────────────┤
+│ Avg Latency   │ 6.06s      │
+│ Max Latency   │ 12.57s     │
+│ Req / Sec     │ 0.31       │
+└───────────────┴────────────┘
+
+Connection Errors:         0
+Successful Connections:    5
+Matching Errors:           0
+Matches Received:          5
+Gameservers Received:      1
 ```

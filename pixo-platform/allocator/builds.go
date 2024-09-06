@@ -4,15 +4,15 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"github.com/rs/zerolog/log"
+	log "github.com/rs/zerolog/log"
 	"net/http"
 	"strings"
 	"time"
 )
 
 type WorkflowsResponse struct {
-	Message   string
-	Workflows []Workflow
+	Message   string     `json:"message"`
+	Workflows []Workflow `json:"workflows"`
 }
 
 type Workflow struct {
@@ -35,14 +35,13 @@ func (a *Client) GetBuildWorkflows() ([]Workflow, error) {
 	}
 
 	if res.StatusCode() != http.StatusOK {
-		err = fmt.Errorf("received status code %d when getting build workflows", res.StatusCode())
-		log.Debug().Err(err).Msg("Failed to get build workflows")
-		return nil, err
+		log.Debug().Msgf("Received status code %d when getting build workflows: %s", res.StatusCode(), res.Body())
+		return nil, fmt.Errorf("received status code %d when getting build workflows", res.StatusCode())
 	}
 
 	var workflowsResponse WorkflowsResponse
 	if err = json.Unmarshal(res.Body(), &workflowsResponse); err != nil {
-		log.Debug().Err(err).Msg("Failed to unmarshal get build workflows response")
+		log.Debug().Err(err).Msg("Failed to unmarshal build workflows response")
 		return nil, err
 	}
 
