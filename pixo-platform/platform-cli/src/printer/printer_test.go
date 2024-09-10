@@ -40,7 +40,7 @@ var _ = Describe("Emoji Printer", func() {
 
 		msg = fmt.Sprintf(":rocket:hello %s", "world")
 		expectedMsg := "🚀 hello world"
-		printer.Printf(msg)
+		printer.Print(msg)
 		Expect(output.String()).To(Equal(expectedMsg))
 	})
 

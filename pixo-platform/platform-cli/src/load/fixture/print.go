@@ -92,10 +92,6 @@ func spacesBuffer(value string, size int) (spaces string) {
 	return spaces
 }
 
-func (t *Tester) printPipe() {
-	t.Println(t.pipe())
-}
-
 func (t *Tester) pipe() string {
 	return LineColor.Sprint("│")
 }
