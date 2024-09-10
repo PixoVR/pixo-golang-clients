@@ -27,14 +27,14 @@ func (m *MockClient) StartSession(ctx context.Context, request EventRequest) (*E
 	}
 
 	return &EventResponse{
-		Session: platform.Session{
-			ID: 1,
-		},
 		Event: platform.Event{
 			ID:        1,
 			SessionID: &[]int{1}[0],
-			Type:      request.Type,
-			Payload:   request.Payload,
+			Session: &platform.Session{
+				ID: 1,
+			},
+			Type:    request.Type,
+			Payload: request.Payload,
 		},
 	}, nil
 }
@@ -47,14 +47,14 @@ func (m *MockClient) SendEvent(ctx context.Context, request EventRequest) (*Even
 	}
 
 	return &EventResponse{
-		Session: platform.Session{
-			ID: 1,
-		},
 		Event: platform.Event{
 			ID:        1,
 			SessionID: &[]int{1}[0],
-			Type:      request.Type,
-			Payload:   request.Payload,
+			Session: &platform.Session{
+				ID: 1,
+			},
+			Type:    request.Type,
+			Payload: request.Payload,
 		},
 	}, nil
 }
@@ -67,14 +67,14 @@ func (m *MockClient) EndSession(ctx context.Context, request EventRequest) (*Eve
 	}
 
 	return &EventResponse{
-		Session: platform.Session{
-			ID: 1,
-		},
 		Event: platform.Event{
 			ID:        1,
 			SessionID: &[]int{1}[0],
-			Type:      request.Type,
-			Payload:   request.Payload,
+			Session: &platform.Session{
+				ID: 1,
+			},
+			Type:    request.Type,
+			Payload: request.Payload,
 		},
 	}, nil
 }

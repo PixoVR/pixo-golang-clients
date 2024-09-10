@@ -252,7 +252,7 @@ var sessionsSimulateCmd = &cobra.Command{
 			if err != nil {
 				return err
 			}
-			session = &res.Session
+			session = res.Event.Session
 			session.LessonStatus = lessonStatus
 			session.Duration = sessionDuration.String()
 			session.RawScore = float64(score)
