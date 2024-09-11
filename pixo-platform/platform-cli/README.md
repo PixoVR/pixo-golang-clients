@@ -503,6 +503,57 @@ Events Created:                 5
 Sessions Completed:             5
 ```
 
+### Legacy Sessions
+```bash
+pixo cannon sessions \
+    --legacy \
+    --module TST \
+    --amount 5 \
+    --concurrent 2
+    
+🚀  Starting load test with 5 requests and 2 concurrent workers
+
+✅  2: session started for module 1
+✅  1: session started for module 1
+✅  1: event created for session 1
+✅  2: event created for session 2
+✅  1: session completed for module 1
+✅  2: session completed for module 1
+✅  3: session started for module 43
+✅  3: event created for session 3
+✅  4: session started for module 1
+✅  4: event created for session 4
+✅  3: session completed for module 1
+✅  4: session completed for module 1
+✅  5: session started for module 1
+✅  5: event created for session 5
+✅  5: session completed for module 1
+
+Load Test Summary
+===========================
+Concurrent Workers:     2
+Amount Requested:       5
+Amount Completed:       5
+Max Test Duration:      2m0s
+Actual Test Duration:   6.75s
+
+┌───────────────┬────────────┐
+│ Stat          │ Value      │
+├───────────────┼────────────┤
+│ Avg Latency   │ 2.26s      │
+│ Max Latency   │ 2.79s      │
+│ Req / Sec     │ 0.74       │
+└───────────────┴────────────┘
+
+Start Session Errors:           0
+Create Event Errors:            0
+Complete Session Errors:        0
+Unsuccessful Sessions:          0
+Sessions Started:               5
+Events Created:                 5
+Sessions Completed:             5
+```
+
 ```bash
 pixo cannon matchmake \
     --module TST \

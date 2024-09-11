@@ -67,6 +67,13 @@ var _ = Describe("Sessions Load Testing", func() {
 
 		Expect(err).ToNot(HaveOccurred())
 		Expect(output).To(ContainSubstring("create session error"))
+		Expect(output).To(ContainLineWithItems("Start Session Errors:", "20"))
+		Expect(output).To(ContainLineWithItems("Create Event Errors:", "0"))
+		Expect(output).To(ContainLineWithItems("Complete Session Errors:", "0"))
+		Expect(output).To(ContainLineWithItems("Unsuccessful Sessions:", "20"))
+		Expect(output).To(ContainLineWithItems("Sessions Started:", "0"))
+		Expect(output).To(ContainLineWithItems("Events Created:", "0"))
+		Expect(output).To(ContainLineWithItems("Sessions Completed:", "0"))
 		Expect(executor.MockPlatformClient.NumCalledCreateSession).To(Equal(amount), "incorrect number of create session calls")
 		Expect(executor.MockPlatformClient.NumCalledCreateEvent).To(Equal(0), "incorrect number of create event calls")
 		Expect(executor.MockPlatformClient.NumCalledUpdateSession).To(Equal(0), "incorrect number of update session calls")
@@ -101,6 +108,38 @@ var _ = Describe("Sessions Load Testing", func() {
 		Expect(executor.MockPlatformClient.NumCalledCreateSession).To(Equal(amount), "incorrect number of create session calls")
 		Expect(executor.MockPlatformClient.NumCalledCreateEvent).To(Equal(amount), "incorrect number of create event calls")
 		Expect(executor.MockPlatformClient.NumCalledUpdateSession).To(Equal(amount), "incorrect number of update session calls")
+	})
+
+	It("can load test sessions using the legacy headset api", func() {
+		amount := 20
+		concurrent := 5
+		timeout := 1
+
+		output := executor.RunCommandAndExpectSuccess(
+			"cannon",
+			"sessions",
+			"--legacy",
+			"--module",
+			"TST",
+			"--amount",
+			fmt.Sprint(amount),
+			"--concurrent",
+			fmt.Sprint(concurrent),
+			"--timeout",
+			fmt.Sprint(timeout),
+		)
+
+		Expect(output).To(ContainSubstring(fmt.Sprintf("Starting load test with %d requests and %d concurrent workers", amount, concurrent)))
+		Expect(output).To(ContainLineWithItems("Start Session Errors:", "0"))
+		Expect(output).To(ContainLineWithItems("Create Event Errors:", "0"))
+		Expect(output).To(ContainLineWithItems("Complete Session Errors:", "0"))
+		Expect(output).To(ContainLineWithItems("Unsuccessful Sessions:", "0"))
+		Expect(output).To(ContainLineWithItems("Sessions Started:", "20"))
+		Expect(output).To(ContainLineWithItems("Events Created:", "20"))
+		Expect(output).To(ContainLineWithItems("Sessions Completed:", "20"))
+		Expect(executor.MockHeadsetClient.NumCalledStartSession).To(Equal(amount), "incorrect number of create session calls")
+		Expect(executor.MockHeadsetClient.NumCalledSendEvent).To(Equal(amount), "incorrect number of create event calls")
+		Expect(executor.MockHeadsetClient.NumCalledEndSession).To(Equal(amount), "incorrect number of update session calls")
 	})
 
 })

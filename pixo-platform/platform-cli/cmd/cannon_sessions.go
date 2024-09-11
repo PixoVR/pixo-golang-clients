@@ -12,6 +12,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var legacy bool
+
 // cannonSessionsCmd represents the sessions start command
 var cannonSessionsCmd = &cobra.Command{
 	Use:   "sessions",
@@ -37,6 +39,7 @@ var cannonSessionsCmd = &cobra.Command{
 				Command:         cmd,
 				Writer:          cmd.OutOrStdout(),
 			},
+			Legacy: legacy,
 			Module: platform.Module{ID: moduleID},
 		}
 
@@ -52,4 +55,5 @@ var cannonSessionsCmd = &cobra.Command{
 
 func init() {
 	cannonCmd.AddCommand(cannonSessionsCmd)
+	cannonSessionsCmd.Flags().BoolVar(&legacy, "legacy", false, "Use the legacy headset API for load testing")
 }
