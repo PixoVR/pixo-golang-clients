@@ -368,10 +368,10 @@ pixo mp servers deploy \
 ServerMatchVersion=1.00.00
 ```
 
-#### Sample `cloudbuild.yaml`
+#### Sample `cloudbuild.yaml` - replace `latest` with the version you want to use
 ```yaml
 steps:
-  - name: "gcr.io/pixo-bootstrap/pixo-platform-cli:0.1.68"
+  - name: "gcr.io/pixo-bootstrap/pixo-platform-cli:latest"
     id: "Version Pre-Check"
     args:
       - mp
@@ -394,14 +394,14 @@ steps:
       - -t
       - gcr.io/${PROJECT_ID}/${_LIFECYCLE}/${_PROJECT_NAME}:${COMMIT_SHA}
 
-  - name: "gcr.io/pixo-bootstrap/pixo-platform-cli:0.1.68"
+  - name: "gcr.io/pixo-bootstrap/pixo-platform-cli:latest"
     id: "Deploy MP Server Version"
     args:
       - mp
       - servers
       - deploy
-      - --moduled
-      - ${_MP_MODULE_ABBREVIATION}
+      - --module
+      - ${_MODULE_ABBREVIATION}
       - --image
       - gcr.io/${PROJECT_ID}/${_LIFECYCLE}/${_PROJECT_NAME}:${COMMIT_SHA}
     env:
@@ -415,6 +415,7 @@ availableSecrets:
       env: PIXO_API_KEY
       
 images:
+  - gcr.io/${PROJECT_ID}/${_LIFECYCLE}/${_PROJECT_NAME}:latest
   - gcr.io/${PROJECT_ID}/${_LIFECYCLE}/${_PROJECT_NAME}:${COMMIT_SHA}
 
 
