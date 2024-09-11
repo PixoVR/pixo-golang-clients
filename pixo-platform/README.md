@@ -15,8 +15,7 @@ A collection of Golang clients to interact with the Pixo Platform.
 
 ### Platform Client
 
-The Platform Client is a Golang client that interacts with the Pixo Platform API.
-It provides a simple interface to interact with the Pixo Platform API.
+The Platform Client simplifies interactions with the [Pixo Platform API](https://apex.pixovr.com/v2/swagger/index.html)
 
 ```go
 package main
@@ -58,7 +57,8 @@ func main() {
 
 ### Legacy Headset Client
 
-The Legacy Headset Client is a Golang client that interacts with the Legacy Headset API
+The Legacy Headset Client simplifies interactions with the [Legacy Headset API](https://modules.apex.pixovr.com/ping)
+to manage sessions. This client is deprecated and will be removed in the future. Use the Platform Client instead.
 
 ```go
 package main
@@ -100,7 +100,7 @@ func main() {
 
 ### Matchmaking Client
 
-The Matchmaking Client is a Golang client that interacts with the Matchmaking Service to
+The Matchmaking Client simplifies interactions with the [Matchmaker Service](https://apex.pixovr.com/matchmaking/swagger/index.html) to
 find and interact with a gameserver
 
 ```go
@@ -145,7 +145,7 @@ func main() {
 
 ### Allocator Client
 
-The Allocator Client is a Golang client that interacts with the Allocator Service to
+The Allocator Client is a Golang client that interacts with the [Allocator Service](https://multi-central1.multiplayer.pixovr.com/allocator/swagger/index.html) to
 allocate gameservers and interact with them
 
 ```go
@@ -192,7 +192,7 @@ func main() {
 ### Heartbeat Client
 
 The Heartbeat Client is a Golang client that simplifies sending pulses to the 
-Heartbeat Service to keep the session alive
+[Heartbeat Service](https://apex.pixovr.com/heartbeat/swagger/index.html) to keep the session alive
 
 ```go
 package main
