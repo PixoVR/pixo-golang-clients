@@ -30,40 +30,47 @@ var loginCmd = &cobra.Command{
 				return errors.New("invalid API key")
 			}
 
-			Ctx.ConfigManager.UnsetConfigValue("auth-token")
-			Ctx.ConfigManager.UnsetConfigValue("auth-username")
-			Ctx.ConfigManager.UnsetConfigValue("auth-password")
 			Ctx.ConfigManager.SetConfigValue("api-key", apiKey)
 			Ctx.Printer.Println(":rocket: Login with API key successful.")
 			return nil
 		}
 
-		Ctx.ConfigManager.UnsetConfigValue("api-key")
-		Ctx.ConfigManager.UnsetConfigValue("auth-username")
-		Ctx.ConfigManager.UnsetConfigValue("auth-password")
+		username, _ := Ctx.ConfigManager.GetConfigValue("auth-username")
+		password, _ := Ctx.ConfigManager.GetConfigValue("auth-password")
+		if username == "" || password == "" {
 
-		questions := []config.Value{
-			{Question: forms.Question{
-				Type: forms.Input,
-				Key:  "username",
-			}},
-			{Question: forms.Question{
-				Type: forms.SensitiveInput,
-				Key:  "password",
-			}},
+			var questions []config.Value
+
+			if username == "" {
+				questions = append(questions, config.Value{
+					Question: forms.Question{
+						Type: forms.Input,
+						Key:  "username",
+					},
+				})
+			}
+
+			if password == "" {
+				questions = append(questions, config.Value{
+					Question: forms.Question{
+						Type: forms.SensitiveInput,
+						Key:  "password",
+					},
+				})
+			}
+
+			answers, err := Ctx.ConfigManager.GetValuesOrSubmitForm(questions, cmd)
+			if err != nil {
+				Ctx.Printer.Println(":exclamation: Login failed")
+				return err
+			}
+
+			username = forms.String(answers["username"])
+			Ctx.ConfigManager.SetConfigValue("auth-username", username)
+
+			password := forms.String(answers["password"])
+			Ctx.ConfigManager.SetConfigValue("auth-password", password)
 		}
-
-		answers, err := Ctx.ConfigManager.GetValuesOrSubmitForm(questions, cmd)
-		if err != nil {
-			Ctx.Printer.Println(":exclamation: Login failed")
-			return err
-		}
-
-		username := forms.String(answers["username"])
-		Ctx.ConfigManager.SetConfigValue("auth-username", username)
-
-		password := forms.String(answers["password"])
-		Ctx.ConfigManager.SetConfigValue("auth-password", password)
 
 		spinner := loader.NewLoader(cmd.Context(), "Logging into the Pixo Platform...", Ctx.Printer)
 		defer spinner.Stop()

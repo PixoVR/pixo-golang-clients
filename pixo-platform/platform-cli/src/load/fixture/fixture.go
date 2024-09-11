@@ -2,7 +2,10 @@ package fixture
 
 import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/ctx"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/printer"
 	"github.com/spf13/cobra"
+	"io"
+	"os"
 	"sync"
 	"time"
 )
@@ -11,6 +14,7 @@ import (
 type Config struct {
 	Command         *cobra.Command
 	PlatformFixture *ctx.Context
+	Writer          io.Writer
 	Amount          int
 	Concurrent      int
 	MaxDuration     time.Duration
@@ -18,6 +22,7 @@ type Config struct {
 
 // Tester configures and runs WebSocket load tests.
 type Tester struct {
+	printer.Printer
 	Config       Config
 	NumLatencies int
 	NumDone      int
@@ -38,6 +43,11 @@ func NewLoadTester(config Config) *Tester {
 		wg:       sync.WaitGroup{},
 		messages: make(map[string][]string),
 	}
+
+	if t.Config.Writer == nil {
+		t.Config.Writer = os.Stdout
+	}
+	t.Printer = printer.NewEmojiPrinter(t.Config.Writer)
 
 	if t.Config.Amount <= 0 {
 		amount, ok := t.Config.PlatformFixture.ConfigManager.GetIntFlagOrConfigValue("amount", t.Config.Command)

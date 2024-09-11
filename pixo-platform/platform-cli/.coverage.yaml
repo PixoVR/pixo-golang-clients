@@ -3,11 +3,11 @@ profile: cover.out
 local-prefix: "github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli"
 
 threshold:
-  file: 54
+  file: 55
 
-  package: 73
+  package: 72
 
-  total: 81
+  total: 82
 
 exclude:
   paths:

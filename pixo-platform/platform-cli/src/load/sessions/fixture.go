@@ -12,7 +12,7 @@ type Config struct {
 	Module platform.Module
 }
 
-// Tester configures and runs WebSocket load tests.
+// Tester configures and runs sessions load tests.
 type Tester struct {
 	*fixture.Tester
 	config Config
@@ -22,10 +22,6 @@ type Tester struct {
 func NewLoadTester(config Config) (*Tester, error) {
 	if config.PlatformFixture == nil || config.PlatformFixture.PlatformClient == nil {
 		return nil, errors.New("platform client is required")
-	}
-
-	if config.Command == nil {
-		return nil, errors.New("command is required")
 	}
 
 	return &Tester{

@@ -47,7 +47,7 @@ type TestExecutor struct {
 func NewTestExecutor() *TestExecutor {
 	formHandler := basic.NewFormHandler(nil, nil)
 	inMemoryConfigManager := config.NewInMemoryConfigManager()
-	emojiPrinter := printer.NewEmojiPrinter(nil)
+	emojiPrinter := printer.NewEmojiPrinter(os.Stdout)
 	configManager := config.NewConfigManager(inMemoryConfigManager, emojiPrinter, formHandler)
 
 	mockPlatformClient := &platform.MockClient{}

@@ -32,7 +32,11 @@ var cannonSessionsCmd = &cobra.Command{
 		moduleID := forms.Int(answers["module"])
 
 		config := sessions.Config{
-			Config: fixture.Config{PlatformFixture: Ctx, Command: cmd},
+			Config: fixture.Config{
+				PlatformFixture: Ctx,
+				Command:         cmd,
+				Writer:          cmd.OutOrStdout(),
+			},
 			Module: platform.Module{ID: moduleID},
 		}
 

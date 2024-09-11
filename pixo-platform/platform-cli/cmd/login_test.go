@@ -55,6 +55,22 @@ var _ = Describe("Login", func() {
 		Expect(output).NotTo(ContainSubstring("api-key"))
 	})
 
+	It("uses the existing username and password if set", func() {
+		executor.ConfigManager.SetConfigValue("auth-username", "testuser3")
+		executor.ConfigManager.SetConfigValue("auth-password", "fakepassword")
+
+		output, err := executor.RunCommand(
+			"auth",
+			"login",
+		)
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(output).To(ContainSubstring("Login successful. Here is your API token:"))
+		userID, ok := executor.ConfigManager.GetConfigValue("auth-user-id")
+		Expect(ok).To(BeTrue())
+		Expect(userID).To(Equal(fmt.Sprint(executor.MockPlatformClient.ActiveUserID())))
+	})
+
 	It("can return an error if unable to use the api key", func() {
 		executor.MockPlatformClient.GetControlTypesError = fmt.Errorf("get roles error")
 

@@ -99,15 +99,3 @@ func (t *Tester) pipe() string {
 func (t *Tester) PrintTableFooter() {
 	t.Println(LineColor.Sprint("└───────────────┴────────────┘"))
 }
-
-func (t *Tester) Printf(format string, msgs ...interface{}) {
-	t.Config.PlatformFixture.Printf(format, msgs...)
-}
-
-func (t *Tester) Println(msgs ...interface{}) {
-	t.Config.PlatformFixture.Println(msgs...)
-}
-
-func (t *Tester) Print(msgs ...interface{}) {
-	t.Config.PlatformFixture.Print(msgs)
-}

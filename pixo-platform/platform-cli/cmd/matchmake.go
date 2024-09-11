@@ -39,7 +39,6 @@ var matchmakeCmd = &cobra.Command{
 		Ctx.Printer.Printf(":magnifying_glass_tilted_left:Attempting to find a match for module %d with server version %s...\n", matchRequest.ModuleID, matchRequest.ServerVersion)
 
 		spinner := loader.NewLoader(cmd.Context(), "", Ctx.Printer)
-
 		addr, err := Ctx.MatchmakingClient.FindMatch(matchRequest)
 		spinner.Stop()
 		if err != nil {
@@ -52,7 +51,6 @@ var matchmakeCmd = &cobra.Command{
 		if connect {
 			gameserverReadLoop(addr)
 		}
-
 		return nil
 	},
 }

@@ -2,6 +2,7 @@ package cmd_test
 
 import (
 	"bytes"
+	"errors"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -65,10 +66,9 @@ var _ = Describe("Matchmake", func() {
 	})
 
 	It("can return an error if the matchmaking request fails", func() {
-		reader := bytes.NewBufferString("exit\n")
+		executor.MockMatchmakingClient.FindMatchError = errors.New("matchmaking error")
 
-		output := executor.RunCommandWithInputAndExpectSuccess(
-			reader,
+		output, err := executor.RunCommand(
 			"mp",
 			"matchmake",
 			"--module",
@@ -78,9 +78,32 @@ var _ = Describe("Matchmake", func() {
 		)
 
 		Expect(output).To(ContainSubstring("Attempting to find a match"))
+		Expect(err).To(MatchError("matchmaking error"))
 		Expect(executor.MockMatchmakingClient.NumCalledFindMatch).To(Equal(1))
 		Expect(executor.MockMatchmakingClient.NumCalledDialGameserver).To(Equal(0))
 		Expect(executor.MockMatchmakingClient.NumCalledCloseGameserver).To(Equal(0))
+	})
+
+	It("can connect to the gameserver connection and exit", func() {
+		reader := bytes.NewBufferString("ACK\nexit\n")
+
+		output := executor.RunCommandWithInputAndExpectSuccess(
+			reader,
+			"mp",
+			"matchmake",
+			"--module",
+			"TST",
+			"--server-version",
+			"1.00.00",
+			"--connect",
+		)
+
+		Expect(output).To(ContainSubstring("Attempting to find a match"))
+		Expect(executor.MockMatchmakingClient.NumCalledFindMatch).To(Equal(1))
+		Expect(executor.MockMatchmakingClient.NumCalledDialGameserver).To(Equal(1))
+		Expect(executor.MockMatchmakingClient.NumCalledSendToGameserver).To(Equal(1))
+		Expect(executor.MockMatchmakingClient.NumCalledReadFromGameserver).To(Equal(1))
+		Expect(executor.MockMatchmakingClient.NumCalledCloseGameserver).To(Equal(1))
 	})
 
 	It("can perform a single matchmaking request and connect in a subsequent command", func() {

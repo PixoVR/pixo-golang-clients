@@ -46,6 +46,32 @@ var _ = Describe("Sessions Load Testing", func() {
 		Expect(err).To(MatchError("cannot run load tests against production"))
 	})
 
+	It("can display errors", func() {
+		amount := 20
+		concurrent := 5
+		timeout := 1
+		executor.MockPlatformClient.CreateSessionError = fmt.Errorf("create session error")
+
+		output, err := executor.RunCommand(
+			"cannon",
+			"sessions",
+			"--module",
+			"TST",
+			"--amount",
+			fmt.Sprint(amount),
+			"--concurrent",
+			fmt.Sprint(concurrent),
+			"--timeout",
+			fmt.Sprint(timeout),
+		)
+
+		Expect(err).ToNot(HaveOccurred())
+		Expect(output).To(ContainSubstring("create session error"))
+		Expect(executor.MockPlatformClient.NumCalledCreateSession).To(Equal(amount), "incorrect number of create session calls")
+		Expect(executor.MockPlatformClient.NumCalledCreateEvent).To(Equal(0), "incorrect number of create event calls")
+		Expect(executor.MockPlatformClient.NumCalledUpdateSession).To(Equal(0), "incorrect number of update session calls")
+	})
+
 	It("can load test sessions", func() {
 		amount := 20
 		concurrent := 5

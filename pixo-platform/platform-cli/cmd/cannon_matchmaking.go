@@ -30,7 +30,11 @@ var cannonMatchmakingCmd = &cobra.Command{
 		semVer := forms.String(answers["server-version"])
 
 		config := matchmaking.Config{
-			Config: fixture.Config{PlatformFixture: Ctx, Command: cmd},
+			Config: fixture.Config{
+				PlatformFixture: Ctx,
+				Command:         cmd,
+				Writer:          cmd.OutOrStdout(),
+			},
 			Request: matchmaker.MatchRequest{
 				ModuleID:      moduleID,
 				ServerVersion: semVer,
