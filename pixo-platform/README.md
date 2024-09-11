@@ -91,7 +91,7 @@ func main() {
     // Start session
     response, err := client.StartSession(context.Background(), headset.EventRequest{ModuleID: 1})
     if err != nil {
-        fmt.Println(err) // error getting headset info
+        fmt.Println(err) // error starting session
     }
 
     fmt.Println(response) // start session event response
