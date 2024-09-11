@@ -6,7 +6,6 @@ import (
 	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
 	commonerrors "github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/commonerrors"
 	"github.com/go-faker/faker/v4"
-	"sync"
 	"time"
 )
 
@@ -14,7 +13,6 @@ var _ Client = (*MockClient)(nil)
 
 type MockClient struct {
 	abstract.MockAbstractClient
-	lock sync.Mutex
 
 	NumCalledGetUser int
 	GetUserResponse  *User
@@ -225,8 +223,8 @@ func (m *MockClient) ActiveOrgID() int {
 }
 
 func (m *MockClient) GetUser(ctx context.Context, id int) (*User, error) {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledGetUser++
 
@@ -254,8 +252,8 @@ func (m *MockClient) GetUser(ctx context.Context, id int) (*User, error) {
 }
 
 func (m *MockClient) GetUserByUsername(ctx context.Context, username string) (*User, error) {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledGetUserByUsername++
 
@@ -279,8 +277,8 @@ func (m *MockClient) GetUserByUsername(ctx context.Context, username string) (*U
 }
 
 func (m *MockClient) CreateUser(ctx context.Context, user *User) error {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledCreateUser++
 
@@ -312,8 +310,8 @@ func (m *MockClient) CreateUser(ctx context.Context, user *User) error {
 }
 
 func (m *MockClient) UpdateUser(ctx context.Context, user *User) error {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledUpdateUser++
 
@@ -342,8 +340,8 @@ func (m *MockClient) UpdateUser(ctx context.Context, user *User) error {
 }
 
 func (m *MockClient) DeleteUser(ctx context.Context, id int) error {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledDeleteUser++
 
@@ -359,8 +357,8 @@ func (m *MockClient) DeleteUser(ctx context.Context, id int) error {
 }
 
 func (m *MockClient) GetModules(ctx context.Context, params ...ModuleParams) ([]Module, error) {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledGetModules++
 
@@ -385,8 +383,8 @@ func (m *MockClient) GetModules(ctx context.Context, params ...ModuleParams) ([]
 }
 
 func (m *MockClient) GetRoles(ctx context.Context) ([]Role, error) {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledGetRoles++
 
@@ -407,8 +405,8 @@ func (m *MockClient) GetRoles(ctx context.Context) ([]Role, error) {
 }
 
 func (m *MockClient) GetOrgs(ctx context.Context, params ...*OrgParams) ([]Org, error) {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledGetOrgs++
 
@@ -435,8 +433,8 @@ func (m *MockClient) GetOrgs(ctx context.Context, params ...*OrgParams) ([]Org, 
 }
 
 func (m *MockClient) GetOrg(ctx context.Context, id int) (*Org, error) {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledGetOrg++
 
@@ -455,8 +453,8 @@ func (m *MockClient) GetOrg(ctx context.Context, id int) (*Org, error) {
 }
 
 func (m *MockClient) CreateOrg(ctx context.Context, org Org) (*Org, error) {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledCreateOrg++
 
@@ -475,8 +473,8 @@ func (m *MockClient) CreateOrg(ctx context.Context, org Org) (*Org, error) {
 }
 
 func (m *MockClient) UpdateOrg(ctx context.Context, org Org) (*Org, error) {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledUpdateOrg++
 
@@ -493,8 +491,8 @@ func (m *MockClient) UpdateOrg(ctx context.Context, org Org) (*Org, error) {
 }
 
 func (m *MockClient) DeleteOrg(ctx context.Context, id int) error {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledDeleteOrg++
 
@@ -510,8 +508,8 @@ func (m *MockClient) DeleteOrg(ctx context.Context, id int) error {
 }
 
 func (m *MockClient) CreateAPIKey(ctx context.Context, input APIKey) (*APIKey, error) {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledCreateAPIKey++
 
@@ -528,8 +526,8 @@ func (m *MockClient) CreateAPIKey(ctx context.Context, input APIKey) (*APIKey, e
 }
 
 func (m *MockClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) ([]APIKey, error) {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledGetAPIKeys++
 
@@ -575,8 +573,8 @@ func (m *MockClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) 
 }
 
 func (m *MockClient) DeleteAPIKey(ctx context.Context, id int) error {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledDeleteAPIKey++
 
@@ -592,8 +590,8 @@ func (m *MockClient) DeleteAPIKey(ctx context.Context, id int) error {
 }
 
 func (m *MockClient) GetWebhooks(ctx context.Context, params *WebhookParams) ([]Webhook, error) {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledGetWebhooks++
 
@@ -620,8 +618,8 @@ func (m *MockClient) GetWebhooks(ctx context.Context, params *WebhookParams) ([]
 }
 
 func (m *MockClient) GetWebhook(ctx context.Context, id int) (*Webhook, error) {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledGetWebhook++
 
@@ -642,8 +640,8 @@ func (m *MockClient) GetWebhook(ctx context.Context, id int) (*Webhook, error) {
 }
 
 func (m *MockClient) CreateWebhook(ctx context.Context, input Webhook) (*Webhook, error) {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledCreateWebhook++
 
@@ -668,8 +666,8 @@ func (m *MockClient) CreateWebhook(ctx context.Context, input Webhook) (*Webhook
 }
 
 func (m *MockClient) UpdateWebhook(ctx context.Context, input Webhook) (*Webhook, error) {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledUpdateWebhook++
 
@@ -697,8 +695,8 @@ func (m *MockClient) UpdateWebhook(ctx context.Context, input Webhook) (*Webhook
 }
 
 func (m *MockClient) DeleteWebhook(ctx context.Context, id int) error {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledDeleteWebhook++
 
@@ -714,8 +712,8 @@ func (m *MockClient) DeleteWebhook(ctx context.Context, id int) error {
 }
 
 func (m *MockClient) GetSession(ctx context.Context, id int) (*Session, error) {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledGetSession++
 
@@ -737,8 +735,8 @@ func (m *MockClient) GetSession(ctx context.Context, id int) (*Session, error) {
 }
 
 func (m *MockClient) CreateSession(ctx context.Context, session *Session) error {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledCreateSession++
 
@@ -769,8 +767,8 @@ func (m *MockClient) CreateSession(ctx context.Context, session *Session) error 
 }
 
 func (m *MockClient) UpdateSession(ctx context.Context, session Session) (*Session, error) {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledUpdateSession++
 
@@ -792,8 +790,8 @@ func (m *MockClient) UpdateSession(ctx context.Context, session Session) (*Sessi
 }
 
 func (m *MockClient) CreateEvent(ctx context.Context, event *Event) error {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledCreateEvent++
 
@@ -812,8 +810,8 @@ func (m *MockClient) CreateEvent(ctx context.Context, event *Event) error {
 }
 
 func (m *MockClient) GetPlatforms(ctx context.Context) ([]Platform, error) {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledGetPlatforms++
 
@@ -828,8 +826,8 @@ func (m *MockClient) GetPlatforms(ctx context.Context) ([]Platform, error) {
 }
 
 func (m *MockClient) GetControlTypes(ctx context.Context) ([]ControlType, error) {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledGetControlTypes++
 
@@ -844,8 +842,8 @@ func (m *MockClient) GetControlTypes(ctx context.Context) ([]ControlType, error)
 }
 
 func (m *MockClient) CreateModuleVersion(ctx context.Context, input ModuleVersion) (*ModuleVersion, error) {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledCreateModuleVersion++
 
@@ -873,8 +871,8 @@ func (m *MockClient) CreateModuleVersion(ctx context.Context, input ModuleVersio
 }
 
 func (m *MockClient) GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]MultiplayerServerConfigQueryParams, error) {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledGetMultiplayerServerConfigs++
 
@@ -912,8 +910,8 @@ func (m *MockClient) GetMultiplayerServerConfigs(ctx context.Context, params *Mu
 }
 
 func (m *MockClient) GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionParams) ([]MultiplayerServerVersion, error) {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledGetMultiplayerServerVersions++
 
@@ -941,8 +939,8 @@ func (m *MockClient) GetMultiplayerServerVersions(ctx context.Context, params *M
 }
 
 func (m *MockClient) GetMultiplayerServerVersionsWithConfig(ctx context.Context, params *MultiplayerServerVersionParams) ([]MultiplayerServerVersion, error) {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledGetMultiplayerServerVersionsWithConfig++
 
@@ -965,8 +963,8 @@ func (m *MockClient) GetMultiplayerServerVersionsWithConfig(ctx context.Context,
 }
 
 func (m *MockClient) GetMultiplayerServerVersion(ctx context.Context, versionID int) (*MultiplayerServerVersion, error) {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledGetMultiplayerServerVersion++
 
@@ -988,8 +986,8 @@ func (m *MockClient) GetMultiplayerServerVersion(ctx context.Context, versionID 
 }
 
 func (m *MockClient) CreateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error) {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledCreateMultiplayerServerVersion++
 
@@ -1019,8 +1017,8 @@ func (m *MockClient) CreateMultiplayerServerVersion(ctx context.Context, input M
 }
 
 func (m *MockClient) UpdateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error) {
-	m.lock.Lock()
-	defer m.lock.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledUpdateMultiplayerServerVersion++
 

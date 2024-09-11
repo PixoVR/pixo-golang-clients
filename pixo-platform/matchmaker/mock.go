@@ -8,13 +8,11 @@ import (
 	"github.com/gorilla/websocket"
 	"net"
 	"net/http"
-	"sync"
 )
 
 // MockMatchmaker is a mock implementation of the Matchmaker interface.
 type MockMatchmaker struct {
 	abstract_client.MockAbstractClient
-	*sync.Mutex
 
 	NumCalledFindMatch int
 	FindMatchError     error
@@ -47,7 +45,6 @@ func NewMockMatchmaker() *MockMatchmaker {
 	mockResponseBytes, _ := json.Marshal(mockResponse)
 
 	return &MockMatchmaker{
-		Mutex: &sync.Mutex{},
 		MockAbstractClient: abstract_client.MockAbstractClient{
 			Response: mockResponseBytes,
 		},
@@ -56,8 +53,8 @@ func NewMockMatchmaker() *MockMatchmaker {
 
 // Reset resets the mock's internal state.
 func (m *MockMatchmaker) Reset() {
-	m.Lock()
-	defer m.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledFindMatch = 0
 	m.FindMatchError = nil
@@ -79,8 +76,8 @@ func (m *MockMatchmaker) Reset() {
 
 // FindMatch is a mock implementation of the Matchmaker interface.
 func (m *MockMatchmaker) FindMatch(request MatchRequest) (*net.UDPAddr, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledFindMatch++
 
@@ -96,15 +93,16 @@ func (m *MockMatchmaker) FindMatch(request MatchRequest) (*net.UDPAddr, error) {
 
 // DialMatchmaker calls the DialWebsocket method on the MockAbstractClient.
 func (m *MockMatchmaker) DialMatchmaker() (*websocket.Conn, *http.Response, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
 	return m.DialWebsocket("")
 }
 
 // SendRequest calls the WriteToWebsocket method on the MockAbstractClient with the given request.
 func (m *MockMatchmaker) SendRequest(conn *websocket.Conn, req MatchRequest) error {
-	m.Lock()
-	defer m.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	reqBytes, _ := json.Marshal(req)
 	return m.WriteToWebsocket(reqBytes)
@@ -112,8 +110,8 @@ func (m *MockMatchmaker) SendRequest(conn *websocket.Conn, req MatchRequest) err
 
 // ReadResponse calls the ReadFromWebsocket method on the MockAbstractClient and returns a mock response.
 func (m *MockMatchmaker) ReadResponse(conn *websocket.Conn) (MatchResponse, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	_, _, err := m.ReadFromWebsocket()
 	if err != nil {
@@ -131,15 +129,15 @@ func (m *MockMatchmaker) ReadResponse(conn *websocket.Conn) (MatchResponse, erro
 
 // CloseMatchmakerConnection calls the CloseWebsocketConnection method on the MockAbstractClient.
 func (m *MockMatchmaker) CloseMatchmakerConnection(conn *websocket.Conn) error {
-	m.Lock()
-	defer m.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 	return m.CloseWebsocketConnection()
 }
 
 // DialGameserver calls the DialGameserver method on the MockAbstractClient.
 func (m *MockMatchmaker) DialGameserver(addr *net.UDPAddr) error {
-	m.Lock()
-	defer m.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledDialGameserver++
 
@@ -152,8 +150,8 @@ func (m *MockMatchmaker) DialGameserver(addr *net.UDPAddr) error {
 
 // CloseGameserverConnection returns an error if CloseGameserverError is set.
 func (m *MockMatchmaker) CloseGameserverConnection() error {
-	m.Lock()
-	defer m.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledCloseGameserver++
 
@@ -166,8 +164,8 @@ func (m *MockMatchmaker) CloseGameserverConnection() error {
 
 // SendMessageToGameserver returns an error if SendToGameserverError is set.
 func (m *MockMatchmaker) SendMessageToGameserver(message []byte) error {
-	m.Lock()
-	defer m.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledSendToGameserver++
 
@@ -180,8 +178,8 @@ func (m *MockMatchmaker) SendMessageToGameserver(message []byte) error {
 
 // ReadMessageFromGameserver returns an error if ReadFromGameserverError is set, if not is returns a mock response string.
 func (m *MockMatchmaker) ReadMessageFromGameserver() ([]byte, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
 
 	m.NumCalledReadFromGameserver++
 

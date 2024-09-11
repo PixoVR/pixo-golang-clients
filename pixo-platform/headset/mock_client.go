@@ -22,6 +22,9 @@ type MockClient struct {
 
 // StartSession returns an error if provided, otherwise returns a mock EventResponse.
 func (m *MockClient) StartSession(ctx context.Context, request EventRequest) (*EventResponse, error) {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
 	m.NumCalledStartSession++
 
 	if m.StartSessionError != nil {
@@ -43,6 +46,9 @@ func (m *MockClient) StartSession(ctx context.Context, request EventRequest) (*E
 
 // SendEvent returns an error if provided, otherwise returns a mock EventResponse.
 func (m *MockClient) SendEvent(ctx context.Context, request EventRequest) (*EventResponse, error) {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
 	m.NumCalledSendEvent++
 
 	if m.SendEventError != nil {
@@ -64,6 +70,9 @@ func (m *MockClient) SendEvent(ctx context.Context, request EventRequest) (*Even
 
 // EndSession returns an error if provided, otherwise returns a mock EventResponse.
 func (m *MockClient) EndSession(ctx context.Context, request EventRequest) (*EventResponse, error) {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
 	m.NumCalledEndSession++
 
 	if m.EndSessionError != nil {

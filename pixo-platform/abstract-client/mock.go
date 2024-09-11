@@ -8,10 +8,13 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/rs/zerolog/log"
 	"net/http"
+	"sync"
 )
 
 // MockAbstractClient is a mock implementation of the AbstractClient interface
 type MockAbstractClient struct {
+	Lock sync.Mutex
+
 	NumCalledGetIPAddress int
 	GetIPAddressError     error
 

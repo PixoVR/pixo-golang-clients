@@ -4,11 +4,14 @@ import (
 	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/headset"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/load/fixture"
 )
 
 // performRequest simulates a single session on the platform.
 func (t *Tester) performRequest(id int) {
 	session := platform.Session{ModuleID: t.config.Module.ID, Module: t.config.Module}
+
+	t.printStart(id)
 
 	if t.config.Legacy {
 		request := headset.EventRequest{ModuleID: session.ModuleID}
@@ -17,7 +20,7 @@ func (t *Tester) performRequest(id int) {
 			t.RecordError(id, "startSession", "unable to start session", err)
 			return
 		}
-		t.RecordSuccess(id, "startSession", fmt.Sprintf("session started for module %d", t.config.Module.ID))
+		t.RecordSuccess(id, "startSession", fmt.Sprintf("session started for module %d", session.ModuleID))
 		request.SessionID = res.SessionID
 
 		if _, err = t.config.PlatformFixture.HeadsetClient.SendEvent(t.Config.Command.Context(), request); err != nil {
@@ -30,7 +33,7 @@ func (t *Tester) performRequest(id int) {
 			t.RecordError(id, "completeSession", fmt.Sprintf("unable to complete session %d", request.SessionID), err)
 			return
 		}
-		t.RecordSuccess(id, "completeSession", fmt.Sprintf("session completed for module %d", t.config.Module.ID))
+		t.RecordSuccess(id, "completeSession", fmt.Sprintf("session completed for module %d", session.ModuleID))
 
 		return
 	}
@@ -53,4 +56,8 @@ func (t *Tester) performRequest(id int) {
 		return
 	}
 	t.RecordSuccess(id, "completeSession", fmt.Sprintf("session completed for module %s", session.Module.Abbreviation))
+}
+
+func (t *Tester) printStart(id int) {
+	t.Printf(":checkered_flag:%d: %s\n", id, fixture.StatColor.Sprintf("starting session for module %d...", t.config.Module.ID))
 }
