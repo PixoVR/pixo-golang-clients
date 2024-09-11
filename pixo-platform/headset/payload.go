@@ -1,5 +1,6 @@
 package headset
 
+// Payload is the struct that represents common items in the event payload
 type Payload struct {
 	LessonStatus    *string `json:"lessonStatus,omitempty"`
 	LessonStatusOld *string `json:"Lesson_status,omitempty"`

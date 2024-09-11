@@ -10,22 +10,26 @@ import (
 	"time"
 )
 
+// WorkflowsResponse represents the response from the build/workflows endpoint
 type WorkflowsResponse struct {
 	Message   string     `json:"message"`
 	Workflows []Workflow `json:"workflows"`
 }
 
+// Workflow represents a build workflow
 type Workflow struct {
 	Name      string    `json:"name"`
 	Status    string    `json:"status"`
 	CreatedAt time.Time `json:"createdAt"`
 }
 
+// Log represents a log line from a build workflow
 type Log struct {
 	Step  string `json:"step"`
 	Lines string `json:"lines"`
 }
 
+// GetBuildWorkflows returns a list of build workflows
 func (a *Client) GetBuildWorkflows() ([]Workflow, error) {
 	path := "build/workflows"
 
@@ -48,6 +52,7 @@ func (a *Client) GetBuildWorkflows() ([]Workflow, error) {
 	return workflowsResponse.Workflows, nil
 }
 
+// GetBuildWorkflowLogs returns a channel of logs for a build workflow or an error
 func (a *Client) GetBuildWorkflowLogs(workflowName string) (chan *Log, error) {
 	path := fmt.Sprintf("build/workflows/%s/logs", workflowName)
 

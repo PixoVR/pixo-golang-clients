@@ -8,6 +8,7 @@ import (
 	"sync"
 )
 
+// MultiplayerMatchmaker is a client for the matchmaking service.
 type MultiplayerMatchmaker struct {
 	*abstract.AbstractServiceClient
 	*sync.Mutex
@@ -18,6 +19,7 @@ type MultiplayerMatchmaker struct {
 	gameserverConnection *net.UDPConn
 }
 
+// NewClientWithBasicAuth creates a new client for the matchmaking service with basic auth.
 func NewClientWithBasicAuth(username, password string, config urlfinder.ClientConfig, timeoutSeconds ...int) (*MultiplayerMatchmaker, error) {
 	platformClient, err := platform.NewClientWithBasicAuth(username, password, config)
 	if err != nil {
@@ -28,8 +30,8 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 	return NewClient(config, timeoutSeconds...), nil
 }
 
+// NewClient creates a new client for the matchmaking service.
 func NewClient(config urlfinder.ClientConfig, timeoutSeconds ...int) *MultiplayerMatchmaker {
-
 	if len(timeoutSeconds) == 0 {
 		timeoutSeconds = []int{60}
 	}
@@ -48,6 +50,7 @@ func NewClient(config urlfinder.ClientConfig, timeoutSeconds ...int) *Multiplaye
 	}
 }
 
+// Login logs in the client to the platform
 func (m *MultiplayerMatchmaker) Login(username, password string) error {
 	m.Lock()
 	defer m.Unlock()

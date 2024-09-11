@@ -8,6 +8,7 @@ const (
 	whatsMyIPURL = "https://httpbin.org/ip"
 )
 
+// GetIPAddress returns the IP address of the client using a get request to httpbin.org/ip
 func (a *AbstractServiceClient) GetIPAddress() (string, error) {
 	response, err := a.restyClient.R().Get(whatsMyIPURL)
 	if err != nil {

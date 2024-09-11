@@ -7,6 +7,7 @@ import (
 	"net/http"
 )
 
+// Matchmaker is the interface for the matchmaker client
 type Matchmaker interface {
 	abstract_client.AbstractClient
 	FindMatch(req MatchRequest) (*net.UDPAddr, error)

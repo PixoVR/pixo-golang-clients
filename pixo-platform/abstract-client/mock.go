@@ -10,6 +10,7 @@ import (
 	"net/http"
 )
 
+// MockAbstractClient is a mock implementation of the AbstractClient interface
 type MockAbstractClient struct {
 	NumCalledGetIPAddress int
 	GetIPAddressError     error
@@ -60,10 +61,12 @@ type MockAbstractClient struct {
 	Response []byte
 }
 
+// Path returns "/api"
 func (m *MockAbstractClient) Path() string {
 	return "/api"
 }
 
+// GetIPAddress returns an error if provided or localhost
 func (m *MockAbstractClient) GetIPAddress() (string, error) {
 	m.NumCalledGetIPAddress++
 
@@ -74,11 +77,13 @@ func (m *MockAbstractClient) GetIPAddress() (string, error) {
 	return "127.0.0.1", nil
 }
 
+// GetURL returns a random URL
 func (m *MockAbstractClient) GetURL(protocol ...string) string {
 	m.NumCalledGetURL++
 	return faker.URL()
 }
 
+// Login sets the token to a fake JWT
 func (m *MockAbstractClient) Login(username, password string) error {
 	m.NumCalledLogin++
 	if m.LoginError != nil {
@@ -100,30 +105,36 @@ func (m *MockAbstractClient) Login(username, password string) error {
 	return nil
 }
 
+// SetAPIKey increments the number of times it was called
 func (m *MockAbstractClient) SetAPIKey(key string) {
 	m.NumCalledSetAPIKey++
 }
 
+// SetToken sets the token to the provided value
 func (m *MockAbstractClient) SetToken(token string) {
 	m.NumCalledSetToken++
 	m.Token = token
 }
 
+// GetToken returns the token
 func (m *MockAbstractClient) GetToken() string {
 	m.NumCalledGetToken++
 	return m.Token
 }
 
+// IsAuthenticated returns false
 func (m *MockAbstractClient) IsAuthenticated() bool {
 	m.NumCalledIsAuthenticated++
 	return false
 }
 
+// ActiveUserID returns 1
 func (m *MockAbstractClient) ActiveUserID() int {
 	m.NumCalledActiveUserID++
 	return 1
 }
 
+// Get increments the number of times it was called and returns an error if provided
 func (m *MockAbstractClient) Get(path string) (*resty.Response, error) {
 	m.NumCalledGet++
 
@@ -134,6 +145,7 @@ func (m *MockAbstractClient) Get(path string) (*resty.Response, error) {
 	return nil, nil
 }
 
+// Post increments the number of times it was called and returns an error if provided
 func (m *MockAbstractClient) Post(path string, body []byte) (*resty.Response, error) {
 	m.NumCalledPost++
 
@@ -144,6 +156,7 @@ func (m *MockAbstractClient) Post(path string, body []byte) (*resty.Response, er
 	return nil, nil
 }
 
+// Put increments the number of times it was called and returns an error if provided
 func (m *MockAbstractClient) Put(path string, body []byte) (*resty.Response, error) {
 	m.NumCalledPut++
 
@@ -154,6 +167,7 @@ func (m *MockAbstractClient) Put(path string, body []byte) (*resty.Response, err
 	return nil, nil
 }
 
+// Patch increments the number of times it was called and returns an error if provided
 func (m *MockAbstractClient) Patch(path string, body []byte) (*resty.Response, error) {
 	m.NumCalledPatch++
 
@@ -164,6 +178,7 @@ func (m *MockAbstractClient) Patch(path string, body []byte) (*resty.Response, e
 	return nil, nil
 }
 
+// Delete increments the number of times it was called and returns an error if provided
 func (m *MockAbstractClient) Delete(path string) (*resty.Response, error) {
 	m.NumCalledDelete++
 
@@ -174,6 +189,7 @@ func (m *MockAbstractClient) Delete(path string) (*resty.Response, error) {
 	return nil, nil
 }
 
+// DialWebsocket increments the number of times it was called and returns an error if provided
 func (m *MockAbstractClient) DialWebsocket(endpoint string) (*websocket.Conn, *http.Response, error) {
 	m.NumCalledDialWebsocket++
 
@@ -184,6 +200,7 @@ func (m *MockAbstractClient) DialWebsocket(endpoint string) (*websocket.Conn, *h
 	return nil, nil, nil
 }
 
+// WriteToWebsocket increments the number of times it was called and returns an error if provided
 func (m *MockAbstractClient) WriteToWebsocket(message []byte) error {
 	m.NumCalledWriteToWebsocketError++
 
@@ -194,6 +211,7 @@ func (m *MockAbstractClient) WriteToWebsocket(message []byte) error {
 	return nil
 }
 
+// ReadFromWebsocket increments the number of times it was called and returns an error if provided
 func (m *MockAbstractClient) ReadFromWebsocket() (int, []byte, error) {
 	m.NumCalledReadFromWebsocket++
 
@@ -205,6 +223,7 @@ func (m *MockAbstractClient) ReadFromWebsocket() (int, []byte, error) {
 	return len(m.Response), m.Response, nil
 }
 
+// CloseWebsocketConnection increments the number of times it was called and returns an error if provided
 func (m *MockAbstractClient) CloseWebsocketConnection() error {
 	m.NumCalledCloseWebsocket++
 

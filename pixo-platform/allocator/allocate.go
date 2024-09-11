@@ -5,6 +5,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// AllocateGameserver send a request for a gameserver to the allocator
 func (a *Client) AllocateGameserver(request AllocationRequest) (*GameServer, error) {
 	body, err := json.Marshal(request)
 	if err != nil {

@@ -2,17 +2,11 @@ package allocator
 
 import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
-	"github.com/go-resty/resty/v2"
 )
 
 type FleetRequest struct {
 	ServerConfig  platform.MultiplayerServerConfig  `json:"serverConfig,omitempty"`
 	ServerVersion platform.MultiplayerServerVersion `json:"serverVersion,omitempty"`
-}
-
-type Response struct {
-	HTTPResponse *resty.Response `json:"http_response"`
-	Error        error           `json:"error"`
 }
 
 type AllocationRequest struct {

@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
+// DialGameserver connects to the gameserver address given
 func (m *MultiplayerMatchmaker) DialGameserver(addr *net.UDPAddr) error {
-
 	udpServer, err := net.ResolveUDPAddr(addr.Network(), addr.String())
 	if err != nil {
 		return err
@@ -21,6 +21,7 @@ func (m *MultiplayerMatchmaker) DialGameserver(addr *net.UDPAddr) error {
 	return nil
 }
 
+// CloseGameserverConnection closes the connection to the gameserver
 func (m *MultiplayerMatchmaker) CloseGameserverConnection() error {
 	if err := m.gameserverConnection.Close(); err != nil {
 		return err
@@ -29,6 +30,7 @@ func (m *MultiplayerMatchmaker) CloseGameserverConnection() error {
 	return nil
 }
 
+// SendMessageToGameserver sends a message to the gameserver
 func (m *MultiplayerMatchmaker) SendMessageToGameserver(message []byte) error {
 	if _, err := m.gameserverConnection.Write(message); err != nil {
 		return err
@@ -37,6 +39,7 @@ func (m *MultiplayerMatchmaker) SendMessageToGameserver(message []byte) error {
 	return nil
 }
 
+// ReadMessageFromGameserver reads a message from the gameserver
 func (m *MultiplayerMatchmaker) ReadMessageFromGameserver() ([]byte, error) {
 	if m.gameserverConnection == nil {
 		if err := m.DialGameserver(m.gameserverAddress); err != nil {

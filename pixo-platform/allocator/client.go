@@ -13,6 +13,7 @@ type Client struct {
 	platformClient platform.Client
 }
 
+// NewClientWithBasicAuth is a function that returns a AbstractServiceClient with basic auth
 func NewClientWithBasicAuth(username, password string, config urlfinder.ClientConfig) (*Client, error) {
 	platformClient, err := platform.NewClientWithBasicAuth(username, password, config)
 	if err != nil {
@@ -41,6 +42,7 @@ func NewClient(config urlfinder.ClientConfig) *Client {
 	}
 }
 
+// Login send a login request to the platform
 func (a *Client) Login(username, password string) error {
 	return a.platformClient.Login(username, password)
 }

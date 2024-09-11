@@ -6,6 +6,7 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 )
 
+// MockClient is a mock implementation of the Client interface.
 type MockClient struct {
 	abstract.MockAbstractClient
 
@@ -19,6 +20,7 @@ type MockClient struct {
 	EndSessionError     error
 }
 
+// StartSession returns an error if provided, otherwise returns a mock EventResponse.
 func (m *MockClient) StartSession(ctx context.Context, request EventRequest) (*EventResponse, error) {
 	m.NumCalledStartSession++
 
@@ -39,6 +41,7 @@ func (m *MockClient) StartSession(ctx context.Context, request EventRequest) (*E
 	}, nil
 }
 
+// SendEvent returns an error if provided, otherwise returns a mock EventResponse.
 func (m *MockClient) SendEvent(ctx context.Context, request EventRequest) (*EventResponse, error) {
 	m.NumCalledSendEvent++
 
@@ -59,6 +62,7 @@ func (m *MockClient) SendEvent(ctx context.Context, request EventRequest) (*Even
 	}, nil
 }
 
+// EndSession returns an error if provided, otherwise returns a mock EventResponse.
 func (m *MockClient) EndSession(ctx context.Context, request EventRequest) (*EventResponse, error) {
 	m.NumCalledEndSession++
 

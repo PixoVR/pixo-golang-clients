@@ -10,6 +10,7 @@ import (
 	"strconv"
 )
 
+// FindMatch returns the UDP address of the game server returned from the matchmaking request
 func (m *MultiplayerMatchmaker) FindMatch(req MatchRequest) (*net.UDPAddr, error) {
 	if !req.IsValid() {
 		return nil, errors.New("match request is invalid")

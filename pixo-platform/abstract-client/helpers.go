@@ -76,6 +76,7 @@ func (a *AbstractServiceClient) FormatRequest() *resty.Request {
 	return req
 }
 
+// SetHeader sets a header of the service client
 func (a *AbstractServiceClient) SetHeader(key string, value string) {
 	a.headers[key] = value
 }

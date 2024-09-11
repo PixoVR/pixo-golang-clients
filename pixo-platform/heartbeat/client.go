@@ -6,6 +6,7 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 )
 
+// Client is an interface that contains an AbstractClient and a SendPulse method
 type Client interface {
 	abstract.AbstractClient
 	SendPulse(sessionID int) error
@@ -31,6 +32,7 @@ func NewClient(config urlfinder.ClientConfig) Client {
 	}
 }
 
+// NewClientWithBasicAuth is a function that returns a new Client using basic auth for the platform client
 func NewClientWithBasicAuth(username, password string, config urlfinder.ClientConfig) (Client, error) {
 	platformClient, err := platform.NewClientWithBasicAuth(username, password, config)
 	if err != nil {
@@ -47,6 +49,7 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 	}, nil
 }
 
+// Login is a method that logs in the client using the platform client
 func (c *client) Login(username, password string) error {
 	if err := c.platformClient.Login(username, password); err != nil {
 		return err
@@ -56,6 +59,7 @@ func (c *client) Login(username, password string) error {
 	return nil
 }
 
+// ActiveUserID returns the active user id
 func (c *client) ActiveUserID() int {
 	return c.platformClient.ActiveUserID()
 }

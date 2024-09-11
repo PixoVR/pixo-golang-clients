@@ -5,15 +5,18 @@ import (
 	"errors"
 )
 
+// LoginRequest is the request body for the login endpoint
 type LoginRequest struct {
 	Login    string `json:"login"`
 	Password string `json:"password"`
 }
 
+// LoginResponse is the response body for the login endpoint
 type LoginResponse struct {
 	Token string `json:"token"`
 }
 
+// Login logs in the user with the given username and password
 func (c *client) Login(username, password string) error {
 	url := c.GetURLWithPath("login")
 
