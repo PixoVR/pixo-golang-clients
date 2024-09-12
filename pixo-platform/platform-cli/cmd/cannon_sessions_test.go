@@ -7,6 +7,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"
+	"math/rand"
 	"os"
 	"strings"
 )
@@ -25,26 +26,30 @@ var _ = Describe("Sessions Load Testing", func() {
 		executor.Cleanup()
 	})
 
-	It("returns an error if unable to get the current user", func() {
-		executor.MockPlatformClient.GetUserError = fmt.Errorf("get user error")
-		_, err := executor.RunCommand("cannon", "sessions")
-		Expect(err).To(MatchError("get user error"))
-	})
+	Context("authorization", func() {
 
-	It("only allows platform users", func() {
-		executor.MockPlatformClient.GetUserResponse = &platform.User{
-			Org: platform.Org{Type: "trial"},
-		}
+		It("returns an error if unable to get the current user", func() {
+			executor.MockPlatformClient.GetUserError = fmt.Errorf("get user error")
+			_, err := executor.RunCommand("cannon", "sessions")
+			Expect(err).To(MatchError("get user error"))
+		})
 
-		_, err := executor.RunCommand("cannon", "sessions")
+		It("only allows platform users", func() {
+			executor.MockPlatformClient.GetUserResponse = &platform.User{
+				Org: platform.Org{Type: "trial"},
+			}
 
-		Expect(err).To(MatchError("only platform users can run load tests"))
-	})
+			_, err := executor.RunCommand("cannon", "sessions")
 
-	It("isn't allowed on prod", func() {
-		Expect(executor.ConfigManager.SetActiveEnv(config.Env{Lifecycle: "prod"})).To(Succeed())
-		_, err := executor.RunCommand("cannon", "matchmake")
-		Expect(err).To(MatchError("cannot run load tests against production"))
+			Expect(err).To(MatchError("only platform users can run load tests"))
+		})
+
+		It("isn't allowed on prod", func() {
+			Expect(executor.ConfigManager.SetActiveEnv(config.Env{Lifecycle: "prod"})).To(Succeed())
+			_, err := executor.RunCommand("cannon", "matchmake")
+			Expect(err).To(MatchError("cannot run load tests against production"))
+		})
+
 	})
 
 	It("can display errors", func() {
@@ -75,13 +80,13 @@ var _ = Describe("Sessions Load Testing", func() {
 		Expect(output).To(ContainLineWithItems("Sessions Started:", "0"))
 		Expect(output).To(ContainLineWithItems("Events Created:", "0"))
 		Expect(output).To(ContainLineWithItems("Sessions Completed:", "0"))
-		Expect(executor.MockPlatformClient.NumCalledCreateSession).To(Equal(amount), "incorrect number of create session calls")
-		Expect(executor.MockPlatformClient.NumCalledCreateEvent).To(Equal(0), "incorrect number of create event calls")
-		Expect(executor.MockPlatformClient.NumCalledUpdateSession).To(Equal(0), "incorrect number of update session calls")
+		Expect(executor.MockPlatformClient.CalledCreateSessionWith).To(HaveLen(amount), "incorrect number of create session calls")
+		Expect(executor.MockPlatformClient.CalledCreateEventWith).To(HaveLen(0), "incorrect number of create event calls")
+		Expect(executor.MockPlatformClient.CalledUpdateSessionWith).To(HaveLen(0), "incorrect number of update session calls")
 	})
 
 	It("can load test sessions", func() {
-		amount := 20
+		amount := rand.Intn(100) + 1
 		concurrent := 5
 		timeout := 1
 
@@ -103,12 +108,46 @@ var _ = Describe("Sessions Load Testing", func() {
 		Expect(output).To(ContainLineWithItems("Create Event Errors:", "0"))
 		Expect(output).To(ContainLineWithItems("Complete Session Errors:", "0"))
 		Expect(output).To(ContainLineWithItems("Unsuccessful Sessions:", "0"))
-		Expect(output).To(ContainLineWithItems("Sessions Started:", "20"))
-		Expect(output).To(ContainLineWithItems("Events Created:", "20"))
-		Expect(output).To(ContainLineWithItems("Sessions Completed:", "20"))
-		Expect(executor.MockPlatformClient.NumCalledCreateSession).To(Equal(amount), "incorrect number of create session calls")
-		Expect(executor.MockPlatformClient.NumCalledCreateEvent).To(Equal(amount), "incorrect number of create event calls")
-		Expect(executor.MockPlatformClient.NumCalledUpdateSession).To(Equal(amount), "incorrect number of update session calls")
+		Expect(output).To(ContainLineWithItems("Sessions Started:", fmt.Sprint(amount)))
+		Expect(output).To(ContainLineWithItems("Events Created:", fmt.Sprint(amount)))
+		Expect(output).To(ContainLineWithItems("Sessions Completed:", fmt.Sprint(amount)))
+		Expect(executor.MockPlatformClient.CalledCreateSessionWith).To(HaveLen(amount), "incorrect number of create session calls")
+		Expect(executor.MockPlatformClient.CalledCreateEventWith).To(HaveLen(amount), "incorrect number of create event calls")
+		Expect(executor.MockPlatformClient.CalledUpdateSessionWith).To(HaveLen(amount), "incorrect number of update session calls")
+	})
+
+	It("can load test sessions with session details", func() {
+		moduleVersion := "1.00.00"
+		scenario := "kitchen"
+		mode := "practice"
+		focus := "milkshake"
+		specialization := "chocolate"
+
+		executor.RunCommandAndExpectSuccess(
+			"cannon",
+			"sessions",
+			"--module",
+			"TST",
+			"-a",
+			"1",
+			"--version",
+			moduleVersion,
+			"--mode",
+			mode,
+			"--scenario",
+			scenario,
+			"--focus",
+			focus,
+			"--specialization",
+			specialization,
+		)
+
+		Expect(executor.MockPlatformClient.CalledCreateSessionWith).To(HaveLen(1))
+		Expect(executor.MockPlatformClient.CalledCreateSessionWith[0].ModuleVersion).To(Equal(moduleVersion))
+		Expect(executor.MockPlatformClient.CalledCreateSessionWith[0].Mode).To(Equal(mode))
+		Expect(executor.MockPlatformClient.CalledCreateSessionWith[0].Scenario).To(Equal(scenario))
+		Expect(executor.MockPlatformClient.CalledCreateSessionWith[0].Focus).To(Equal(focus))
+		Expect(executor.MockPlatformClient.CalledCreateSessionWith[0].Specialization).To(Equal(specialization))
 	})
 
 	It("can load test sessions with event payloads", func() {
@@ -124,7 +163,7 @@ var _ = Describe("Sessions Load Testing", func() {
 		)
 
 		expectedPayload := map[string]interface{}{"key": "value"}
-		Expect(executor.MockPlatformClient.NumCalledCreateEvent).To(Equal(1))
+		Expect(executor.MockPlatformClient.CalledCreateEventWith).To(HaveLen(1))
 		Expect(executor.MockPlatformClient.CalledCreateEventWith[0].Payload).To(Equal(expectedPayload))
 	})
 
@@ -143,25 +182,22 @@ var _ = Describe("Sessions Load Testing", func() {
 
 	It("can load test sessions with event payloads from a file", func() {
 		payload := `{"key":"value"}`
-		filename := "payload.json"
-		Expect(os.WriteFile(filename, []byte(payload), 0644)).To(Succeed())
-		defer func() {
-			Expect(os.Remove(filename)).To(Succeed())
-		}()
+		file, cleanup := NewTestFile(payload)
+		defer cleanup()
 
-		_ = executor.RunCommandAndExpectSuccess(
+		executor.RunCommandAndExpectSuccess(
 			"cannon",
 			"sessions",
 			"--module",
 			"TST",
 			"--payload-file",
-			filename,
+			file.Name(),
 			"-a",
 			"1",
 		)
 
 		expectedPayload := map[string]interface{}{"key": "value"}
-		Expect(executor.MockPlatformClient.NumCalledCreateEvent).To(Equal(1))
+		Expect(executor.MockPlatformClient.CalledCreateEventWith).To(HaveLen(1))
 		Expect(executor.MockPlatformClient.CalledCreateEventWith[0].Payload).To(Equal(expectedPayload))
 	})
 
@@ -194,9 +230,54 @@ var _ = Describe("Sessions Load Testing", func() {
 			Expect(output).To(ContainLineWithItems("Sessions Started:", fmt.Sprint(amount)))
 			Expect(output).To(ContainLineWithItems("Events Created:", fmt.Sprint(amount)))
 			Expect(output).To(ContainLineWithItems("Sessions Completed:", fmt.Sprint(amount)))
-			Expect(executor.MockHeadsetClient.NumCalledStartSession).To(Equal(amount), "incorrect number of create session calls")
-			Expect(executor.MockHeadsetClient.NumCalledSendEvent).To(Equal(amount), "incorrect number of create event calls")
-			Expect(executor.MockHeadsetClient.NumCalledEndSession).To(Equal(amount), "incorrect number of update session calls")
+			Expect(executor.MockHeadsetClient.CalledStartSessionWith).To(HaveLen(amount), "incorrect number of create session calls")
+			Expect(executor.MockHeadsetClient.CalledSendEventWith).To(HaveLen(amount), "incorrect number of create event calls")
+			Expect(executor.MockHeadsetClient.CalledEndSessionWith).To(HaveLen(amount), "incorrect number of update session calls")
+		})
+
+		It("can load test sessions with session details", func() {
+			moduleVersion := "1.00.00"
+			scenario := "kitchen"
+			mode := "practice"
+			focus := "milkshake"
+			specialization := "chocolate"
+
+			executor.RunCommandAndExpectSuccess(
+				"cannon",
+				"sessions",
+				"--legacy",
+				"--module",
+				"TST",
+				"-a",
+				"1",
+				"--version",
+				moduleVersion,
+				"--mode",
+				mode,
+				"--scenario",
+				scenario,
+				"--focus",
+				focus,
+				"--specialization",
+				specialization,
+			)
+
+			expectedPayload := map[string]interface{}{
+				"object": map[string]interface{}{
+					"id": fmt.Sprintf("https://pixovr.com/xapi/objects/%d/%s", 1, scenario),
+				},
+				"context": map[string]interface{}{
+					"revision": moduleVersion,
+					"extensions": map[string]interface{}{
+						"https://pixovr.com/xapi/extension/sessionMode":           mode,
+						"https://pixovr.com/xapi/extension/sessionFocus":          focus,
+						"https://pixovr.com/xapi/extension/sessionSpecialization": specialization,
+					},
+				},
+			}
+			Expect(executor.MockHeadsetClient.CalledStartSessionWith).To(HaveLen(1))
+			Expect(executor.MockHeadsetClient.CalledSendEventWith).To(HaveLen(1))
+			Expect(executor.MockHeadsetClient.CalledSendEventWith[0].Payload).To(Equal(expectedPayload))
 		})
 
 		It("can load test sessions with event payloads", func() {
@@ -213,8 +294,8 @@ var _ = Describe("Sessions Load Testing", func() {
 			)
 
 			expectedPayload := map[string]interface{}{"key": "value"}
-			Expect(executor.MockHeadsetClient.NumCalledSendEvent).To(Equal(1))
-			Expect(executor.MockHeadsetClient.CalledSendEventsWith[0].Payload).To(Equal(expectedPayload))
+			Expect(executor.MockHeadsetClient.CalledSendEventWith).To(HaveLen(1))
+			Expect(executor.MockHeadsetClient.CalledSendEventWith[0].Payload).To(Equal(expectedPayload))
 		})
 
 	})
@@ -256,4 +337,17 @@ func (m *containsLineWithItemsMatcher) FailureMessage(actual interface{}) (messa
 
 func (m *containsLineWithItemsMatcher) NegatedFailureMessage(actual interface{}) (message string) {
 	return fmt.Sprintf("Expected %s not to contain %s", actual, m.expected)
+}
+
+func NewTestFile(contents string) (*os.File, func()) {
+	randomFilename := fmt.Sprintf("testfile-%d", rand.Intn(10000000))
+	Expect(os.WriteFile(randomFilename, []byte(contents), 0644)).To(Succeed())
+	cleanup := func() {
+		Expect(os.Remove(randomFilename)).To(Succeed())
+	}
+
+	file, err := os.Open(randomFilename)
+	Expect(err).ToNot(HaveOccurred())
+
+	return file, cleanup
 }

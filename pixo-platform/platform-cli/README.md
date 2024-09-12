@@ -459,19 +459,24 @@ pixo cannon sessions \
     --amount 5 \
     --concurrent 2
     
-# Or with a payload
+# With session details
 pixo cannon sessions \
     --module TST \
-    --payload '{"key": "value"}' \
-    --amount 5 \
-    --concurrent 2
+    --version "1.00.00" \
+    --mode "practice" \
+    --scenario "warehouse" \
+    --focus "packaging" \
+    --specialization "machinery"
     
-# Or with a payload from a file
+# With an event payload
 pixo cannon sessions \
     --module TST \
-    --payload-file /path/to/payload.json \
-    --amount 5 \
-    --concurrent 2
+    --payload '{"key": "value"}'
+    
+# Or with an event payload from a file
+pixo cannon sessions \
+    --module TST \
+    --payload-file /path/to/payload.json
     
 # Sample output
 🚀  Starting load test with 5 requests and 2 concurrent workers

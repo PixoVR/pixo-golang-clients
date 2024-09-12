@@ -83,13 +83,12 @@ type MockClient struct {
 	NumCalledGetSession int
 	GetSessionError     error
 
-	NumCalledCreateSession int
-	CreateSessionError     error
+	CalledCreateSessionWith []*Session
+	CreateSessionError      error
 
-	NumCalledUpdateSession int
-	UpdateSessionError     error
+	CalledUpdateSessionWith []*Session
+	UpdateSessionError      error
 
-	NumCalledCreateEvent  int
 	CalledCreateEventWith []*Event
 	CreateEventError      error
 
@@ -128,11 +127,9 @@ type MockClient struct {
 }
 
 func (m *MockClient) Reset() {
-	m.NumCalledCreateEvent = 0
 	m.CalledCreateEventWith = nil
 	m.CreateEventError = nil
 
-	m.NumCalledCreateSession = 0
 	m.CreateSessionError = nil
 
 	m.NumCalledGetUser = 0
@@ -198,7 +195,10 @@ func (m *MockClient) Reset() {
 	m.NumCalledGetSession = 0
 	m.GetSessionError = nil
 
-	m.NumCalledUpdateSession = 0
+	m.CalledCreateSessionWith = nil
+	m.CreateSessionError = nil
+
+	m.CalledUpdateSessionWith = nil
 	m.UpdateSessionError = nil
 
 	m.NumCalledGetPlatforms = 0
@@ -758,7 +758,7 @@ func (m *MockClient) CreateSession(ctx context.Context, session *Session) error 
 	m.Lock.Lock()
 	defer m.Lock.Unlock()
 
-	m.NumCalledCreateSession++
+	m.CalledCreateSessionWith = append(m.CalledCreateSessionWith, session)
 
 	if session == nil {
 		return errors.New("session can not be nil")
@@ -772,16 +772,13 @@ func (m *MockClient) CreateSession(ctx context.Context, session *Session) error 
 		return m.CreateSessionError
 	}
 
-	*session = Session{
-		ID:        1,
-		UserID:    m.ActiveUserID(),
-		ModuleID:  session.ModuleID,
-		Module:    Module{ID: session.ModuleID, Abbreviation: "TST"},
-		IPAddress: session.IPAddress,
-		DeviceID:  session.DeviceID,
-		CreatedAt: time.Now().UTC(),
-		UpdatedAt: time.Now().UTC(),
-	}
+	session.ID = 1
+	session.UserID = m.ActiveUserID()
+	session.Module.Abbreviation = "TST"
+	session.IPAddress = "127.0.0.1"
+
+	session.CreatedAt = time.Now().UTC()
+	session.UpdatedAt = time.Now().UTC()
 
 	return nil
 }
@@ -790,7 +787,7 @@ func (m *MockClient) UpdateSession(ctx context.Context, session Session) (*Sessi
 	m.Lock.Lock()
 	defer m.Lock.Unlock()
 
-	m.NumCalledUpdateSession++
+	m.CalledUpdateSessionWith = append(m.CalledUpdateSessionWith, &session)
 
 	if session.ID <= 0 {
 		return nil, errors.New("invalid session id")
@@ -813,15 +810,13 @@ func (m *MockClient) CreateEvent(ctx context.Context, event *Event) error {
 	m.Lock.Lock()
 	defer m.Lock.Unlock()
 
-	m.NumCalledCreateEvent++
+	m.CalledCreateEventWith = append(m.CalledCreateEventWith, event)
 
 	noSessionID := event.SessionID == nil || *event.SessionID <= 0
 	noSessionUUID := event.SessionUUID == nil || *event.SessionUUID == ""
 	if noSessionID && noSessionUUID {
 		return errors.New("session id or session uuid required")
 	}
-
-	m.CalledCreateEventWith = append(m.CalledCreateEventWith, event)
 
 	if m.CreateEventError != nil {
 		return m.CreateEventError

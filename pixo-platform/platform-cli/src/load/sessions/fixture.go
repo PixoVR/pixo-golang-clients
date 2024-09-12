@@ -11,14 +11,14 @@ import (
 // Config contains the configuration for a load test.
 type Config struct {
 	fixture.Config
-	Module       platform.Module
+
+	Session      platform.Session
 	EventPayload string
+	Event        platform.Event
 
-	Session platform.Session
-	Event   platform.Event
-
-	Legacy       bool
-	EventRequest headset.EventRequest
+	Legacy         bool
+	EventRequest   headset.EventRequest
+	SessionDetails map[string]interface{}
 }
 
 // Tester configures and runs sessions load tests.
@@ -36,14 +36,20 @@ func NewLoadTester(config Config) (*Tester, error) {
 	var payload map[string]interface{}
 	_ = json.Unmarshal([]byte(config.EventPayload), &payload)
 
-	config.Session = platform.Session{ModuleID: config.Module.ID, Module: config.Module}
+	if config.Session.ModuleID == 0 {
+		return nil, errors.New("module id is required")
+	}
+
 	config.Event = platform.Event{Payload: payload}
 	config.EventRequest = headset.EventRequest{ModuleID: config.Session.ModuleID}
 
-	return &Tester{
+	t := &Tester{
 		Tester: fixture.NewLoadTester(config.Config),
 		config: config,
-	}, nil
+	}
+
+	t.formatSessionDetails()
+	return t, nil
 }
 
 // Run starts the load testing process.

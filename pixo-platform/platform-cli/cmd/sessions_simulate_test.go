@@ -57,7 +57,7 @@ var _ = Describe("Sessions Simulation", func() {
 
 		Expect(err).To(HaveOccurred())
 		Expect(err).To(MatchError("create error"))
-		Expect(executor.MockPlatformClient.NumCalledCreateSession).To(Equal(1))
+		Expect(executor.MockPlatformClient.CalledCreateSessionWith).To(HaveLen(1))
 	})
 
 	It("can pass in mode, scenario, focus, and specialization as flags", func() {
@@ -98,7 +98,7 @@ var _ = Describe("Sessions Simulation", func() {
 		)
 
 		Expect(err).To(MatchError("update error"))
-		Expect(executor.MockPlatformClient.NumCalledUpdateSession).To(Equal(1))
+		Expect(executor.MockPlatformClient.CalledUpdateSessionWith).To(HaveLen(1))
 	})
 
 	It("can ask the user if the session was passed", func() {
@@ -127,10 +127,10 @@ var _ = Describe("Sessions Simulation", func() {
 			"TST",
 		)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(executor.MockPlatformClient.NumCalledCreateSession).To(Equal(1))
+		Expect(executor.MockPlatformClient.CalledCreateSessionWith).To(HaveLen(1))
 		Expect(output).To(ContainSubstring("Session started for module TST"))
 		Expect(output).To(ContainSubstring("Create event?"))
-		Expect(executor.MockPlatformClient.NumCalledUpdateSession).To(Equal(1))
+		Expect(executor.MockPlatformClient.CalledUpdateSessionWith).To(HaveLen(1))
 		Expect(output).To(ContainSubstring("Session completed"))
 		Expect(output).To(ContainSubstring("Score: 1.00/3.00"))
 		Expect(output).To(ContainSubstring("Percent: 33%"))
@@ -156,7 +156,7 @@ var _ = Describe("Sessions Simulation", func() {
 		Expect(output).To(ContainSubstring("Create event?"))
 		Expect(output).To(ContainSubstring("EVENT TYPE: "))
 		Expect(err).To(MatchError("create event error"))
-		Expect(executor.MockPlatformClient.NumCalledCreateEvent).To(Equal(1))
+		Expect(executor.MockPlatformClient.CalledCreateEventWith).To(HaveLen(1))
 	})
 
 	It("can simulate a session with an event and payload", func() {
@@ -170,13 +170,13 @@ var _ = Describe("Sessions Simulation", func() {
 			"TST",
 		)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(executor.MockPlatformClient.NumCalledCreateSession).To(Equal(1))
+		Expect(executor.MockPlatformClient.CalledCreateSessionWith).To(HaveLen(1))
 		Expect(output).To(ContainSubstring("Session started for module TST"))
 		Expect(output).To(ContainSubstring("Create event?"))
 		Expect(output).To(ContainSubstring("JSON PAYLOAD: "))
-		Expect(executor.MockPlatformClient.NumCalledCreateEvent).To(Equal(1))
+		Expect(executor.MockPlatformClient.CalledCreateEventWith).To(HaveLen(1))
 		Expect(output).To(ContainSubstring("Event created for session"))
-		Expect(executor.MockPlatformClient.NumCalledUpdateSession).To(Equal(1))
+		Expect(executor.MockPlatformClient.CalledUpdateSessionWith).To(HaveLen(1))
 		Expect(output).To(ContainSubstring("Session completed"))
 		Expect(output).To(ContainSubstring("Lesson Status: passed"))
 	})
@@ -193,10 +193,10 @@ var _ = Describe("Sessions Simulation", func() {
 		)
 
 		Expect(err).NotTo(HaveOccurred())
-		Expect(executor.MockPlatformClient.NumCalledCreateSession).To(Equal(1))
+		Expect(executor.MockPlatformClient.CalledCreateSessionWith).To(HaveLen(1))
 		Expect(output).To(ContainSubstring("Session started for module TST"))
 		Expect(output).To(ContainSubstring("Create event?"))
-		Expect(executor.MockPlatformClient.NumCalledCreateEvent).To(Equal(2))
+		Expect(executor.MockPlatformClient.CalledCreateEventWith).To(HaveLen(2))
 		Expect(output).To(ContainSubstring("Event created for session"))
 		Expect(output).To(ContainSubstring("Session completed"))
 	})
@@ -218,7 +218,7 @@ var _ = Describe("Sessions Simulation", func() {
 
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(MatchError("start session error"))
-			Expect(executor.MockHeadsetClient.NumCalledStartSession).To(Equal(1))
+			Expect(executor.MockHeadsetClient.CalledStartSessionWith).To(HaveLen(1))
 		})
 
 		It("can return an error if the end session call fails", func() {
@@ -235,7 +235,7 @@ var _ = Describe("Sessions Simulation", func() {
 			)
 
 			Expect(err).To(MatchError("end session error"))
-			Expect(executor.MockHeadsetClient.NumCalledEndSession).To(Equal(1))
+			Expect(executor.MockHeadsetClient.CalledEndSessionWith).To(HaveLen(1))
 		})
 
 		It("can simulate a session with no events", func() {
@@ -251,10 +251,10 @@ var _ = Describe("Sessions Simulation", func() {
 			)
 
 			Expect(err).NotTo(HaveOccurred())
-			Expect(executor.MockHeadsetClient.NumCalledStartSession).To(Equal(1))
+			Expect(executor.MockHeadsetClient.CalledStartSessionWith).To(HaveLen(1))
 			Expect(output).To(ContainSubstring("Session started using legacy headset API"))
 			Expect(output).To(ContainSubstring("Create event?"))
-			Expect(executor.MockHeadsetClient.NumCalledEndSession).To(Equal(1))
+			Expect(executor.MockHeadsetClient.CalledEndSessionWith).To(HaveLen(1))
 		})
 
 		It("can simulate a session with an event and payload", func() {
@@ -270,12 +270,12 @@ var _ = Describe("Sessions Simulation", func() {
 			)
 
 			Expect(err).NotTo(HaveOccurred())
-			Expect(executor.MockHeadsetClient.NumCalledStartSession).To(Equal(1))
+			Expect(executor.MockHeadsetClient.CalledStartSessionWith).To(HaveLen(1))
 			Expect(output).To(ContainSubstring("Session started using legacy headset API"))
 			Expect(output).To(ContainSubstring("Create event?"))
-			Expect(executor.MockHeadsetClient.NumCalledSendEvent).To(Equal(1))
+			Expect(executor.MockHeadsetClient.CalledSendEventWith).To(HaveLen(1))
 			Expect(output).To(ContainSubstring("Event created for session"))
-			Expect(executor.MockHeadsetClient.NumCalledEndSession).To(Equal(1))
+			Expect(executor.MockHeadsetClient.CalledEndSessionWith).To(HaveLen(1))
 		})
 
 	})

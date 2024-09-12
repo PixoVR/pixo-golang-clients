@@ -10,15 +10,14 @@ import (
 type MockClient struct {
 	abstract.MockAbstractClient
 
-	NumCalledStartSession int
-	StartSessionError     error
+	CalledStartSessionWith []EventRequest
+	StartSessionError      error
 
-	NumCalledSendEvent   int
-	CalledSendEventsWith []EventRequest
-	SendEventError       error
+	CalledSendEventWith []EventRequest
+	SendEventError      error
 
-	NumCalledEndSession int
-	EndSessionError     error
+	CalledEndSessionWith []EventRequest
+	EndSessionError      error
 }
 
 // StartSession returns an error if provided, otherwise returns a mock EventResponse.
@@ -26,7 +25,7 @@ func (m *MockClient) StartSession(ctx context.Context, request EventRequest) (*E
 	m.Lock.Lock()
 	defer m.Lock.Unlock()
 
-	m.NumCalledStartSession++
+	m.CalledStartSessionWith = append(m.CalledStartSessionWith, request)
 
 	if m.StartSessionError != nil {
 		return nil, m.StartSessionError
@@ -50,9 +49,7 @@ func (m *MockClient) SendEvent(ctx context.Context, request EventRequest) (*Even
 	m.Lock.Lock()
 	defer m.Lock.Unlock()
 
-	m.NumCalledSendEvent++
-
-	m.CalledSendEventsWith = append(m.CalledSendEventsWith, request)
+	m.CalledSendEventWith = append(m.CalledSendEventWith, request)
 
 	if m.SendEventError != nil {
 		return nil, nil
@@ -76,7 +73,7 @@ func (m *MockClient) EndSession(ctx context.Context, request EventRequest) (*Eve
 	m.Lock.Lock()
 	defer m.Lock.Unlock()
 
-	m.NumCalledEndSession++
+	m.CalledEndSessionWith = append(m.CalledEndSessionWith, request)
 
 	if m.EndSessionError != nil {
 		return nil, m.EndSessionError
