@@ -7,6 +7,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"
+	"os"
 	"strings"
 )
 
@@ -110,36 +111,112 @@ var _ = Describe("Sessions Load Testing", func() {
 		Expect(executor.MockPlatformClient.NumCalledUpdateSession).To(Equal(amount), "incorrect number of update session calls")
 	})
 
-	It("can load test sessions using the legacy headset api", func() {
-		amount := 20
-		concurrent := 5
-		timeout := 1
-
-		output := executor.RunCommandAndExpectSuccess(
+	It("can load test sessions with event payloads", func() {
+		_ = executor.RunCommandAndExpectSuccess(
 			"cannon",
 			"sessions",
-			"--legacy",
 			"--module",
 			"TST",
-			"--amount",
-			fmt.Sprint(amount),
-			"--concurrent",
-			fmt.Sprint(concurrent),
-			"--timeout",
-			fmt.Sprint(timeout),
+			"--payload",
+			`{"key":"value"}`,
+			"-a",
+			"1",
 		)
 
-		Expect(output).To(ContainSubstring(fmt.Sprintf("Starting load test with %d requests and %d concurrent workers", amount, concurrent)))
-		Expect(output).To(ContainLineWithItems("Start Session Errors:", "0"))
-		Expect(output).To(ContainLineWithItems("Create Event Errors:", "0"))
-		Expect(output).To(ContainLineWithItems("Complete Session Errors:", "0"))
-		Expect(output).To(ContainLineWithItems("Unsuccessful Sessions:", "0"))
-		Expect(output).To(ContainLineWithItems("Sessions Started:", "20"))
-		Expect(output).To(ContainLineWithItems("Events Created:", "20"))
-		Expect(output).To(ContainLineWithItems("Sessions Completed:", "20"))
-		Expect(executor.MockHeadsetClient.NumCalledStartSession).To(Equal(amount), "incorrect number of create session calls")
-		Expect(executor.MockHeadsetClient.NumCalledSendEvent).To(Equal(amount), "incorrect number of create event calls")
-		Expect(executor.MockHeadsetClient.NumCalledEndSession).To(Equal(amount), "incorrect number of update session calls")
+		expectedPayload := map[string]interface{}{"key": "value"}
+		Expect(executor.MockPlatformClient.NumCalledCreateEvent).To(Equal(1))
+		Expect(executor.MockPlatformClient.CalledCreateEventWith[0].Payload).To(Equal(expectedPayload))
+	})
+
+	It("returns an error if unable to read the payload file", func() {
+		_, err := executor.RunCommand(
+			"cannon",
+			"sessions",
+			"--module",
+			"TST",
+			"--payload-file",
+			"missing.json",
+		)
+
+		Expect(err).To(MatchError("open missing.json: no such file or directory"))
+	})
+
+	It("can load test sessions with event payloads from a file", func() {
+		payload := `{"key":"value"}`
+		filename := "payload.json"
+		Expect(os.WriteFile(filename, []byte(payload), 0644)).To(Succeed())
+		defer func() {
+			Expect(os.Remove(filename)).To(Succeed())
+		}()
+
+		_ = executor.RunCommandAndExpectSuccess(
+			"cannon",
+			"sessions",
+			"--module",
+			"TST",
+			"--payload-file",
+			filename,
+			"-a",
+			"1",
+		)
+
+		expectedPayload := map[string]interface{}{"key": "value"}
+		Expect(executor.MockPlatformClient.NumCalledCreateEvent).To(Equal(1))
+		Expect(executor.MockPlatformClient.CalledCreateEventWith[0].Payload).To(Equal(expectedPayload))
+	})
+
+	Context("legacy headset api", func() {
+
+		It("can load test sessions", func() {
+			amount := 30
+			concurrent := 2
+			timeout := 2
+
+			output := executor.RunCommandAndExpectSuccess(
+				"cannon",
+				"sessions",
+				"--legacy",
+				"--module",
+				"TST",
+				"--amount",
+				fmt.Sprint(amount),
+				"--concurrent",
+				fmt.Sprint(concurrent),
+				"--timeout",
+				fmt.Sprint(timeout),
+			)
+
+			Expect(output).To(ContainSubstring(fmt.Sprintf("Starting load test with %d requests and %d concurrent workers", amount, concurrent)))
+			Expect(output).To(ContainLineWithItems("Start Session Errors:", "0"))
+			Expect(output).To(ContainLineWithItems("Create Event Errors:", "0"))
+			Expect(output).To(ContainLineWithItems("Complete Session Errors:", "0"))
+			Expect(output).To(ContainLineWithItems("Unsuccessful Sessions:", "0"))
+			Expect(output).To(ContainLineWithItems("Sessions Started:", fmt.Sprint(amount)))
+			Expect(output).To(ContainLineWithItems("Events Created:", fmt.Sprint(amount)))
+			Expect(output).To(ContainLineWithItems("Sessions Completed:", fmt.Sprint(amount)))
+			Expect(executor.MockHeadsetClient.NumCalledStartSession).To(Equal(amount), "incorrect number of create session calls")
+			Expect(executor.MockHeadsetClient.NumCalledSendEvent).To(Equal(amount), "incorrect number of create event calls")
+			Expect(executor.MockHeadsetClient.NumCalledEndSession).To(Equal(amount), "incorrect number of update session calls")
+		})
+
+		It("can load test sessions with event payloads", func() {
+			executor.RunCommandAndExpectSuccess(
+				"cannon",
+				"sessions",
+				"--module",
+				"TST",
+				"--legacy",
+				"--payload",
+				`{"key":"value"}`,
+				"-a",
+				"1",
+			)
+
+			expectedPayload := map[string]interface{}{"key": "value"}
+			Expect(executor.MockHeadsetClient.NumCalledSendEvent).To(Equal(1))
+			Expect(executor.MockHeadsetClient.CalledSendEventsWith[0].Payload).To(Equal(expectedPayload))
+		})
+
 	})
 
 })

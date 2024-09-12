@@ -50,8 +50,8 @@ with the platform, deploying gameserver versions, and simplifying the testing of
     - [Request a Match](#request-a-match)
     - [Connect to the Game Server](#connect-to-the-game-server)
 - [Load Testing](#load-testing)
-  - [Sessions](#sessions)
-  - [Matchmaking](#matchmaking)
+  - [Sessions](#load-test-sessions)
+  - [Matchmaking](#load-test-matchmaking)
 
 ## Installation
 ### Go - recommended
@@ -452,10 +452,24 @@ pixo mp --connect
 
 ## Load Testing
 
-### Sessions
+### Load Test Sessions
 ```bash
 pixo cannon sessions \
     --module TST \
+    --amount 5 \
+    --concurrent 2
+    
+# Or with a payload
+pixo cannon sessions \
+    --module TST \
+    --payload '{"key": "value"}' \
+    --amount 5 \
+    --concurrent 2
+    
+# Or with a payload from a file
+pixo cannon sessions \
+    --module TST \
+    --payload-file /path/to/payload.json \
     --amount 5 \
     --concurrent 2
     
@@ -554,6 +568,7 @@ Events Created:                 5
 Sessions Completed:             5
 ```
 
+### Load Test Matchmaking
 ```bash
 pixo cannon matchmake \
     --module TST \

@@ -1,6 +1,7 @@
 package sessions
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/headset"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
@@ -11,9 +12,13 @@ import (
 type Config struct {
 	fixture.Config
 	Module       platform.Module
-	Session      platform.Session
-	EventRequest headset.EventRequest
+	EventPayload string
+
+	Session platform.Session
+	Event   platform.Event
+
 	Legacy       bool
+	EventRequest headset.EventRequest
 }
 
 // Tester configures and runs sessions load tests.
@@ -28,7 +33,11 @@ func NewLoadTester(config Config) (*Tester, error) {
 		return nil, errors.New("platform client is required")
 	}
 
+	var payload map[string]interface{}
+	_ = json.Unmarshal([]byte(config.EventPayload), &payload)
+
 	config.Session = platform.Session{ModuleID: config.Module.ID, Module: config.Module}
+	config.Event = platform.Event{Payload: payload}
 	config.EventRequest = headset.EventRequest{ModuleID: config.Session.ModuleID}
 
 	return &Tester{

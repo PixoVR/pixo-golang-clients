@@ -13,8 +13,9 @@ type MockClient struct {
 	NumCalledStartSession int
 	StartSessionError     error
 
-	NumCalledSendEvent int
-	SendEventError     error
+	NumCalledSendEvent   int
+	CalledSendEventsWith []EventRequest
+	SendEventError       error
 
 	NumCalledEndSession int
 	EndSessionError     error
@@ -50,6 +51,8 @@ func (m *MockClient) SendEvent(ctx context.Context, request EventRequest) (*Even
 	defer m.Lock.Unlock()
 
 	m.NumCalledSendEvent++
+
+	m.CalledSendEventsWith = append(m.CalledSendEventsWith, request)
 
 	if m.SendEventError != nil {
 		return nil, nil

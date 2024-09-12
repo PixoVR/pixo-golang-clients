@@ -23,11 +23,13 @@ func (t *Tester) performRequest(id int) {
 		t.RecordSuccess(id, "startSession", fmt.Sprintf("session started for module %d", session.ModuleID))
 		request.SessionID = res.SessionID
 
+		request.Payload = t.config.Event.Payload
 		if _, err = t.config.PlatformFixture.HeadsetClient.SendEvent(t.Config.Command.Context(), request); err != nil {
 			t.RecordError(id, "createEvent", fmt.Sprintf("unable to create event for session %d", request.SessionID), err)
 		} else {
 			t.RecordSuccess(id, "createEvent", fmt.Sprintf("event created for session %d", request.SessionID))
 		}
+		request.Payload = nil
 
 		if _, err = t.config.PlatformFixture.HeadsetClient.EndSession(t.Config.Command.Context(), request); err != nil {
 			t.RecordError(id, "completeSession", fmt.Sprintf("unable to complete session %d", request.SessionID), err)
@@ -44,7 +46,8 @@ func (t *Tester) performRequest(id int) {
 	}
 	t.RecordSuccess(id, "startSession", fmt.Sprintf("session started for module %s", session.Module.Abbreviation))
 
-	if err := t.config.PlatformFixture.PlatformClient.CreateEvent(t.Config.Command.Context(), &platform.Event{SessionID: &session.ID}); err != nil {
+	event := platform.Event{SessionID: &session.ID, Payload: t.config.Event.Payload}
+	if err := t.config.PlatformFixture.PlatformClient.CreateEvent(t.Config.Command.Context(), &event); err != nil {
 		t.RecordError(id, "createEvent", "unable to create event", err)
 	} else {
 		t.RecordSuccess(id, "createEvent", fmt.Sprintf("event created for session %d", session.ID))

@@ -89,8 +89,9 @@ type MockClient struct {
 	NumCalledUpdateSession int
 	UpdateSessionError     error
 
-	NumCalledCreateEvent int
-	CreateEventError     error
+	NumCalledCreateEvent  int
+	CalledCreateEventWith []*Event
+	CreateEventError      error
 
 	NumCalledGetPlatforms int
 	GetPlatformsError     error
@@ -128,19 +129,27 @@ type MockClient struct {
 
 func (m *MockClient) Reset() {
 	m.NumCalledCreateEvent = 0
+	m.CalledCreateEventWith = nil
+	m.CreateEventError = nil
 
 	m.NumCalledCreateSession = 0
+	m.CreateSessionError = nil
 
 	m.NumCalledGetUser = 0
 	m.GetUserError = nil
+
 	m.NumCalledGetUserByUsername = 0
 	m.GetUserByUsernameError = nil
+
 	m.NumCalledGetUsers = 0
 	m.GetUsersError = nil
+
 	m.NumCalledCreateUser = 0
 	m.CreateUserError = nil
+
 	m.NumCalledUpdateUser = 0
 	m.UpdateUserError = nil
+
 	m.NumCalledDeleteUser = 0
 	m.DeleteUserError = nil
 
@@ -149,35 +158,46 @@ func (m *MockClient) Reset() {
 
 	m.NumCalledGetOrgs = 0
 	m.GetOrgsError = nil
+
 	m.NumCalledGetOrg = 0
 	m.GetOrgError = nil
+
 	m.NumCalledCreateOrg = 0
 	m.CreateOrgError = nil
+
 	m.NumCalledUpdateOrg = 0
 	m.UpdateOrgError = nil
+
 	m.NumCalledDeleteOrg = 0
 	m.DeleteOrgError = nil
 
 	m.NumCalledGetAPIKeys = 0
 	m.GetAPIKeysError = nil
+
 	m.NumCalledCreateAPIKey = 0
 	m.CreateAPIKeyError = nil
+
 	m.NumCalledDeleteAPIKey = 0
 	m.DeleteAPIKeyError = nil
 
 	m.NumCalledGetWebhooks = 0
 	m.GetWebhooksError = nil
+
 	m.NumCalledGetWebhook = 0
 	m.GetWebhookError = nil
+
 	m.NumCalledCreateWebhook = 0
 	m.CreateWebhookError = nil
+
 	m.NumCalledUpdateWebhook = 0
 	m.UpdateWebhookError = nil
+
 	m.NumCalledDeleteWebhook = 0
 	m.DeleteWebhookError = nil
 
 	m.NumCalledGetSession = 0
 	m.GetSessionError = nil
+
 	m.NumCalledUpdateSession = 0
 	m.UpdateSessionError = nil
 
@@ -800,6 +820,8 @@ func (m *MockClient) CreateEvent(ctx context.Context, event *Event) error {
 	if noSessionID && noSessionUUID {
 		return errors.New("session id or session uuid required")
 	}
+
+	m.CalledCreateEventWith = append(m.CalledCreateEventWith, event)
 
 	if m.CreateEventError != nil {
 		return m.CreateEventError

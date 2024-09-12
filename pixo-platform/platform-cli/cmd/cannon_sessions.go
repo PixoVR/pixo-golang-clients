@@ -10,6 +10,7 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/load/fixture"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/load/sessions"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 var legacy bool
@@ -31,6 +32,18 @@ var cannonSessionsCmd = &cobra.Command{
 			return err
 		}
 
+		eventPayload, _ := Ctx.ConfigManager.GetFlagValue("payload", cmd)
+		if eventPayload == "" {
+			payloadFile, _ := Ctx.ConfigManager.GetFlagValue("payload-file", cmd)
+			if payloadFile != "" {
+				payloadData, err := os.ReadFile(payloadFile)
+				if err != nil {
+					return err
+				}
+				eventPayload = string(payloadData)
+			}
+		}
+
 		moduleID := forms.Int(answers["module"])
 
 		config := sessions.Config{
@@ -39,8 +52,9 @@ var cannonSessionsCmd = &cobra.Command{
 				Command:         cmd,
 				Writer:          cmd.OutOrStdout(),
 			},
-			Legacy: legacy,
-			Module: platform.Module{ID: moduleID},
+			Legacy:       legacy,
+			Module:       platform.Module{ID: moduleID},
+			EventPayload: eventPayload,
 		}
 
 		tester, err := sessions.NewLoadTester(config)
@@ -55,5 +69,7 @@ var cannonSessionsCmd = &cobra.Command{
 
 func init() {
 	cannonCmd.AddCommand(cannonSessionsCmd)
+	cannonSessionsCmd.Flags().StringP("payload", "p", "", "Event payload to send when creating events")
+	cannonSessionsCmd.Flags().StringP("payload-file", "f", "", "File containing event payload to send when creating events")
 	cannonSessionsCmd.Flags().BoolVar(&legacy, "legacy", false, "Use the legacy headset API for load testing")
 }
