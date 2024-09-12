@@ -15,7 +15,7 @@ type LegacyClient interface {
 
 // Client is a struct for the primary API that contains an abstract client
 type Client struct {
-	abstract.AbstractServiceClient
+	*abstract.AbstractServiceClient
 }
 
 // NewClient is a function that returns a AbstractServiceClient
@@ -28,8 +28,13 @@ func NewClient(config urlfinder.ClientConfig) *Client {
 		Token:         config.Token,
 	}
 
+	abstractClient := abstract.NewClient(abstractConfig)
+	if config.Token != "" {
+		abstractClient.SetHeader("x-access-token", config.Token)
+	}
+
 	return &Client{
-		AbstractServiceClient: *abstract.NewClient(abstractConfig),
+		AbstractServiceClient: abstractClient,
 	}
 }
 
@@ -43,7 +48,7 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 	}
 
 	primaryClient := &Client{
-		AbstractServiceClient: *abstract.NewClient(abstractConfig),
+		AbstractServiceClient: abstract.NewClient(abstractConfig),
 	}
 
 	if err := primaryClient.Login(username, password); err != nil {

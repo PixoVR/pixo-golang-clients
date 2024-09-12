@@ -31,7 +31,7 @@ type EventResponse struct {
 	Event Event `json:"event"`
 }
 
-func (p *PlatformClient) GetEvent(ctx context.Context, id int) (*Event, error) {
+func (p *clientImpl) GetEvent(ctx context.Context, id int) (*Event, error) {
 	query := `query event($id: ID!) { event(id: $id) { id session } }`
 
 	variables := map[string]interface{}{
@@ -51,7 +51,7 @@ func (p *PlatformClient) GetEvent(ctx context.Context, id int) (*Event, error) {
 	return &sessionResponse.Event, nil
 }
 
-func (p *PlatformClient) CreateEvent(ctx context.Context, event *Event) error {
+func (p *clientImpl) CreateEvent(ctx context.Context, event *Event) error {
 	if event == nil {
 		return errors.New("event is nil")
 	}
@@ -89,7 +89,7 @@ func (p *PlatformClient) CreateEvent(ctx context.Context, event *Event) error {
 	return nil
 }
 
-func (p *PlatformClient) UpdateEvent(ctx context.Context, session Event) (*Event, error) {
+func (p *clientImpl) UpdateEvent(ctx context.Context, session Event) (*Event, error) {
 	query := `mutation updateEvent($input: EventInput!) { updateEvent(input: $input) { id sessionId } }`
 
 	variables := map[string]interface{}{

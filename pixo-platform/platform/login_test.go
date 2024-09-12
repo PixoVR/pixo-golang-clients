@@ -11,7 +11,7 @@ import (
 var _ = Describe("Platform API", func() {
 
 	It("can login and interact with the api", func() {
-		config := urlfinder.ClientConfig{Lifecycle: lifecycle, APIKey: apiKey}
+		config := urlfinder.ClientConfig{Lifecycle: lifecycle, APIKey: apiKeyValue}
 		client := NewClient(config)
 		Expect(client).NotTo(BeNil())
 

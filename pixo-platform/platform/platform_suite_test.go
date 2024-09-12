@@ -19,12 +19,12 @@ func TestPlatformClient(t *testing.T) {
 }
 
 var (
-	apiKeyClient *PlatformClient
-	tokenClient  *PlatformClient
+	apiKeyClient Client
+	tokenClient  Client
 	lifecycle    string
 	username     string
 	password     string
-	apiKey       string
+	apiKeyValue  string
 	moduleID     = 43
 	orgID        = 20
 )
@@ -33,9 +33,9 @@ var _ = BeforeSuite(func() {
 	lifecycle = config2.GetEnvOrReturn("TEST_PIXO_LIFECYCLE", "dev")
 	username = os.Getenv("TEST_PIXO_USERNAME")
 	password = os.Getenv("TEST_PIXO_PASSWORD")
-	apiKey = os.Getenv("TEST_PIXO_API_KEY")
+	apiKeyValue = os.Getenv("TEST_PIXO_API_KEY")
 
-	config := urlfinder.ClientConfig{Lifecycle: lifecycle, APIKey: apiKey}
+	config := urlfinder.ClientConfig{Lifecycle: lifecycle, APIKey: apiKeyValue}
 	apiKeyClient = NewClient(config)
 	Expect(apiKeyClient).NotTo(BeNil())
 	Expect(apiKeyClient.IsAuthenticated()).To(BeTrue())

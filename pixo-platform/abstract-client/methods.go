@@ -8,7 +8,7 @@ import (
 func (a *AbstractServiceClient) Get(path string) (*resty.Response, error) {
 	url := a.GetURLWithPath(path)
 
-	res, err := a.FormatRequest().Get(url)
+	res, err := a.NewRequest().Get(url)
 	if err != nil {
 		return nil, err
 	}
@@ -20,7 +20,7 @@ func (a *AbstractServiceClient) Get(path string) (*resty.Response, error) {
 func (a *AbstractServiceClient) Post(path string, body []byte) (*resty.Response, error) {
 	url := a.GetURLWithPath(path)
 
-	req := a.FormatRequest()
+	req := a.NewRequest()
 	if body != nil {
 		req = req.SetBody(body)
 	}
@@ -37,7 +37,7 @@ func (a *AbstractServiceClient) Post(path string, body []byte) (*resty.Response,
 func (a *AbstractServiceClient) Patch(path string, body []byte) (*resty.Response, error) {
 	url := a.GetURLWithPath(path)
 
-	res, err := a.FormatRequest().SetBody(body).Patch(url)
+	res, err := a.NewRequest().SetBody(body).Patch(url)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (a *AbstractServiceClient) Patch(path string, body []byte) (*resty.Response
 func (a *AbstractServiceClient) Put(path string, body []byte) (*resty.Response, error) {
 	url := a.GetURLWithPath(path)
 
-	res, err := a.FormatRequest().SetBody(body).Put(url)
+	res, err := a.NewRequest().SetBody(body).Put(url)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (a *AbstractServiceClient) Put(path string, body []byte) (*resty.Response, 
 func (a *AbstractServiceClient) Delete(path string) (*resty.Response, error) {
 	url := a.GetURLWithPath(path)
 
-	res, err := a.FormatRequest().Delete(url)
+	res, err := a.NewRequest().Delete(url)
 	if err != nil {
 		return nil, err
 	}

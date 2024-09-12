@@ -112,8 +112,10 @@ func (p *Context) Authenticate(cmd *cobra.Command) error {
 		p.ConfigManager.SetConfigValue("auth-password", password)
 	}
 
-	spinner := loader.NewLoader(ctx, "Logging into the Pixo Platform...", p.Printer)
-	defer spinner.Stop()
+	if cmd != nil {
+		spinner := loader.NewLoader(ctx, "Logging into the Pixo Platform...", cmd.OutOrStdout())
+		defer spinner.Stop()
+	}
 
 	if username != "" && password != "" {
 		if err := p.PlatformClient.Login(username, password); err != nil {

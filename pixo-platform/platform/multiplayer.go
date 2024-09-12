@@ -71,7 +71,7 @@ type MultiplayerServerVersion struct {
 	UpdatedAt *time.Time `json:"updatedAt,omitempty" graphql:"updatedAt"`
 }
 
-func (p *PlatformClient) GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]MultiplayerServerConfigQueryParams, error) {
+func (p *clientImpl) GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]MultiplayerServerConfigQueryParams, error) {
 
 	variables := map[string]interface{}{
 		"params": params,
@@ -85,7 +85,7 @@ func (p *PlatformClient) GetMultiplayerServerConfigs(ctx context.Context, params
 	return query.MultiplayerServerConfigs, nil
 }
 
-func (p *PlatformClient) GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionParams) ([]MultiplayerServerVersion, error) {
+func (p *clientImpl) GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionParams) ([]MultiplayerServerVersion, error) {
 
 	variables := map[string]interface{}{
 		"params": params,
@@ -99,7 +99,7 @@ func (p *PlatformClient) GetMultiplayerServerVersions(ctx context.Context, param
 	return query.MultiplayerServerVersions, nil
 }
 
-func (p *PlatformClient) GetMultiplayerServerVersionsWithConfig(ctx context.Context, params *MultiplayerServerVersionParams) ([]MultiplayerServerVersion, error) {
+func (p *clientImpl) GetMultiplayerServerVersionsWithConfig(ctx context.Context, params *MultiplayerServerVersionParams) ([]MultiplayerServerVersion, error) {
 
 	configs, err := p.GetMultiplayerServerConfigs(ctx, &MultiplayerServerConfigParams{
 		ModuleID:      params.ModuleID,
@@ -127,7 +127,7 @@ func (p *PlatformClient) GetMultiplayerServerVersionsWithConfig(ctx context.Cont
 	return res, nil
 }
 
-func (p *PlatformClient) UpdateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error) {
+func (p *clientImpl) UpdateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error) {
 	query := `mutation updateMultiplayerServerVersion($input: MultiplayerServerVersionInput!) { updateMultiplayerServerVersion(input: $input) { id moduleId imageRegistry engine status semanticVersion module { name } } }`
 
 	variables := map[string]interface{}{
@@ -163,7 +163,7 @@ func (p *PlatformClient) UpdateMultiplayerServerVersion(ctx context.Context, inp
 	return response.ServerVersion, nil
 }
 
-func (p *PlatformClient) GetMultiplayerServerVersion(ctx context.Context, versionID int) (*MultiplayerServerVersion, error) {
+func (p *clientImpl) GetMultiplayerServerVersion(ctx context.Context, versionID int) (*MultiplayerServerVersion, error) {
 	query := `query multiplayerServerVersion($id: ID!) { multiplayerServerVersion(id: $id) { id moduleId imageRegistry engine status semanticVersion module { name } } }`
 
 	variables := map[string]interface{}{
@@ -185,7 +185,7 @@ func (p *PlatformClient) GetMultiplayerServerVersion(ctx context.Context, versio
 	return response.MultiplayerServerVersion, nil
 }
 
-func (p *PlatformClient) CreateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error) {
+func (p *clientImpl) CreateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error) {
 	query := `mutation createMultiplayerServerVersion($input: MultiplayerServerVersionInput!) { createMultiplayerServerVersion(input: $input) { id imageRegistry fileLink semanticVersion engine module { name } } }`
 
 	if input.ImageRegistry == "" && input.LocalFilePath == "" {

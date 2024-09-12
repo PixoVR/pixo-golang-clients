@@ -25,7 +25,7 @@ func (c *client) Login(username, password string) error {
 		Password: password,
 	}
 
-	res, err := c.FormatRequest().
+	res, err := c.NewRequest().
 		SetHeader("Content-Type", "application/json").
 		SetBody(loginInput).
 		Post(url)

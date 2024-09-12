@@ -68,7 +68,7 @@ type CreateModuleVersionResponse struct {
 	ModuleVersion ModuleVersion `json:"createModuleVersion"`
 }
 
-func (p *PlatformClient) GetModules(ctx context.Context, params ...ModuleParams) ([]Module, error) {
+func (p *clientImpl) GetModules(ctx context.Context, params ...ModuleParams) ([]Module, error) {
 	query := `query modules { modules { id abbreviation description imageLink shortDesc gitConfigId gitConfig { provider orgName repoName } createdAt updatedAt } }`
 
 	res, err := p.Client.ExecRaw(ctx, query, nil)
@@ -84,7 +84,7 @@ func (p *PlatformClient) GetModules(ctx context.Context, params ...ModuleParams)
 	return response.Modules, nil
 }
 
-func (p *PlatformClient) CreateModuleVersion(ctx context.Context, input ModuleVersion) (*ModuleVersion, error) {
+func (p *clientImpl) CreateModuleVersion(ctx context.Context, input ModuleVersion) (*ModuleVersion, error) {
 	query := `mutation createModuleVersion($input: ModuleVersionInput!) { createModuleVersion(input: $input) { id moduleId module { abbreviation } version package status fileLink } }`
 
 	if input.LocalFilePath == "" {

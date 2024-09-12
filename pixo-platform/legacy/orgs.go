@@ -9,7 +9,7 @@ import (
 func (p *Client) GetOrgs() ([]Org, error) {
 	url := p.GetURLWithPath("api/orgs")
 
-	res, err := p.FormatRequest().
+	res, err := p.NewRequest().
 		Get(url)
 	if err != nil {
 		return nil, err

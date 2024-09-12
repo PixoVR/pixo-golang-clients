@@ -14,7 +14,7 @@ type GetControlTypesResponse struct {
 	ControlTypes []ControlType `json:"controls,omitempty"`
 }
 
-func (p *PlatformClient) GetControlTypes(ctx context.Context) ([]ControlType, error) {
+func (p *clientImpl) GetControlTypes(ctx context.Context) ([]ControlType, error) {
 	query := `{ controls { id name } }`
 
 	res, err := p.Client.ExecRaw(ctx, query, nil)

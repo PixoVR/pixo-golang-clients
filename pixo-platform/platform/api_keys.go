@@ -33,7 +33,7 @@ type DeleteAPIKeyResponse struct {
 	Success bool `json:"deleteApiKey"`
 }
 
-func (p *PlatformClient) CreateAPIKey(ctx context.Context, input APIKey) (*APIKey, error) {
+func (p *clientImpl) CreateAPIKey(ctx context.Context, input APIKey) (*APIKey, error) {
 	query := `mutation createApiKey($input: ApiKeyInput!) { createApiKey(input: $input) { id key userId user { role } } }`
 
 	variables := map[string]interface{}{
@@ -59,7 +59,7 @@ func (p *PlatformClient) CreateAPIKey(ctx context.Context, input APIKey) (*APIKe
 	return &apiKeyResponse.APIKey, nil
 }
 
-func (p *PlatformClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) ([]APIKey, error) {
+func (p *clientImpl) GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) ([]APIKey, error) {
 	query := `query apiKeys($params: ApiKeyParams) { apiKeys(params: $params) { id key userId user { username email role } } }`
 
 	variables := map[string]interface{}{
@@ -85,7 +85,7 @@ func (p *PlatformClient) GetAPIKeys(ctx context.Context, params *APIKeyQueryPara
 	return apiKeysResponse.APIKeys, nil
 }
 
-func (p *PlatformClient) DeleteAPIKey(ctx context.Context, id int) error {
+func (p *clientImpl) DeleteAPIKey(ctx context.Context, id int) error {
 	query := `mutation deleteApiKey($id: ID!) { deleteApiKey(id: $id) }`
 
 	variables := map[string]interface{}{

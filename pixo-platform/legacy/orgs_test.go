@@ -26,7 +26,6 @@ var _ = Describe("Orgs", Ordered, func() {
 
 	It("can get orgs", func() {
 		orgs, err := apiClient.GetOrgs()
-
 		Expect(err).NotTo(HaveOccurred())
 		Expect(orgs).NotTo(BeNil())
 		Expect(len(orgs)).To(BeNumerically(">", 0))

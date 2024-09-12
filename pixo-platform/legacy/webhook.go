@@ -10,7 +10,7 @@ import (
 func (p *Client) CreateWebhook(input Webhook) error {
 	url := p.GetURLWithPath("api/webhook")
 
-	res, err := p.FormatRequest().
+	res, err := p.NewRequest().
 		SetBody(input).
 		Post(url)
 	if err != nil {
@@ -28,7 +28,7 @@ func (p *Client) CreateWebhook(input Webhook) error {
 func (p *Client) GetWebhooks(orgID int) ([]Webhook, error) {
 	url := p.GetURLWithPath(fmt.Sprintf("api/webhooks/org/%d", orgID))
 
-	res, err := p.FormatRequest().
+	res, err := p.NewRequest().
 		Get(url)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func (p *Client) GetWebhooks(orgID int) ([]Webhook, error) {
 func (p *Client) DeleteWebhook(id int) error {
 	url := p.GetURLWithPath(fmt.Sprintf("api/webhook/%d", id))
 
-	res, err := p.FormatRequest().
+	res, err := p.NewRequest().
 		Delete(url)
 	if err != nil {
 		return err

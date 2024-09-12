@@ -4,6 +4,7 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"github.com/go-resty/resty/v2"
 	"github.com/gorilla/websocket"
+	"sync"
 )
 
 // AbstractServiceClient is a struct that handles generic http client operations
@@ -11,11 +12,12 @@ type AbstractServiceClient struct {
 	serviceConfig urlfinder.ServiceConfig
 	token         string
 	key           string
-	headers       map[string]string
 
-	restyClient    *resty.Client
+	client         *resty.Client
 	websocketConn  *websocket.Conn
 	timeoutSeconds int
+	lock           sync.Mutex
+	headers        sync.Map
 }
 
 // AbstractConfig is a struct that holds the configuration for the AbstractServiceClient
@@ -33,12 +35,21 @@ func NewClient(config AbstractConfig) *AbstractServiceClient {
 		config.TimeoutSeconds = 30
 	}
 
-	return &AbstractServiceClient{
+	client := resty.New().SetHeader("Content-Type", "application/json")
+
+	abstractClient := AbstractServiceClient{
 		serviceConfig:  config.ServiceConfig,
-		token:          config.Token,
 		key:            config.APIKey,
+		token:          config.Token,
 		timeoutSeconds: config.TimeoutSeconds,
-		restyClient:    resty.New(),
-		headers:        make(map[string]string),
+		client:         client,
 	}
+
+	if config.Token != "" {
+		abstractClient.SetToken(config.Token)
+	} else if config.APIKey != "" {
+		abstractClient.SetAPIKey(config.APIKey)
+	}
+
+	return &abstractClient
 }

@@ -19,7 +19,7 @@ type GetRolesResponse struct {
 	Roles []Role `json:"roles"`
 }
 
-func (p *PlatformClient) GetRoles(ctx context.Context) ([]Role, error) {
+func (p *clientImpl) GetRoles(ctx context.Context) ([]Role, error) {
 	query := `{ roles { id name permissions } }`
 
 	res, err := p.Client.ExecRaw(ctx, query, nil)

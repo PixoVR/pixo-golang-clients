@@ -9,13 +9,8 @@ import (
 
 // DialWebsocket creates a new websocket connection to the given endpoint.
 func (a *AbstractServiceClient) DialWebsocket(endpoint string) (*websocket.Conn, *http.Response, error) {
-	header := http.Header{}
-	if a.token != "" {
-		header.Add("Authorization", "Bearer "+a.token)
-	}
-
 	url := a.GetURLWithPath(endpoint, "ws")
-	conn, response, err := websocket.DefaultDialer.Dial(url, header)
+	conn, response, err := websocket.DefaultDialer.Dial(url, a.GetAuthHeader())
 	if err != nil {
 		return nil, nil, fmt.Errorf("%w - %s", err, response.Status)
 	}

@@ -15,7 +15,7 @@ func (p *Client) Login(username, password string) error {
 		Password: password,
 	}
 
-	res, err := p.FormatRequest().
+	res, err := p.NewRequest().
 		SetHeader("Content-Type", "application/json").
 		SetBody(loginInput).
 		Post(url)
@@ -36,6 +36,6 @@ func (p *Client) Login(username, password string) error {
 	}
 
 	p.SetToken(loginResponse.User.Token)
-
+	p.SetHeader("x-access-token", loginResponse.User.Token)
 	return nil
 }

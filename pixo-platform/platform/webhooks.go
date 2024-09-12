@@ -41,7 +41,7 @@ type DeleteWebhookResponse struct {
 	Success bool `json:"deleteWebhook"`
 }
 
-func (p *PlatformClient) GetWebhooks(ctx context.Context, params *WebhookParams) ([]Webhook, error) {
+func (p *clientImpl) GetWebhooks(ctx context.Context, params *WebhookParams) ([]Webhook, error) {
 	query := `query webhooks($params: WebhookParams) { webhooks(params: $params) { id orgId org { name } url token description } }`
 
 	variables := map[string]interface{}{
@@ -62,7 +62,7 @@ func (p *PlatformClient) GetWebhooks(ctx context.Context, params *WebhookParams)
 	return webhooksResponse.Webhooks, nil
 }
 
-func (p *PlatformClient) GetWebhook(ctx context.Context, id int) (*Webhook, error) {
+func (p *clientImpl) GetWebhook(ctx context.Context, id int) (*Webhook, error) {
 	query := `query webhook($id: ID) { webhook(id: $id) { id url description token orgId org { name } }`
 
 	variables := map[string]interface{}{
@@ -82,7 +82,7 @@ func (p *PlatformClient) GetWebhook(ctx context.Context, id int) (*Webhook, erro
 	return &webhookResponse.Webhook, nil
 }
 
-func (p *PlatformClient) CreateWebhook(ctx context.Context, webhook Webhook) (*Webhook, error) {
+func (p *clientImpl) CreateWebhook(ctx context.Context, webhook Webhook) (*Webhook, error) {
 	query := `mutation createWebhook($input: WebhookInput!) {
   createWebhook(input: $input) {
     id
@@ -126,7 +126,7 @@ func (p *PlatformClient) CreateWebhook(ctx context.Context, webhook Webhook) (*W
 	return &webhookResponse.Webhook, nil
 }
 
-func (p *PlatformClient) UpdateWebhook(ctx context.Context, webhook Webhook) (*Webhook, error) {
+func (p *clientImpl) UpdateWebhook(ctx context.Context, webhook Webhook) (*Webhook, error) {
 
 	if webhook.ID == 0 {
 		return nil, errors.New("webhook id is required")
@@ -169,7 +169,7 @@ func (p *PlatformClient) UpdateWebhook(ctx context.Context, webhook Webhook) (*W
 	return &updateWebhookResponse.Webhook, nil
 }
 
-func (p *PlatformClient) DeleteWebhook(ctx context.Context, id int) error {
+func (p *clientImpl) DeleteWebhook(ctx context.Context, id int) error {
 	query := `mutation deleteWebhook($id: ID!) { deleteWebhook(id: $id) }`
 
 	variables := map[string]interface{}{

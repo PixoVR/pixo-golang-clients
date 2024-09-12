@@ -6,24 +6,23 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/middleware/auth"
 	"github.com/rs/zerolog/log"
-	"net/http"
 	"os"
 
 	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
 	"github.com/hasura/go-graphql-client"
 )
 
-var _ Client = (*PlatformClient)(nil)
+var _ Client = (*clientImpl)(nil)
 
-// PlatformClient is a struct for the graphql API that contains an abstract client
-type PlatformClient struct {
+// clientImpl is a struct for the graphql API that contains an abstract client
+type clientImpl struct {
 	*abstract.AbstractServiceClient
 	*graphql.Client
 	defaultContext context.Context
 }
 
-// NewClient is a function that returns a PlatformClient
-func NewClient(config urlfinder.ClientConfig) *PlatformClient {
+// NewClient is a function that returns a clientImpl
+func NewClient(config urlfinder.ClientConfig) Client {
 
 	if config.Token == "" && config.APIKey == "" {
 		config.APIKey = os.Getenv("PIXO_API_KEY")
@@ -33,60 +32,34 @@ func NewClient(config urlfinder.ClientConfig) *PlatformClient {
 
 	url := serviceConfig.FormatURL()
 
-	t := &transport{
-		underlyingTransport: http.DefaultTransport,
-		token:               config.Token,
-		key:                 config.APIKey,
-	}
-	c := http.Client{Transport: t}
-
 	abstractConfig := abstract.AbstractConfig{
 		ServiceConfig: serviceConfig,
 		Token:         config.Token,
 		APIKey:        config.APIKey,
 	}
+	abstractClient := abstract.NewClient(abstractConfig)
 
-	return &PlatformClient{
-		AbstractServiceClient: abstract.NewClient(abstractConfig),
-		Client:                graphql.NewClient(fmt.Sprintf("%s/query", url), &c),
+	return &clientImpl{
+		AbstractServiceClient: abstractClient,
+		Client:                graphql.NewClient(fmt.Sprintf("%s/query", url), abstractClient.Client()),
 		defaultContext:        context.Background(),
 	}
 }
 
-// NewClientWithBasicAuth is a function that returns a PlatformClient with basic auth performed
-func NewClientWithBasicAuth(username, password string, config urlfinder.ClientConfig) (*PlatformClient, error) {
+// NewClientWithBasicAuth is a function that returns a clientImpl with basic auth performed
+func NewClientWithBasicAuth(username, password string, config urlfinder.ClientConfig) (Client, error) {
 
-	serviceConfig := newServiceConfig(config)
-
-	client := &PlatformClient{
-		AbstractServiceClient: abstract.NewClient(abstract.AbstractConfig{ServiceConfig: serviceConfig}),
-		defaultContext:        context.Background(),
-	}
+	client := NewClient(config)
 
 	if err := client.Login(username, password); err != nil {
 		log.Error().Err(err).Msg("Failed to login to the pixo platform")
 		return nil, err
 	}
 
-	httpClient := http.Client{Transport: &transport{underlyingTransport: http.DefaultTransport, token: client.GetToken()}}
-
-	client.Client = graphql.NewClient(fmt.Sprintf("%s/query", serviceConfig.FormatURL()), &httpClient)
-
 	return client, nil
 }
 
-func (p *PlatformClient) SetToken(token string) {
-	p.AbstractServiceClient.SetToken(token)
-	httpClient := http.Client{Transport: &transport{underlyingTransport: http.DefaultTransport, token: token}}
-	p.Client = graphql.NewClient(fmt.Sprintf("%s/query", p.GetURL()), &httpClient)
-}
-
-func (p *PlatformClient) SetAPIKey(key string) {
-	p.AbstractServiceClient.SetAPIKey(key)
-}
-
-func (p *PlatformClient) ActiveUserID() int {
-
+func (p *clientImpl) ActiveUserID() int {
 	if !p.IsAuthenticated() {
 		return 0
 	}
@@ -101,8 +74,7 @@ func (p *PlatformClient) ActiveUserID() int {
 	return rawToken.UserID
 }
 
-func (p *PlatformClient) ActiveOrgID() int {
-
+func (p *clientImpl) ActiveOrgID() int {
 	if !p.IsAuthenticated() {
 		return 0
 	}

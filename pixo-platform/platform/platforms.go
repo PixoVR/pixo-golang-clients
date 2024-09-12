@@ -15,7 +15,7 @@ type GetPlatformsResponse struct {
 	Platforms []Platform `json:"platforms,omitempty"`
 }
 
-func (p *PlatformClient) GetPlatforms(ctx context.Context) ([]Platform, error) {
+func (p *clientImpl) GetPlatforms(ctx context.Context) ([]Platform, error) {
 	query := `query platforms { platforms { id name shortName } }`
 
 	res, err := p.Client.ExecRaw(ctx, query, nil)

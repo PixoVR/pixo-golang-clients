@@ -56,7 +56,7 @@ func (a *Client) GetBuildWorkflows() ([]Workflow, error) {
 func (a *Client) GetBuildWorkflowLogs(workflowName string) (chan *Log, error) {
 	path := fmt.Sprintf("build/workflows/%s/logs", workflowName)
 
-	req := a.FormatRequest()
+	req := a.NewRequest()
 	req.SetHeader("Accept", "application/octet-stream")
 
 	req.SetDoNotParseResponse(true)

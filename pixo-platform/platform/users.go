@@ -39,7 +39,7 @@ type DeleteUserResponse struct {
 	Success bool `json:"deleteUser"`
 }
 
-func (p *PlatformClient) CreateUser(ctx context.Context, user *User) error {
+func (p *clientImpl) CreateUser(ctx context.Context, user *User) error {
 	if user == nil {
 		return errors.New("user is nil")
 	}
@@ -72,7 +72,7 @@ func (p *PlatformClient) CreateUser(ctx context.Context, user *User) error {
 	return nil
 }
 
-func (p *PlatformClient) UpdateUser(ctx context.Context, user *User) error {
+func (p *clientImpl) UpdateUser(ctx context.Context, user *User) error {
 	if user == nil {
 		return errors.New("user is nil")
 	}
@@ -127,7 +127,7 @@ func (p *PlatformClient) UpdateUser(ctx context.Context, user *User) error {
 	return nil
 }
 
-func (p *PlatformClient) DeleteUser(ctx context.Context, id int) error {
+func (p *clientImpl) DeleteUser(ctx context.Context, id int) error {
 	query := `mutation deleteUser($id: ID!) { deleteUser(id: $id) }`
 
 	variables := map[string]interface{}{
@@ -151,7 +151,7 @@ func (p *PlatformClient) DeleteUser(ctx context.Context, id int) error {
 	return nil
 }
 
-func (p *PlatformClient) GetUser(ctx context.Context, id int) (*User, error) {
+func (p *clientImpl) GetUser(ctx context.Context, id int) (*User, error) {
 	query := `query user($id: ID, $username: String) { user(id: $id, username: $username) { id username email firstName lastName orgId org { id name type } role } }`
 
 	variables := map[string]interface{}{
@@ -171,7 +171,7 @@ func (p *PlatformClient) GetUser(ctx context.Context, id int) (*User, error) {
 	return &userResponse.User, nil
 }
 
-func (p *PlatformClient) GetUserByUsername(ctx context.Context, username string) (*User, error) {
+func (p *clientImpl) GetUserByUsername(ctx context.Context, username string) (*User, error) {
 	query := `query user($id: ID, $username: String) { user(id: $id, username: $username) { id username firstName lastName orgId role } }`
 
 	variables := map[string]interface{}{
