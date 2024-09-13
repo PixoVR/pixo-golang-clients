@@ -2,7 +2,6 @@ package platform
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"time"
 )
@@ -58,17 +57,12 @@ func (p *clientImpl) GetSession(ctx context.Context, id int) (*Session, error) {
 		"id": id,
 	}
 
-	res, err := p.Client.ExecRaw(ctx, query, variables)
-	if err != nil {
+	var res SessionResponse
+	if err := p.Exec(ctx, query, &res, variables); err != nil {
 		return nil, err
 	}
 
-	var sessionResponse SessionResponse
-	if err = json.Unmarshal(res, &sessionResponse); err != nil {
-		return nil, err
-	}
-
-	return &sessionResponse.Session, nil
+	return &res.Session, nil
 }
 
 func (p *clientImpl) CreateSession(ctx context.Context, session *Session) error {
@@ -121,18 +115,12 @@ func (p *clientImpl) CreateSession(ctx context.Context, session *Session) error 
 		variables["input"].(map[string]interface{})["specialization"] = session.Specialization
 	}
 
-	res, err := p.Client.ExecRaw(ctx, query, variables)
-	if err != nil {
+	var res CreateSessionResponse
+	if err := p.Exec(ctx, query, &res, variables); err != nil {
 		return err
 	}
 
-	var sessionResponse CreateSessionResponse
-	if err = json.Unmarshal(res, &sessionResponse); err != nil {
-		return err
-	}
-
-	*session = sessionResponse.Session
-
+	*session = res.Session
 	return nil
 }
 
@@ -183,15 +171,10 @@ func (p *clientImpl) UpdateSession(ctx context.Context, session Session) (*Sessi
 		variables["input"].(map[string]interface{})["moduleVersion"] = session.ModuleVersion
 	}
 
-	res, err := p.Client.ExecRaw(ctx, query, variables)
-	if err != nil {
+	var res UpdateSessionResponse
+	if err := p.Exec(ctx, query, &res, variables); err != nil {
 		return nil, err
 	}
 
-	var sessionResponse UpdateSessionResponse
-	if err = json.Unmarshal(res, &sessionResponse); err != nil {
-		return nil, err
-	}
-
-	return &sessionResponse.Session, nil
+	return &res.Session, nil
 }

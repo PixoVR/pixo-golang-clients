@@ -2,7 +2,6 @@ package platform
 
 import (
 	"context"
-	"encoding/json"
 )
 
 type ControlType struct {
@@ -17,15 +16,10 @@ type GetControlTypesResponse struct {
 func (p *clientImpl) GetControlTypes(ctx context.Context) ([]ControlType, error) {
 	query := `{ controls { id name } }`
 
-	res, err := p.Client.ExecRaw(ctx, query, nil)
-	if err != nil {
+	var res GetControlTypesResponse
+	if err := p.Exec(ctx, query, &res, nil); err != nil {
 		return nil, err
 	}
 
-	var gqlRes GetControlTypesResponse
-	if err = json.Unmarshal(res, &gqlRes); err != nil {
-		return nil, err
-	}
-
-	return gqlRes.ControlTypes, nil
+	return res.ControlTypes, nil
 }

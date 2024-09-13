@@ -1,7 +1,7 @@
 package heartbeat
 
 import (
-	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
+	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 )
@@ -12,9 +12,9 @@ type Client interface {
 	SendPulse(sessionID int) error
 }
 
-// Client is a struct that contains an AbstractServiceClient
+// Client is a struct that contains an ServiceClient
 type client struct {
-	abstract.AbstractServiceClient
+	abstract.ServiceClient
 	platformClient platform.Client
 }
 
@@ -27,8 +27,8 @@ func NewClient(config urlfinder.ClientConfig) Client {
 	}
 
 	return &client{
-		AbstractServiceClient: *abstract.NewClient(abstractConfig),
-		platformClient:        platform.NewClient(config),
+		ServiceClient:  *abstract.NewClient(abstractConfig),
+		platformClient: platform.NewClient(config),
 	}
 }
 
@@ -45,7 +45,7 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 	}
 
 	return &client{
-		AbstractServiceClient: *abstract.NewClient(abstractConfig),
+		ServiceClient: *abstract.NewClient(abstractConfig),
 	}, nil
 }
 

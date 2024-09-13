@@ -2,7 +2,6 @@ package platform
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"time"
 )
@@ -55,17 +54,12 @@ func (p *clientImpl) GetOrgs(ctx context.Context, params ...*OrgParams) ([]Org, 
 		}
 	}
 
-	res, err := p.Client.ExecRaw(ctx, query, variables)
-	if err != nil {
+	var res GetOrgsResponse
+	if err := p.Exec(ctx, query, &res, variables); err != nil {
 		return nil, err
 	}
 
-	var orgsResponse GetOrgsResponse
-	if err = json.Unmarshal(res, &orgsResponse); err != nil {
-		return nil, err
-	}
-
-	return orgsResponse.Orgs, nil
+	return res.Orgs, nil
 }
 
 func (p *clientImpl) GetOrg(ctx context.Context, id int) (*Org, error) {
@@ -75,17 +69,12 @@ func (p *clientImpl) GetOrg(ctx context.Context, id int) (*Org, error) {
 		"id": id,
 	}
 
-	res, err := p.Client.ExecRaw(ctx, query, variables)
-	if err != nil {
+	var res GetOrgResponse
+	if err := p.Exec(ctx, query, &res, variables); err != nil {
 		return nil, err
 	}
 
-	var orgResponse GetOrgResponse
-	if err = json.Unmarshal(res, &orgResponse); err != nil {
-		return nil, err
-	}
-
-	return &orgResponse.Org, nil
+	return &res.Org, nil
 }
 
 func (p *clientImpl) CreateOrg(ctx context.Context, org Org) (*Org, error) {
@@ -99,17 +88,12 @@ func (p *clientImpl) CreateOrg(ctx context.Context, org Org) (*Org, error) {
 		},
 	}
 
-	res, err := p.Client.ExecRaw(ctx, query, variables)
-	if err != nil {
+	var res CreateOrgResponse
+	if err := p.Exec(ctx, query, &res, variables); err != nil {
 		return nil, err
 	}
 
-	var orgResponse CreateOrgResponse
-	if err = json.Unmarshal(res, &orgResponse); err != nil {
-		return nil, err
-	}
-
-	return &orgResponse.Org, nil
+	return &res.Org, nil
 }
 
 func (p *clientImpl) UpdateOrg(ctx context.Context, org Org) (*Org, error) {
@@ -130,17 +114,12 @@ func (p *clientImpl) UpdateOrg(ctx context.Context, org Org) (*Org, error) {
 		variables["input"].(map[string]interface{})["name"] = org.Name
 	}
 
-	res, err := p.Client.ExecRaw(ctx, query, variables)
-	if err != nil {
+	var res UpdateOrgResponse
+	if err := p.Exec(ctx, query, &res, variables); err != nil {
 		return nil, err
 	}
 
-	var userResponse UpdateOrgResponse
-	if err = json.Unmarshal(res, &userResponse); err != nil {
-		return nil, err
-	}
-
-	return &userResponse.Org, nil
+	return &res.Org, nil
 }
 
 func (p *clientImpl) DeleteOrg(ctx context.Context, id int) error {
@@ -150,17 +129,12 @@ func (p *clientImpl) DeleteOrg(ctx context.Context, id int) error {
 		"id": id,
 	}
 
-	res, err := p.Client.ExecRaw(ctx, query, variables)
-	if err != nil {
+	var res DeleteOrgResponse
+	if err := p.Exec(ctx, query, &res, variables); err != nil {
 		return err
 	}
 
-	var deleteResponse DeleteOrgResponse
-	if err = json.Unmarshal(res, &deleteResponse); err != nil {
-		return err
-	}
-
-	if !deleteResponse.Success {
+	if !res.Success {
 		return errors.New("failed to delete user")
 	}
 

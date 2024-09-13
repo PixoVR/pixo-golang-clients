@@ -2,22 +2,22 @@ package platform
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/middleware/auth"
 	"github.com/rs/zerolog/log"
+	"io"
 	"os"
 
-	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
-	"github.com/hasura/go-graphql-client"
+	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract"
 )
 
 var _ Client = (*clientImpl)(nil)
 
 // clientImpl is a struct for the graphql API that contains an abstract client
 type clientImpl struct {
-	*abstract.AbstractServiceClient
-	*graphql.Client
+	*abstract.ServiceClient
 	defaultContext context.Context
 }
 
@@ -28,21 +28,16 @@ func NewClient(config urlfinder.ClientConfig) Client {
 		config.APIKey = os.Getenv("PIXO_API_KEY")
 	}
 
-	serviceConfig := newServiceConfig(config)
-
-	url := serviceConfig.FormatURL()
-
 	abstractConfig := abstract.AbstractConfig{
-		ServiceConfig: serviceConfig,
+		ServiceConfig: newServiceConfig(config),
 		Token:         config.Token,
 		APIKey:        config.APIKey,
 	}
 	abstractClient := abstract.NewClient(abstractConfig)
 
 	return &clientImpl{
-		AbstractServiceClient: abstractClient,
-		Client:                graphql.NewClient(fmt.Sprintf("%s/query", url), abstractClient.Client()),
-		defaultContext:        context.Background(),
+		ServiceClient:  abstractClient,
+		defaultContext: context.Background(),
 	}
 }
 
@@ -98,4 +93,34 @@ func newServiceConfig(config urlfinder.ClientConfig) urlfinder.ServiceConfig {
 		Namespace:   fmt.Sprintf("%s-apex", config.Lifecycle),
 		Port:        8000,
 	}
+}
+
+func (p *clientImpl) Exec(ctx context.Context, query string, v any, variables map[string]interface{}) error {
+	req := GraphQLRequestPayload{
+		Query:     query,
+		Variables: variables,
+	}
+	reqBody, _ := json.Marshal(req)
+	p.SetHeader("Content-Type", "application/json")
+	res, err := p.Post(ctx, "query", reqBody)
+	if err != nil {
+		return err
+	}
+
+	var gqlRes struct {
+		Messages []string        `json:"messages"`
+		Errors   []string        `json:"errors"`
+		Data     json.RawMessage `json:"data"`
+	}
+
+	resBody, _ := io.ReadAll(res.Body)
+	if err = json.Unmarshal(resBody, &gqlRes); err != nil {
+		return err
+	}
+
+	if len(gqlRes.Errors) > 0 {
+		return fmt.Errorf("graphql error: %v", gqlRes.Errors)
+	}
+
+	return json.Unmarshal(gqlRes.Data, v)
 }

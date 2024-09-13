@@ -1,8 +1,10 @@
 package headset
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
+	"io"
 )
 
 // LoginRequest is the request body for the login endpoint
@@ -18,28 +20,27 @@ type LoginResponse struct {
 
 // Login logs in the user with the given username and password
 func (c *client) Login(username, password string) error {
-	url := c.GetURLWithPath("login")
-
 	loginInput := LoginRequest{
 		Login:    username,
 		Password: password,
 	}
 
-	res, err := c.NewRequest().
-		SetHeader("Content-Type", "application/json").
-		SetBody(loginInput).
-		Post(url)
+	payload, _ := json.Marshal(loginInput)
+
+	res, err := c.Post(context.TODO(), "login", payload)
 	if err != nil {
 		return err
 	}
 
-	if res.IsError() {
-		return errors.New(string(res.Body()))
+	resBody, _ := io.ReadAll(res.Body)
+
+	if res.StatusCode != 200 {
+		return errors.New(string(resBody))
 	}
 
 	var loginResponse LoginResponse
-	if err = json.Unmarshal(res.Body(), &loginResponse); err != nil {
-		return errors.New(string(res.Body()))
+	if err = json.Unmarshal(resBody, &loginResponse); err != nil {
+		return errors.New(string(resBody))
 	}
 
 	c.SetToken(loginResponse.Token)

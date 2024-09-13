@@ -1,7 +1,7 @@
-package abstract_client
+package abstract
 
 import (
-	"github.com/go-resty/resty/v2"
+	"context"
 	"github.com/gorilla/websocket"
 	"net/http"
 )
@@ -16,11 +16,11 @@ type AbstractClient interface {
 	GetURL(protocol ...string) string
 	IsAuthenticated() bool
 
-	Get(path string) (*resty.Response, error)
-	Post(path string, body []byte) (*resty.Response, error)
-	Put(path string, body []byte) (*resty.Response, error)
-	Patch(path string, body []byte) (*resty.Response, error)
-	Delete(path string) (*resty.Response, error)
+	Get(ctx context.Context, path string) (*http.Response, error)
+	Post(ctx context.Context, path string, body []byte) (*http.Response, error)
+	Put(ctx context.Context, path string, body []byte) (*http.Response, error)
+	Patch(ctx context.Context, path string, body []byte) (*http.Response, error)
+	Delete(ctx context.Context, path string) (*http.Response, error)
 
 	DialWebsocket(endpoint string) (*websocket.Conn, *http.Response, error)
 	WriteToWebsocket(message []byte) error

@@ -1,9 +1,9 @@
-package abstract_client
+package abstract
 
 import (
+	"context"
 	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/config"
 	"github.com/go-faker/faker/v4"
-	"github.com/go-resty/resty/v2"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/websocket"
 	"github.com/rs/zerolog/log"
@@ -138,7 +138,7 @@ func (m *MockAbstractClient) ActiveUserID() int {
 }
 
 // Get increments the number of times it was called and returns an error if provided
-func (m *MockAbstractClient) Get(path string) (*resty.Response, error) {
+func (m *MockAbstractClient) Get(ctx context.Context, path string) (*http.Response, error) {
 	m.NumCalledGet++
 
 	if m.GetError != nil {
@@ -149,7 +149,7 @@ func (m *MockAbstractClient) Get(path string) (*resty.Response, error) {
 }
 
 // Post increments the number of times it was called and returns an error if provided
-func (m *MockAbstractClient) Post(path string, body []byte) (*resty.Response, error) {
+func (m *MockAbstractClient) Post(ctx context.Context, path string, body []byte) (*http.Response, error) {
 	m.NumCalledPost++
 
 	if m.PostError != nil {
@@ -160,7 +160,7 @@ func (m *MockAbstractClient) Post(path string, body []byte) (*resty.Response, er
 }
 
 // Put increments the number of times it was called and returns an error if provided
-func (m *MockAbstractClient) Put(path string, body []byte) (*resty.Response, error) {
+func (m *MockAbstractClient) Put(ctx context.Context, path string, body []byte) (*http.Response, error) {
 	m.NumCalledPut++
 
 	if m.PutError != nil {
@@ -171,7 +171,7 @@ func (m *MockAbstractClient) Put(path string, body []byte) (*resty.Response, err
 }
 
 // Patch increments the number of times it was called and returns an error if provided
-func (m *MockAbstractClient) Patch(path string, body []byte) (*resty.Response, error) {
+func (m *MockAbstractClient) Patch(ctx context.Context, path string, body []byte) (*http.Response, error) {
 	m.NumCalledPatch++
 
 	if m.PatchError != nil {
@@ -182,7 +182,7 @@ func (m *MockAbstractClient) Patch(path string, body []byte) (*resty.Response, e
 }
 
 // Delete increments the number of times it was called and returns an error if provided
-func (m *MockAbstractClient) Delete(path string) (*resty.Response, error) {
+func (m *MockAbstractClient) Delete(ctx context.Context, path string) (*http.Response, error) {
 	m.NumCalledDelete++
 
 	if m.DeleteError != nil {

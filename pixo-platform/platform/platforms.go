@@ -2,7 +2,6 @@ package platform
 
 import (
 	"context"
-	"encoding/json"
 )
 
 type Platform struct {
@@ -18,15 +17,10 @@ type GetPlatformsResponse struct {
 func (p *clientImpl) GetPlatforms(ctx context.Context) ([]Platform, error) {
 	query := `query platforms { platforms { id name shortName } }`
 
-	res, err := p.Client.ExecRaw(ctx, query, nil)
-	if err != nil {
+	var res GetPlatformsResponse
+	if err := p.Exec(ctx, query, &res, nil); err != nil {
 		return nil, err
 	}
 
-	var gqlRes GetPlatformsResponse
-	if err = json.Unmarshal(res, &gqlRes); err != nil {
-		return nil, err
-	}
-
-	return gqlRes.Platforms, nil
+	return res.Platforms, nil
 }

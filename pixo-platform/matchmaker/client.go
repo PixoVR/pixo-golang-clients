@@ -1,7 +1,7 @@
 package matchmaker
 
 import (
-	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
+	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"net"
@@ -10,7 +10,7 @@ import (
 
 // MultiplayerMatchmaker is a client for the matchmaking service.
 type MultiplayerMatchmaker struct {
-	*abstract.AbstractServiceClient
+	*abstract.ServiceClient
 	*sync.Mutex
 
 	platformClient platform.Client
@@ -44,9 +44,9 @@ func NewClient(config urlfinder.ClientConfig, timeoutSeconds ...int) *Multiplaye
 	}
 
 	return &MultiplayerMatchmaker{
-		AbstractServiceClient: abstract.NewClient(abstractConfig),
-		platformClient:        platform.NewClient(config),
-		Mutex:                 &sync.Mutex{},
+		ServiceClient:  abstract.NewClient(abstractConfig),
+		platformClient: platform.NewClient(config),
+		Mutex:          &sync.Mutex{},
 	}
 }
 

@@ -2,7 +2,6 @@ package platform
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"time"
 )
@@ -45,7 +44,6 @@ func (p *clientImpl) CreateUser(ctx context.Context, user *User) error {
 	}
 
 	query := `mutation createUser($input: UserInput!) { createUser(input: $input) { id firstName lastName username email role orgId org { id name }  } }`
-
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{
 			"firstName": user.FirstName,
@@ -58,13 +56,8 @@ func (p *clientImpl) CreateUser(ctx context.Context, user *User) error {
 		},
 	}
 
-	res, err := p.Client.ExecRaw(ctx, query, variables)
-	if err != nil {
-		return err
-	}
-
 	var userResponse CreateUserResponse
-	if err = json.Unmarshal(res, &userResponse); err != nil {
+	if err := p.Exec(ctx, query, &userResponse, variables); err != nil {
 		return err
 	}
 
@@ -113,13 +106,8 @@ func (p *clientImpl) UpdateUser(ctx context.Context, user *User) error {
 		variables["input"].(map[string]interface{})["role"] = user.Role
 	}
 
-	res, err := p.Client.ExecRaw(ctx, query, variables)
-	if err != nil {
-		return err
-	}
-
 	var userResponse UpdateUserResponse
-	if err = json.Unmarshal(res, &userResponse); err != nil {
+	if err := p.Exec(ctx, query, &userResponse, variables); err != nil {
 		return err
 	}
 
@@ -134,13 +122,8 @@ func (p *clientImpl) DeleteUser(ctx context.Context, id int) error {
 		"id": id,
 	}
 
-	res, err := p.Client.ExecRaw(ctx, query, variables)
-	if err != nil {
-		return err
-	}
-
 	var deleteResponse DeleteUserResponse
-	if err = json.Unmarshal(res, &deleteResponse); err != nil {
+	if err := p.Exec(ctx, query, &deleteResponse, variables); err != nil {
 		return err
 	}
 
@@ -158,13 +141,8 @@ func (p *clientImpl) GetUser(ctx context.Context, id int) (*User, error) {
 		"id": id,
 	}
 
-	res, err := p.Client.ExecRaw(ctx, query, variables)
-	if err != nil {
-		return nil, err
-	}
-
 	var userResponse GetUserResponse
-	if err = json.Unmarshal(res, &userResponse); err != nil {
+	if err := p.Exec(ctx, query, &userResponse, variables); err != nil {
 		return nil, err
 	}
 
@@ -178,13 +156,8 @@ func (p *clientImpl) GetUserByUsername(ctx context.Context, username string) (*U
 		"username": username,
 	}
 
-	res, err := p.Client.ExecRaw(ctx, query, variables)
-	if err != nil {
-		return nil, err
-	}
-
 	var userResponse GetUserResponse
-	if err = json.Unmarshal(res, &userResponse); err != nil {
+	if err := p.Exec(ctx, query, &userResponse, variables); err != nil {
 		return nil, err
 	}
 

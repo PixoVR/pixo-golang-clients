@@ -1,6 +1,7 @@
 package allocator_test
 
 import (
+	"context"
 	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/allocator"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	config2 "github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/config"
@@ -28,10 +29,10 @@ var _ = Describe("Allocate", Ordered, func() {
 
 	It("can check the health of the allocator", func() {
 		client := NewClient(config)
-		res, err := client.Get("health")
+		res, err := client.Get(context.Background(), "health")
 		Expect(err).NotTo(HaveOccurred())
 		Expect(res).NotTo(BeNil())
-		Expect(res.StatusCode()).To(Equal(http.StatusOK))
+		Expect(res.StatusCode).To(Equal(http.StatusOK))
 	})
 
 	It("should return an error if the server allocation failed", func() {

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/rs/zerolog/log"
+	"io"
 )
 
 // Response is the response object for requests to the headset API
@@ -55,14 +56,16 @@ func (c *client) SendEvent(ctx context.Context, request EventRequest) (*EventRes
 
 	path := "event"
 
-	res, err := c.Post(path, body)
+	res, err := c.Post(context.TODO(), path, body)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to post event request")
 		return nil, err
 	}
 
+	resBody, _ := io.ReadAll(res.Body)
+
 	var response Response
-	if err = json.Unmarshal(res.Body(), &response); err != nil {
+	if err = json.Unmarshal(resBody, &response); err != nil {
 		log.Error().Err(err).Msg("Failed to unmarshal create event response")
 		return nil, err
 	}

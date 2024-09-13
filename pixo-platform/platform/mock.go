@@ -3,7 +3,7 @@ package platform
 import (
 	"context"
 	"errors"
-	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
+	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract"
 	commonerrors "github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/commonerrors"
 	"github.com/go-faker/faker/v4"
 	"time"

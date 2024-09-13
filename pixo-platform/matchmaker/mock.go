@@ -3,7 +3,7 @@ package matchmaker
 import (
 	"encoding/json"
 	"fmt"
-	abstract_client "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
+	abstract_client "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/allocator"
 	"github.com/gorilla/websocket"
 	"net"

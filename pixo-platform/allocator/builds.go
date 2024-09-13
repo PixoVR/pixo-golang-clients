@@ -2,9 +2,10 @@ package allocator
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"fmt"
-	log "github.com/rs/zerolog/log"
+	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -33,19 +34,19 @@ type Log struct {
 func (a *Client) GetBuildWorkflows() ([]Workflow, error) {
 	path := "build/workflows"
 
-	res, err := a.Get(path)
+	res, err := a.Get(context.TODO(), path)
 	if err != nil {
 		return nil, err
 	}
 
-	if res.StatusCode() != http.StatusOK {
-		log.Debug().Msgf("Received status code %d when getting build workflows: %s", res.StatusCode(), res.Body())
-		return nil, fmt.Errorf("received status code %d when getting build workflows", res.StatusCode())
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("received status code %d when getting build workflows", res.StatusCode)
 	}
 
+	resBody, _ := io.ReadAll(res.Body)
+
 	var workflowsResponse WorkflowsResponse
-	if err = json.Unmarshal(res.Body(), &workflowsResponse); err != nil {
-		log.Debug().Err(err).Msg("Failed to unmarshal build workflows response")
+	if err = json.Unmarshal(resBody, &workflowsResponse); err != nil {
 		return nil, err
 	}
 
@@ -56,12 +57,10 @@ func (a *Client) GetBuildWorkflows() ([]Workflow, error) {
 func (a *Client) GetBuildWorkflowLogs(workflowName string) (chan *Log, error) {
 	path := fmt.Sprintf("build/workflows/%s/logs", workflowName)
 
-	req := a.NewRequest()
-	req.SetHeader("Accept", "application/octet-stream")
+	req, err := a.NewRequest(http.MethodGet, path, nil)
+	req.Header.Set("Accept", "application/octet-stream")
 
-	req.SetDoNotParseResponse(true)
-
-	res, err := req.Get(a.GetURLWithPath(path))
+	res, err := a.Client().Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -70,13 +69,11 @@ func (a *Client) GetBuildWorkflowLogs(workflowName string) (chan *Log, error) {
 
 	go func() {
 		for {
-			line, err := bufio.NewReader(res.RawResponse.Body).ReadBytes('\n')
+			line, err := bufio.NewReader(res.Body).ReadBytes('\n')
 			if err != nil {
 				close(logs)
 				break
 			}
-
-			log.Debug().Msgf("Received line from stream: %s", line)
 
 			data := strings.Trim(string(line), "\n")
 			if data != "event:message" {
@@ -85,7 +82,6 @@ func (a *Client) GetBuildWorkflowLogs(workflowName string) (chan *Log, error) {
 				workflowLog.Step = workflowName
 				workflowLog.Lines = data
 				//if err = json.Unmarshal(line, &workflowLog); err != nil {
-				//	log.Debug().Err(err).Msg("Failed to unmarshal workflow log")
 				//	continue
 				//}
 

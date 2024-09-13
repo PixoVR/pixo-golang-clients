@@ -2,7 +2,7 @@ package platform
 
 import (
 	"context"
-	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
+	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract"
 )
 
 type Client interface {

@@ -38,17 +38,12 @@ func (p *clientImpl) GetEvent(ctx context.Context, id int) (*Event, error) {
 		"id": id,
 	}
 
-	res, err := p.Client.ExecRaw(ctx, query, variables)
-	if err != nil {
+	var res EventResponse
+	if err := p.Exec(ctx, query, &res, variables); err != nil {
 		return nil, err
 	}
 
-	var sessionResponse EventResponse
-	if err = json.Unmarshal(res, &sessionResponse); err != nil {
-		return nil, err
-	}
-
-	return &sessionResponse.Event, nil
+	return &res.Event, nil
 }
 
 func (p *clientImpl) CreateEvent(ctx context.Context, event *Event) error {
@@ -75,17 +70,12 @@ func (p *clientImpl) CreateEvent(ctx context.Context, event *Event) error {
 		variables["input"].(map[string]interface{})["payload"] = string(payload)
 	}
 
-	res, err := p.Client.ExecRaw(ctx, query, variables)
-	if err != nil {
+	var res CreateEventResponse
+	if err := p.Exec(ctx, query, &res, variables); err != nil {
 		return err
 	}
 
-	var eventResponse CreateEventResponse
-	if err = json.Unmarshal(res, &eventResponse); err != nil {
-		return err
-	}
-
-	*event = eventResponse.Event
+	*event = res.Event
 	return nil
 }
 
@@ -98,15 +88,10 @@ func (p *clientImpl) UpdateEvent(ctx context.Context, session Event) (*Event, er
 		},
 	}
 
-	res, err := p.Client.ExecRaw(ctx, query, variables)
-	if err != nil {
+	var res UpdateEventResponse
+	if err := p.Exec(ctx, query, &res, variables); err != nil {
 		return nil, err
 	}
 
-	var sessionResponse UpdateEventResponse
-	if err = json.Unmarshal(res, &sessionResponse); err != nil {
-		return nil, err
-	}
-
-	return &sessionResponse.Event, nil
+	return &res.Event, nil
 }

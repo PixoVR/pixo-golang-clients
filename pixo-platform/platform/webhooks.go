@@ -2,7 +2,6 @@ package platform
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 )
 
@@ -48,18 +47,12 @@ func (p *clientImpl) GetWebhooks(ctx context.Context, params *WebhookParams) ([]
 		"params": params,
 	}
 
-	res, err := p.Client.ExecRaw(ctx, query, variables)
-	if err != nil {
+	var res GetWebhooksResponse
+	if err := p.Exec(ctx, query, &res, variables); err != nil {
 		return nil, err
 	}
 
-	var webhooksResponse GetWebhooksResponse
-	if err = json.Unmarshal(res, &webhooksResponse); err != nil {
-		return nil, err
-
-	}
-
-	return webhooksResponse.Webhooks, nil
+	return res.Webhooks, nil
 }
 
 func (p *clientImpl) GetWebhook(ctx context.Context, id int) (*Webhook, error) {
@@ -69,17 +62,12 @@ func (p *clientImpl) GetWebhook(ctx context.Context, id int) (*Webhook, error) {
 		"id": id,
 	}
 
-	res, err := p.Client.ExecRaw(ctx, query, variables)
-	if err != nil {
+	var res GetWebhookResponse
+	if err := p.Exec(ctx, query, &res, variables); err != nil {
 		return nil, err
 	}
 
-	var webhookResponse GetWebhookResponse
-	if err = json.Unmarshal(res, &webhookResponse); err != nil {
-		return nil, err
-	}
-
-	return &webhookResponse.Webhook, nil
+	return &res.Webhook, nil
 }
 
 func (p *clientImpl) CreateWebhook(ctx context.Context, webhook Webhook) (*Webhook, error) {
@@ -113,17 +101,12 @@ func (p *clientImpl) CreateWebhook(ctx context.Context, webhook Webhook) (*Webho
 		},
 	}
 
-	res, err := p.Client.ExecRaw(ctx, query, variables)
-	if err != nil {
+	var res CreateWebhookResponse
+	if err := p.Exec(ctx, query, &res, variables); err != nil {
 		return nil, err
 	}
 
-	var webhookResponse CreateWebhookResponse
-	if err = json.Unmarshal(res, &webhookResponse); err != nil {
-		return nil, err
-	}
-
-	return &webhookResponse.Webhook, nil
+	return &res.Webhook, nil
 }
 
 func (p *clientImpl) UpdateWebhook(ctx context.Context, webhook Webhook) (*Webhook, error) {
@@ -156,17 +139,12 @@ func (p *clientImpl) UpdateWebhook(ctx context.Context, webhook Webhook) (*Webho
 		variables["input"].(map[string]interface{})["description"] = webhook.Description
 	}
 
-	res, err := p.Client.ExecRaw(ctx, query, variables)
-	if err != nil {
+	var res UpdateWebhookResponse
+	if err := p.Exec(ctx, query, &res, variables); err != nil {
 		return nil, err
 	}
 
-	var updateWebhookResponse UpdateWebhookResponse
-	if err = json.Unmarshal(res, &updateWebhookResponse); err != nil {
-		return nil, err
-	}
-
-	return &updateWebhookResponse.Webhook, nil
+	return &res.Webhook, nil
 }
 
 func (p *clientImpl) DeleteWebhook(ctx context.Context, id int) error {
@@ -176,17 +154,12 @@ func (p *clientImpl) DeleteWebhook(ctx context.Context, id int) error {
 		"id": id,
 	}
 
-	res, err := p.Client.ExecRaw(ctx, query, variables)
-	if err != nil {
+	var res DeleteWebhookResponse
+	if err := p.Exec(ctx, query, &res, variables); err != nil {
 		return err
 	}
 
-	var deleteResponse DeleteWebhookResponse
-	if err = json.Unmarshal(res, &deleteResponse); err != nil {
-		return err
-	}
-
-	if !deleteResponse.Success {
+	if !res.Success {
 		return errors.New("failed to delete webhook")
 	}
 

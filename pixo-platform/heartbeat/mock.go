@@ -1,6 +1,6 @@
 package heartbeat
 
-import abstract_client "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
+import abstract_client "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract"
 
 type MockClient struct {
 	abstract_client.MockAbstractClient

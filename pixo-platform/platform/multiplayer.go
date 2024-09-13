@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/rs/zerolog/log"
 	"io"
 	"mime"
 	"mime/multipart"
@@ -16,6 +15,38 @@ import (
 	"time"
 )
 
+type MultiplayerServerConfigQuery struct {
+	MultiplayerServerConfigs []MultiplayerServerConfigQueryParams `graphql:"multiplayerServerConfigs(params: $params)"`
+}
+
+type MultiplayerServerVersionQuery struct {
+	MultiplayerServerVersions []MultiplayerServerVersion `graphql:"multiplayerServerVersions(params: $params)"`
+}
+
+type MultiplayerServerConfigParams struct {
+	ModuleID       int                        `json:"moduleId,omitempty"`
+	OrgID          int                        `json:"orgId,omitempty"`
+	ServerVersion  string                     `json:"serverVersion,omitempty"`
+	Capacity       int                        `json:"capacity,omitempty"`
+	ServerVersions []MultiplayerServerVersion `json:"serverVersions,omitempty"`
+}
+
+type MultiplayerServerConfigQueryParams struct {
+	ID       int  `json:"id" graphql:"id"`
+	ModuleID int  `json:"moduleId" graphql:"moduleId"`
+	Capacity int  `json:"capacity" graphql:"capacity"`
+	Disabled bool `json:"disabled" graphql:"disabled"`
+	Module   struct {
+		ID   int    `json:"id" graphql:"id"`
+		Name string `json:"name" graphql:"name"`
+	}
+	ServerVersions []MultiplayerServerVersion `json:"serverVersions" graphql:"serverVersions"`
+}
+
+type MultiplayerServerVersionParams struct {
+	ModuleID        int    `json:"moduleId" graphql:"moduleId"`
+	SemanticVersion string `json:"semanticVersion" graphql:"semanticVersion"`
+}
 type MultiplayerServerConfig struct {
 	ID              int    `json:"id"`
 	Capacity        int    `json:"capacity,omitempty"`
@@ -72,31 +103,33 @@ type MultiplayerServerVersion struct {
 }
 
 func (p *clientImpl) GetMultiplayerServerConfigs(ctx context.Context, params *MultiplayerServerConfigParams) ([]MultiplayerServerConfigQueryParams, error) {
+	query := `query multiplayerServerConfigs($params: MultiplayerServerConfigParams) { multiplayerServerConfigs(params: $params) { id moduleId capacity disabled module { id name } serverVersions { id semanticVersion imageRegistry } } }`
 
 	variables := map[string]interface{}{
 		"params": params,
 	}
 
-	var query MultiplayerServerConfigQuery
-	if err := p.Client.Query(ctx, &query, variables); err != nil {
+	var res MultiplayerServerConfigQuery
+	if err := p.Exec(ctx, query, &res, variables); err != nil {
 		return nil, err
 	}
 
-	return query.MultiplayerServerConfigs, nil
+	return res.MultiplayerServerConfigs, nil
 }
 
 func (p *clientImpl) GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionParams) ([]MultiplayerServerVersion, error) {
+	query := `query multiplayerServerVersions($params: MultiplayerServerVersionParams) { multiplayerServerVersions(params: $params) { id moduleId imageRegistry engine status semanticVersion module { name } } }`
 
 	variables := map[string]interface{}{
 		"params": params,
 	}
 
-	var query MultiplayerServerVersionQuery
-	if err := p.Client.Query(ctx, &query, variables); err != nil {
+	var res MultiplayerServerVersionQuery
+	if err := p.Exec(ctx, query, &res, variables); err != nil {
 		return nil, err
 	}
 
-	return query.MultiplayerServerVersions, nil
+	return res.MultiplayerServerVersions, nil
 }
 
 func (p *clientImpl) GetMultiplayerServerVersionsWithConfig(ctx context.Context, params *MultiplayerServerVersionParams) ([]MultiplayerServerVersion, error) {
@@ -147,20 +180,15 @@ func (p *clientImpl) UpdateMultiplayerServerVersion(ctx context.Context, input M
 		variables["input"].(map[string]interface{})["engine"] = input.Engine
 	}
 
-	res, err := p.Client.ExecRaw(ctx, query, variables)
-	if err != nil {
-		return nil, err
-	}
-
-	var response struct {
+	var res struct {
 		ServerVersion *MultiplayerServerVersion `json:"updateMultiplayerServerVersion"`
 	}
 
-	if err = json.Unmarshal(res, &response); err != nil {
+	if err := p.Exec(ctx, query, &res, variables); err != nil {
 		return nil, err
 	}
 
-	return response.ServerVersion, nil
+	return res.ServerVersion, nil
 }
 
 func (p *clientImpl) GetMultiplayerServerVersion(ctx context.Context, versionID int) (*MultiplayerServerVersion, error) {
@@ -170,19 +198,14 @@ func (p *clientImpl) GetMultiplayerServerVersion(ctx context.Context, versionID 
 		"id": versionID,
 	}
 
-	res, err := p.Client.ExecRaw(ctx, query, variables)
-	if err != nil {
-		return nil, err
-	}
-
-	var response struct {
+	var res struct {
 		MultiplayerServerVersion *MultiplayerServerVersion `json:"multiplayerServerVersion"`
 	}
-	if err = json.Unmarshal(res, &response); err != nil {
+	if err := p.Exec(ctx, query, &res, variables); err != nil {
 		return nil, err
 	}
 
-	return response.MultiplayerServerVersion, nil
+	return res.MultiplayerServerVersion, nil
 }
 
 func (p *clientImpl) CreateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error) {
@@ -207,26 +230,17 @@ func (p *clientImpl) CreateMultiplayerServerVersion(ctx context.Context, input M
 	}
 
 	if input.LocalFilePath == "" {
-		res, err := p.Client.ExecRaw(ctx, query, variables)
-		if err != nil {
-			return nil, err
-		}
-
-		var response struct {
+		var res struct {
 			ServerVersion *MultiplayerServerVersion `json:"createMultiplayerServerVersion"`
 		}
-		if err = json.Unmarshal(res, &response); err != nil {
+		if err := p.Exec(ctx, query, &res, variables); err != nil {
 			return nil, err
 		}
 
-		return response.ServerVersion, nil
+		return res.ServerVersion, nil
 	}
 
-	graphqlRequest := struct {
-		OperationName string         `json:"operationName"`
-		Query         string         `json:"query"`
-		Variables     map[string]any `json:"variables,omitempty"`
-	}{
+	graphqlRequest := GraphQLRequestPayload{
 		OperationName: "createMultiplayerServerVersion",
 		Query:         query,
 		Variables:     variables,
@@ -265,16 +279,17 @@ func (p *clientImpl) CreateMultiplayerServerVersion(ctx context.Context, input M
 		return nil, err
 	}
 
-	p.AbstractServiceClient.SetHeader("Content-Type", writer.FormDataContentType())
+	p.ServiceClient.SetHeader("Content-Type", writer.FormDataContentType())
 
-	res, err := p.Post("query", payload.Bytes())
+	res, err := p.Post(context.TODO(), "query", payload.Bytes())
 	if err != nil {
-		log.Error().Err(err).Msg("error creating multiplayer server version")
 		return nil, err
 	}
 
-	if res.IsError() {
-		return nil, fmt.Errorf("error creating multiplayer server version: %s", res.String())
+	resBody, _ := io.ReadAll(res.Body)
+
+	if res.StatusCode > 299 {
+		return nil, fmt.Errorf("error creating multiplayer server version: %s", string(resBody))
 	}
 
 	var gqlRes struct {
@@ -283,7 +298,7 @@ func (p *clientImpl) CreateMultiplayerServerVersion(ctx context.Context, input M
 		} `json:"data"`
 	}
 
-	if err = json.Unmarshal(res.Body(), &gqlRes); err != nil {
+	if err = json.Unmarshal(resBody, &gqlRes); err != nil {
 		return nil, err
 	}
 

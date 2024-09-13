@@ -2,7 +2,6 @@ package platform
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"time"
 )
@@ -46,17 +45,12 @@ func (p *clientImpl) CreateAPIKey(ctx context.Context, input APIKey) (*APIKey, e
 		}
 	}
 
-	res, err := p.Client.ExecRaw(ctx, query, variables)
-	if err != nil {
+	var res CreateAPIKeyResponse
+	if err := p.Exec(ctx, query, &res, variables); err != nil {
 		return nil, err
 	}
 
-	var apiKeyResponse CreateAPIKeyResponse
-	if err = json.Unmarshal(res, &apiKeyResponse); err != nil {
-		return nil, err
-	}
-
-	return &apiKeyResponse.APIKey, nil
+	return &res.APIKey, nil
 }
 
 func (p *clientImpl) GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) ([]APIKey, error) {
@@ -72,17 +66,12 @@ func (p *clientImpl) GetAPIKeys(ctx context.Context, params *APIKeyQueryParams) 
 		}
 	}
 
-	res, err := p.Client.ExecRaw(ctx, query, variables)
-	if err != nil {
+	var res GetAPIKeysResponse
+	if err := p.Exec(ctx, query, &res, variables); err != nil {
 		return nil, err
 	}
 
-	var apiKeysResponse GetAPIKeysResponse
-	if err = json.Unmarshal(res, &apiKeysResponse); err != nil {
-		return nil, err
-	}
-
-	return apiKeysResponse.APIKeys, nil
+	return res.APIKeys, nil
 }
 
 func (p *clientImpl) DeleteAPIKey(ctx context.Context, id int) error {
@@ -92,17 +81,12 @@ func (p *clientImpl) DeleteAPIKey(ctx context.Context, id int) error {
 		"id": id,
 	}
 
-	res, err := p.Client.ExecRaw(ctx, query, variables)
-	if err != nil {
+	var res DeleteAPIKeyResponse
+	if err := p.Exec(ctx, query, &res, variables); err != nil {
 		return err
 	}
 
-	var deleteResponse DeleteAPIKeyResponse
-	if err = json.Unmarshal(res, &deleteResponse); err != nil {
-		return err
-	}
-
-	if !deleteResponse.Success {
+	if !res.Success {
 		return errors.New("failed to delete api key")
 	}
 

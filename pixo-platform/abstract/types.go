@@ -1,4 +1,4 @@
-package abstract_client
+package abstract
 
 // Response is a struct that represents a basic response from the server.
 type Response struct {

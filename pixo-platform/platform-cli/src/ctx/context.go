@@ -3,7 +3,6 @@ package ctx
 import (
 	"context"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/headset"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/config"
@@ -25,7 +24,6 @@ type Context struct {
 	FileOpener        editor.FileOpener
 	HeadsetClient     headset.Client
 	PlatformClient    platform.Client
-	LegacyClient      legacy.LegacyClient
 	MatchmakingClient matchmaker.Matchmaker
 }
 
@@ -63,7 +61,6 @@ func NewContext(configFiles ...string) *Context {
 		HeadsetClient:     headset.NewClient(clientConfig),
 		PlatformClient:    platform.NewClient(clientConfig),
 		MatchmakingClient: matchmaker.NewClient(clientConfig),
-		LegacyClient:      legacy.NewClient(clientConfig),
 		FileOpener:        editor.NewFileOpener(""),
 	}
 }

@@ -7,7 +7,6 @@ import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/rs/zerolog/log"
 	"math/rand"
 	"os"
 )
@@ -123,15 +122,10 @@ var _ = Describe("Multiplayer Resources", func() {
 	})
 
 	It("can upload a gameserver build", func() {
-		file, err := os.Create(localFilePath)
-		Expect(err).NotTo(HaveOccurred())
-		n, err := file.WriteString("test")
+		Expect(os.WriteFile(localFilePath, []byte("test"), 0644)).NotTo(HaveOccurred())
 		defer func() {
-			_ = file.Close()
 			_ = os.Remove(localFilePath)
 		}()
-		Expect(err).NotTo(HaveOccurred())
-		Expect(n).To(Equal(4))
 		serverVersionInput := platform.MultiplayerServerVersion{
 			ModuleID:        moduleID,
 			SemanticVersion: randVersion,
@@ -152,17 +146,8 @@ var _ = Describe("Multiplayer Resources", func() {
 })
 
 func makeTestFile(filePath string) func() {
-	file, err := os.Create(filePath)
-	if err != nil {
-		log.Panic().Err(err).Msg("failed to create file")
-	}
-
-	if _, err = file.WriteString("test"); err != nil {
-		log.Panic().Err(err).Msg("failed to write to file")
-	}
-
+	Expect(os.WriteFile(filePath, []byte("test"), 0644)).To(Succeed())
 	return func() {
-		_ = file.Close()
-		_ = os.Remove(filePath)
+		Expect(os.Remove(filePath)).To(Succeed())
 	}
 }

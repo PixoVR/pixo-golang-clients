@@ -1,4 +1,4 @@
-package legacy_test
+package abstract_test
 
 import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/env"
@@ -8,8 +8,8 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestLegacyAPI(t *testing.T) {
+func TestAbstractClient(t *testing.T) {
 	RegisterFailHandler(Fail)
 	env.SourceProjectEnv()
-	RunSpecs(t, "Legacy API Suite")
+	RunSpecs(t, "AbstractClient Suite")
 }

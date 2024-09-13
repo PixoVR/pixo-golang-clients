@@ -2,7 +2,6 @@ package platform
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 )
 
@@ -22,16 +21,10 @@ type GetRolesResponse struct {
 func (p *clientImpl) GetRoles(ctx context.Context) ([]Role, error) {
 	query := `{ roles { id name permissions } }`
 
-	res, err := p.Client.ExecRaw(ctx, query, nil)
-	if err != nil {
+	var res GetRolesResponse
+	if err := p.Exec(ctx, query, &res, nil); err != nil {
 		return nil, err
 	}
 
-	var rolesResponse GetRolesResponse
-	if err = json.Unmarshal(res, &rolesResponse); err != nil {
-		return nil, err
-
-	}
-
-	return rolesResponse.Roles, nil
+	return res.Roles, nil
 }

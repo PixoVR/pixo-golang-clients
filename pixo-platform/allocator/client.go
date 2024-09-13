@@ -1,19 +1,19 @@
 package allocator
 
 import (
-	abstractClient "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
+	abstractClient "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 )
 
 // Client is a struct for the primary API that contains an abstract client
 type Client struct {
-	abstractClient.AbstractServiceClient
+	abstractClient.ServiceClient
 
 	platformClient platform.Client
 }
 
-// NewClientWithBasicAuth is a function that returns a AbstractServiceClient with basic auth
+// NewClientWithBasicAuth is a function that returns a ServiceClient with basic auth
 func NewClientWithBasicAuth(username, password string, config urlfinder.ClientConfig) (*Client, error) {
 	platformClient, err := platform.NewClientWithBasicAuth(username, password, config)
 	if err != nil {
@@ -25,7 +25,7 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 	return NewClient(config), nil
 }
 
-// NewClient is a function that returns a AbstractServiceClient
+// NewClient is a function that returns a ServiceClient
 func NewClient(config urlfinder.ClientConfig) *Client {
 
 	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
@@ -37,8 +37,8 @@ func NewClient(config urlfinder.ClientConfig) *Client {
 	}
 
 	return &Client{
-		AbstractServiceClient: *abstractClient.NewClient(abstractConfig),
-		platformClient:        platform.NewClient(config),
+		ServiceClient:  *abstractClient.NewClient(abstractConfig),
+		platformClient: platform.NewClient(config),
 	}
 }
 

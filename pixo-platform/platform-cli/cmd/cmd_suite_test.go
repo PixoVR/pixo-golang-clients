@@ -3,7 +3,6 @@ package cmd_test
 import (
 	"bytes"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/headset"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/matchmaker"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/cmd"
@@ -38,7 +37,6 @@ type TestExecutor struct {
 	ConfigManager         *config.ConfigManager
 	InMemoryConfig        *config.InMemoryConfigManager
 	MockPlatformClient    *platform.MockClient
-	MockLegacyClient      *legacy.MockClient
 	MockHeadsetClient     *headset.MockClient
 	MockMatchmakingClient *matchmaker.MockMatchmaker
 	MockFileOpener        *editor.MockFileOpener
@@ -51,7 +49,6 @@ func NewTestExecutor() *TestExecutor {
 	configManager := config.NewConfigManager(inMemoryConfigManager, emojiPrinter, formHandler)
 
 	mockPlatformClient := &platform.MockClient{}
-	mockLegacyClient := &legacy.MockClient{}
 	mockHeadsetClient := &headset.MockClient{}
 	mockMatchmaker := matchmaker.NewMockMatchmaker()
 
@@ -62,7 +59,6 @@ func NewTestExecutor() *TestExecutor {
 		FormHandler:       formHandler,
 		ConfigManager:     configManager,
 		PlatformClient:    mockPlatformClient,
-		LegacyClient:      mockLegacyClient,
 		HeadsetClient:     mockHeadsetClient,
 		MatchmakingClient: mockMatchmaker,
 		FileOpener:        mockFileOpener,
@@ -76,7 +72,6 @@ func NewTestExecutor() *TestExecutor {
 		InMemoryConfig:        inMemoryConfigManager,
 		ConfigManager:         configManager,
 		MockPlatformClient:    mockPlatformClient,
-		MockLegacyClient:      mockLegacyClient,
 		MockHeadsetClient:     mockHeadsetClient,
 		MockMatchmakingClient: mockMatchmaker,
 		MockFileOpener:        mockFileOpener,

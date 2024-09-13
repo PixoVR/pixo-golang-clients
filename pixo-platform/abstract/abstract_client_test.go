@@ -1,8 +1,9 @@
-package abstract_client_test
+package abstract_test
 
 import (
+	"context"
 	"fmt"
-	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
+	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"net/http"
@@ -12,7 +13,7 @@ var _ = Describe("Abstract", func() {
 
 	var (
 		fakeToken = "fake-token"
-		apiClient *AbstractServiceClient
+		apiClient *ServiceClient
 	)
 
 	BeforeEach(func() {
@@ -32,10 +33,11 @@ var _ = Describe("Abstract", func() {
 	It("can add headers needed for authentication", func() {
 		apiClient.SetHeader("x-fake-header", fakeToken)
 
-		request := apiClient.NewRequest()
+		request, err := apiClient.NewRequest(http.MethodGet, "/path", nil)
 
+		Expect(err).NotTo(HaveOccurred())
 		Expect(request.Header.Get("x-fake-header")).To(Equal(fakeToken))
-		Expect(request.Header.Get(AuthorizationHeader)).To(Equal(fmt.Sprintf("Bearer %s", fakeToken)))
+		Expect(request.Header.Get(AuthorizationHeaderKey)).To(Equal(fmt.Sprintf("Bearer %s", fakeToken)))
 	})
 
 	It("can use the api key", func() {
@@ -43,17 +45,18 @@ var _ = Describe("Abstract", func() {
 		Expect(apiClient.IsAuthenticated()).To(BeTrue())
 		Expect(apiClient.GetAPIKey()).To(Equal(fakeToken))
 
-		request := apiClient.NewRequest()
+		request, err := apiClient.NewRequest(http.MethodGet, "/path", nil)
 
-		Expect(request.Header.Get(APIKeyHeader)).To(Equal(fakeToken))
+		Expect(err).NotTo(HaveOccurred())
+		Expect(request.Header.Get(APIKeyHeaderKey)).To(Equal(fakeToken))
 	})
 
 	It("should return a response if the request fails", func() {
-		res, err := apiClient.Post("nonexistent", nil)
+		res, err := apiClient.Post(context.Background(), "nonexistent", nil)
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(res).NotTo(BeNil())
-		Expect(res.StatusCode()).To(Equal(http.StatusNotFound))
+		Expect(res.StatusCode).To(Equal(http.StatusNotFound))
 	})
 
 	It("can return the current ip address", func() {

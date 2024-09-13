@@ -1,4 +1,4 @@
-package abstract_client
+package abstract
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 )
 
 // DialWebsocket creates a new websocket connection to the given endpoint.
-func (a *AbstractServiceClient) DialWebsocket(endpoint string) (*websocket.Conn, *http.Response, error) {
+func (a *ServiceClient) DialWebsocket(endpoint string) (*websocket.Conn, *http.Response, error) {
 	url := a.GetURLWithPath(endpoint, "ws")
 	conn, response, err := websocket.DefaultDialer.Dial(url, a.GetAuthHeader())
 	if err != nil {
@@ -24,22 +24,22 @@ func (a *AbstractServiceClient) DialWebsocket(endpoint string) (*websocket.Conn,
 }
 
 // WriteToWebsocket writes a message to the websocket connection.
-func (a *AbstractServiceClient) WriteToWebsocket(message []byte) error {
+func (a *ServiceClient) WriteToWebsocket(message []byte) error {
 	return a.websocketConn.WriteMessage(websocket.TextMessage, message)
 }
 
 // ReadFromWebsocket reads a message from the websocket connection.
-func (a *AbstractServiceClient) ReadFromWebsocket() (int, []byte, error) {
+func (a *ServiceClient) ReadFromWebsocket() (int, []byte, error) {
 	return a.websocketConn.ReadMessage()
 }
 
 // CloseWebsocketConnection closes the websocket connection.
-func (a *AbstractServiceClient) CloseWebsocketConnection() error {
+func (a *ServiceClient) CloseWebsocketConnection() error {
 	return a.websocketConn.Close()
 }
 
 // SetWebsocketTimeout sets the timeout for the websocket connection. Defaults to 30 seconds.
-func (a *AbstractServiceClient) timeoutDuration() time.Duration {
+func (a *ServiceClient) timeoutDuration() time.Duration {
 	if a.timeoutSeconds == 0 {
 		return 30 * time.Second
 	}

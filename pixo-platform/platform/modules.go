@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
 	"github.com/rs/zerolog/log"
 	"io"
 	"mime/multipart"
@@ -38,18 +37,18 @@ type Module struct {
 }
 
 type ModuleVersion struct {
-	ID              int           `json:"id,omitempty"`
-	ModuleID        int           `json:"moduleId,omitempty"`
-	Module          legacy.Module `json:"module,omitempty"`
-	Status          string        `json:"status,omitempty"`
-	FileLink        string        `json:"fileLink,omitempty"`
-	SemanticVersion string        `json:"version,omitempty"`
-	Notes           string        `json:"notes,omitempty"`
-	Package         string        `json:"package,omitempty"`
-	ExternalID      string        `json:"externalId,omitempty"`
-	LocalFilePath   string        `json:"-"`
-	ControlIds      []int         `json:"controlIds,omitempty"`
-	PlatformIds     []int         `json:"platformIds,omitempty"`
+	ID              int    `json:"id,omitempty"`
+	ModuleID        int    `json:"moduleId,omitempty"`
+	Module          Module `json:"module,omitempty"`
+	Status          string `json:"status,omitempty"`
+	FileLink        string `json:"fileLink,omitempty"`
+	SemanticVersion string `json:"version,omitempty"`
+	Notes           string `json:"notes,omitempty"`
+	Package         string `json:"package,omitempty"`
+	ExternalID      string `json:"externalId,omitempty"`
+	LocalFilePath   string `json:"-"`
+	ControlIds      []int  `json:"controlIds,omitempty"`
+	PlatformIds     []int  `json:"platformIds,omitempty"`
 }
 
 type ModuleParams struct {
@@ -71,17 +70,12 @@ type CreateModuleVersionResponse struct {
 func (p *clientImpl) GetModules(ctx context.Context, params ...ModuleParams) ([]Module, error) {
 	query := `query modules { modules { id abbreviation description imageLink shortDesc gitConfigId gitConfig { provider orgName repoName } createdAt updatedAt } }`
 
-	res, err := p.Client.ExecRaw(ctx, query, nil)
-	if err != nil {
+	var res GetModulesResponse
+	if err := p.Exec(ctx, query, &res, nil); err != nil {
 		return nil, err
 	}
 
-	var response GetModulesResponse
-	if err = json.Unmarshal(res, &response); err != nil {
-		return nil, err
-	}
-
-	return response.Modules, nil
+	return res.Modules, nil
 }
 
 func (p *clientImpl) CreateModuleVersion(ctx context.Context, input ModuleVersion) (*ModuleVersion, error) {
@@ -108,17 +102,12 @@ func (p *clientImpl) CreateModuleVersion(ctx context.Context, input ModuleVersio
 	}
 
 	if input.LocalFilePath == "" {
-		res, err := p.Client.ExecRaw(ctx, query, variables)
-		if err != nil {
+		var res CreateModuleVersionResponse
+		if err := p.Exec(ctx, query, &res, variables); err != nil {
 			return nil, err
 		}
 
-		var response CreateModuleVersionResponse
-		if err = json.Unmarshal(res, &response); err != nil {
-			return nil, err
-		}
-
-		return &response.ModuleVersion, nil
+		return &res.ModuleVersion, nil
 	}
 
 	graphqlRequest := struct {
@@ -164,16 +153,18 @@ func (p *clientImpl) CreateModuleVersion(ctx context.Context, input ModuleVersio
 		return nil, err
 	}
 
-	p.AbstractServiceClient.SetHeader("Content-Type", writer.FormDataContentType())
+	p.ServiceClient.SetHeader("Content-Type", writer.FormDataContentType())
 
-	res, err := p.Post("query", payload.Bytes())
+	res, err := p.Post(context.TODO(), "query", payload.Bytes())
 	if err != nil {
 		log.Error().Err(err).Msg("error creating multiplayer server version")
 		return nil, err
 	}
 
-	if res.IsError() {
-		return nil, fmt.Errorf("error creating multiplayer server version: %s", res.String())
+	resBody, _ := io.ReadAll(res.Body)
+
+	if res.StatusCode > 299 {
+		return nil, fmt.Errorf("error creating multiplayer server version: %s", string(resBody))
 	}
 
 	var gqlRes struct {
@@ -183,7 +174,7 @@ func (p *clientImpl) CreateModuleVersion(ctx context.Context, input ModuleVersio
 		}
 	}
 
-	if err = json.Unmarshal(res.Body(), &gqlRes); err != nil {
+	if err = json.Unmarshal(resBody, &gqlRes); err != nil {
 		return nil, err
 	}
 

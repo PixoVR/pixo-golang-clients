@@ -1,9 +1,10 @@
 package platform
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/legacy"
+	"io"
 )
 
 type LoginRequest struct {
@@ -12,34 +13,33 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	Token string      `json:"token"`
-	User  legacy.User `json:"user"`
+	Token string `json:"token"`
+	User  User   `json:"user"`
 }
 
 // Login performs a login request to the API
 func (p *clientImpl) Login(username, password string) error {
-	url := p.GetURLWithPath("auth/login")
-
 	loginInput := LoginRequest{
 		Login:    username,
 		Password: password,
 	}
 
-	res, err := p.NewRequest().
-		SetHeader("Content-Type", "application/json").
-		SetBody(loginInput).
-		Post(url)
+	payload, _ := json.Marshal(loginInput)
+
+	res, err := p.Post(context.TODO(), "auth/login", payload)
 	if err != nil {
 		return err
 	}
 
-	if res.IsError() {
-		return errors.New(string(res.Body()))
+	resBody, _ := io.ReadAll(res.Body)
+
+	if res.StatusCode > 299 {
+		return errors.New(string(resBody))
 	}
 
 	var loginResponse LoginResponse
-	if err = json.Unmarshal(res.Body(), &loginResponse); err != nil {
-		return errors.New(string(res.Body()))
+	if err = json.Unmarshal(resBody, &loginResponse); err != nil {
+		return errors.New(string(resBody))
 	}
 
 	p.SetToken(loginResponse.Token)

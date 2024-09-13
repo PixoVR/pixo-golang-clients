@@ -2,7 +2,7 @@ package headset
 
 import (
 	"context"
-	abstractClient "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract-client"
+	abstractClient "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 )
@@ -15,9 +15,9 @@ type Client interface {
 	EndSession(ctx context.Context, request EventRequest) (*EventResponse, error)
 }
 
-// Client is a struct that contains an AbstractServiceClient
+// Client is a struct that contains an ServiceClient
 type client struct {
-	abstractClient.AbstractServiceClient
+	*abstractClient.ServiceClient
 	platformClient platform.Client
 }
 
@@ -30,8 +30,8 @@ func NewClient(config urlfinder.ClientConfig) Client {
 	}
 
 	return &client{
-		AbstractServiceClient: *abstractClient.NewClient(abstractConfig),
-		platformClient:        platform.NewClient(config),
+		ServiceClient:  abstractClient.NewClient(abstractConfig),
+		platformClient: platform.NewClient(config),
 	}
 }
 
@@ -42,7 +42,7 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 	}
 
 	c := &client{
-		AbstractServiceClient: *abstractClient.NewClient(abstractConfig),
+		ServiceClient: abstractClient.NewClient(abstractConfig),
 	}
 
 	if err := c.Login(username, password); err != nil {
