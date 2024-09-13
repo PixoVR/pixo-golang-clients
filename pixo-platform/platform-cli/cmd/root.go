@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	cliVersion = "0.1.76"
+	cliVersion = "0.1.77"
 
 	homeDir          = os.Getenv("HOME")
 	configDirName    = ".pixo"
@@ -55,7 +55,6 @@ func GetRootCmd() *cobra.Command {
 
 func Execute() {
 	Ctx = ctx.NewContext(localConfigFile, globalConfigFile)
-
 	activeConfigFile = Ctx.FileManager.ConfigFile()
 
 	if err := rootCmd.Execute(); err != nil {

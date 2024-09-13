@@ -79,12 +79,14 @@ func (p *Context) Authenticate(cmd *cobra.Command) error {
 
 	token, ok := p.ConfigManager.GetFlagOrConfigValue("auth-token", cmd)
 	if ok {
+		p.PlatformClient.SetToken(token)
 		if _, err := p.PlatformClient.GetPlatforms(ctx); err == nil {
-			p.PlatformClient.SetToken(token)
 			p.MatchmakingClient.SetToken(token)
 			p.HeadsetClient.SetToken(token)
 			p.ConfigManager.SetConfigValue("auth-token", token)
 			return nil
+		} else {
+			p.PlatformClient.SetToken("")
 		}
 	}
 

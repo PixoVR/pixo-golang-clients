@@ -54,9 +54,7 @@ func (c *client) SendEvent(ctx context.Context, request EventRequest) (*EventRes
 		return nil, err
 	}
 
-	path := "event"
-
-	res, err := c.Post(context.TODO(), path, body)
+	res, err := c.Post(ctx, "event", body)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to post event request")
 		return nil, err
