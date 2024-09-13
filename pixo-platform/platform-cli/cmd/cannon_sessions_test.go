@@ -86,8 +86,9 @@ var _ = Describe("Sessions Load Testing", func() {
 	})
 
 	It("can load test sessions", func() {
-		amount := rand.Intn(100) + 1
+		amount := rand.Intn(1000) + 1
 		concurrent := 5
+		actualConcurrent := min(amount, concurrent)
 		timeout := 1
 
 		output := executor.RunCommandAndExpectSuccess(
@@ -103,7 +104,7 @@ var _ = Describe("Sessions Load Testing", func() {
 			fmt.Sprint(timeout),
 		)
 
-		Expect(output).To(ContainSubstring(fmt.Sprintf("Starting load test with %d requests and %d concurrent workers", amount, concurrent)))
+		Expect(output).To(ContainSubstring(fmt.Sprintf("Starting load test with %d requests and %d concurrent workers", amount, actualConcurrent)))
 		Expect(output).To(ContainLineWithItems("Start Session Errors:", "0"))
 		Expect(output).To(ContainLineWithItems("Create Event Errors:", "0"))
 		Expect(output).To(ContainLineWithItems("Complete Session Errors:", "0"))

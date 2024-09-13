@@ -43,7 +43,7 @@ var _ = Describe("API Keys", func() {
 		Expect(ok).To(BeTrue())
 	})
 
-	It("returns an error if the username isnt found", func() {
+	It("returns an error if the username isn't found", func() {
 		executor.MockPlatformClient.GetUserByUsernameError = errors.New("get users by username error")
 
 		_, err := executor.RunCommand(

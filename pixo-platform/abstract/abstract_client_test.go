@@ -17,14 +17,14 @@ var _ = Describe("Abstract", func() {
 	)
 
 	BeforeEach(func() {
-		config := AbstractConfig{
+		config := Config{
 			Token: fakeToken,
 		}
 		apiClient = NewClient(config)
 	})
 
 	It("can set the token", func() {
-		config := AbstractConfig{}
+		config := Config{}
 		newClient := NewClient(config)
 		newClient.SetToken(fakeToken)
 		Expect(newClient.GetToken()).To(Equal(fakeToken))

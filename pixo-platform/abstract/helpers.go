@@ -1,7 +1,6 @@
 package abstract
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -80,20 +79,11 @@ func (a *ServiceClient) NewRequest(method, path string, body io.Reader) (*http.R
 	return a.addHeaders(req), nil
 }
 
-func (a *ServiceClient) NewRequestWithContext(ctx context.Context, method, path string, body io.Reader) (*http.Request, error) {
-	req, err := http.NewRequestWithContext(ctx, method, a.GetURLWithPath(path), body)
-	if err != nil {
-		return nil, err
-	}
-	return a.addHeaders(req), nil
-}
-
 func (a *ServiceClient) addHeaders(req *http.Request) *http.Request {
 	a.lock.Lock()
-	headers := a.headers
-	a.lock.Unlock()
+	defer a.lock.Unlock()
 
-	for key, value := range headers {
+	for key, value := range a.headers {
 		req.Header.Set(key, value)
 	}
 	return req
@@ -124,7 +114,5 @@ func (a *ServiceClient) GetAuthHeader() http.Header {
 
 func (a *ServiceClient) RoundTrip(req *http.Request) (*http.Response, error) {
 	req.Header = a.addHeaders(req).Header
-	body, _ := io.ReadAll(req.Body)
-	req.Body = io.NopCloser(strings.NewReader(string(body)))
-	return a.client.Do(req)
+	return http.DefaultClient.Do(req)
 }

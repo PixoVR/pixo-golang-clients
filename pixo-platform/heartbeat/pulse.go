@@ -6,6 +6,7 @@ import (
 	"errors"
 	abstract_client "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract"
 	"io"
+	"net/http"
 )
 
 // Pulse is a struct that represents a pulse sent to the heartbeat service.
@@ -34,7 +35,7 @@ func (c *client) SendPulse(sessionID int) error {
 		return err
 	}
 
-	if httpRes.StatusCode != 200 {
+	if httpRes.StatusCode != http.StatusOK {
 		return errors.New(res.Error)
 	}
 

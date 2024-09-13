@@ -37,7 +37,7 @@ func NewClient(config urlfinder.ClientConfig, timeoutSeconds ...int) *Multiplaye
 	}
 
 	serviceConfig := newServiceConfig(config.Lifecycle, config.Region)
-	abstractConfig := abstract.AbstractConfig{
+	abstractConfig := abstract.Config{
 		ServiceConfig:  serviceConfig,
 		Token:          config.Token,
 		TimeoutSeconds: timeoutSeconds[0],

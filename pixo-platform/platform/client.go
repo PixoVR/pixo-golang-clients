@@ -3,11 +3,13 @@ package platform
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/middleware/auth"
 	"github.com/rs/zerolog/log"
 	"io"
+	"net/http"
 	"os"
 
 	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract"
@@ -28,7 +30,7 @@ func NewClient(config urlfinder.ClientConfig) Client {
 		config.APIKey = os.Getenv("PIXO_API_KEY")
 	}
 
-	abstractConfig := abstract.AbstractConfig{
+	abstractConfig := abstract.Config{
 		ServiceConfig: newServiceConfig(config),
 		Token:         config.Token,
 		APIKey:        config.APIKey,
@@ -107,19 +109,23 @@ func (p *clientImpl) Exec(ctx context.Context, query string, v any, variables ma
 		return err
 	}
 
-	var gqlRes struct {
-		Messages []string        `json:"messages"`
-		Errors   []string        `json:"errors"`
-		Data     json.RawMessage `json:"data"`
+	resBody, _ := io.ReadAll(res.Body)
+
+	if res.StatusCode != http.StatusOK {
+		var basicRes abstract.Response
+		if err = json.Unmarshal(resBody, &basicRes); err == nil {
+			return errors.New(basicRes.Error)
+		}
+		return fmt.Errorf("error: %d", res.StatusCode)
 	}
 
-	resBody, _ := io.ReadAll(res.Body)
+	var gqlRes GraphQLResponse
 	if err = json.Unmarshal(resBody, &gqlRes); err != nil {
 		return err
 	}
 
 	if len(gqlRes.Errors) > 0 {
-		return fmt.Errorf("graphql error: %v", gqlRes.Errors)
+		return errors.New(gqlRes.Errors[0].Message)
 	}
 
 	return json.Unmarshal(gqlRes.Data, v)

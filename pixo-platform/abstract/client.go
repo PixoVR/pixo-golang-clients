@@ -3,25 +3,24 @@ package abstract
 import (
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"github.com/gorilla/websocket"
-	"net/http"
 	"sync"
 )
 
 // ServiceClient is a struct that handles generic http client operations
 type ServiceClient struct {
 	serviceConfig urlfinder.ServiceConfig
+	headers       map[string]string
 	token         string
 	key           string
 
-	client         *http.Client
 	websocketConn  *websocket.Conn
 	timeoutSeconds int
-	lock           sync.Mutex
-	headers        map[string]string
+
+	lock sync.Mutex
 }
 
-// AbstractConfig is a struct that holds the configuration for the ServiceClient
-type AbstractConfig struct {
+// Config is a struct that holds the configuration for the ServiceClient
+type Config struct {
 	ServiceConfig  urlfinder.ServiceConfig
 	APIKey         string
 	Token          string
@@ -29,7 +28,7 @@ type AbstractConfig struct {
 }
 
 // NewClient creates a new ServiceClient given a config struct
-func NewClient(config AbstractConfig) *ServiceClient {
+func NewClient(config Config) *ServiceClient {
 
 	if config.TimeoutSeconds == 0 {
 		config.TimeoutSeconds = 30
@@ -40,7 +39,6 @@ func NewClient(config AbstractConfig) *ServiceClient {
 		key:            config.APIKey,
 		token:          config.Token,
 		timeoutSeconds: config.TimeoutSeconds,
-		client:         &http.Client{},
 		headers:        make(map[string]string),
 	}
 

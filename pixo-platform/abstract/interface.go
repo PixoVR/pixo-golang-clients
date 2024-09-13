@@ -3,6 +3,7 @@ package abstract
 import (
 	"context"
 	"github.com/gorilla/websocket"
+	"io"
 	"net/http"
 )
 
@@ -15,6 +16,7 @@ type AbstractClient interface {
 	GetToken() string
 	GetURL(protocol ...string) string
 	IsAuthenticated() bool
+	NewRequest(method, path string, body io.Reader) (*http.Request, error)
 
 	Get(ctx context.Context, path string) (*http.Response, error)
 	Post(ctx context.Context, path string, body []byte) (*http.Response, error)

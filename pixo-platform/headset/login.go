@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"net/http"
 )
 
 // LoginRequest is the request body for the login endpoint
@@ -34,7 +35,7 @@ func (c *client) Login(username, password string) error {
 
 	resBody, _ := io.ReadAll(res.Body)
 
-	if res.StatusCode != 200 {
+	if res.StatusCode != http.StatusOK {
 		return errors.New(string(resBody))
 	}
 

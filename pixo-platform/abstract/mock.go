@@ -7,9 +7,12 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/websocket"
 	"github.com/rs/zerolog/log"
+	"io"
 	"net/http"
 	"sync"
 )
+
+var _ AbstractClient = (*MockAbstractClient)(nil)
 
 // MockAbstractClient is a mock implementation of the AbstractClient interface
 type MockAbstractClient struct {
@@ -84,6 +87,11 @@ func (m *MockAbstractClient) GetIPAddress() (string, error) {
 func (m *MockAbstractClient) GetURL(protocol ...string) string {
 	m.NumCalledGetURL++
 	return faker.URL()
+}
+
+// NewRequest returns a new request
+func (m *MockAbstractClient) NewRequest(method, path string, body io.Reader) (*http.Request, error) {
+	return http.NewRequest(method, path, nil)
 }
 
 // Login sets the token to a fake JWT
