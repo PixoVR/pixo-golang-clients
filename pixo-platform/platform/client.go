@@ -20,7 +20,6 @@ var _ Client = (*clientImpl)(nil)
 // clientImpl is a struct for the graphql API that contains an abstract client
 type clientImpl struct {
 	*abstract.ServiceClient
-	defaultContext context.Context
 }
 
 // NewClient is a function that returns a clientImpl
@@ -38,8 +37,7 @@ func NewClient(config urlfinder.ClientConfig) Client {
 	abstractClient := abstract.NewClient(abstractConfig)
 
 	return &clientImpl{
-		ServiceClient:  abstractClient,
-		defaultContext: context.Background(),
+		ServiceClient: abstractClient,
 	}
 }
 
@@ -54,6 +52,27 @@ func NewClientWithBasicAuth(username, password string, config urlfinder.ClientCo
 	}
 
 	return client, nil
+}
+
+func (p *clientImpl) CheckAuth(ctx context.Context) (User, error) {
+	res, err := p.Get(ctx, "auth/check")
+	if err != nil {
+		return User{}, err
+	}
+
+	var resPayload struct {
+		Error string
+		User  User
+	}
+	if err = json.NewDecoder(res.Body).Decode(&resPayload); err != nil {
+		return User{}, err
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return User{}, errors.New(resPayload.Error)
+	}
+
+	return resPayload.User, nil
 }
 
 func (p *clientImpl) ActiveUserID() int {

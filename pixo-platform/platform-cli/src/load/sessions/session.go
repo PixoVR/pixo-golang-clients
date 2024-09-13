@@ -19,7 +19,7 @@ func (t *Tester) performRequest(id int) {
 }
 
 func (t *Tester) printStart(id int) {
-	t.Printf(":checkered_flag:%d: %s\n", id, fixture.StatColor.Sprintf("starting session for module %d...", t.config.Session.ModuleID))
+	t.Printf(":checkered_flag: %d: %s\n", id, fixture.StatColor.Sprintf("starting session for module %d...", t.config.Session.ModuleID))
 }
 
 func (t *Tester) performSession(id int) {

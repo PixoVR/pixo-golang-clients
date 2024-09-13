@@ -80,10 +80,11 @@ func (p *Context) Authenticate(cmd *cobra.Command) error {
 	token, ok := p.ConfigManager.GetFlagOrConfigValue("auth-token", cmd)
 	if ok {
 		p.PlatformClient.SetToken(token)
-		if _, err := p.PlatformClient.GetPlatforms(ctx); err == nil {
+		if user, err := p.PlatformClient.CheckAuth(ctx); err == nil {
 			p.MatchmakingClient.SetToken(token)
 			p.HeadsetClient.SetToken(token)
 			p.ConfigManager.SetConfigValue("auth-token", token)
+			p.ConfigManager.SetIntConfigValue("auth-user-id", user.ID)
 			return nil
 		} else {
 			p.PlatformClient.SetToken("")
@@ -93,8 +94,11 @@ func (p *Context) Authenticate(cmd *cobra.Command) error {
 	apiKey, ok := p.ConfigManager.GetFlagOrConfigValue("api-key", cmd)
 	if ok {
 		p.PlatformClient.SetAPIKey(apiKey)
-		p.ConfigManager.SetConfigValue("api-key", apiKey)
-		if _, err := p.PlatformClient.GetPlatforms(ctx); err == nil {
+		if user, err := p.PlatformClient.CheckAuth(ctx); err == nil {
+			p.MatchmakingClient.SetAPIKey(apiKey)
+			p.HeadsetClient.SetAPIKey(apiKey)
+			p.ConfigManager.SetConfigValue("api-key", apiKey)
+			p.ConfigManager.SetIntConfigValue("auth-user-id", user.ID)
 			return nil
 		}
 	}

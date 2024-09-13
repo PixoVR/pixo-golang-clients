@@ -230,6 +230,14 @@ func (m *MockClient) Reset() {
 	m.UpdateMultiplayerServerVersionError = nil
 }
 
+func (m *MockClient) CheckAuth(ctx context.Context) (User, error) {
+	if !m.IsAuthenticated() {
+		return User{}, errors.New("not authenticated")
+	}
+
+	return User{ID: m.ActiveUserID()}, nil
+}
+
 func (m *MockClient) Path() string {
 	return "v2"
 }

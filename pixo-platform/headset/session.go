@@ -48,9 +48,12 @@ func (c *client) EndSession(ctx context.Context, request EventRequest) (*EventRe
 
 // SendEvent sends an event to the platform
 func (c *client) SendEvent(ctx context.Context, request EventRequest) (*EventResponse, error) {
+	if request.Type == "" {
+		request.Type = "PIXOVR_SESSION_EVENT"
+	}
+
 	body, err := json.Marshal(request)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to marshal event request")
 		return nil, err
 	}
 
@@ -64,12 +67,13 @@ func (c *client) SendEvent(ctx context.Context, request EventRequest) (*EventRes
 
 	var response Response
 	if err = json.Unmarshal(resBody, &response); err != nil {
-		log.Error().Err(err).Msg("Failed to unmarshal create event response")
 		return nil, err
 	}
 
 	if response.Error {
-		log.Error().Msg(response.Message)
+		log.Error().
+			Str("message", response.Message).
+			Msg("Error creating event")
 		return nil, errors.New(response.Message)
 	}
 

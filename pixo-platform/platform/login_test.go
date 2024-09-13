@@ -10,19 +10,32 @@ import (
 
 var _ = Describe("Platform API", func() {
 
-	It("can login and interact with the api", func() {
+	var (
+		platformClient Client
+	)
+
+	BeforeEach(func() {
 		config := urlfinder.ClientConfig{Lifecycle: lifecycle, APIKey: apiKeyValue}
-		client := NewClient(config)
-		Expect(client).NotTo(BeNil())
+		platformClient = NewClient(config)
+		Expect(platformClient).NotTo(BeNil())
+	})
 
-		Expect(client.Login(username, password)).To(Succeed())
-		Expect(client.IsAuthenticated()).To(BeTrue())
-		Expect(client.GetToken()).NotTo(BeEmpty())
+	It("can check if the token is valid", func() {
+		user, err := platformClient.CheckAuth(context.Background())
+		Expect(err).To(MatchError("unauthorized"))
+		Expect(user).NotTo(BeNil())
+		Expect(user.ID).To(BeZero())
+	})
 
-		platforms, err := client.GetPlatforms(context.Background())
+	It("can login and validate the token", func() {
+		Expect(platformClient.Login(username, password)).To(Succeed())
+		Expect(platformClient.IsAuthenticated()).To(BeTrue())
+		Expect(platformClient.GetToken()).NotTo(BeEmpty())
+
+		user, err := platformClient.CheckAuth(context.Background())
 		Expect(err).NotTo(HaveOccurred())
-		Expect(platforms).NotTo(BeNil())
-		Expect(len(platforms)).To(BeNumerically(">", 0))
+		Expect(user).NotTo(BeNil())
+		Expect(user.ID).To(Equal(platformClient.ActiveUserID()))
 	})
 
 })

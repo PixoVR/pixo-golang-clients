@@ -8,6 +8,7 @@ import (
 type Client interface {
 	abstract.AbstractClient
 
+	CheckAuth(ctx context.Context) (User, error)
 	ActiveUserID() int
 	ActiveOrgID() int
 
