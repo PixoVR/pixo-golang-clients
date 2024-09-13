@@ -13,7 +13,10 @@ import (
 	"os"
 )
 
-var legacy bool
+var (
+	legacy bool
+	passed bool
+)
 
 // cannonSessionsCmd represents the sessions start command
 var cannonSessionsCmd = &cobra.Command{
@@ -37,6 +40,13 @@ var cannonSessionsCmd = &cobra.Command{
 		scenario, _ := Ctx.ConfigManager.GetFlagValue("scenario", cmd)
 		focus, _ := Ctx.ConfigManager.GetFlagValue("focus", cmd)
 		specialization, _ := Ctx.ConfigManager.GetFlagValue("specialization", cmd)
+		score, _ := Ctx.ConfigManager.GetIntFlagValue("score", cmd)
+		maxScore, _ := Ctx.ConfigManager.GetIntFlagValue("max-score", cmd)
+
+		lessonStatus := "failed"
+		if passed {
+			lessonStatus = "passed"
+		}
 
 		eventPayload, _ := Ctx.ConfigManager.GetFlagValue("payload", cmd)
 		if eventPayload == "" {
@@ -67,6 +77,9 @@ var cannonSessionsCmd = &cobra.Command{
 				Scenario:       scenario,
 				Focus:          focus,
 				Specialization: specialization,
+				LessonStatus:   lessonStatus,
+				RawScore:       float64(score),
+				MaxScore:       float64(maxScore),
 			},
 			EventPayload: eventPayload,
 		}
@@ -88,6 +101,9 @@ func init() {
 	cannonSessionsCmd.Flags().String("scenario", "", "Scenario to create sessions for")
 	cannonSessionsCmd.Flags().String("focus", "", "Focus to create sessions for")
 	cannonSessionsCmd.Flags().String("specialization", "", "Specialization to create sessions for")
+	cannonSessionsCmd.Flags().Int("score", 0, "Lesson score of the sessions")
+	cannonSessionsCmd.Flags().Int("max-score", 0, "Max lesson score of the sessions")
+	cannonSessionsCmd.Flags().BoolVar(&passed, "passed", false, "Lesson status of the sessions")
 	cannonSessionsCmd.Flags().String("payload", "", "Event payload to send when creating events")
 	cannonSessionsCmd.Flags().String("payload-file", "", "File containing event payload to send when creating events")
 	cannonSessionsCmd.Flags().BoolVar(&legacy, "legacy", false, "Use the legacy headset API for load testing")

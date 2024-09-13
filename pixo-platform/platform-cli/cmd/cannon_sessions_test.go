@@ -141,6 +141,11 @@ var _ = Describe("Sessions Load Testing", func() {
 			focus,
 			"--specialization",
 			specialization,
+			"--score",
+			"100",
+			"--max-score",
+			"200",
+			"--passed",
 		)
 
 		Expect(executor.MockPlatformClient.CalledCreateSessionWith).To(HaveLen(1))
@@ -149,6 +154,12 @@ var _ = Describe("Sessions Load Testing", func() {
 		Expect(executor.MockPlatformClient.CalledCreateSessionWith[0].Scenario).To(Equal(scenario))
 		Expect(executor.MockPlatformClient.CalledCreateSessionWith[0].Focus).To(Equal(focus))
 		Expect(executor.MockPlatformClient.CalledCreateSessionWith[0].Specialization).To(Equal(specialization))
+		Expect(executor.MockPlatformClient.CalledCreateSessionWith[0].LessonStatus).To(Equal(""))
+		Expect(executor.MockPlatformClient.CalledCreateSessionWith[0].RawScore).To(Equal(0.0))
+		Expect(executor.MockPlatformClient.CalledCreateSessionWith[0].MaxScore).To(Equal(0.0))
+		Expect(executor.MockPlatformClient.CalledUpdateSessionWith[0].LessonStatus).To(Equal("passed"))
+		Expect(executor.MockPlatformClient.CalledUpdateSessionWith[0].RawScore).To(Equal(100.0))
+		Expect(executor.MockPlatformClient.CalledUpdateSessionWith[0].MaxScore).To(Equal(200.0))
 	})
 
 	It("can load test sessions with event payloads", func() {
@@ -242,6 +253,8 @@ var _ = Describe("Sessions Load Testing", func() {
 			mode := "practice"
 			focus := "milkshake"
 			specialization := "chocolate"
+			score := 100.0
+			maxScore := 200.0
 
 			executor.RunCommandAndExpectSuccess(
 				"cannon",
@@ -261,9 +274,14 @@ var _ = Describe("Sessions Load Testing", func() {
 				focus,
 				"--specialization",
 				specialization,
+				"--score",
+				fmt.Sprint(score),
+				"--max-score",
+				fmt.Sprint(maxScore),
+				"--passed",
 			)
 
-			expectedPayload := map[string]interface{}{
+			expectedStartPayload := map[string]interface{}{
 				"object": map[string]interface{}{
 					"id": fmt.Sprintf("https://pixovr.com/xapi/objects/%d/%s", 1, scenario),
 				},
@@ -276,9 +294,26 @@ var _ = Describe("Sessions Load Testing", func() {
 					},
 				},
 			}
+			expectedEndPayload := map[string]interface{}{
+				"lessonStatus": "passed",
+				"result": map[string]interface{}{
+					"score": map[string]interface{}{
+						"raw": score,
+						"max": maxScore,
+					},
+				},
+			}
 			Expect(executor.MockHeadsetClient.CalledStartSessionWith).To(HaveLen(1))
+			Expect(executor.MockHeadsetClient.CalledStartSessionWith[0].Payload).To(Equal(expectedStartPayload))
+
 			Expect(executor.MockHeadsetClient.CalledSendEventWith).To(HaveLen(1))
-			Expect(executor.MockHeadsetClient.CalledSendEventWith[0].Payload).To(Equal(expectedPayload))
+			Expect(executor.MockHeadsetClient.CalledSendEventWith[0].Payload).To(BeNil())
+
+			payload := executor.MockHeadsetClient.CalledEndSessionWith[0].Payload["result"].(map[string]interface{})
+			Expect(payload["duration"]).NotTo(BeNil())
+			delete(payload, "duration")
+			Expect(executor.MockHeadsetClient.CalledEndSessionWith).To(HaveLen(1))
+			Expect(executor.MockHeadsetClient.CalledEndSessionWith[0].Payload).To(Equal(expectedEndPayload))
 		})
 
 		It("can load test sessions with event payloads", func() {

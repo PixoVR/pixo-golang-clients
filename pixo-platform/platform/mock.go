@@ -766,7 +766,8 @@ func (m *MockClient) CreateSession(ctx context.Context, session *Session) error 
 	m.Lock.Lock()
 	defer m.Lock.Unlock()
 
-	m.CalledCreateSessionWith = append(m.CalledCreateSessionWith, session)
+	sessionCopy := *session
+	m.CalledCreateSessionWith = append(m.CalledCreateSessionWith, &sessionCopy)
 
 	if session == nil {
 		return errors.New("session can not be nil")
@@ -818,7 +819,8 @@ func (m *MockClient) CreateEvent(ctx context.Context, event *Event) error {
 	m.Lock.Lock()
 	defer m.Lock.Unlock()
 
-	m.CalledCreateEventWith = append(m.CalledCreateEventWith, event)
+	eventCopy := *event
+	m.CalledCreateEventWith = append(m.CalledCreateEventWith, &eventCopy)
 
 	noSessionID := event.SessionID == nil || *event.SessionID <= 0
 	noSessionUUID := event.SessionUUID == nil || *event.SessionUUID == ""

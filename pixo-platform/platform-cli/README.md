@@ -466,7 +466,10 @@ pixo cannon sessions \
     --mode "practice" \
     --scenario "warehouse" \
     --focus "packaging" \
-    --specialization "machinery"
+    --specialization "machinery" \
+    --score 5 \
+    --max-score 10 \
+    --passed
     
 # With an event payload
 pixo cannon sessions \

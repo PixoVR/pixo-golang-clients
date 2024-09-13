@@ -3,7 +3,6 @@ package sessions
 import (
 	"encoding/json"
 	"errors"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/headset"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/load/fixture"
 )
@@ -16,9 +15,9 @@ type Config struct {
 	EventPayload string
 	Event        platform.Event
 
-	Legacy         bool
-	EventRequest   headset.EventRequest
-	SessionDetails map[string]interface{}
+	Legacy                 bool
+	SessionStartDetails    map[string]interface{}
+	SessionCompleteDetails map[string]interface{}
 }
 
 // Tester configures and runs sessions load tests.
@@ -41,14 +40,14 @@ func NewLoadTester(config Config) (*Tester, error) {
 	}
 
 	config.Event = platform.Event{Payload: payload}
-	config.EventRequest = headset.EventRequest{ModuleID: config.Session.ModuleID}
 
 	t := &Tester{
 		Tester: fixture.NewLoadTester(config.Config),
 		config: config,
 	}
 
-	t.formatSessionDetails()
+	t.formatSessionStartDetails()
+	t.formatSessionCompleteDetails()
 	return t, nil
 }
 
