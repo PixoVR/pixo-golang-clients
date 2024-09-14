@@ -309,9 +309,9 @@ var _ = Describe("Sessions Load Testing", func() {
 			Expect(executor.MockHeadsetClient.CalledSendEventWith).To(HaveLen(1))
 			Expect(executor.MockHeadsetClient.CalledSendEventWith[0].Payload).To(BeNil())
 
-			payload := executor.MockHeadsetClient.CalledEndSessionWith[0].Payload["result"].(map[string]interface{})
-			Expect(payload["duration"]).NotTo(BeNil())
-			delete(payload, "duration")
+			payload := executor.MockHeadsetClient.CalledEndSessionWith[0].Payload
+			Expect(payload["sessionDuration"]).NotTo(BeNil())
+			delete(payload, "sessionDuration")
 			Expect(executor.MockHeadsetClient.CalledEndSessionWith).To(HaveLen(1))
 			Expect(executor.MockHeadsetClient.CalledEndSessionWith[0].Payload).To(Equal(expectedEndPayload))
 		})

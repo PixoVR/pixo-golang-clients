@@ -142,6 +142,5 @@ func (t *Tester) formatSessionCompleteDetails() {
 
 func (t *Tester) prepareSessionCompletePayload(req *headset.EventRequest, start time.Time) {
 	req.Payload = t.config.SessionCompleteDetails
-	resultPayload := req.Payload["result"].(map[string]interface{})
-	resultPayload["duration"] = time.Since(start).Seconds()
+	req.Payload["sessionDuration"] = time.Since(start).Seconds()
 }

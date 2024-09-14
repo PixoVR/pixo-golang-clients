@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	cliVersion = "0.1.80"
+	cliVersion = "0.1.81"
 
 	homeDir          = os.Getenv("HOME")
 	configDirName    = ".pixo"
@@ -39,7 +39,6 @@ var rootCmd = &cobra.Command{
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		initLogger()
 		Ctx.SetIO(cmd)
-		_ = Ctx.Authenticate(nil)
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		//if _, err := tea.NewProgram(tui.NewModel()).Run(); err != nil {
@@ -56,6 +55,7 @@ func GetRootCmd() *cobra.Command {
 func Execute() {
 	Ctx = ctx.NewContext(localConfigFile, globalConfigFile)
 	activeConfigFile = Ctx.FileManager.ConfigFile()
+	_ = Ctx.Authenticate(nil)
 
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
