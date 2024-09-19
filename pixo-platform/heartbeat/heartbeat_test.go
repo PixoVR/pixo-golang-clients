@@ -9,13 +9,18 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"os"
+	"time"
 )
 
 var _ = Describe("Heartbeat Client", Ordered, func() {
 
 	var (
+		ctx = context.Background()
+
+		platformClient  platform.Client
 		heartbeatClient Client
-		config          = urlfinder.ClientConfig{
+
+		config = urlfinder.ClientConfig{
 			Lifecycle: config2.GetEnvOrReturn("TEST_PIXO_LIFECYCLE", "dev"),
 		}
 		username = os.Getenv("TEST_PIXO_USERNAME")
@@ -25,6 +30,8 @@ var _ = Describe("Heartbeat Client", Ordered, func() {
 
 	BeforeEach(func() {
 		var err error
+		platformClient, err = platform.NewClientWithBasicAuth(username, password, config)
+		Expect(err).NotTo(HaveOccurred())
 		heartbeatClient, err = NewClientWithBasicAuth(username, password, config)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(heartbeatClient).NotTo(BeNil())
@@ -39,22 +46,24 @@ var _ = Describe("Heartbeat Client", Ordered, func() {
 	})
 
 	It("should return an error if the session doesnt exist", func() {
-		err := heartbeatClient.SendPulse(9999999999)
-		Expect(err).To(MatchError("invalid session"))
+		Expect(heartbeatClient.SendPulse(ctx, -1)).To(MatchError("invalid session"))
 	})
 
-	It("should be able to create a session and send a pulse", func() {
-		platformClient, err := platform.NewClientWithBasicAuth(username, password, config)
-		Expect(err).NotTo(HaveOccurred())
-		session := &platform.Session{
-			ModuleID: moduleID,
-			DeviceID: "test",
-		}
-		Expect(platformClient.CreateSession(context.Background(), session)).To(Succeed())
-		Expect(err).NotTo(HaveOccurred())
-		Expect(session).NotTo(BeNil())
+	It("can create a session and send a pulse", func() {
+		session := &platform.Session{ModuleID: moduleID}
+		Expect(platformClient.CreateSession(ctx, session)).To(Succeed())
+		Expect(heartbeatClient.SendPulse(ctx, session.ID)).To(Succeed())
+	})
 
-		Expect(heartbeatClient.SendPulse(session.ID)).To(Succeed())
+	It("sends pulses in a new goroutine", func() {
+		errCh, cancel := heartbeatClient.SendPulsesWithCancel(context.Background(), -1, .5)
+		Expect(errCh).NotTo(BeNil())
+		time.Sleep(1 * time.Second)
+		cancel()
+		err := <-errCh
+		Expect(err).To(MatchError("invalid session"))
+		err = <-errCh
+		Expect(err).To(MatchError("invalid session"))
 	})
 
 })

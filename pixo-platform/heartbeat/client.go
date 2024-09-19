@@ -1,6 +1,7 @@
 package heartbeat
 
 import (
+	"context"
 	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
@@ -9,8 +10,11 @@ import (
 // Client is an interface that contains an AbstractClient and a SendPulse method
 type Client interface {
 	abstract.AbstractClient
-	SendPulse(sessionID int) error
+	SendPulse(ctx context.Context, sessionID int) error
+	SendPulsesWithCancel(ctx context.Context, sessionID int, periodSeconds float64) (chan error, context.CancelFunc)
 }
+
+var _ Client = &client{}
 
 // Client is a struct that contains an ServiceClient
 type client struct {

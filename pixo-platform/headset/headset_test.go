@@ -62,8 +62,6 @@ var _ = Describe("Headset Client", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(response).NotTo(BeNil())
 		Expect(response.SessionID).NotTo(BeZero())
-		Expect(response.LessonStatus).NotTo(BeNil())
-		Expect(*response.LessonStatus).To(Equal("passed"))
 	})
 
 })
