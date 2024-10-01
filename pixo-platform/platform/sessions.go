@@ -91,6 +91,10 @@ func (p *clientImpl) CreateSession(ctx context.Context, session *Session) error 
 		variables["input"].(map[string]interface{})["deviceId"] = session.DeviceID
 	}
 
+	if session.IPAddress != "" {
+		variables["input"].(map[string]interface{})["ipAddress"] = session.IPAddress
+	}
+
 	if session.Status != "" {
 		variables["input"].(map[string]interface{})["status"] = session.Status
 	}
