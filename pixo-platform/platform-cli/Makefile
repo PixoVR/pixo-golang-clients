@@ -14,8 +14,8 @@ build:
 
 .PHONY: cp
 cp:
-	@echo "🚀 Copying binary to /usr/local/bin/pixo..."
-	@sudo cp $(EXECUTABLE) /usr/local/bin/pixo
+	@echo "🚀 Copying binary to /usr/local/bin/pixo-dev..."
+	@sudo cp $(EXECUTABLE) /usr/local/bin/pixo-dev
 
 
 .PHONY: lint

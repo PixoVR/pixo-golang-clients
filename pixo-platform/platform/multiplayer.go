@@ -1,17 +1,8 @@
 package platform
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
-	"fmt"
-	"io"
-	"mime"
-	"mime/multipart"
-	"net/textproto"
-	"os"
-	"path/filepath"
 	"time"
 )
 
@@ -47,6 +38,7 @@ type MultiplayerServerVersionParams struct {
 	ModuleID        int    `json:"moduleId" graphql:"moduleId"`
 	SemanticVersion string `json:"semanticVersion" graphql:"semanticVersion"`
 }
+
 type MultiplayerServerConfig struct {
 	ID              int    `json:"id"`
 	Capacity        int    `json:"capacity,omitempty"`
@@ -229,89 +221,13 @@ func (p *clientImpl) CreateMultiplayerServerVersion(ctx context.Context, input M
 		},
 	}
 
-	if input.LocalFilePath == "" {
-		var res struct {
-			ServerVersion *MultiplayerServerVersion `json:"createMultiplayerServerVersion"`
-		}
-		if err := p.Exec(ctx, query, &res, variables); err != nil {
-			return nil, err
-		}
-
-		return res.ServerVersion, nil
+	var res struct {
+		ServerVersion *MultiplayerServerVersion `json:"createMultiplayerServerVersion"`
 	}
 
-	graphqlRequest := GraphQLRequestPayload{
-		OperationName: "createMultiplayerServerVersion",
-		Query:         query,
-		Variables:     variables,
-	}
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(graphqlRequest); err != nil {
+	if err := p.ExecWithFile(ctx, query, &res, variables, input.LocalFilePath, "filePath"); err != nil {
 		return nil, err
 	}
 
-	payload := &bytes.Buffer{}
-	writer := multipart.NewWriter(payload)
-	_ = writer.WriteField("operations", buf.String())
-	file, err := os.Open(input.LocalFilePath)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	mapData := map[string][]string{}
-	mapData["0"] = []string{fmt.Sprintf(`variables.%s`, "input.filePath")}
-	jsonData, _ := json.Marshal(mapData)
-
-	_ = writer.WriteField("map", string(jsonData))
-
-	part, err := createFormFile(writer, "0", filepath.Base(input.LocalFilePath))
-	if err != nil {
-		return nil, err
-	}
-
-	if _, err = io.Copy(part, file); err != nil {
-		return nil, err
-	}
-
-	if err = writer.Close(); err != nil {
-		return nil, err
-	}
-
-	p.ServiceClient.SetHeader("Content-Type", writer.FormDataContentType())
-
-	res, err := p.Post(context.TODO(), "query", payload.Bytes())
-	if err != nil {
-		return nil, err
-	}
-
-	resBody, _ := io.ReadAll(res.Body)
-
-	if res.StatusCode > 299 {
-		return nil, fmt.Errorf("error creating multiplayer server version: %s", string(resBody))
-	}
-
-	var gqlRes struct {
-		Data struct {
-			CreateMultiplayerServerVersion *MultiplayerServerVersion `json:"createMultiplayerServerVersion"`
-		} `json:"data"`
-	}
-
-	if err = json.Unmarshal(resBody, &gqlRes); err != nil {
-		return nil, err
-	}
-
-	return gqlRes.Data.CreateMultiplayerServerVersion, nil
-}
-
-func createFormFile(w *multipart.Writer, fieldName, filename string) (io.Writer, error) {
-	fileContentType := mime.TypeByExtension(filepath.Ext(filename))
-	if fileContentType == "" {
-		fileContentType = "application/octet-stream"
-	}
-	h := make(textproto.MIMEHeader)
-	h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, fieldName, filename))
-	h.Set("Content-Type", fileContentType)
-	return w.CreatePart(h)
+	return res.ServerVersion, nil
 }

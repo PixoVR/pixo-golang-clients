@@ -1,0 +1,87 @@
+moduleId: 43
+assets:
+    - name: header-logo
+      type: audio
+    - name: 4f6c38b5-7051-42fc-92a0-5202211e4684
+      type: image
+      versions:
+        - id: 19
+          status: release
+          languageCode: en
+    - name: d2244d66-6d5c-4acf-bc2b-a04ad8c00f19
+      type: image
+      versions:
+        - id: 15
+          status: pending
+          languageCode: es
+    - name: 6a8a4a57-da4a-4d6a-989c-dc619f51ff86
+      type: image
+      versions:
+        - id: 14
+          status: release
+          languageCode: en
+    - name: 9f5d9147-dcdc-4ce5-b924-298863566b10
+      type: image
+      versions:
+        - id: 13
+          status: pending
+          languageCode: es
+    - name: 4b1111b2-2c52-461d-be9d-0d9836859490
+      type: image
+      versions:
+        - id: 12
+          status: release
+          languageCode: es
+    - name: 4dd92f38-f2c5-45bc-af67-2d4e2eb1bad5
+      type: image
+      versions:
+        - id: 11
+          status: stage
+          languageCode: es
+    - name: 30009d87-526e-434f-9f52-493969d2d4a0
+      type: image
+      versions:
+        - id: 10
+          status: release
+          languageCode: en
+    - name: 392119bc-68f8-4548-b192-16018aed07a2-external
+      type: image
+    - name: 66fb38a9-8091-4a92-a10d-67510844765f
+      type: image
+      versions:
+        - id: 6
+          status: release
+          languageCode: es
+    - name: 3f829b26-1180-4704-aee0-e69a136ccd32
+      type: image
+      versions:
+        - id: 5
+          status: pending
+          languageCode: es
+    - name: 48297f61-9236-40dd-ae2e-2f7a9567efca
+      type: image
+      versions:
+        - id: 4
+          status: stage
+          languageCode: es
+    - name: 45f8134e-0b68-4b15-abfb-4e626190a836
+      type: image
+      versions:
+        - id: 3
+          status: release
+          languageCode: en
+    - name: ca7ffe6e-097d-4645-a389-03a311586d79
+      type: image
+      versions:
+        - id: 2
+          status: pending
+          languageCode: es
+    - name: 573bae0f-39d3-4f71-9bf3-35b9529acf6f
+      type: image
+      versions:
+        - id: 1
+          status: release
+          languageCode: en
+    - name: newasset
+    - name: newasset2
+      type: video

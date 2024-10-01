@@ -396,7 +396,7 @@ var _ = Describe("Basic Forms", func() {
 				},
 			}
 
-			answers, err := s.AskQuestions(questions)
+			answers, err := s.AskQuestions(questions...)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(answers).NotTo(BeNil())

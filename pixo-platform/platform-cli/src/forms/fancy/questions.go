@@ -7,7 +7,7 @@ import (
 	"github.com/charmbracelet/huh"
 )
 
-func (f *Handler) AskQuestions(questions []forms.Question) (map[string]interface{}, error) {
+func (f *Handler) AskQuestions(questions ...forms.Question) (map[string]interface{}, error) {
 	answers := make(map[string]interface{})
 	var groupItems []huh.Field
 

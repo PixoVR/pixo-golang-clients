@@ -42,6 +42,12 @@ type Client interface {
 	UpdateOrg(ctx context.Context, org Org) (*Org, error)
 	DeleteOrg(ctx context.Context, id int) error
 
+	GetAsset(ctx context.Context, id int) (*Asset, error)
+	GetAssets(ctx context.Context, params AssetParams) ([]Asset, error)
+	CreateAsset(ctx context.Context, asset *Asset) error
+	CreateAssetVersion(ctx context.Context, assetVersion *AssetVersion) error
+	UpdateAssetVersion(ctx context.Context, assetVersion *AssetVersion) error
+
 	GetSession(ctx context.Context, id int) (*Session, error)
 	CreateSession(ctx context.Context, session *Session) error
 	UpdateSession(ctx context.Context, session Session) (*Session, error)

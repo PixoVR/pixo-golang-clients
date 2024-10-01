@@ -83,6 +83,23 @@ type MockClient struct {
 	NumCalledGetSession int
 	GetSessionError     error
 
+	CalledGetAssetWith []*Asset
+	GetAssetReturns    *Asset
+	GetAssetError      error
+
+	CalledGetAssetsWith []*AssetParams
+	GetAssetsReturns    []Asset
+	GetAssetsError      error
+
+	CalledCreateAssetWith []*Asset
+	CreateAssetError      error
+
+	CalledCreateAssetVersionWith []*AssetVersion
+	CreateAssetVersionError      error
+
+	CalledUpdateAssetVersionWith []AssetVersion
+	UpdateAssetVersionError      error
+
 	CalledCreateSessionWith []*Session
 	CreateSessionError      error
 
@@ -191,6 +208,27 @@ func (m *MockClient) Reset() {
 
 	m.NumCalledDeleteWebhook = 0
 	m.DeleteWebhookError = nil
+
+	m.NumCalledGetModules = 0
+	m.GetModulesError = nil
+	m.GetModulesEmpty = false
+
+	m.CalledGetAssetWith = nil
+	m.GetAssetReturns = nil
+	m.GetAssetError = nil
+
+	m.CalledGetAssetsWith = nil
+	m.GetAssetsReturns = nil
+	m.GetAssetsError = nil
+
+	m.CalledCreateAssetWith = nil
+	m.CreateAssetError = nil
+
+	m.CalledCreateAssetWith = nil
+	m.CreateAssetError = nil
+
+	m.CalledUpdateAssetVersionWith = nil
+	m.UpdateAssetVersionError = nil
 
 	m.NumCalledGetSession = 0
 	m.GetSessionError = nil
@@ -615,6 +653,125 @@ func (m *MockClient) DeleteAPIKey(ctx context.Context, id int) error {
 	}
 
 	return nil
+}
+
+func (m *MockClient) GetAsset(ctx context.Context, id int) (*Asset, error) {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.CalledGetAssetWith = append(m.CalledGetAssetWith, &Asset{ID: id})
+
+	if m.GetAssetError != nil {
+		return nil, m.GetAssetError
+	}
+
+	if m.GetAssetReturns != nil {
+		return m.GetAssetReturns, nil
+	}
+
+	return &Asset{
+		ID:        id,
+		ModuleID:  1,
+		Name:      faker.Name(),
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+	}, nil
+}
+
+func (m *MockClient) GetAssets(ctx context.Context, params AssetParams) ([]Asset, error) {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.CalledGetAssetsWith = append(m.CalledGetAssetsWith, &params)
+
+	if m.GetAssetsError != nil {
+		return nil, m.GetAssetsError
+	}
+
+	assets := []Asset{
+		{
+			ID:       1,
+			ModuleID: 1,
+			Name:     faker.Name(),
+			Type:     "text",
+			Versions: []AssetVersion{
+				{
+					ID:           1,
+					AssetID:      1,
+					Status:       "stage",
+					LanguageCode: "en",
+					CreatedAt:    time.Now().UTC(),
+					UpdatedAt:    time.Now().UTC(),
+				},
+			},
+			CreatedAt: time.Now().UTC(),
+			UpdatedAt: time.Now().UTC(),
+		},
+	}
+
+	if m.GetAssetsReturns != nil {
+		assets = m.GetAssetsReturns
+	}
+
+	var filteredAssets []Asset
+	for i := range assets {
+		if params.ModuleID > 0 && assets[i].ModuleID != params.ModuleID {
+			continue
+		}
+
+		if params.Name != "" && assets[i].Name != params.Name {
+			continue
+		}
+
+		if params.LanguageCode != "" {
+			var versions []AssetVersion
+			for j := range assets[i].Versions {
+				if assets[i].Versions[j].Status == params.Status &&
+					assets[i].Versions[j].LanguageCode == params.LanguageCode {
+
+					versions = append(versions, assets[i].Versions[j])
+				}
+			}
+
+			assets[i].Versions = versions
+		}
+
+		filteredAssets = append(filteredAssets, assets[i])
+	}
+
+	return filteredAssets, nil
+}
+
+func (m *MockClient) CreateAsset(ctx context.Context, asset *Asset) error {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.CalledCreateAssetWith = append(m.CalledCreateAssetWith, asset)
+	return m.CreateAssetError
+}
+
+func (m *MockClient) CreateAssetVersion(ctx context.Context, assetVersion *AssetVersion) error {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.CalledCreateAssetVersionWith = append(m.CalledCreateAssetVersionWith, assetVersion)
+
+	assetVersion.ID = len(m.CalledCreateAssetVersionWith)
+
+	return m.CreateAssetVersionError
+}
+
+func (m *MockClient) UpdateAssetVersion(ctx context.Context, assetVersion *AssetVersion) error {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.CalledUpdateAssetVersionWith = append(m.CalledUpdateAssetVersionWith, *assetVersion)
+
+	if assetVersion.LanguageCode == "" {
+		assetVersion.LanguageCode = "en"
+	}
+
+	return m.UpdateAssetVersionError
 }
 
 func (m *MockClient) GetWebhooks(ctx context.Context, params *WebhookParams) ([]Webhook, error) {

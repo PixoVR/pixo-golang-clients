@@ -8,7 +8,7 @@ import (
 	"io"
 )
 
-func (f *Handler) AskQuestions(questions []forms.Question) (map[string]interface{}, error) {
+func (f *Handler) AskQuestions(questions ...forms.Question) (map[string]interface{}, error) {
 	answers := make(map[string]interface{})
 	for _, question := range questions {
 		var (
