@@ -111,6 +111,58 @@ var _ = Describe("Assets", func() {
 
 		})
 
+		Context("via rest interface", func() {
+
+			It("returns an error if no file", func() {
+				assetVersion := platform.AssetVersion{
+					Asset:        asset,
+					AssetID:      asset.ID,
+					Status:       "release",
+					LanguageCode: "en",
+				}
+
+				Expect(tokenClient.PostAsset(ctx, &assetVersion)).NotTo(Succeed())
+			})
+
+			It("can create and retrieve an asset", func() {
+				localFilePath := "./test.png"
+				cleanup := NewTestFile(localFilePath)
+				defer cleanup()
+				tag := fmt.Sprintf("tag-%d", rand.Intn(100000000))
+				assetVersion := platform.AssetVersion{
+					Asset: &platform.Asset{
+						ModuleID: moduleID,
+						Name:     fmt.Sprintf("logo-%d", rand.Intn(100000000)),
+						Type:     "image",
+						Tags:     []string{tag, "tag2"},
+					},
+					Status:        "release",
+					LanguageCode:  "en",
+					LocalFilePath: localFilePath,
+				}
+
+				Expect(tokenClient.PostAsset(ctx, &assetVersion)).To(Succeed())
+				Expect(assetVersion).NotTo(BeNil())
+				Expect(assetVersion.ID).NotTo(BeZero())
+				Expect(assetVersion.Asset.ID).NotTo(BeZero())
+
+				assets, err := tokenClient.RetrieveAssets(ctx, platform.AssetParams{
+					ModuleID:     moduleID,
+					Tags:         []string{tag},
+					WithChecksum: true,
+					WithVersions: true,
+				})
+				Expect(err).NotTo(HaveOccurred())
+				Expect(len(assets)).To(BeNumerically(">", 0))
+				Expect(assets[0].ID).To(Equal(assetVersion.Asset.ID))
+				Expect(assets[0].Checksum).NotTo(BeEmpty())
+				Expect(assets[0].DownloadLink).NotTo(BeEmpty())
+				Expect(assets[0].Versions).To(HaveLen(1))
+				Expect(assets[0].Versions[0].ID).To(Equal(assetVersion.ID))
+			})
+
+		})
+
 	})
 
 })

@@ -35,7 +35,7 @@ var _ = Describe("Modules", func() {
 	})
 
 	It("can return an error if a required field is missing when creating a module version", func() {
-		cleanup := makeTestFile(localFilePath)
+		cleanup := NewTestFile(localFilePath)
 		defer cleanup()
 		_, err := tokenClient.CreateModuleVersion(ctx, ModuleVersion{LocalFilePath: localFilePath})
 		Expect(err).To(HaveOccurred())
@@ -49,7 +49,7 @@ var _ = Describe("Modules", func() {
 	})
 
 	It("can create a module version", func() {
-		cleanup := makeTestFile(localFilePath)
+		cleanup := NewTestFile(localFilePath)
 		defer cleanup()
 		input := ModuleVersion{
 			ModuleID:        moduleID,

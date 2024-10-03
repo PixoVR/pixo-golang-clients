@@ -169,9 +169,9 @@ func (p *clientImpl) ExecWithFile(ctx context.Context, query string, v any, vari
 		return p.Exec(ctx, query, v, variables)
 	}
 
-	payload, writer, err := createMultipartWriter(req)
+	payload, writer, err := NewMultipartGQLWriter(req)
 
-	if err = addFile(writer, filePath, label); err != nil {
+	if err = addGQLFile(writer, filePath, label); err != nil {
 		return err
 	}
 
@@ -200,20 +200,17 @@ func (p *clientImpl) ExecWithFile(ctx context.Context, query string, v any, vari
 	return json.Unmarshal(gqlRes.Data, v)
 }
 
-func createMultipartWriter(req GraphQLRequestPayload) (*bytes.Buffer, *multipart.Writer, error) {
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(req); err != nil {
+func NewMultipartGQLWriter(req GraphQLRequestPayload) (*bytes.Buffer, *multipart.Writer, error) {
+	payload, writer, err := NewMultipartWriter(req)
+	if err != nil {
 		return nil, nil, err
 	}
 
-	payload := &bytes.Buffer{}
-	writer := multipart.NewWriter(payload)
-	_ = writer.WriteField("operations", buf.String())
-
+	_ = writer.WriteField("operations", payload.String())
 	return payload, writer, nil
 }
 
-func addFile(writer *multipart.Writer, filePath, label string) error {
+func addGQLFile(writer *multipart.Writer, filePath, label string) error {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return err
@@ -240,6 +237,35 @@ func addFile(writer *multipart.Writer, filePath, label string) error {
 	}
 
 	return nil
+}
+
+func NewMultipartWriter(req interface{}) (*bytes.Buffer, *multipart.Writer, error) {
+	var payload bytes.Buffer
+	if err := json.NewEncoder(&payload).Encode(req); err != nil {
+		return nil, nil, err
+	}
+
+	writer := multipart.NewWriter(&payload)
+	return &payload, writer, nil
+}
+
+func addFile(writer *multipart.Writer, filePath, label string) error {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close() //nolint:errcheck
+
+	part, err := createFormFile(writer, label, filepath.Base(filePath))
+	if err != nil {
+		return err
+	}
+
+	if _, err = io.Copy(part, file); err != nil {
+		return err
+	}
+
+	return writer.Close()
 }
 
 func createFormFile(w *multipart.Writer, fieldName, filename string) (io.Writer, error) {

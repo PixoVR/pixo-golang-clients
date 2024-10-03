@@ -122,8 +122,8 @@ var _ = Describe("Multiplayer Resources", func() {
 	})
 
 	It("can upload a gameserver build", func() {
-		Expect(os.WriteFile(localFilePath, []byte("test"), 0644)).NotTo(HaveOccurred())
-		defer os.Remove(localFilePath) // nolint:errcheck
+		cleanup := NewTestFile(localFilePath)
+		defer cleanup()
 		serverVersionInput := platform.MultiplayerServerVersion{
 			ModuleID:        moduleID,
 			SemanticVersion: randVersion,
@@ -143,7 +143,7 @@ var _ = Describe("Multiplayer Resources", func() {
 
 })
 
-func makeTestFile(filePath string) func() {
+func NewTestFile(filePath string) func() {
 	Expect(os.WriteFile(filePath, []byte("test"), 0644)).To(Succeed())
 	return func() {
 		Expect(os.Remove(filePath)).To(Succeed())

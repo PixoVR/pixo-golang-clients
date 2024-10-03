@@ -100,6 +100,13 @@ type MockClient struct {
 	CalledUpdateAssetVersionWith []AssetVersion
 	UpdateAssetVersionError      error
 
+	CalledPostAssetWith []AssetVersion
+	PostAssetError      error
+
+	CalledRetrieveAssetsWith []AssetParams
+	RetrieveAssetsReturns    []Asset
+	RetrieveAssetsError      error
+
 	CalledCreateSessionWith []*Session
 	CreateSessionError      error
 
@@ -759,6 +766,55 @@ func (m *MockClient) CreateAssetVersion(ctx context.Context, assetVersion *Asset
 	assetVersion.ID = len(m.CalledCreateAssetVersionWith)
 
 	return m.CreateAssetVersionError
+}
+
+func (m *MockClient) PostAsset(ctx context.Context, assetVersion *AssetVersion) error {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.CalledPostAssetWith = append(m.CalledPostAssetWith, *assetVersion)
+
+	if assetVersion.LanguageCode == "" {
+		assetVersion.LanguageCode = "en"
+	}
+
+	return m.CreateAssetVersionError
+}
+
+func (m *MockClient) RetrieveAssets(ctx context.Context, params AssetParams) ([]Asset, error) {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.CalledRetrieveAssetsWith = append(m.CalledRetrieveAssetsWith, params)
+
+	if m.RetrieveAssetsError != nil {
+		return nil, m.RetrieveAssetsError
+	}
+
+	if m.RetrieveAssetsReturns != nil {
+		return m.RetrieveAssetsReturns, nil
+	}
+
+	return []Asset{
+		{
+			ID:       1,
+			ModuleID: 1,
+			Name:     faker.Name(),
+			Type:     "text",
+			Versions: []AssetVersion{
+				{
+					ID:           1,
+					AssetID:      1,
+					Status:       "stage",
+					LanguageCode: "en",
+					CreatedAt:    time.Now().UTC(),
+					UpdatedAt:    time.Now().UTC(),
+				},
+			},
+			CreatedAt: time.Now().UTC(),
+			UpdatedAt: time.Now().UTC(),
+		},
+	}, nil
 }
 
 func (m *MockClient) UpdateAssetVersion(ctx context.Context, assetVersion *AssetVersion) error {

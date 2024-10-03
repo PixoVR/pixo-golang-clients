@@ -1,32 +1,46 @@
 package platform
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
+	"github.com/rs/zerolog/log"
+	"io"
+	"mime/multipart"
+	"net/http"
+	"strings"
 	"time"
 )
 
 type Asset struct {
-	ID   int    `json:"id,omitempty"`
-	Name string `json:"name,omitempty" yaml:"name,omitempty"`
-	Type string `json:"type,omitempty"`
+	ID   int      `json:"id,omitempty"`
+	Name string   `json:"name,omitempty" yaml:"name,omitempty"`
+	Type string   `json:"type,omitempty"`
+	Tags []string `json:"tags,omitempty"`
 
 	ModuleID int            `json:"moduleId,omitempty"`
 	Module   *Module        `json:"module,omitempty"`
 	Versions []AssetVersion `json:"versions,omitempty" yaml:"versions,omitempty"`
+
+	Checksum     string `json:"checksum,omitempty"`
+	DownloadLink string `json:"downloadLink,omitempty"`
 
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	UpdatedAt time.Time `json:"updatedAt,omitempty"`
 }
 
 type AssetParams struct {
-	ModuleID         int    `json:"moduleId,omitempty"`
-	ExternalModuleID string `json:"externalModuleId,omitempty"`
-	Name             string `json:"name,omitempty"`
-	Type             string `json:"type,omitempty"`
-	Status           string `json:"status,omitempty"`
-	LanguageCode     string `json:"languageCode,omitempty"`
-	Tags             string `json:"tags,omitempty"`
+	ModuleID         int      `json:"moduleId,omitempty"`
+	ExternalModuleID string   `json:"externalModuleId,omitempty"`
+	Name             string   `json:"name,omitempty"`
+	Type             string   `json:"type,omitempty"`
+	Status           string   `json:"status,omitempty"`
+	LanguageCode     string   `json:"languageCode,omitempty"`
+	Tags             []string `json:"tags,omitempty"`
+	WithVersions     bool     `json:"withVersions,omitempty"`
+	WithChecksum     bool     `json:"withChecksum,omitempty"`
 }
 
 type CreateAssetResponse struct {
@@ -210,4 +224,108 @@ func (p *clientImpl) UpdateAssetVersion(ctx context.Context, assetVersion *Asset
 
 	*assetVersion = assetVersionResponse.AssetVersion
 	return nil
+}
+
+type PostAssetVersionResponse struct {
+	Message      string       `json:"message"`
+	Error        string       `json:"error"`
+	Asset        Asset        `json:"asset"`
+	AssetVersion AssetVersion `json:"version"`
+}
+
+func (p *clientImpl) PostAsset(ctx context.Context, assetVersion *AssetVersion) error {
+	if assetVersion == nil {
+		return errors.New("asset version is nil")
+	} else if assetVersion.Asset == nil {
+		return errors.New("asset is nil")
+	}
+
+	tags := strings.Join(assetVersion.Asset.Tags, ",")
+
+	var payload bytes.Buffer
+	writer := multipart.NewWriter(&payload)
+
+	_ = writer.WriteField("moduleId", fmt.Sprint(assetVersion.Asset.ModuleID))
+	_ = writer.WriteField("name", assetVersion.Asset.Name)
+	_ = writer.WriteField("type", assetVersion.Asset.Type)
+	_ = writer.WriteField("tags", tags)
+	_ = writer.WriteField("status", assetVersion.Status)
+	_ = writer.WriteField("languageCode", assetVersion.LanguageCode)
+
+	if err := addFile(writer, assetVersion.LocalFilePath, "file"); err != nil {
+		log.Debug().Err(err).Msg("failed to add file")
+		return err
+	}
+
+	p.ServiceClient.SetHeader("Content-Type", writer.FormDataContentType())
+
+	res, err := p.Post(ctx, "assets", payload.Bytes())
+	if err != nil {
+		return err
+	}
+
+	resBody, _ := io.ReadAll(res.Body)
+
+	var response PostAssetVersionResponse
+	if err = json.Unmarshal(resBody, &response); err != nil {
+		return err
+	}
+
+	if res.StatusCode != http.StatusCreated {
+		return fmt.Errorf("unable to create asset version: %s", response.Error)
+	}
+
+	*assetVersion = response.AssetVersion
+	assetVersion.Asset = &response.Asset
+	return nil
+}
+
+type AssetsResponse struct {
+	Message string  `json:"message"`
+	Error   string  `json:"error"`
+	Assets  []Asset `json:"assets"`
+}
+
+// RetrieveAssets retrieves assets based on the provided parameters using the REST interface.
+func (p *clientImpl) RetrieveAssets(ctx context.Context, params AssetParams) ([]Asset, error) {
+	if params.ModuleID == 0 && params.ExternalModuleID == "" {
+		return nil, errors.New("module id or external id is required")
+	}
+
+	req, err := p.ServiceClient.NewRequest(http.MethodGet, "assets", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	tags := strings.Join(params.Tags, ",")
+
+	paramMap := map[string]string{
+		"moduleId":         fmt.Sprint(params.ModuleID),
+		"externalModuleId": params.ExternalModuleID,
+		"name":             params.Name,
+		"type":             params.Type,
+		"tags":             tags,
+		"status":           params.Status,
+		"languageCode":     params.LanguageCode,
+		"withVersions":     fmt.Sprint(params.WithVersions),
+		"withChecksum":     fmt.Sprint(params.WithChecksum),
+	}
+
+	req = p.AddQueryParams(req, paramMap)
+
+	res, err := http.DefaultClient.Do(req.WithContext(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	var response AssetsResponse
+	if err = json.NewDecoder(res.Body).Decode(&response); err != nil {
+		return nil, err
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return nil, errors.New(response.Error)
+	}
+
+	return response.Assets, nil
 }
