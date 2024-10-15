@@ -1,7 +1,6 @@
 package sessions
 
 import (
-	"encoding/json"
 	"errors"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/load/fixture"
@@ -32,14 +31,11 @@ func NewLoadTester(config Config) (*Tester, error) {
 		return nil, errors.New("platform client is required")
 	}
 
-	var payload map[string]interface{}
-	_ = json.Unmarshal([]byte(config.EventPayload), &payload)
-
 	if config.Session.ModuleID == 0 {
 		return nil, errors.New("module id is required")
 	}
 
-	config.Event = platform.Event{Payload: payload}
+	config.Event = platform.Event{Payload: config.EventPayload}
 
 	t := &Tester{
 		Tester: fixture.NewLoadTester(config.Config),

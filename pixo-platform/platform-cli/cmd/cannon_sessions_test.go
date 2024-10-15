@@ -174,9 +174,8 @@ var _ = Describe("Sessions Load Testing", func() {
 			"1",
 		)
 
-		expectedPayload := map[string]interface{}{"key": "value"}
 		Expect(executor.MockPlatformClient.CalledCreateEventWith).To(HaveLen(1))
-		Expect(executor.MockPlatformClient.CalledCreateEventWith[0].Payload).To(Equal(expectedPayload))
+		Expect(executor.MockPlatformClient.CalledCreateEventWith[0].Payload).To(Equal(`{"key":"value"}`))
 	})
 
 	It("returns an error if unable to read the payload file", func() {
@@ -208,9 +207,8 @@ var _ = Describe("Sessions Load Testing", func() {
 			"1",
 		)
 
-		expectedPayload := map[string]interface{}{"key": "value"}
 		Expect(executor.MockPlatformClient.CalledCreateEventWith).To(HaveLen(1))
-		Expect(executor.MockPlatformClient.CalledCreateEventWith[0].Payload).To(Equal(expectedPayload))
+		Expect(executor.MockPlatformClient.CalledCreateEventWith[0].Payload).To(Equal(`{"key":"value"}`))
 	})
 
 	Context("legacy headset api", func() {

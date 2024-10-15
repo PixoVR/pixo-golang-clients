@@ -181,7 +181,7 @@ var sessionsSimulateCmd = &cobra.Command{
 					event := &platform.Event{
 						SessionID: &sessionID,
 						Type:      eventType,
-						Payload:   payloadMap,
+						Payload:   payload,
 					}
 
 					spinner = loader.NewLoader(cmd.Context(), "Creating event...", Ctx.Printer)

@@ -2,7 +2,6 @@ package platform
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"time"
 )
@@ -13,7 +12,8 @@ type Event struct {
 	SessionUUID *string                `json:"sessionUuid,omitempty"`
 	Session     *Session               `json:"session,omitempty"`
 	Type        string                 `json:"type,omitempty"`
-	Payload     map[string]interface{} `json:"payload,omitempty"`
+	Payload     string                 `json:"payload,omitempty"`
+	PayloadMap  map[string]interface{} `json:"-"`
 
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	UpdatedAt time.Time `json:"updatedAt,omitempty"`
@@ -61,13 +61,8 @@ func (p *clientImpl) CreateEvent(ctx context.Context, event *Event) error {
 		},
 	}
 
-	if event.Payload != nil {
-		payload, err := json.Marshal(event.Payload)
-		if err != nil {
-			return errors.New("invalid json")
-		}
-
-		variables["input"].(map[string]interface{})["payload"] = string(payload)
+	if event.Payload != "" {
+		variables["input"].(map[string]interface{})["payload"] = event.Payload
 	}
 
 	var res CreateEventResponse

@@ -1,6 +1,7 @@
 package sessions
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/headset"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
@@ -69,7 +70,10 @@ func (t *Tester) performLegacySession(id int) {
 	t.RecordSuccess(id, "startSession", fmt.Sprintf("session started for module %d", session.ModuleID))
 	request.SessionID = res.SessionID
 
-	request.Payload = t.config.Event.Payload
+	var payloadMap map[string]interface{}
+	_ = json.Unmarshal([]byte(t.config.Event.Payload), &payloadMap)
+	request.Payload = payloadMap
+
 	if _, err = t.config.PlatformFixture.HeadsetClient.SendEvent(t.Config.Command.Context(), request); err != nil {
 		t.RecordError(id, "createEvent", fmt.Sprintf("unable to create event for session %d", request.SessionID), err)
 	} else {
