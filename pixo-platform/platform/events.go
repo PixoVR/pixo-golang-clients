@@ -13,7 +13,7 @@ type Event struct {
 	SessionUUID *string                `json:"sessionUuid,omitempty"`
 	Session     *Session               `json:"session,omitempty"`
 	Type        string                 `json:"type,omitempty"`
-	Payload     map[string]interface{} `json:"jsonData,omitempty"`
+	Payload     map[string]interface{} `json:"payload,omitempty"`
 
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	UpdatedAt time.Time `json:"updatedAt,omitempty"`
