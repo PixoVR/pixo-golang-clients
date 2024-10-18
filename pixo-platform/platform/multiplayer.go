@@ -110,7 +110,7 @@ func (p *clientImpl) GetMultiplayerServerConfigs(ctx context.Context, params *Mu
 }
 
 func (p *clientImpl) GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionParams) ([]MultiplayerServerVersion, error) {
-	query := `query multiplayerServerVersions($params: MultiplayerServerVersionParams) { multiplayerServerVersions(params: $params) { id moduleId imageRegistry engine status semanticVersion filePath module { name } } }`
+	query := `query multiplayerServerVersions($params: MultiplayerServerVersionParams) { multiplayerServerVersions(params: $params) { id moduleId imageRegistry engine status semanticVersion filePath module { name } createdAt updatedAt } }`
 
 	variables := map[string]interface{}{
 		"params": params,
@@ -184,7 +184,7 @@ func (p *clientImpl) UpdateMultiplayerServerVersion(ctx context.Context, input M
 }
 
 func (p *clientImpl) GetMultiplayerServerVersion(ctx context.Context, versionID int) (*MultiplayerServerVersion, error) {
-	query := `query multiplayerServerVersion($id: ID!) { multiplayerServerVersion(id: $id) { id moduleId imageRegistry engine status semanticVersion filePath module { name } } }`
+	query := `query multiplayerServerVersion($id: ID!) { multiplayerServerVersion(id: $id) { id moduleId imageRegistry engine status semanticVersion filePath module { name } createdAt updatedAt } }`
 
 	variables := map[string]interface{}{
 		"id": versionID,
