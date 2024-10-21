@@ -125,7 +125,6 @@ func (p *clientImpl) GetMultiplayerServerVersions(ctx context.Context, params *M
 }
 
 func (p *clientImpl) GetMultiplayerServerVersionsWithConfig(ctx context.Context, params *MultiplayerServerVersionParams) ([]MultiplayerServerVersion, error) {
-
 	configs, err := p.GetMultiplayerServerConfigs(ctx, &MultiplayerServerConfigParams{
 		ModuleID:      params.ModuleID,
 		ServerVersion: params.SemanticVersion,
@@ -153,7 +152,7 @@ func (p *clientImpl) GetMultiplayerServerVersionsWithConfig(ctx context.Context,
 }
 
 func (p *clientImpl) UpdateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error) {
-	query := `mutation updateMultiplayerServerVersion($input: MultiplayerServerVersionInput!) { updateMultiplayerServerVersion(input: $input) { id moduleId imageRegistry engine status semanticVersion module { name } } }`
+	query := `mutation updateMultiplayerServerVersion($input: MultiplayerServerVersionInput!) { updateMultiplayerServerVersion(input: $input) { id moduleId imageRegistry engine status semanticVersion filePath module { name } } }`
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{
@@ -201,7 +200,7 @@ func (p *clientImpl) GetMultiplayerServerVersion(ctx context.Context, versionID 
 }
 
 func (p *clientImpl) CreateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error) {
-	query := `mutation createMultiplayerServerVersion($input: MultiplayerServerVersionInput!) { createMultiplayerServerVersion(input: $input) { id imageRegistry fileLink semanticVersion engine module { name } } }`
+	query := `mutation createMultiplayerServerVersion($input: MultiplayerServerVersionInput!) { createMultiplayerServerVersion(input: $input) { id imageRegistry filePath semanticVersion engine module { name } } }`
 
 	if input.ImageRegistry == "" && input.LocalFilePath == "" {
 		return nil, errors.New("image or file path must be provided")
