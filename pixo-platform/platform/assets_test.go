@@ -100,7 +100,7 @@ var _ = Describe("Assets", func() {
 			It("can update an asset versions status", func() {
 				assetVersion := platform.AssetVersion{
 					AssetID:       asset.ID,
-					LanguageCode:  "en",
+					LanguageCode:  "es",
 					LocalFilePath: localFilePath,
 				}
 				Expect(tokenClient.CreateAssetVersion(ctx, &assetVersion)).To(Succeed())

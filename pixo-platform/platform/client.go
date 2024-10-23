@@ -170,6 +170,9 @@ func (p *clientImpl) ExecWithFile(ctx context.Context, query string, v any, vari
 	}
 
 	payload, writer, err := NewMultipartGQLWriter(req)
+	if err != nil {
+		return err
+	}
 
 	if err = addGQLFile(writer, filePath, label); err != nil {
 		return err

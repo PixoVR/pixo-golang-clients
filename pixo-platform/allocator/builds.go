@@ -58,6 +58,10 @@ func (a *Client) GetBuildWorkflowLogs(workflowName string) (chan *Log, error) {
 	path := fmt.Sprintf("build/workflows/%s/logs", workflowName)
 
 	req, err := a.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, err
+	}
+
 	req.Header.Set("Accept", "application/octet-stream")
 
 	res, err := a.Client().Do(req)

@@ -979,12 +979,12 @@ func (m *MockClient) CreateSession(ctx context.Context, session *Session) error 
 	m.Lock.Lock()
 	defer m.Lock.Unlock()
 
-	sessionCopy := *session
-	m.CalledCreateSessionWith = append(m.CalledCreateSessionWith, &sessionCopy)
-
 	if session == nil {
 		return errors.New("session can not be nil")
 	}
+
+	sessionCopy := *session
+	m.CalledCreateSessionWith = append(m.CalledCreateSessionWith, &sessionCopy)
 
 	if session.ModuleID <= 0 {
 		return errors.New("invalid module id")
