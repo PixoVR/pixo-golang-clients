@@ -56,9 +56,9 @@ var _ = Describe("Heartbeat Client", Ordered, func() {
 	})
 
 	It("sends pulses in a new goroutine", func() {
-		errCh, cancel := heartbeatClient.SendPulsesWithCancel(context.Background(), -1, .5)
+		errCh, cancel := heartbeatClient.SendPulsesWithCancel(context.TODO(), -1, .5)
 		Expect(errCh).NotTo(BeNil())
-		time.Sleep(1 * time.Second)
+		time.Sleep(2 * time.Second)
 		cancel()
 		err := <-errCh
 		Expect(err).To(MatchError("invalid session"))

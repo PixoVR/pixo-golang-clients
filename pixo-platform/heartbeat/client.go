@@ -24,7 +24,6 @@ type client struct {
 
 // NewClient is a function that returns a new Client
 func NewClient(config urlfinder.ClientConfig) Client {
-
 	abstractConfig := abstract.Config{
 		ServiceConfig: newServiceConfig(config.Lifecycle, config.Region),
 		Token:         config.Token,
