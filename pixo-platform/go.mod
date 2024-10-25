@@ -4,7 +4,7 @@ go 1.23.0
 
 require (
 	github.com/PixoVR/pixo-golang-server-utilities/pixo-platform v0.0.0-20240904200001-99920749c214
-	github.com/charmbracelet/bubbletea v1.1.1
+	github.com/charmbracelet/bubbletea v1.1.2
 	github.com/charmbracelet/huh v0.6.0
 	github.com/charmbracelet/lipgloss v0.13.0
 	github.com/fatih/color v1.17.0
@@ -37,7 +37,7 @@ require (
 	github.com/casbin/govaluate v1.2.0 // indirect
 	github.com/catppuccin/go v0.2.0 // indirect
 	github.com/charmbracelet/bubbles v0.20.0 // indirect
-	github.com/charmbracelet/x/ansi v0.2.3 // indirect
+	github.com/charmbracelet/x/ansi v0.4.0 // indirect
 	github.com/charmbracelet/x/exp/strings v0.0.0-20240904165849-e8e43e13f84b // indirect
 	github.com/charmbracelet/x/term v0.2.0 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
@@ -91,7 +91,7 @@ require (
 	golang.org/x/exp v0.0.0-20240904232852-e7e105dedf7e // indirect
 	golang.org/x/net v0.29.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
-	golang.org/x/sys v0.25.0 // indirect
+	golang.org/x/sys v0.26.0 // indirect
 	golang.org/x/term v0.24.0 // indirect
 	golang.org/x/tools v0.24.0 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
