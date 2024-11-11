@@ -36,6 +36,9 @@ type Session struct {
 
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	UpdatedAt time.Time `json:"updatedAt,omitempty"`
+
+	JoinExtensions     *string `json:"joinExtensions,omitempty"`
+	CompleteExtensions *string `json:"completeExtensions,omitempty"`
 }
 
 type CreateSessionResponse struct {
@@ -119,6 +122,10 @@ func (p *clientImpl) CreateSession(ctx context.Context, session *Session) error 
 		variables["input"].(map[string]interface{})["specialization"] = session.Specialization
 	}
 
+	if session.JoinExtensions != nil {
+		variables["input"].(map[string]interface{})["joinExtensions"] = session.JoinExtensions
+	}
+
 	var res CreateSessionResponse
 	if err := p.Exec(ctx, query, &res, variables); err != nil {
 		return err
@@ -173,6 +180,10 @@ func (p *clientImpl) UpdateSession(ctx context.Context, session Session) (*Sessi
 
 	if session.ModuleVersion != "" {
 		variables["input"].(map[string]interface{})["moduleVersion"] = session.ModuleVersion
+	}
+
+	if session.CompleteExtensions != nil {
+		variables["input"].(map[string]interface{})["completeExtensions"] = session.CompleteExtensions
 	}
 
 	var res UpdateSessionResponse
