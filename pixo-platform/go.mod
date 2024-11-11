@@ -14,7 +14,7 @@ require (
 	github.com/gorilla/websocket v1.5.3
 	github.com/joho/godotenv v1.5.1
 	github.com/kyokomi/emoji v2.2.4+incompatible
-	github.com/ollama/ollama v0.3.12
+	github.com/ollama/ollama v0.4.1
 	github.com/onsi/ginkgo/v2 v2.20.2
 	github.com/onsi/gomega v1.34.2
 	github.com/rs/zerolog v1.33.0
