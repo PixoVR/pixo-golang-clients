@@ -6,6 +6,12 @@ import (
 	"time"
 )
 
+type EventResult struct {
+	Success    *bool   `json:"success,omitempty"`
+	Completion *bool   `json:"completion,omitempty"`
+	Duration   *string `json:"duration,omitempty"`
+}
+
 type Session struct {
 	ID int `json:"id,omitempty"`
 
@@ -37,8 +43,9 @@ type Session struct {
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	UpdatedAt time.Time `json:"updatedAt,omitempty"`
 
-	JoinExtensions     *string `json:"joinExtensions,omitempty"`
-	CompleteExtensions *string `json:"completeExtensions,omitempty"`
+	JoinExtensions     *string      `json:"joinExtensions,omitempty"`
+	CompleteExtensions *string      `json:"completeExtensions,omitempty"`
+	EventResult        *EventResult `json:"eventResult,omitempty"`
 }
 
 type CreateSessionResponse struct {
@@ -184,6 +191,10 @@ func (p *clientImpl) UpdateSession(ctx context.Context, session Session) (*Sessi
 
 	if session.CompleteExtensions != nil {
 		variables["input"].(map[string]interface{})["completeExtensions"] = session.CompleteExtensions
+	}
+
+	if session.EventResult != nil {
+		variables["input"].(map[string]interface{})["eventResult"] = session.EventResult
 	}
 
 	var res UpdateSessionResponse
