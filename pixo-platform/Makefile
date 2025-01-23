@@ -35,4 +35,3 @@ report:
 	@echo "📊 Generating coverage report..."
 	@go test -cover -v -coverprofile=prof.out ./...
 	@go tool cover -html=prof.out
-
