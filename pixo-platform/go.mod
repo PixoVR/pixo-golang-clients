@@ -6,7 +6,7 @@ toolchain go1.23.5
 
 require (
 	github.com/PixoVR/pixo-golang-server-utilities/pixo-platform v0.0.0-20250124191417-bc6d57519342
-	github.com/charmbracelet/bubbletea v1.2.4
+	github.com/charmbracelet/bubbletea v1.3.0
 	github.com/charmbracelet/huh v0.6.0
 	github.com/charmbracelet/lipgloss v1.0.0
 	github.com/fatih/color v1.18.0
@@ -39,7 +39,7 @@ require (
 	github.com/casbin/govaluate v1.3.0 // indirect
 	github.com/catppuccin/go v0.2.0 // indirect
 	github.com/charmbracelet/bubbles v0.20.0 // indirect
-	github.com/charmbracelet/x/ansi v0.7.0 // indirect
+	github.com/charmbracelet/x/ansi v0.8.0 // indirect
 	github.com/charmbracelet/x/exp/strings v0.0.0-20250124185643-7598ce4d23fb // indirect
 	github.com/charmbracelet/x/term v0.2.1 // indirect
 	github.com/cloudwego/base64x v0.1.5 // indirect
