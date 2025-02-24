@@ -7,15 +7,17 @@ import (
 )
 
 type Org struct {
-	ID          int       `json:"id"`
-	Name        string    `json:"name"`
-	Type        string    `json:"type"`
-	Status      string    `json:"enabled"`
-	LogoLink    string    `json:"logoLink"`
-	HubLogoLink string    `json:"hubLogoLink"`
-	OpenAccess  bool      `json:"openAccess"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
+	ID             int       `json:"id"`
+	Name           string    `json:"name"`
+	Type           string    `json:"type"`
+	Status         string    `json:"enabled"`
+	LogoLink       string    `json:"logoLink"`
+	HubLogoLink    string    `json:"hubLogoLink"`
+	PrimaryColor   string    `json:"primaryColor"`
+	SecondaryColor string    `json:"secondaryColor"`
+	OpenAccess     bool      `json:"openAccess"`
+	CreatedAt      time.Time `json:"createdAt"`
+	UpdatedAt      time.Time `json:"updatedAt"`
 }
 
 type OrgParams struct {
@@ -43,7 +45,7 @@ type DeleteOrgResponse struct {
 }
 
 func (p *clientImpl) GetOrgs(ctx context.Context, params ...*OrgParams) ([]Org, error) {
-	query := `query orgs { orgs { id name type openAccess logoLink hubLogoLink } }`
+	query := `query orgs { orgs { id name type openAccess logoLink hubLogoLink primaryColor secondaryColor } }`
 
 	variables := map[string]interface{}{
 		"params": map[string]interface{}{},
@@ -63,7 +65,7 @@ func (p *clientImpl) GetOrgs(ctx context.Context, params ...*OrgParams) ([]Org, 
 }
 
 func (p *clientImpl) GetOrg(ctx context.Context, id int) (*Org, error) {
-	query := `query org($id: ID!) { org(id: $id) { id name type openAccess logoLink hubLogoLink } }`
+	query := `query org($id: ID!) { org(id: $id) { id name type openAccess logoLink hubLogoLink primaryColor secondaryColor } }`
 
 	variables := map[string]interface{}{
 		"id": id,
