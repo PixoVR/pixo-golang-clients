@@ -15,9 +15,15 @@ type Org struct {
 	HubLogoLink    string    `json:"hubLogoLink"`
 	PrimaryColor   string    `json:"primaryColor"`
 	SecondaryColor string    `json:"secondaryColor"`
+	Colors         OrgColors `json:"colors"`
 	OpenAccess     bool      `json:"openAccess"`
 	CreatedAt      time.Time `json:"createdAt"`
 	UpdatedAt      time.Time `json:"updatedAt"`
+}
+
+type OrgColors struct {
+	Primary   string `json:"primary"`
+	Secondary string `json:"secondary"`
 }
 
 type OrgParams struct {
@@ -45,7 +51,7 @@ type DeleteOrgResponse struct {
 }
 
 func (p *clientImpl) GetOrgs(ctx context.Context, params ...*OrgParams) ([]Org, error) {
-	query := `query orgs { orgs { id name type openAccess logoLink hubLogoLink primaryColor secondaryColor } }`
+	query := `query orgs { orgs { id name type openAccess logoLink hubLogoLink primaryColor secondaryColor colors { primary secondary } } }`
 
 	variables := map[string]interface{}{
 		"params": map[string]interface{}{},
@@ -65,7 +71,7 @@ func (p *clientImpl) GetOrgs(ctx context.Context, params ...*OrgParams) ([]Org, 
 }
 
 func (p *clientImpl) GetOrg(ctx context.Context, id int) (*Org, error) {
-	query := `query org($id: ID!) { org(id: $id) { id name type openAccess logoLink hubLogoLink primaryColor secondaryColor } }`
+	query := `query org($id: ID!) { org(id: $id) { id name type openAccess logoLink hubLogoLink primaryColor secondaryColor colors { primary secondary } } }`
 
 	variables := map[string]interface{}{
 		"id": id,
