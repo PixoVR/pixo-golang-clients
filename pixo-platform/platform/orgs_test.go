@@ -46,6 +46,8 @@ var _ = Describe("Orgs API", func() {
 		Expect(retrievedOrg).NotTo(BeNil())
 		Expect(retrievedOrg.ID).To(Equal(testOrg.ID))
 		Expect(retrievedOrg.HubLogoLink).NotTo(BeEmpty())
+		Expect(retrievedOrg.PrimaryColor).To(BeEmpty())
+		Expect(retrievedOrg.SecondaryColor).To(BeEmpty())
 	})
 
 	//It("can get all orgs", func() {
