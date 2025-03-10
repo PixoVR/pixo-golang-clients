@@ -51,7 +51,7 @@ type DeleteOrgResponse struct {
 }
 
 func (p *clientImpl) GetOrgs(ctx context.Context, params ...*OrgParams) ([]Org, error) {
-	query := `query orgs { orgs { id name type openAccess logoLink hubLogoLink primaryColor secondaryColor colors { primary secondary } } }`
+	query := `query orgs { orgs { id name type openAccess logoLink hubLogoLink primaryColor secondaryColor inheritedColors { primary secondary } } }`
 
 	variables := map[string]interface{}{
 		"params": map[string]interface{}{},
@@ -105,7 +105,6 @@ func (p *clientImpl) CreateOrg(ctx context.Context, org Org) (*Org, error) {
 }
 
 func (p *clientImpl) UpdateOrg(ctx context.Context, org Org) (*Org, error) {
-
 	if org.ID == 0 {
 		return nil, errors.New("org id is required")
 	}
