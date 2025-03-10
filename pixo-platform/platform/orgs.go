@@ -71,7 +71,7 @@ func (p *clientImpl) GetOrgs(ctx context.Context, params ...*OrgParams) ([]Org, 
 }
 
 func (p *clientImpl) GetOrg(ctx context.Context, id int) (*Org, error) {
-	query := `query org($id: ID!) { org(id: $id) { id name type openAccess logoLink hubLogoLink primaryColor secondaryColor colors { primary secondary } } }`
+	query := `query org($id: ID!) { org(id: $id) { id name type openAccess logoLink hubLogoLink primaryColor secondaryColor inheritedColors { primary secondary } } }`
 
 	variables := map[string]interface{}{
 		"id": id,
