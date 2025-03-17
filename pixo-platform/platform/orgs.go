@@ -7,18 +7,18 @@ import (
 )
 
 type Org struct {
-	ID             int       `json:"id"`
-	Name           string    `json:"name"`
-	Type           string    `json:"type"`
-	Status         string    `json:"enabled"`
-	LogoLink       string    `json:"logoLink"`
-	HubLogoLink    string    `json:"hubLogoLink"`
-	PrimaryColor   string    `json:"primaryColor"`
-	SecondaryColor string    `json:"secondaryColor"`
-	Colors         OrgColors `json:"colors"`
-	OpenAccess     bool      `json:"openAccess"`
-	CreatedAt      time.Time `json:"createdAt"`
-	UpdatedAt      time.Time `json:"updatedAt"`
+	ID              int       `json:"id"`
+	Name            string    `json:"name"`
+	Type            string    `json:"type"`
+	Status          string    `json:"enabled"`
+	LogoLink        string    `json:"logoLink"`
+	HubLogoLink     string    `json:"hubLogoLink"`
+	PrimaryColor    string    `json:"primaryColor"`
+	SecondaryColor  string    `json:"secondaryColor"`
+	InheritedColors OrgColors `json:"inheritedColors"`
+	OpenAccess      bool      `json:"openAccess"`
+	CreatedAt       time.Time `json:"createdAt"`
+	UpdatedAt       time.Time `json:"updatedAt"`
 }
 
 type OrgColors struct {
