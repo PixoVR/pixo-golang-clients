@@ -148,6 +148,18 @@ type MockClient struct {
 
 	NumCalledUpdateMultiplayerServerVersion int
 	UpdateMultiplayerServerVersionError     error
+
+	NumCalledGetLearningHistoryRecords int
+	GetLearningHistoryRecordsError     error
+
+	NumCalledGetCourseDataRecords int
+	GetCourseDataRecordsError     error
+
+	NumCalledGetOrgSuccessFactors int
+	GetOrgSuccessFactorsError     error
+
+	NumCalledGetExpiringModules int
+	GetExpiringModulesError     error
 }
 
 func (m *MockClient) Reset() {
@@ -273,6 +285,15 @@ func (m *MockClient) Reset() {
 
 	m.NumCalledUpdateMultiplayerServerVersion = 0
 	m.UpdateMultiplayerServerVersionError = nil
+
+	m.NumCalledGetLearningHistoryRecords = 0
+	m.GetLearningHistoryRecordsError = nil
+
+	m.NumCalledGetCourseDataRecords = 0
+	m.GetCourseDataRecordsError = nil
+
+	m.NumCalledGetOrgSuccessFactors = 0
+	m.GetOrgSuccessFactorsError = nil
 }
 
 func (m *MockClient) CheckAuth(ctx context.Context) (User, error) {
@@ -1281,4 +1302,44 @@ func (m *MockClient) UpdateMultiplayerServerVersion(ctx context.Context, input M
 			Abbreviation: "TST",
 		},
 	}, nil
+}
+
+func (m *MockClient) GetLearningHistoryRecords(ctx context.Context, params LearningHistoryParams) ([]LearningHistory, error) {
+	m.NumCalledGetLearningHistoryRecords++
+
+	if m.GetLearningHistoryRecordsError != nil {
+		return nil, m.GetLearningHistoryRecordsError
+	}
+
+	return []LearningHistory{}, nil
+}
+
+func (m *MockClient) GetCourseDataRecords(ctx context.Context, orgID int) ([]CourseData, error) {
+	m.NumCalledGetCourseDataRecords++
+
+	if m.GetCourseDataRecordsError != nil {
+		return nil, m.GetCourseDataRecordsError
+	}
+
+	return []CourseData{}, nil
+}
+
+func (m *MockClient) GetOrgSuccessFactors(ctx context.Context) ([]OrgSuccessFactor, error) {
+	m.NumCalledGetOrgSuccessFactors++
+
+	if m.GetOrgSuccessFactorsError != nil {
+		return nil, m.GetOrgSuccessFactorsError
+	}
+
+	return []OrgSuccessFactor{}, nil
+}
+
+func (m *MockClient) GetExpiringModules(ctx context.Context) ([]ExpiringModule, error) {
+	m.NumCalledGetExpiringModules++
+
+	if m.GetExpiringModulesError != nil {
+		return nil, m.GetExpiringModulesError
+	}
+
+	return []ExpiringModule{}, nil
 }

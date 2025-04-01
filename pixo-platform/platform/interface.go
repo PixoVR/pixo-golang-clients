@@ -88,4 +88,14 @@ type Client interface {
 	CreateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error)
 	// UpdateMultiplayerServerVersion updates a multiplayer server version on the platform using the GraphQL interface
 	UpdateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error)
+
+	// GetLearningHistoryRecords retrieves success factors learning history records from the platform using the GraphQL interface
+	GetLearningHistoryRecords(ctx context.Context, params LearningHistoryParams) ([]LearningHistory, error)
+	// GetCourseData retrieves success factors course data from the platform using the GraphQL interface
+	GetCourseDataRecords(ctx context.Context, orgID int) ([]CourseData, error)
+	// GetOrgSuccessFactors retrieves success factors org success factors from the platform using the GraphQL interface
+	GetOrgSuccessFactors(ctx context.Context) ([]OrgSuccessFactor, error)
+
+	// GetExpiringModules retrieves expiring modules from the platform using the GraphQL interface
+	GetExpiringModules(ctx context.Context) ([]ExpiringModule, error)
 }
