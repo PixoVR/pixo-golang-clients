@@ -151,15 +151,19 @@ type MockClient struct {
 
 	NumCalledGetLearningHistoryRecords int
 	GetLearningHistoryRecordsError     error
+	LearningHistoryRecordsToReturn     []LearningHistory
 
 	NumCalledGetCourseDataRecords int
 	GetCourseDataRecordsError     error
+	CourseDataRecordsToReturn     []CourseData
 
 	NumCalledGetOrgSuccessFactors int
 	GetOrgSuccessFactorsError     error
+	OrgSuccessFactorsToReturn     []OrgSuccessFactor
 
 	NumCalledGetExpiringModules int
 	GetExpiringModulesError     error
+	ExpiringModulesToReturn     []ExpiringModule
 }
 
 func (m *MockClient) Reset() {
@@ -288,12 +292,19 @@ func (m *MockClient) Reset() {
 
 	m.NumCalledGetLearningHistoryRecords = 0
 	m.GetLearningHistoryRecordsError = nil
+	m.LearningHistoryRecordsToReturn = nil
 
 	m.NumCalledGetCourseDataRecords = 0
 	m.GetCourseDataRecordsError = nil
+	m.CourseDataRecordsToReturn = nil
 
 	m.NumCalledGetOrgSuccessFactors = 0
 	m.GetOrgSuccessFactorsError = nil
+	m.OrgSuccessFactorsToReturn = nil
+
+	m.NumCalledGetExpiringModules = 0
+	m.GetExpiringModulesError = nil
+	m.ExpiringModulesToReturn = nil
 }
 
 func (m *MockClient) CheckAuth(ctx context.Context) (User, error) {
@@ -1311,6 +1322,10 @@ func (m *MockClient) GetLearningHistoryRecords(ctx context.Context, params Learn
 		return nil, m.GetLearningHistoryRecordsError
 	}
 
+	if len(m.LearningHistoryRecordsToReturn) > 0 {
+		return m.LearningHistoryRecordsToReturn, nil
+	}
+
 	return []LearningHistory{}, nil
 }
 
@@ -1319,6 +1334,10 @@ func (m *MockClient) GetCourseDataRecords(ctx context.Context, orgID int) ([]Cou
 
 	if m.GetCourseDataRecordsError != nil {
 		return nil, m.GetCourseDataRecordsError
+	}
+
+	if len(m.CourseDataRecordsToReturn) > 0 {
+		return m.CourseDataRecordsToReturn, nil
 	}
 
 	return []CourseData{}, nil
@@ -1331,6 +1350,10 @@ func (m *MockClient) GetOrgSuccessFactors(ctx context.Context) ([]OrgSuccessFact
 		return nil, m.GetOrgSuccessFactorsError
 	}
 
+	if len(m.OrgSuccessFactorsToReturn) > 0 {
+		return m.OrgSuccessFactorsToReturn, nil
+	}
+
 	return []OrgSuccessFactor{}, nil
 }
 
@@ -1339,6 +1362,10 @@ func (m *MockClient) GetExpiringModules(ctx context.Context) ([]ExpiringModule, 
 
 	if m.GetExpiringModulesError != nil {
 		return nil, m.GetExpiringModulesError
+	}
+
+	if len(m.ExpiringModulesToReturn) > 0 {
+		return m.ExpiringModulesToReturn, nil
 	}
 
 	return []ExpiringModule{}, nil
