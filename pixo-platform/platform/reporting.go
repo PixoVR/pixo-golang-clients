@@ -2,17 +2,18 @@ package platform
 
 import (
 	"context"
+	"time"
 )
 
 type ExpiringModule struct {
-	OrgModuleID int    `json:"orgModuleId"`
-	ExpiresAt   string `json:"expiresAt"`
-	ModuleName  string `json:"moduleName"`
-	Description string `json:"description"`
-	ShortDesc   string `json:"shortDesc"`
-	OrgID       int    `json:"orgId"`
-	OrgName     string `json:"orgName"`
-	Type        string `json:"type"`
+	OrgModuleID int       `json:"orgModuleId"`
+	ExpiresAt   time.Time `json:"expiresAt"`
+	ModuleName  string    `json:"moduleName"`
+	Description string    `json:"description"`
+	ShortDesc   string    `json:"shortDesc"`
+	OrgID       int       `json:"orgId"`
+	OrgName     string    `json:"orgName"`
+	Type        string    `json:"type"`
 }
 
 type GetExpiringModulesResponse struct {
