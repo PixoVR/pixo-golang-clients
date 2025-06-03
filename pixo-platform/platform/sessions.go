@@ -193,10 +193,10 @@ func (p *clientImpl) UpdateSession(ctx context.Context, session Session) (*Sessi
 		variables["input"].(map[string]interface{})["completeExtensions"] = session.CompleteExtensions
 	}
 
+
 	if session.EventResult != nil {
 		variables["input"].(map[string]interface{})["eventResult"] = session.EventResult
 	}
-
 	var res UpdateSessionResponse
 	if err := p.Exec(ctx, query, &res, variables); err != nil {
 		return nil, err
