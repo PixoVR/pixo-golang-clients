@@ -20,7 +20,7 @@ var _ = Describe("Config", Ordered, func() {
 	It("can show the platform urls", func() {
 		output := executor.RunCommandAndExpectSuccess("config", "urls")
 		Expect(output).To(ContainSubstring("Region: na"))
-		Expect(output).To(ContainSubstring("Lifecycle: prod"))
+		Expect(output).To(ContainSubstring("Status: prod"))
 		Expect(output).To(ContainSubstring("Web: https://apex.pixovr.com"))
 		Expect(output).To(ContainSubstring("Platform API: https://apex.pixovr.com/v2"))
 		Expect(output).To(ContainSubstring("Platform API Docs: https://apex.pixovr.com/v2/swagger/index.html"))
@@ -62,7 +62,7 @@ var _ = Describe("Config", Ordered, func() {
 		Expect(output).NotTo(ContainSubstring(token))
 		Expect(output).To(ContainSubstring(fmt.Sprintf("User ID: %d", userID)))
 		Expect(output).To(ContainSubstring("Region: na"))
-		Expect(output).To(ContainSubstring("Lifecycle: prod"))
+		Expect(output).To(ContainSubstring("Status: prod"))
 		Expect(output).To(ContainSubstring("Username: " + username))
 		Expect(output).To(ContainSubstring("API Key: ********"))
 		Expect(output).NotTo(ContainSubstring("testapikey"))
@@ -85,19 +85,19 @@ var _ = Describe("Config", Ordered, func() {
 	It("can set the region", func() {
 		output := executor.RunCommandAndExpectSuccess("config", "set", "-r", "saudi", "-l", "prod")
 		Expect(output).To(ContainSubstring("Region: saudi"))
-		Expect(output).To(ContainSubstring("Lifecycle: prod"))
+		Expect(output).To(ContainSubstring("Status: prod"))
 		Expect(executor.ConfigManager.Lifecycle()).To(Equal("prod"))
 		Expect(executor.ConfigManager.Region()).To(Equal("saudi"))
 		output = executor.RunCommandAndExpectSuccess("config")
 		Expect(output).To(ContainSubstring("Region: saudi"))
-		Expect(output).To(ContainSubstring("Lifecycle: prod"))
+		Expect(output).To(ContainSubstring("Status: prod"))
 
 		output = executor.RunCommandAndExpectSuccess("config", "set", "-r", "na", "-l", "dev")
 
 		Expect(executor.ConfigManager.Lifecycle()).To(Equal("dev"))
 		Expect(executor.ConfigManager.Region()).To(Equal("na"))
 		Expect(output).To(ContainSubstring("Region: na"))
-		Expect(output).To(ContainSubstring("Lifecycle: dev"))
+		Expect(output).To(ContainSubstring("Status: dev"))
 	})
 
 	It("can set the username and password", func() {

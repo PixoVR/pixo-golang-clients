@@ -36,6 +36,9 @@ with the platform, deploying gameserver versions, and simplifying the testing of
   - [Create](#create-webhook)
   - [List](#list-webhook)
   - [Delete](#delete-webhook)
+- [Assets](#assets)
+  - [Creating Assets](#create-asset)
+  - [Promote to Release](#promote)
 - [Sessions](#sessions)
   - [Simulate a Session](#simulate-a-session)
   - [Using Legacy Headset API](#using-legacy-headset-api)
@@ -256,6 +259,114 @@ pixo webhooks list
 ```bash
 pixo webhooks delete --webhook-id 1
 ```
+
+## Assets
+
+### Initialize Module
+Initialize the assets manifest file
+
+```bash
+ # Creates an asset manifest in the current directory. Asks for the module abbreviation if not provided
+pixo assets init
+ 
+cat manifest.yaml
+# module: TST
+```
+
+```sh
+# Or with a module. If the module has existing assets, they will be loaded into the manifest file
+pixo assets init --module TST
+
+cat manifest.yaml
+# moduleId: 1
+# assets: []
+
+# OR if there are existing assets
+
+# moduleId: 1
+# assets:
+#   - name: title-logo
+#     type: image
+
+```
+
+### Add Asset
+Add a logical asset for your module to use at runtime.
+Physical assets can be added in the form of asset versions
+
+```bash
+# Creates a new abstract asset on the Pixo Platform and adds it to the asset manifest
+pixo assets add \
+    --name "header-logo" \
+    --type "image"
+    
+cat manifest.yaml
+# ...
+# assets:
+#   - name: header-logo
+#     type: image
+```
+
+
+### Add Asset Version
+Add an asset version to an existing asset
+
+Phases:
+- Stage
+    - Used for testing and development
+- Release
+    - Used for production
+
+```bash
+# Creates a new physical asset version with status "stage" on the Pixo Platform and adds it to the asset manifest
+pixo assets versions stage \
+    --name "title-logo" \
+    --lang "en" \
+    --filepath "/path/to/asset"
+```
+
+***WARNING***: Depending on module implementation, this will likely cause assets to be used in production. Use with caution.
+```bash
+# Promote an asset version to release
+pixo assets version release --asset "title-logo"
+```
+
+### Localized Asset Versions
+Add a localized asset version. Useful for assets that may have different versions for different languages
+
+```bash
+pixo assets versions stage \
+    --asset "title-logo" \
+    --lang "es" \
+    --filepath "/path/to/asset"
+    
+pixo assets versions release \
+    --asset "title-logo" \
+    --lang "es"
+```
+
+### Language Translations
+Currently working on text translations. Requires [Ollama](https://ollama.com/) to be installed and running.
+
+```bash
+# Pull translation model. Can choose any model and set with environment variable
+ollama pull icky/translate
+
+# Run ollama server
+ollama serve
+```
+
+In separate terminal
+```bash
+export LLM_MODEL=icky/translate # if using different model
+
+# Translate an asset to a specific language
+pixo assets translate \
+    --name "title" \
+    --from "en" \
+    --to "es"
+```
+
 
 ## Sessions
 

@@ -79,6 +79,16 @@ func (a *ServiceClient) NewRequest(method, path string, body io.Reader) (*http.R
 	return a.addHeaders(req), nil
 }
 
+// AddQueryParams adds query parameters to the request
+func (a *ServiceClient) AddQueryParams(req *http.Request, params map[string]string) *http.Request {
+	q := req.URL.Query()
+	for key, value := range params {
+		q.Add(key, value)
+	}
+	req.URL.RawQuery = q.Encode()
+	return req
+}
+
 func (a *ServiceClient) addHeaders(req *http.Request) *http.Request {
 	a.lock.Lock()
 	defer a.lock.Unlock()

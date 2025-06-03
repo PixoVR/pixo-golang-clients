@@ -61,6 +61,7 @@ func (a *Client) GetBuildWorkflowLogs(workflowName string) (chan *Log, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	req.Header.Set("Accept", "application/octet-stream")
 
 	res, err := a.Client().Do(req)

@@ -12,7 +12,7 @@ type FormHandler interface {
 	SelectID(question *Question) error
 	MultiSelect(question *Question) error
 	MultiSelectIDs(question *Question) error
-	AskQuestions(questions []Question) (map[string]interface{}, error)
+	AskQuestions(questions ...Question) (map[string]interface{}, error)
 	SetReader(reader io.Reader)
 	SetWriter(writer io.Writer)
 }

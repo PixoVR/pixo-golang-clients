@@ -13,7 +13,7 @@ var _ = Describe("Builds", func() {
 	//BeforeEach(func() {
 	//	var err error
 	//	config := urlfinder.ClientConfig{
-	//		Lifecycle: "dev",
+	//		Status: "dev",
 	//		Token:     os.Getenv("SECRET_KEY"),
 	//	}
 	//	allocatorClient = multiplayerAllocator.NewClient(config)

@@ -89,7 +89,7 @@ func (c *ConfigManager) GetValuesOrSubmitForm(values []Value, cmd *cobra.Command
 		}
 	}
 
-	answers, err := c.formHandler.AskQuestions(questions)
+	answers, err := c.formHandler.AskQuestions(questions...)
 	if err != nil {
 		return nil, err
 	}

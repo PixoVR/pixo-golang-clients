@@ -27,7 +27,7 @@ to quickly create a Cobra application.`,
 
 		lifecycle := Ctx.ConfigManager.Lifecycle()
 		if lifecycle != "" {
-			Ctx.Printer.Println(":gear:  Lifecycle: ", lifecycle)
+			Ctx.Printer.Println(":gear:  Status: ", lifecycle)
 		}
 
 		Ctx.Printer.Println()

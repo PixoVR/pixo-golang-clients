@@ -147,20 +147,18 @@ var _ = Describe("Sessions and Events", func() {
 		event := &platform.Event{
 			SessionID: &[]int{session.ID}[0],
 			Type:      "PIXOVR_SESSION_JOINED",
-			Payload:   map[string]interface{}{"invalid": make(chan int)},
+			Payload:   "invalid json",
 		}
 
 		err := tokenClient.CreateEvent(ctx, event)
-		Expect(err).To(MatchError("invalid json"))
+		Expect(err).To(MatchError("invalid json data"))
 	})
 
 	It("can create an event with a payload", func() {
 		event := &platform.Event{
 			SessionID: &[]int{session.ID}[0],
 			Type:      "PIXOVR_SESSION_JOINED",
-			Payload: map[string]interface{}{
-				"action": "something-cool",
-			},
+			Payload:   `{"key": "value"}`,
 		}
 
 		Expect(tokenClient.CreateEvent(ctx, event)).To(Succeed())

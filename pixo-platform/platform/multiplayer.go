@@ -1,17 +1,8 @@
 package platform
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
-	"fmt"
-	"io"
-	"mime"
-	"mime/multipart"
-	"net/textproto"
-	"os"
-	"path/filepath"
 	"time"
 )
 
@@ -47,6 +38,7 @@ type MultiplayerServerVersionParams struct {
 	ModuleID        int    `json:"moduleId" graphql:"moduleId"`
 	SemanticVersion string `json:"semanticVersion" graphql:"semanticVersion"`
 }
+
 type MultiplayerServerConfig struct {
 	ID              int    `json:"id"`
 	Capacity        int    `json:"capacity,omitempty"`
@@ -118,7 +110,7 @@ func (p *clientImpl) GetMultiplayerServerConfigs(ctx context.Context, params *Mu
 }
 
 func (p *clientImpl) GetMultiplayerServerVersions(ctx context.Context, params *MultiplayerServerVersionParams) ([]MultiplayerServerVersion, error) {
-	query := `query multiplayerServerVersions($params: MultiplayerServerVersionParams) { multiplayerServerVersions(params: $params) { id moduleId imageRegistry engine status semanticVersion module { name } } }`
+	query := `query multiplayerServerVersions($params: MultiplayerServerVersionParams) { multiplayerServerVersions(params: $params) { id moduleId imageRegistry engine status semanticVersion filePath module { name } createdAt updatedAt } }`
 
 	variables := map[string]interface{}{
 		"params": params,
@@ -133,7 +125,6 @@ func (p *clientImpl) GetMultiplayerServerVersions(ctx context.Context, params *M
 }
 
 func (p *clientImpl) GetMultiplayerServerVersionsWithConfig(ctx context.Context, params *MultiplayerServerVersionParams) ([]MultiplayerServerVersion, error) {
-
 	configs, err := p.GetMultiplayerServerConfigs(ctx, &MultiplayerServerConfigParams{
 		ModuleID:      params.ModuleID,
 		ServerVersion: params.SemanticVersion,
@@ -161,7 +152,7 @@ func (p *clientImpl) GetMultiplayerServerVersionsWithConfig(ctx context.Context,
 }
 
 func (p *clientImpl) UpdateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error) {
-	query := `mutation updateMultiplayerServerVersion($input: MultiplayerServerVersionInput!) { updateMultiplayerServerVersion(input: $input) { id moduleId imageRegistry engine status semanticVersion module { name } } }`
+	query := `mutation updateMultiplayerServerVersion($input: MultiplayerServerVersionInput!) { updateMultiplayerServerVersion(input: $input) { id moduleId imageRegistry engine status semanticVersion filePath module { name } } }`
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{
@@ -192,7 +183,7 @@ func (p *clientImpl) UpdateMultiplayerServerVersion(ctx context.Context, input M
 }
 
 func (p *clientImpl) GetMultiplayerServerVersion(ctx context.Context, versionID int) (*MultiplayerServerVersion, error) {
-	query := `query multiplayerServerVersion($id: ID!) { multiplayerServerVersion(id: $id) { id moduleId imageRegistry engine status semanticVersion module { name } } }`
+	query := `query multiplayerServerVersion($id: ID!) { multiplayerServerVersion(id: $id) { id moduleId imageRegistry engine status semanticVersion filePath module { name } createdAt updatedAt } }`
 
 	variables := map[string]interface{}{
 		"id": versionID,
@@ -209,7 +200,7 @@ func (p *clientImpl) GetMultiplayerServerVersion(ctx context.Context, versionID 
 }
 
 func (p *clientImpl) CreateMultiplayerServerVersion(ctx context.Context, input MultiplayerServerVersion) (*MultiplayerServerVersion, error) {
-	query := `mutation createMultiplayerServerVersion($input: MultiplayerServerVersionInput!) { createMultiplayerServerVersion(input: $input) { id imageRegistry fileLink semanticVersion engine module { name } } }`
+	query := `mutation createMultiplayerServerVersion($input: MultiplayerServerVersionInput!) { createMultiplayerServerVersion(input: $input) { id imageRegistry filePath semanticVersion engine module { name } } }`
 
 	if input.ImageRegistry == "" && input.LocalFilePath == "" {
 		return nil, errors.New("image or file path must be provided")
@@ -229,89 +220,13 @@ func (p *clientImpl) CreateMultiplayerServerVersion(ctx context.Context, input M
 		},
 	}
 
-	if input.LocalFilePath == "" {
-		var res struct {
-			ServerVersion *MultiplayerServerVersion `json:"createMultiplayerServerVersion"`
-		}
-		if err := p.Exec(ctx, query, &res, variables); err != nil {
-			return nil, err
-		}
-
-		return res.ServerVersion, nil
+	var res struct {
+		ServerVersion *MultiplayerServerVersion `json:"createMultiplayerServerVersion"`
 	}
 
-	graphqlRequest := GraphQLRequestPayload{
-		OperationName: "createMultiplayerServerVersion",
-		Query:         query,
-		Variables:     variables,
-	}
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(graphqlRequest); err != nil {
+	if err := p.ExecWithFile(ctx, query, &res, variables, input.LocalFilePath, "filePath"); err != nil {
 		return nil, err
 	}
 
-	payload := &bytes.Buffer{}
-	writer := multipart.NewWriter(payload)
-	_ = writer.WriteField("operations", buf.String())
-	file, err := os.Open(input.LocalFilePath)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	mapData := map[string][]string{}
-	mapData["0"] = []string{fmt.Sprintf(`variables.%s`, "input.filePath")}
-	jsonData, _ := json.Marshal(mapData)
-
-	_ = writer.WriteField("map", string(jsonData))
-
-	part, err := createFormFile(writer, "0", filepath.Base(input.LocalFilePath))
-	if err != nil {
-		return nil, err
-	}
-
-	if _, err = io.Copy(part, file); err != nil {
-		return nil, err
-	}
-
-	if err = writer.Close(); err != nil {
-		return nil, err
-	}
-
-	p.ServiceClient.SetHeader("Content-Type", writer.FormDataContentType())
-
-	res, err := p.Post(context.TODO(), "query", payload.Bytes())
-	if err != nil {
-		return nil, err
-	}
-
-	resBody, _ := io.ReadAll(res.Body)
-
-	if res.StatusCode > 299 {
-		return nil, fmt.Errorf("error creating multiplayer server version: %s", string(resBody))
-	}
-
-	var gqlRes struct {
-		Data struct {
-			CreateMultiplayerServerVersion *MultiplayerServerVersion `json:"createMultiplayerServerVersion"`
-		} `json:"data"`
-	}
-
-	if err = json.Unmarshal(resBody, &gqlRes); err != nil {
-		return nil, err
-	}
-
-	return gqlRes.Data.CreateMultiplayerServerVersion, nil
-}
-
-func createFormFile(w *multipart.Writer, fieldName, filename string) (io.Writer, error) {
-	fileContentType := mime.TypeByExtension(filepath.Ext(filename))
-	if fileContentType == "" {
-		fileContentType = "application/octet-stream"
-	}
-	h := make(textproto.MIMEHeader)
-	h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, fieldName, filename))
-	h.Set("Content-Type", fileContentType)
-	return w.CreatePart(h)
+	return res.ServerVersion, nil
 }

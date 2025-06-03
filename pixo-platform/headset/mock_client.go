@@ -38,8 +38,8 @@ func (m *MockClient) StartSession(ctx context.Context, request EventRequest) (*E
 			Session: &platform.Session{
 				ID: 1,
 			},
-			Type:    request.Type,
-			Payload: request.Payload,
+			Type:       request.Type,
+			PayloadMap: request.Payload,
 		},
 	}, nil
 }
@@ -62,8 +62,8 @@ func (m *MockClient) SendEvent(ctx context.Context, request EventRequest) (*Even
 			Session: &platform.Session{
 				ID: 1,
 			},
-			Type:    request.Type,
-			Payload: request.Payload,
+			Type:       request.Type,
+			PayloadMap: request.Payload,
 		},
 	}, nil
 }
@@ -86,8 +86,8 @@ func (m *MockClient) EndSession(ctx context.Context, request EventRequest) (*Eve
 			Session: &platform.Session{
 				ID: 1,
 			},
-			Type:    request.Type,
-			Payload: request.Payload,
+			Type:       request.Type,
+			PayloadMap: request.Payload,
 		},
 	}, nil
 }

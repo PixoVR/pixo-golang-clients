@@ -15,15 +15,10 @@ import (
 // matchmakeCmd represents the matchmake rootCmd
 var matchmakeCmd = &cobra.Command{
 	Use:   "matchmake",
-	Short: "Connect to the matchmaking service to receive a gameserver",
-	Long:  `Connect to the matchmaking service to receive a gameserver.`,
+	Short: "Request a multiplayer match",
+	Long:  `Connect to the matchmaking service to receive a gameserver address`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		questions := []config.Value{
-			{Question: moduleQuestion()},
-			{Question: forms.Question{Type: forms.Input, Key: "server-version"}},
-		}
-
-		answers, err := Ctx.ConfigManager.GetValuesOrSubmitForm(questions, cmd)
+		answers, err := Ctx.ConfigManager.GetValuesOrSubmitForm(matchmakingQuestions(), cmd)
 		if err != nil {
 			return err
 		}

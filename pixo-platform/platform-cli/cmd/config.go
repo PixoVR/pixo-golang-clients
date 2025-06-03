@@ -36,7 +36,7 @@ var configCmd = &cobra.Command{
 		}
 
 		if lifecycle := Ctx.ConfigManager.Lifecycle(); lifecycle != "" {
-			Ctx.Printer.Println(":gear: Lifecycle: ", lifecycle)
+			Ctx.Printer.Println(":gear: Status: ", lifecycle)
 		}
 
 		Ctx.Printer.Println()

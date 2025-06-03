@@ -82,15 +82,15 @@ func (t *TestExecutor) Cleanup() {
 	t.InMemoryConfig.Clear()
 	t.MockPlatformClient.Reset()
 	t.rootCmd.SetArgs(nil)
-	t.clearFlagValues(t.rootCmd)
+	t.ClearFlagValues(t.rootCmd)
 }
 
-func (t *TestExecutor) clearFlagValues(cmd *cobra.Command) {
+func (t *TestExecutor) ClearFlagValues(cmd *cobra.Command) {
 	cmd.Flags().VisitAll(func(flag *pflag.Flag) {
 		_ = flag.Value.Set(flag.DefValue)
 	})
 	for _, subCmd := range cmd.Commands() {
-		t.clearFlagValues(subCmd)
+		t.ClearFlagValues(subCmd)
 	}
 }
 
@@ -113,6 +113,7 @@ func (t *TestExecutor) RunCommandWithInput(reader io.Reader, args ...string) (st
 }
 
 func (t *TestExecutor) RunCommandWithInputAndExpectSuccess(input io.Reader, args ...string) string {
+	GinkgoHelper()
 	output, err := t.RunCommandWithInput(input, args...)
 	Expect(err).NotTo(HaveOccurred())
 	Expect(output).NotTo(BeEmpty())
@@ -120,10 +121,12 @@ func (t *TestExecutor) RunCommandWithInputAndExpectSuccess(input io.Reader, args
 }
 
 func (t *TestExecutor) RunCommand(args ...string) (string, error) {
+	GinkgoHelper()
 	return t.RunCommandWithInput(os.Stdin, args...)
 }
 
 func (t *TestExecutor) RunCommandAndExpectSuccess(args ...string) string {
+	GinkgoHelper()
 	output, err := t.RunCommandWithInput(os.Stdin, args...)
 	Expect(err).NotTo(HaveOccurred())
 	return output

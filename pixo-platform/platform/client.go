@@ -1,6 +1,7 @@
 package platform
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -9,8 +10,12 @@ import (
 	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/middleware/auth"
 	"github.com/rs/zerolog/log"
 	"io"
+	"mime"
+	"mime/multipart"
 	"net/http"
+	"net/textproto"
 	"os"
+	"path/filepath"
 
 	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract"
 )
@@ -125,6 +130,11 @@ func (p *clientImpl) Exec(ctx context.Context, query string, v any, variables ma
 	p.SetHeader("Content-Type", "application/json")
 	res, err := p.Post(ctx, "query", reqBody)
 	if err != nil {
+		log.Error().
+			Err(err).
+			Str("query", query).
+			Str("variables", fmt.Sprintf("%v", variables)).
+			Msg("Request to platform API failed")
 		return err
 	}
 
@@ -148,4 +158,126 @@ func (p *clientImpl) Exec(ctx context.Context, query string, v any, variables ma
 	}
 
 	return json.Unmarshal(gqlRes.Data, v)
+}
+
+func (p *clientImpl) ExecWithFile(ctx context.Context, query string, v any, variables map[string]interface{}, filePath, label string) error {
+	req := GraphQLRequestPayload{
+		Query:     query,
+		Variables: variables,
+	}
+	if filePath == "" {
+		return p.Exec(ctx, query, v, variables)
+	}
+
+	payload, writer, err := NewMultipartGQLWriter(req)
+	if err != nil {
+		return err
+	}
+
+	if err = addGQLFile(writer, filePath, label); err != nil {
+		return err
+	}
+
+	p.ServiceClient.SetHeader("Content-Type", writer.FormDataContentType())
+
+	res, err := p.Post(ctx, "query", payload.Bytes())
+	if err != nil {
+		return err
+	}
+
+	resBody, _ := io.ReadAll(res.Body)
+
+	if res.StatusCode != http.StatusOK {
+		return errors.New(string(resBody))
+	}
+
+	var gqlRes GraphQLResponse
+	if err = json.Unmarshal(resBody, &gqlRes); err != nil {
+		return err
+	}
+
+	if len(gqlRes.Errors) > 0 {
+		return errors.New(gqlRes.Errors[0].Message)
+	}
+
+	return json.Unmarshal(gqlRes.Data, v)
+}
+
+func NewMultipartGQLWriter(req GraphQLRequestPayload) (*bytes.Buffer, *multipart.Writer, error) {
+	payload, writer, err := NewMultipartWriter(req)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	_ = writer.WriteField("operations", payload.String())
+	return payload, writer, nil
+}
+
+func addGQLFile(writer *multipart.Writer, filePath, label string) error {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close() //nolint:errcheck
+
+	mapData := map[string][]string{}
+	mapData["0"] = []string{fmt.Sprintf(`variables.input.%s`, label)}
+	jsonData, _ := json.Marshal(mapData)
+
+	_ = writer.WriteField("map", string(jsonData))
+
+	part, err := createFormFile(writer, "0", filepath.Base(filePath))
+	if err != nil {
+		return err
+	}
+
+	if _, err = io.Copy(part, file); err != nil {
+		return err
+	}
+
+	if err = writer.Close(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func NewMultipartWriter(req interface{}) (*bytes.Buffer, *multipart.Writer, error) {
+	var payload bytes.Buffer
+	if err := json.NewEncoder(&payload).Encode(req); err != nil {
+		return nil, nil, err
+	}
+
+	writer := multipart.NewWriter(&payload)
+	return &payload, writer, nil
+}
+
+func addFile(writer *multipart.Writer, filePath, label string) error {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close() //nolint:errcheck
+
+	part, err := createFormFile(writer, label, filepath.Base(filePath))
+	if err != nil {
+		return err
+	}
+
+	if _, err = io.Copy(part, file); err != nil {
+		return err
+	}
+
+	return writer.Close()
+}
+
+func createFormFile(w *multipart.Writer, fieldName, filename string) (io.Writer, error) {
+	fileContentType := mime.TypeByExtension(filepath.Ext(filename))
+	if fileContentType == "" {
+		fileContentType = "application/octet-stream"
+	}
+	h := make(textproto.MIMEHeader)
+	h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, fieldName, filename))
+	h.Set("Content-Type", fileContentType)
+	return w.CreatePart(h)
 }

@@ -84,6 +84,30 @@ type MockClient struct {
 	NumCalledGetSession int
 	GetSessionError     error
 
+	CalledGetAssetWith []*Asset
+	GetAssetReturns    *Asset
+	GetAssetError      error
+
+	CalledGetAssetsWith []*AssetParams
+	GetAssetsReturns    []Asset
+	GetAssetsError      error
+
+	CalledCreateAssetWith []*Asset
+	CreateAssetError      error
+
+	CalledCreateAssetVersionWith []*AssetVersion
+	CreateAssetVersionError      error
+
+	CalledUpdateAssetVersionWith []AssetVersion
+	UpdateAssetVersionError      error
+
+	CalledPostAssetWith []AssetVersion
+	PostAssetError      error
+
+	CalledRetrieveAssetsWith []AssetParams
+	RetrieveAssetsReturns    []Asset
+	RetrieveAssetsError      error
+
 	CalledCreateSessionWith []*Session
 	CreateSessionError      error
 
@@ -125,6 +149,22 @@ type MockClient struct {
 
 	NumCalledUpdateMultiplayerServerVersion int
 	UpdateMultiplayerServerVersionError     error
+
+	NumCalledGetLearningHistoryRecords int
+	GetLearningHistoryRecordsError     error
+	LearningHistoryRecordsToReturn     []LearningHistory
+
+	NumCalledGetCourseDataRecords int
+	GetCourseDataRecordsError     error
+	CourseDataRecordsToReturn     []CourseData
+
+	NumCalledGetOrgSuccessFactors int
+	GetOrgSuccessFactorsError     error
+	OrgSuccessFactorsToReturn     []OrgSuccessFactor
+
+	NumCalledGetExpiringModules int
+	GetExpiringModulesError     error
+	ExpiringModulesToReturn     []ExpiringModule
 }
 
 func (m *MockClient) Reset() {
@@ -193,6 +233,27 @@ func (m *MockClient) Reset() {
 	m.NumCalledDeleteWebhook = 0
 	m.DeleteWebhookError = nil
 
+	m.NumCalledGetModules = 0
+	m.GetModulesError = nil
+	m.GetModulesEmpty = false
+
+	m.CalledGetAssetWith = nil
+	m.GetAssetReturns = nil
+	m.GetAssetError = nil
+
+	m.CalledGetAssetsWith = nil
+	m.GetAssetsReturns = nil
+	m.GetAssetsError = nil
+
+	m.CalledCreateAssetWith = nil
+	m.CreateAssetError = nil
+
+	m.CalledCreateAssetWith = nil
+	m.CreateAssetError = nil
+
+	m.CalledUpdateAssetVersionWith = nil
+	m.UpdateAssetVersionError = nil
+
 	m.NumCalledGetSession = 0
 	m.GetSessionError = nil
 
@@ -229,6 +290,22 @@ func (m *MockClient) Reset() {
 
 	m.NumCalledUpdateMultiplayerServerVersion = 0
 	m.UpdateMultiplayerServerVersionError = nil
+
+	m.NumCalledGetLearningHistoryRecords = 0
+	m.GetLearningHistoryRecordsError = nil
+	m.LearningHistoryRecordsToReturn = nil
+
+	m.NumCalledGetCourseDataRecords = 0
+	m.GetCourseDataRecordsError = nil
+	m.CourseDataRecordsToReturn = nil
+
+	m.NumCalledGetOrgSuccessFactors = 0
+	m.GetOrgSuccessFactorsError = nil
+	m.OrgSuccessFactorsToReturn = nil
+
+	m.NumCalledGetExpiringModules = 0
+	m.GetExpiringModulesError = nil
+	m.ExpiringModulesToReturn = nil
 }
 
 func (m *MockClient) CheckAuth(ctx context.Context) (User, error) {
@@ -616,6 +693,174 @@ func (m *MockClient) DeleteAPIKey(ctx context.Context, id int) error {
 	}
 
 	return nil
+}
+
+func (m *MockClient) GetAsset(ctx context.Context, id int) (*Asset, error) {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.CalledGetAssetWith = append(m.CalledGetAssetWith, &Asset{ID: id})
+
+	if m.GetAssetError != nil {
+		return nil, m.GetAssetError
+	}
+
+	if m.GetAssetReturns != nil {
+		return m.GetAssetReturns, nil
+	}
+
+	return &Asset{
+		ID:        id,
+		ModuleID:  1,
+		Name:      faker.Name(),
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+	}, nil
+}
+
+func (m *MockClient) GetAssets(ctx context.Context, params AssetParams) ([]Asset, error) {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.CalledGetAssetsWith = append(m.CalledGetAssetsWith, &params)
+
+	if m.GetAssetsError != nil {
+		return nil, m.GetAssetsError
+	}
+
+	assets := []Asset{
+		{
+			ID:       1,
+			ModuleID: 1,
+			Name:     faker.Name(),
+			Type:     "text",
+			Versions: []AssetVersion{
+				{
+					ID:           1,
+					AssetID:      1,
+					Status:       "stage",
+					LanguageCode: "en",
+					CreatedAt:    time.Now().UTC(),
+					UpdatedAt:    time.Now().UTC(),
+				},
+			},
+			CreatedAt: time.Now().UTC(),
+			UpdatedAt: time.Now().UTC(),
+		},
+	}
+
+	if m.GetAssetsReturns != nil {
+		assets = m.GetAssetsReturns
+	}
+
+	var filteredAssets []Asset
+	for i := range assets {
+		if params.ModuleID > 0 && assets[i].ModuleID != params.ModuleID {
+			continue
+		}
+
+		if params.Name != "" && assets[i].Name != params.Name {
+			continue
+		}
+
+		if params.LanguageCode != "" {
+			var versions []AssetVersion
+			for j := range assets[i].Versions {
+				if assets[i].Versions[j].Status == params.Status &&
+					assets[i].Versions[j].LanguageCode == params.LanguageCode {
+
+					versions = append(versions, assets[i].Versions[j])
+				}
+			}
+
+			assets[i].Versions = versions
+		}
+
+		filteredAssets = append(filteredAssets, assets[i])
+	}
+
+	return filteredAssets, nil
+}
+
+func (m *MockClient) CreateAsset(ctx context.Context, asset *Asset) error {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.CalledCreateAssetWith = append(m.CalledCreateAssetWith, asset)
+	return m.CreateAssetError
+}
+
+func (m *MockClient) CreateAssetVersion(ctx context.Context, assetVersion *AssetVersion) error {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.CalledCreateAssetVersionWith = append(m.CalledCreateAssetVersionWith, assetVersion)
+
+	assetVersion.ID = len(m.CalledCreateAssetVersionWith)
+
+	return m.CreateAssetVersionError
+}
+
+func (m *MockClient) PostAsset(ctx context.Context, assetVersion *AssetVersion) error {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.CalledPostAssetWith = append(m.CalledPostAssetWith, *assetVersion)
+
+	if assetVersion.LanguageCode == "" {
+		assetVersion.LanguageCode = "en"
+	}
+
+	return m.CreateAssetVersionError
+}
+
+func (m *MockClient) RetrieveAssets(ctx context.Context, params AssetParams) ([]Asset, error) {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.CalledRetrieveAssetsWith = append(m.CalledRetrieveAssetsWith, params)
+
+	if m.RetrieveAssetsError != nil {
+		return nil, m.RetrieveAssetsError
+	}
+
+	if m.RetrieveAssetsReturns != nil {
+		return m.RetrieveAssetsReturns, nil
+	}
+
+	return []Asset{
+		{
+			ID:       1,
+			ModuleID: 1,
+			Name:     faker.Name(),
+			Type:     "text",
+			Versions: []AssetVersion{
+				{
+					ID:           1,
+					AssetID:      1,
+					Status:       "stage",
+					LanguageCode: "en",
+					CreatedAt:    time.Now().UTC(),
+					UpdatedAt:    time.Now().UTC(),
+				},
+			},
+			CreatedAt: time.Now().UTC(),
+			UpdatedAt: time.Now().UTC(),
+		},
+	}, nil
+}
+
+func (m *MockClient) UpdateAssetVersion(ctx context.Context, assetVersion *AssetVersion) error {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.CalledUpdateAssetVersionWith = append(m.CalledUpdateAssetVersionWith, *assetVersion)
+
+	if assetVersion.LanguageCode == "" {
+		assetVersion.LanguageCode = "en"
+	}
+
+	return m.UpdateAssetVersionError
 }
 
 func (m *MockClient) GetWebhooks(ctx context.Context, params *WebhookParams) ([]Webhook, error) {
@@ -1069,4 +1314,60 @@ func (m *MockClient) UpdateMultiplayerServerVersion(ctx context.Context, input M
 			Abbreviation: "TST",
 		},
 	}, nil
+}
+
+func (m *MockClient) GetLearningHistoryRecords(ctx context.Context, params LearningHistoryParams) ([]LearningHistory, error) {
+	m.NumCalledGetLearningHistoryRecords++
+
+	if m.GetLearningHistoryRecordsError != nil {
+		return nil, m.GetLearningHistoryRecordsError
+	}
+
+	if len(m.LearningHistoryRecordsToReturn) > 0 {
+		return m.LearningHistoryRecordsToReturn, nil
+	}
+
+	return []LearningHistory{}, nil
+}
+
+func (m *MockClient) GetCourseDataRecords(ctx context.Context, orgID int) ([]CourseData, error) {
+	m.NumCalledGetCourseDataRecords++
+
+	if m.GetCourseDataRecordsError != nil {
+		return nil, m.GetCourseDataRecordsError
+	}
+
+	if len(m.CourseDataRecordsToReturn) > 0 {
+		return m.CourseDataRecordsToReturn, nil
+	}
+
+	return []CourseData{}, nil
+}
+
+func (m *MockClient) GetOrgSuccessFactors(ctx context.Context) ([]OrgSuccessFactor, error) {
+	m.NumCalledGetOrgSuccessFactors++
+
+	if m.GetOrgSuccessFactorsError != nil {
+		return nil, m.GetOrgSuccessFactorsError
+	}
+
+	if len(m.OrgSuccessFactorsToReturn) > 0 {
+		return m.OrgSuccessFactorsToReturn, nil
+	}
+
+	return []OrgSuccessFactor{}, nil
+}
+
+func (m *MockClient) GetExpiringModules(ctx context.Context) ([]ExpiringModule, error) {
+	m.NumCalledGetExpiringModules++
+
+	if m.GetExpiringModulesError != nil {
+		return nil, m.GetExpiringModulesError
+	}
+
+	if len(m.ExpiringModulesToReturn) > 0 {
+		return m.ExpiringModulesToReturn, nil
+	}
+
+	return []ExpiringModule{}, nil
 }

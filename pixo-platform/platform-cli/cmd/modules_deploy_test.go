@@ -26,7 +26,6 @@ var _ = Describe("Module", func() {
 			"deploy",
 		)
 
-		Expect(err).To(HaveOccurred())
 		Expect(err).To(MatchError("SEMANTIC VERSION not provided"))
 		Expect(output).To(ContainSubstring("MODULE"))
 		Expect(output).To(ContainSubstring("SEMANTIC VERSION"))
@@ -51,13 +50,12 @@ var _ = Describe("Module", func() {
 			"keyboard/mouse",
 		)
 
-		Expect(err).To(HaveOccurred())
 		Expect(err).To(MatchError("MODULE not provided"))
 		Expect(output).To(ContainSubstring("MODULE"))
 	})
 
 	It("can return an error if semantic version is missing", func() {
-		input := bytes.NewBufferString("\n")
+		input := bytes.NewBufferString("")
 
 		output, err := executor.RunCommandWithInput(
 			input,
@@ -75,7 +73,6 @@ var _ = Describe("Module", func() {
 			"test.zip",
 		)
 
-		Expect(err).To(HaveOccurred())
 		Expect(err).To(MatchError("SEMANTIC VERSION not provided"))
 		Expect(output).To(ContainSubstring("SEMANTIC VERSION"))
 	})
@@ -99,7 +96,6 @@ var _ = Describe("Module", func() {
 			"keyboard/mouse",
 		)
 
-		Expect(err).To(HaveOccurred())
 		Expect(err).To(MatchError("PACKAGE not provided"))
 		Expect(output).To(ContainSubstring("PACKAGE"))
 	})
@@ -125,7 +121,6 @@ var _ = Describe("Module", func() {
 			"",
 		)
 
-		Expect(err).To(HaveOccurred())
 		Expect(err).To(MatchError("ZIP FILE not provided"))
 		Expect(output).To(ContainSubstring("Enter ZIP FILE:"))
 	})
@@ -148,7 +143,6 @@ var _ = Describe("Module", func() {
 			"test.zip",
 		)
 
-		Expect(err).To(HaveOccurred())
 		Expect(err).To(MatchError("get platforms error"))
 		Expect(executor.MockPlatformClient.NumCalledGetPlatforms).To(Equal(1))
 	})
@@ -172,7 +166,6 @@ var _ = Describe("Module", func() {
 			"keyboard/mouse",
 		)
 
-		Expect(err).To(HaveOccurred())
 		Expect(err).To(MatchError("PLATFORMS not provided"))
 		Expect(executor.MockPlatformClient.NumCalledGetPlatforms).To(Equal(1))
 		Expect(output).To(ContainSubstring("PLATFORMS"))
@@ -198,7 +191,6 @@ var _ = Describe("Module", func() {
 			"android",
 		)
 
-		Expect(err).To(HaveOccurred())
 		Expect(err).To(MatchError("get controls error"))
 		Expect(executor.MockPlatformClient.NumCalledGetControlTypes).To(Equal(1))
 	})
@@ -222,7 +214,6 @@ var _ = Describe("Module", func() {
 			"android",
 		)
 
-		Expect(err).To(HaveOccurred())
 		Expect(err).To(MatchError("CONTROLS not provided"))
 		Expect(executor.MockPlatformClient.NumCalledGetControlTypes).To(Equal(1))
 		Expect(output).To(ContainSubstring("CONTROLS"))
@@ -250,7 +241,6 @@ var _ = Describe("Module", func() {
 			"keyboard/mouse",
 		)
 
-		Expect(err).To(HaveOccurred())
 		Expect(err).To(MatchError("error"))
 		Expect(executor.MockPlatformClient.NumCalledCreateModuleVersion).To(Equal(1))
 	})
