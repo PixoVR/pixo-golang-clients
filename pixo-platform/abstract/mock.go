@@ -3,8 +3,8 @@ package abstract
 import (
 	"context"
 	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/config"
-	"github.com/go-faker/faker/v4"
-	"github.com/golang-jwt/jwt/v4"
+	faker "github.com/go-faker/faker/v4"
+	jwt "github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/websocket"
 	"github.com/rs/zerolog/log"
 	"io"

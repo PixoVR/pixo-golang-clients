@@ -3,7 +3,7 @@ package platform_test
 import (
 	"context"
 	platform "github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
-	"github.com/go-faker/faker/v4"
+	faker "github.com/go-faker/faker/v4"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
