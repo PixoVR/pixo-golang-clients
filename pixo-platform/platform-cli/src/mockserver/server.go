@@ -41,7 +41,7 @@ func requestHandler(w http.ResponseWriter, r *http.Request, response []byte) {
 		log.Error().Err(err).Msg("failed to upgrade connection")
 		return
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 
 	var receivedData Request
 	if err = conn.ReadJSON(&receivedData); err != nil {
