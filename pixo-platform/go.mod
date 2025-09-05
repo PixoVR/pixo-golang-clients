@@ -11,9 +11,9 @@ require (
 	github.com/charmbracelet/lipgloss v1.0.0
 	github.com/fatih/color v1.18.0
 	github.com/gin-gonic/gin v1.10.0
+  github.com/golang-jwt/jwt/v4 v4.5.2
 	github.com/go-faker/faker/v4 v4.6.0
-	github.com/golang-jwt/jwt/v4 v4.5.1
-	github.com/gorilla/websocket v1.5.3
+  github.com/gorilla/websocket v1.5.3
 	github.com/joho/godotenv v1.5.1
 	github.com/kyokomi/emoji v2.2.4+incompatible
 	github.com/ollama/ollama v0.5.7

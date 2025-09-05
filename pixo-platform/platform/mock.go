@@ -3,10 +3,11 @@ package platform
 import (
 	"context"
 	"errors"
+	"time"
+
 	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract"
 	commonerrors "github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/commonerrors"
-	faker "github.com/go-faker/faker/v4"
-	"time"
+	"github.com/go-faker/faker/v4"
 )
 
 var _ Client = (*MockClient)(nil)
