@@ -132,7 +132,7 @@ func (p *clientImpl) CreateModuleVersion(ctx context.Context, input ModuleVersio
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	mapData := map[string][]string{}
 	mapData["0"] = []string{fmt.Sprintf(`variables.%s`, "input.filePath")}

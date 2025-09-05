@@ -3,7 +3,7 @@ package cmd_test
 import (
 	"bytes"
 	"fmt"
-	"github.com/go-faker/faker/v4"
+	faker "github.com/go-faker/faker/v4"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
