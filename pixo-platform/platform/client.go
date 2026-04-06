@@ -6,9 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
-	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/middleware/auth"
-	"github.com/rs/zerolog/log"
 	"io"
 	"mime"
 	"mime/multipart"
@@ -16,6 +13,10 @@ import (
 	"net/textproto"
 	"os"
 	"path/filepath"
+
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
+	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/middleware/auth"
+	"github.com/rs/zerolog/log"
 
 	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract"
 )
@@ -178,7 +179,7 @@ func (p *clientImpl) ExecWithFile(ctx context.Context, query string, v any, vari
 		return err
 	}
 
-	p.ServiceClient.SetHeader("Content-Type", writer.FormDataContentType())
+	p.SetHeader("Content-Type", writer.FormDataContentType())
 
 	res, err := p.Post(ctx, "query", payload.Bytes())
 	if err != nil {

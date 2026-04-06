@@ -56,7 +56,7 @@ var modulesDeployCmd = &cobra.Command{
 			return err
 		}
 
-		Ctx.Printer.Printf("Deployed version %s for module %d\n", moduleVersion.SemanticVersion, moduleVersion.ModuleID)
+		Ctx.Printf("Deployed version %s for module %d\n", moduleVersion.SemanticVersion, moduleVersion.ModuleID)
 		return nil
 	},
 }

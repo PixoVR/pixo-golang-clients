@@ -8,10 +8,10 @@ import (
 )
 
 type Loader struct {
-	periodSeconds time.Duration
-	chars         []rune
-	writer        io.Writer
-	doneChan      chan bool
+	duration time.Duration
+	chars    []rune
+	writer   io.Writer
+	doneChan chan bool
 }
 
 func NewLoader(ctx context.Context, msg string, writer io.Writer) *Loader {
@@ -19,10 +19,10 @@ func NewLoader(ctx context.Context, msg string, writer io.Writer) *Loader {
 	period := 250 * time.Millisecond
 
 	spinner := &Loader{
-		periodSeconds: period,
-		writer:        writer,
-		chars:         []rune{'-', '\\', '|', '/'},
-		doneChan:      make(chan bool),
+		duration: period,
+		writer:   writer,
+		chars:    []rune{'-', '\\', '|', '/'},
+		doneChan: make(chan bool),
 	}
 
 	//_, _ = writer.Write([]byte(emoji.Sprintf("%s ", msg)))
@@ -39,7 +39,7 @@ func (s *Loader) Start() {
 			case <-s.doneChan:
 				return
 			default:
-				_, _ = s.writer.Write([]byte(fmt.Sprintf("\r%c", r)))
+				_, _ = fmt.Fprintf(s.writer, "\r%c", r)
 				time.Sleep(s.period())
 			}
 		}
@@ -53,5 +53,5 @@ func (s *Loader) Stop() {
 }
 
 func (s *Loader) period() time.Duration {
-	return s.periodSeconds / time.Duration(len(s.chars))
+	return s.duration / time.Duration(len(s.chars))
 }

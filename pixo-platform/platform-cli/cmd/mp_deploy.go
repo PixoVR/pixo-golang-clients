@@ -6,6 +6,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/config"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
@@ -46,14 +47,14 @@ var mpDeployCmd = &cobra.Command{
 				iniParser, err := parser.NewIniParser(&iniPath)
 				if err != nil {
 					msg := emoji.Sprintf(":exclamation_mark: failed to parse ini file %s", iniPath)
-					Ctx.Printer.Println(msg)
+					Ctx.Println(msg)
 					return errors.New(msg)
 				}
 
 				semVer, err = iniParser.ParseSemanticVersion()
 				if err != nil {
 					msg := emoji.Sprintf(":exclamation_mark: No semantic version given and failed to parse server version from ini file %s", iniPath)
-					Ctx.Printer.Println(msg)
+					Ctx.Println(msg)
 					return errors.New(msg)
 				}
 
@@ -73,19 +74,19 @@ var mpDeployCmd = &cobra.Command{
 			spinner := loader.NewLoader(cmd.Context(), "Getting multiplayer server versions...", Ctx.Printer)
 
 			if versions, err := Ctx.PlatformClient.GetMultiplayerServerVersionsWithConfig(cmd.Context(), params); err != nil {
-				Ctx.Printer.Println(":negative_squared_cross_mark: Unable to retrieve server versions from the Pixo Platform")
+				Ctx.Println(":negative_squared_cross_mark: Unable to retrieve server versions from the Pixo Platform")
 				spinner.Stop()
 				return err
 
 			} else if len(versions) > 0 {
 				spinner.Stop()
 				msg := emoji.Sprintf(":exclamation: server version %s already exists\n", semVer)
-				Ctx.Printer.Println(msg)
+				Ctx.Println(msg)
 				return errors.New(msg)
 			}
 
 			spinner.Stop()
-			Ctx.Printer.Println(":heavy_check_mark: Server version does not exist yet: ", semVer)
+			Ctx.Println(":heavy_check_mark: Server version does not exist yet: ", semVer)
 			return nil
 		}
 
@@ -122,7 +123,7 @@ var mpDeployCmd = &cobra.Command{
 				msg := fmt.Sprintf("Failed to update multiplayer server version: %s - %s", semVer, err.Error())
 				return errors.New(msg)
 			}
-			Ctx.Printer.Printf(":cruise_ship: Updated server version: %s - %s\n", serverVersion.Module.Abbreviation, semVer)
+			Ctx.Printf(":cruise_ship: Updated server version: %s - %s\n", serverVersion.Module.Abbreviation, semVer)
 			return nil
 		} else {
 			msg := fmt.Sprint("Deploying server version: ", semVer)
@@ -133,7 +134,7 @@ var mpDeployCmd = &cobra.Command{
 				msg := fmt.Sprintf("Failed to deploy multiplayer server version: %s - %s", semVer, err.Error())
 				return errors.New(msg)
 			}
-			Ctx.Printer.Printf(":cruise_ship: Deployed version: %s - %s\n", serverVersion.Module.Abbreviation, semVer)
+			Ctx.Printf(":cruise_ship: Deployed version: %s - %s\n", serverVersion.Module.Abbreviation, semVer)
 			return nil
 		}
 

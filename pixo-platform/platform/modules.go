@@ -155,7 +155,7 @@ func (p *clientImpl) CreateModuleVersion(ctx context.Context, input ModuleVersio
 		return nil, err
 	}
 
-	p.ServiceClient.SetHeader("Content-Type", writer.FormDataContentType())
+	p.SetHeader("Content-Type", writer.FormDataContentType())
 
 	res, err := p.Post(context.TODO(), "query", payload.Bytes())
 	if err != nil {

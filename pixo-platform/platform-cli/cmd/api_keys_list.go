@@ -31,18 +31,18 @@ var listApiKeyCmd = &cobra.Command{
 		apiKeys, err := Ctx.PlatformClient.GetAPIKeys(cmd.Context(), apiKeyParams)
 		spinner.Stop()
 		if err != nil {
-			Ctx.Printer.Println("Error getting API keys: ", err)
+			Ctx.Println("Error getting API keys: ", err)
 			return err
 		}
 
 		if len(apiKeys) == 0 {
-			Ctx.Printer.Println("No API keys found")
+			Ctx.Println("No API keys found")
 			return nil
 		}
 
-		Ctx.Printer.Println("API keys:")
+		Ctx.Println("API keys:")
 		for _, apiKey := range apiKeys {
-			Ctx.Printer.Println("Key ID: ", apiKey.ID)
+			Ctx.Println("Key ID: ", apiKey.ID)
 		}
 
 		return nil

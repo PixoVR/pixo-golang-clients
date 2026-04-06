@@ -91,8 +91,8 @@ var sessionsSimulateCmd = &cobra.Command{
 			if err != nil {
 				return err
 			}
-			sessionID = *res.Event.SessionID
-			Ctx.Printer.Println(":white_check_mark: Session started using legacy headset API")
+			sessionID = *res.SessionID
+			Ctx.Println(":white_check_mark: Session started using legacy headset API")
 		} else {
 			session := &platform.Session{
 				ModuleID:       moduleID,
@@ -107,7 +107,7 @@ var sessionsSimulateCmd = &cobra.Command{
 				return err
 			}
 			sessionID = session.ID
-			Ctx.Printer.Printf(":white_check_mark: Session started for module %s\n", session.Module.Abbreviation)
+			Ctx.Printf(":white_check_mark: Session started for module %s\n", session.Module.Abbreviation)
 		}
 
 		startTime := time.Now()
@@ -175,7 +175,7 @@ var sessionsSimulateCmd = &cobra.Command{
 						return err
 					}
 
-					Ctx.Printer.Println(":white_check_mark: Event created for session")
+					Ctx.Println(":white_check_mark: Event created for session")
 
 				} else {
 					event := &platform.Event{
@@ -192,7 +192,7 @@ var sessionsSimulateCmd = &cobra.Command{
 					}
 				}
 
-				Ctx.Printer.Println(":white_check_mark: Event created for session")
+				Ctx.Println(":white_check_mark: Event created for session")
 			}
 		}
 
@@ -252,7 +252,7 @@ var sessionsSimulateCmd = &cobra.Command{
 			if err != nil {
 				return err
 			}
-			session = res.Event.Session
+			session = res.Session
 			session.LessonStatus = lessonStatus
 			session.Duration = sessionDuration.String()
 			session.RawScore = float64(score)
@@ -275,32 +275,32 @@ var sessionsSimulateCmd = &cobra.Command{
 			session, err = Ctx.PlatformClient.UpdateSession(cmd.Context(), *session)
 			spinner.Stop()
 			if err != nil {
-				Ctx.Printer.Println(":exclamation: Unable to end session")
+				Ctx.Println(":exclamation: Unable to end session")
 				return err
 			}
 		}
 
 		percentScore := int(session.ScaledScore * 100)
 
-		Ctx.Printer.Println("\n:white_check_mark:  Session completed")
-		Ctx.Printer.Printf(":alarm_clock:  Duration: %s\n\n", session.Duration)
+		Ctx.Println("\n:white_check_mark:  Session completed")
+		Ctx.Printf(":alarm_clock:  Duration: %s\n\n", session.Duration)
 
 		if mode != "" {
-			Ctx.Printer.Printf(":book: Mode: %s\n", mode)
+			Ctx.Printf(":book: Mode: %s\n", mode)
 		}
 		if scenario != "" {
-			Ctx.Printer.Printf(":magnifying_glass_tilted_right: Scenario: %s\n", scenario)
+			Ctx.Printf(":magnifying_glass_tilted_right: Scenario: %s\n", scenario)
 		}
 		if focus != "" {
-			Ctx.Printer.Printf(":magnifying_glass_tilted_right: Focus: %s\n", focus)
+			Ctx.Printf(":magnifying_glass_tilted_right: Focus: %s\n", focus)
 		}
 		if specialization != "" {
-			Ctx.Printer.Printf(":glowing_star: Specialization: %s\n", specialization)
+			Ctx.Printf(":glowing_star: Specialization: %s\n", specialization)
 		}
 
-		Ctx.Printer.Printf("\n:input_numbers: Score: %.2f/%.2f\n", session.RawScore, session.MaxScore)
-		Ctx.Printer.Printf(":hundred_points: Percent: %d%s\n", percentScore, "%")
-		Ctx.Printer.Printf(":%s: Lesson Status: %s\n\n", lessonStatusEmoji, session.LessonStatus)
+		Ctx.Printf("\n:input_numbers: Score: %.2f/%.2f\n", session.RawScore, session.MaxScore)
+		Ctx.Printf(":hundred_points: Percent: %d%s\n", percentScore, "%")
+		Ctx.Printf(":%s: Lesson Status: %s\n\n", lessonStatusEmoji, session.LessonStatus)
 		return nil
 	},
 }

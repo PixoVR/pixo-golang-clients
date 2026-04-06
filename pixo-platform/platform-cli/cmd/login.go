@@ -31,7 +31,7 @@ var loginCmd = &cobra.Command{
 			}
 
 			Ctx.ConfigManager.SetConfigValue("api-key", apiKey)
-			Ctx.Printer.Println(":rocket: Login with API key successful.")
+			Ctx.Println(":rocket: Login with API key successful.")
 			return nil
 		}
 
@@ -61,7 +61,7 @@ var loginCmd = &cobra.Command{
 
 			answers, err := Ctx.ConfigManager.GetValuesOrSubmitForm(questions, cmd)
 			if err != nil {
-				Ctx.Printer.Println(":exclamation: Login failed")
+				Ctx.Println(":exclamation: Login failed")
 				return err
 			}
 
@@ -83,7 +83,7 @@ var loginCmd = &cobra.Command{
 		Ctx.ConfigManager.SetIntConfigValue("auth-user-id", Ctx.PlatformClient.ActiveUserID())
 
 		msg := ":rocket: Login successful. Here is your API token:\n"
-		Ctx.Printer.Println(msg, Ctx.PlatformClient.GetToken())
+		Ctx.Println(msg, Ctx.PlatformClient.GetToken())
 		return nil
 	},
 }

@@ -61,11 +61,11 @@ var createUserCmd = &cobra.Command{
 		err = Ctx.PlatformClient.CreateUser(cmd.Context(), user)
 		spinner.Stop()
 		if err != nil {
-			Ctx.Printer.Println(":exclamation: Unable to create user: ", err)
+			Ctx.Println(":exclamation: Unable to create user: ", err)
 			return err
 		}
 
-		Ctx.Printer.Printf(":rocket: User created: %s - %s\n", user.Email, user.Role)
+		Ctx.Printf(":rocket: User created: %s - %s\n", user.Email, user.Role)
 		return nil
 	},
 }

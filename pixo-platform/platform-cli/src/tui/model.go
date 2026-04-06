@@ -83,7 +83,7 @@ func NewModel() Model {
 				Title("All done?").
 				Validate(func(v bool) error {
 					if !v {
-						return fmt.Errorf("Welp, finish up then")
+						return fmt.Errorf("welp, finish up then")
 					}
 					return nil
 				}).

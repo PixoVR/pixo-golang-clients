@@ -8,9 +8,10 @@ func ToInt(val string) (int, bool) {
 }
 
 func ToBool(val string) (bool, bool) {
-	if val == "yes" {
+	switch val {
+	case "yes":
 		return true, true
-	} else if val == "no" {
+	case "no":
 		return false, true
 	}
 

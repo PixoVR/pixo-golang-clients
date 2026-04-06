@@ -4,10 +4,11 @@ Copyright © 2023 Walker O'Brien walker.obrien@pixovr.com
 package cmd
 
 import (
+	"strings"
+
 	"github.com/spf13/cobra"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-	"strings"
 )
 
 var (
@@ -23,45 +24,45 @@ var configCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		if edit {
-			Ctx.Printer.Println(":file_folder: Opening config file in editor")
+			Ctx.Println(":file_folder: Opening config file in editor")
 			if err := Ctx.FileOpener.OpenEditor(activeConfigFile); err != nil {
-				Ctx.Printer.Println(":warning: Unable to open editor: ", err)
+				Ctx.Println(":warning: Unable to open editor: ", err)
 			}
 		}
 
-		Ctx.Printer.Println(":file_folder: Config: ", activeConfigFile)
+		Ctx.Println(":file_folder: Config: ", activeConfigFile)
 
 		if region := Ctx.ConfigManager.Region(); region != "" {
-			Ctx.Printer.Println(":earth_americas: Region: ", region)
+			Ctx.Println(":earth_americas: Region: ", region)
 		}
 
 		if lifecycle := Ctx.ConfigManager.Lifecycle(); lifecycle != "" {
-			Ctx.Printer.Println(":gear: Status: ", lifecycle)
+			Ctx.Println(":gear: Status: ", lifecycle)
 		}
 
-		Ctx.Printer.Println()
+		Ctx.Println()
 
 		if userID, ok := Ctx.ConfigManager.GetConfigValue("auth-user-id"); ok {
-			Ctx.Printer.Println(":id: User ID: ", userID)
+			Ctx.Println(":id: User ID: ", userID)
 		}
 
 		if username, ok := Ctx.ConfigManager.GetConfigValue("auth-username"); ok {
-			Ctx.Printer.Println(":bust_in_silhouette: Username: ", username)
+			Ctx.Println(":bust_in_silhouette: Username: ", username)
 		}
 
 		if _, ok := Ctx.ConfigManager.GetConfigValue("auth-password"); ok {
-			Ctx.Printer.Println(":lock: Password: ********")
+			Ctx.Println(":lock: Password: ********")
 		}
 
 		if _, ok := Ctx.ConfigManager.GetConfigValue("api-key"); ok {
-			Ctx.Printer.Println(":key: API Key: ********")
+			Ctx.Println(":key: API Key: ********")
 		}
 
 		if _, ok := Ctx.ConfigManager.GetConfigValue("auth-token"); ok {
-			Ctx.Printer.Println(":coin: Token: ********")
+			Ctx.Println(":coin: Token: ********")
 		}
 
-		Ctx.Printer.Println()
+		Ctx.Println()
 
 		activeEnv := Ctx.ConfigManager.ActiveEnv()
 
@@ -69,7 +70,7 @@ var configCmd = &cobra.Command{
 			if isSensitiveOrRepetitive(k) {
 				continue
 			}
-			Ctx.Printer.Println(":arrow_right: ", cleanKey(k), ": ", v)
+			Ctx.Println(":arrow_right: ", cleanKey(k), ": ", v)
 		}
 
 	},
@@ -82,9 +83,9 @@ func init() {
 }
 
 func cleanKey(k string) string {
-	k = strings.Replace(k, "id", "ID", -1)
-	k = strings.Replace(k, "api", "API", -1)
-	k = strings.Replace(k, "-", " ", -1)
+	k = strings.ReplaceAll(k, "id", "ID")
+	k = strings.ReplaceAll(k, "api", "API")
+	k = strings.ReplaceAll(k, "-", " ")
 
 	c := cases.Title(language.English)
 	return c.String(k)

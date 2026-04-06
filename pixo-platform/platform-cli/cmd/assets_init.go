@@ -5,16 +5,17 @@ package cmd
 
 import (
 	"errors"
+	"os"
+
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/config"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/loader"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 var (
-	ManifestNotInitializedError = errors.New("asset manifest not initialized. Please run 'pixo assets init'")
+	ErrManifestNotInitialized = errors.New("asset manifest not initialized. Please run 'pixo assets init'")
 )
 
 // assetsInitCmd represents the assetsInit rootCmd

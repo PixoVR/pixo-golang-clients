@@ -49,9 +49,9 @@ var webhooksDeleteCmd = &cobra.Command{
 		spinner := loader.NewLoader(cmd.Context(), "Deleting webhooks...", Ctx.Printer)
 		for _, id := range ids {
 			if err := Ctx.PlatformClient.DeleteWebhook(cmd.Context(), id); err != nil {
-				Ctx.Printer.Printf(":exclamation: Unable to delete webhook %d: %s\n", id, err.Error())
+				Ctx.Printf(":exclamation: Unable to delete webhook %d: %s\n", id, err.Error())
 			} else {
-				Ctx.Printer.Printf(":white_check_mark: Webhook %d deleted\n", id)
+				Ctx.Printf(":white_check_mark: Webhook %d deleted\n", id)
 			}
 		}
 
