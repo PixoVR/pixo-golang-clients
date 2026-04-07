@@ -93,7 +93,7 @@ var _ = Describe("SuccessFactors", func() {
 
 			Expect(foundRecord).NotTo(BeNil(), "course data record not found for seeded module")
 			Expect(foundRecord.Name).To(ContainSubstring("360"))
-			Expect(foundRecord.Description).To(Equal("PIXO VR 360 Video Player "))
+			Expect(foundRecord.Description).To(Equal("PIXO VR 360 Video Player"))
 		})
 	})
 
