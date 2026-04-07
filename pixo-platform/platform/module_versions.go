@@ -23,13 +23,7 @@ func (p *clientImpl) GetModuleVersions(ctx context.Context, params *ModuleVersio
 
 	query := `query moduleVersions($params: ModuleVersionParamsInput) { moduleVersions(params: $params) { id moduleId status version fileLink package module { id abbreviation description } } }`
 	variables := map[string]interface{}{
-		"params": map[string]interface{}{
-			"status":             params.Status,
-			"moduleId":           params.ModuleID,
-			"platformShortNames": params.PlatformShortNames,
-			"sortField":          params.SortField,
-			"sortOrder":          params.SortOrder,
-		},
+		"params": params,
 	}
 
 	var moduleVersionsReponse ModuleVersionsResponse
