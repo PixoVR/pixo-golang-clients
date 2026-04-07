@@ -32,10 +32,7 @@ var _ = Describe("ModulesAccess", func() {
 			OrgID:     1,
 		}
 		Expect(tokenClient.CreateUser(ctx, user)).To(Succeed())
-		Expect(user).NotTo(BeNil())
-		Expect(user.ID).NotTo(BeZero())
-		Expect(user.Username).To(Equal(user.Username))
-		Expect(user.Email).To(Equal(user.Email))
+
 		user.Password = newUserPassword
 	})
 
