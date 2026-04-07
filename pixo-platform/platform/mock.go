@@ -1394,12 +1394,12 @@ func (m *MockClient) GetExpiringModules(ctx context.Context) ([]ExpiringModule, 
 
 func (m *MockClient) GetModuleVersions(ctx context.Context, params *ModuleVersionParams) ([]ModuleVersion, error) {
 	m.NumCalledGetModuleVersions++
+	m.GetModuleVersionsParameters = params
 
 	if m.GetModuleVersionsError != nil {
 		return nil, m.GetModuleVersionsError
 	}
 
-	m.GetModuleVersionsParameters = params
 	return m.ModuleVersionsReturns, nil
 }
 
