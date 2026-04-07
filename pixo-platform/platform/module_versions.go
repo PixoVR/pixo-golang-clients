@@ -21,7 +21,7 @@ func (p *clientImpl) GetModuleVersions(ctx context.Context, params *ModuleVersio
 		params = &ModuleVersionParams{}
 	}
 
-	query := `fragment ModuleVersionFragment on ModuleVersion { id moduleId status version fileLink createdAt updatedAt package controls { id name } platforms { id name shortName } module { id abbreviation isMultiplayer description details createdBy updatedBy isPublic status distributorId distributor { id name } createdAt updatedAt } createdBy updatedBy } query moduleVersions($params: ModuleVersionParamsInput) { moduleVersions(params: $params) { ...ModuleVersionFragment } }`
+	query := `query moduleVersions($params: ModuleVersionParamsInput) { moduleVersions(params: $params) { id moduleId status version fileLink package module { id abbreviation description } } }`
 	variables := map[string]interface{}{
 		"params": map[string]interface{}{
 			"status":             params.Status,
