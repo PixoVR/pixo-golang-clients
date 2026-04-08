@@ -19,9 +19,10 @@ var _ = Describe("Orgs API", func() {
 	BeforeEach(func() {
 		ctx = context.Background()
 		orgInput = platform.Org{
-			Name:       faker.Username(),
-			Type:       "distributor",
-			OpenAccess: false,
+			AffiliateID: 1,
+			Name:        faker.Username(),
+			Type:        "distributor",
+			OpenAccess:  false,
 		}
 		var err error
 
