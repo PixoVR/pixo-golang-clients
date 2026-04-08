@@ -33,7 +33,7 @@ var webhooksCreateCmd = &cobra.Command{
 		generateToken := forms.Bool(answers["generate-token"])
 
 		if !generateToken {
-			Ctx.Printer.Println(":warning: No token provided. Webhook will be insecure")
+			Ctx.Println(":warning: No token provided. Webhook will be insecure")
 		}
 
 		spinner := loader.NewLoader(cmd.Context(), "Creating webhook...", Ctx.Printer)
@@ -48,9 +48,9 @@ var webhooksCreateCmd = &cobra.Command{
 			return err
 		}
 
-		Ctx.Printer.Println(":white_check_mark: Webhook created")
+		Ctx.Println(":white_check_mark: Webhook created")
 		if webhook.Token != "" {
-			Ctx.Printer.Println("Token: ", webhook.Token)
+			Ctx.Println("Token: ", webhook.Token)
 		}
 		return nil
 	},

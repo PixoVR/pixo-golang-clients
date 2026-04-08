@@ -3,10 +3,11 @@ package platform_test
 import (
 	"context"
 	"fmt"
+	"math/rand"
+
 	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"math/rand"
 )
 
 var _ = Describe("Modules", func() {

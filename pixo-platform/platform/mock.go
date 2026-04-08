@@ -7,7 +7,7 @@ import (
 
 	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract"
 	commonerrors "github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/commonerrors"
-	"github.com/go-faker/faker/v4"
+	faker "github.com/go-faker/faker/v4"
 )
 
 var _ Client = (*MockClient)(nil)
@@ -165,6 +165,16 @@ type MockClient struct {
 	NumCalledGetExpiringModules int
 	GetExpiringModulesError     error
 	ExpiringModulesToReturn     []ExpiringModule
+
+	NumCalledGetModuleVersions  int
+	GetModuleVersionsError      error
+	GetModuleVersionsParameters *ModuleVersionParams
+	ModuleVersionsReturns       []ModuleVersion
+
+	NumCalledGetModulesForUser int
+	GetModulesForUserError     error
+	GetModulesForUserIDParam   int
+	GetModulesForUserReturn    []Module
 }
 
 func (m *MockClient) Reset() {
@@ -306,6 +316,16 @@ func (m *MockClient) Reset() {
 	m.NumCalledGetExpiringModules = 0
 	m.GetExpiringModulesError = nil
 	m.ExpiringModulesToReturn = nil
+
+	m.NumCalledGetModuleVersions = 0
+	m.GetModuleVersionsError = nil
+	m.GetModuleVersionsParameters = nil
+	m.ModuleVersionsReturns = nil
+
+	m.NumCalledGetModulesForUser = 0
+	m.GetModulesForUserError = nil
+	m.GetModulesForUserIDParam = 0
+	m.GetModulesForUserReturn = nil
 }
 
 func (m *MockClient) CheckAuth(ctx context.Context) (User, error) {
@@ -1370,4 +1390,24 @@ func (m *MockClient) GetExpiringModules(ctx context.Context) ([]ExpiringModule, 
 	}
 
 	return []ExpiringModule{}, nil
+}
+
+func (m *MockClient) GetModuleVersions(ctx context.Context, params *ModuleVersionParams) ([]ModuleVersion, error) {
+	m.NumCalledGetModuleVersions++
+	m.GetModuleVersionsParameters = params
+
+	if m.GetModuleVersionsError != nil {
+		return nil, m.GetModuleVersionsError
+	}
+
+	return m.ModuleVersionsReturns, nil
+}
+
+func (m *MockClient) GetModulesForUser(ctx context.Context, userID int) ([]Module, error) {
+	m.NumCalledGetModulesForUser++
+	m.GetModulesForUserIDParam = userID
+	if m.GetModulesForUserError != nil {
+		return nil, m.GetModulesForUserError
+	}
+	return m.GetModulesForUserReturn, nil
 }

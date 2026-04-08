@@ -58,9 +58,9 @@ var deleteApiKeyCmd = &cobra.Command{
 		defer spinner.Stop()
 		for _, id := range ids {
 			if err := Ctx.PlatformClient.DeleteAPIKey(cmd.Context(), id); err != nil {
-				Ctx.Printer.Printf("Error deleting API key %d: %s\n", id, err.Error())
+				Ctx.Printf("Error deleting API key %d: %s\n", id, err.Error())
 			} else {
-				Ctx.Printer.Printf(":white_check_mark: Deleted API key: %d\n", id)
+				Ctx.Printf(":white_check_mark: Deleted API key: %d\n", id)
 			}
 		}
 

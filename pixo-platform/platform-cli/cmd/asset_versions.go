@@ -40,7 +40,7 @@ var assetsVersionCmd = &cobra.Command{
 
 		manifest, err := NewManifest()
 		if err != nil {
-			return ManifestNotInitializedError
+			return ErrManifestNotInitialized
 		}
 
 		if manifest.GetAsset(assetName) == nil {

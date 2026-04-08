@@ -6,12 +6,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/rs/zerolog/log"
 	"io"
 	"mime/multipart"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/rs/zerolog/log"
 )
 
 type Asset struct {
@@ -257,7 +258,7 @@ func (p *clientImpl) PostAsset(ctx context.Context, assetVersion *AssetVersion) 
 		return err
 	}
 
-	p.ServiceClient.SetHeader("Content-Type", writer.FormDataContentType())
+	p.SetHeader("Content-Type", writer.FormDataContentType())
 
 	res, err := p.Post(ctx, "assets", payload.Bytes())
 	if err != nil {
@@ -292,7 +293,7 @@ func (p *clientImpl) RetrieveAssets(ctx context.Context, params AssetParams) ([]
 		return nil, errors.New("module id or external id is required")
 	}
 
-	req, err := p.ServiceClient.NewRequest(http.MethodGet, "assets", nil)
+	req, err := p.NewRequest(http.MethodGet, "assets", nil)
 	if err != nil {
 		return nil, err
 	}

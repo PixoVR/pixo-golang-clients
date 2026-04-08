@@ -38,7 +38,7 @@ var mockserverCmd = &cobra.Command{
 
 		response, err := json.Marshal(data)
 		if err != nil {
-			Ctx.Printer.Println(":exclamation: Could not marshal response: ", err)
+			Ctx.Println(":exclamation: Could not marshal response: ", err)
 			return
 		}
 

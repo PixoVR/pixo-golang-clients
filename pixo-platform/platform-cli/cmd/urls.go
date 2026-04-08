@@ -4,9 +4,10 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"strings"
+
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"github.com/spf13/cobra"
-	"strings"
 )
 
 // urlsCmd represents the urls command
@@ -22,28 +23,28 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		region := Ctx.ConfigManager.Region()
 		if region != "" {
-			Ctx.Printer.Println(":earth_americas: Region: ", region)
+			Ctx.Println(":earth_americas: Region: ", region)
 		}
 
 		lifecycle := Ctx.ConfigManager.Lifecycle()
 		if lifecycle != "" {
-			Ctx.Printer.Println(":gear:  Status: ", lifecycle)
+			Ctx.Println(":gear:  Status: ", lifecycle)
 		}
 
-		Ctx.Printer.Println()
+		Ctx.Println()
 
 		client := urlfinder.ServiceConfig{
 			Region:    region,
 			Lifecycle: lifecycle,
 		}
 		url := strings.Replace(client.FormatURL(), "/v2", "", 1)
-		Ctx.Printer.Println(":link: Web: ", url)
-		Ctx.Printer.Println("\n:link: Platform API: ", url, "/v2")
-		Ctx.Printer.Println(":link: Platform API Docs: ", url, "/v2/swagger/index.html")
-		Ctx.Printer.Println("\n:link: Matchmaking API: ", url, "/matchmaking")
-		Ctx.Printer.Println(":link: Matchmaking API Docs: ", url, "/matchmaking/swagger/index.html")
-		Ctx.Printer.Println("\n:link: Heartbeat API: ", url, "/heartbeat")
-		Ctx.Printer.Println(":link: Heartbeat API Docs: ", url, "/heartbeat/swagger/index.html")
+		Ctx.Println(":link: Web: ", url)
+		Ctx.Println("\n:link: Platform API: ", url, "/v2")
+		Ctx.Println(":link: Platform API Docs: ", url, "/v2/swagger/index.html")
+		Ctx.Println("\n:link: Matchmaking API: ", url, "/matchmaking")
+		Ctx.Println(":link: Matchmaking API Docs: ", url, "/matchmaking/swagger/index.html")
+		Ctx.Println("\n:link: Heartbeat API: ", url, "/heartbeat")
+		Ctx.Println(":link: Heartbeat API Docs: ", url, "/heartbeat/swagger/index.html")
 	},
 }
 
