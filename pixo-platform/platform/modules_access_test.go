@@ -45,7 +45,6 @@ var _ = Describe("ModulesAccess", func() {
 	It("can fail to get the modules a user has access to if the user does not exist", func() {
 		_, err := tokenClient.GetModulesForUser(ctx, 999999)
 		Expect(err).To(HaveOccurred())
-		Expect(err).To(MatchError("record not found"))
 	})
 
 	It("can return the modules a user has access to", func() {

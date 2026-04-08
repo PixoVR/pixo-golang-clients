@@ -188,7 +188,7 @@ func (p *clientImpl) CreateModuleVersion(ctx context.Context, input ModuleVersio
 }
 
 func (p *clientImpl) GetModulesForUser(ctx context.Context, userID int) ([]Module, error) {
-	query := `query user($id: ID!){ user(id: $id) { modules{ id name abbreviation description imageLink shortDesc externalId isAvailable gitConfigId gitConfig { id } createdAt updatedAt } } }`
+	query := `query user($id: ID!){ user(id: $id) { modules{ id name abbreviation description imageLink shortDesc externalId isAvailable gitConfigId gitConfig { provider orgName repoName } createdAt updatedAt } } }`
 
 	variables := map[string]interface{}{
 		"id": userID,
