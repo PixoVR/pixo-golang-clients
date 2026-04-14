@@ -6,9 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
-	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/middleware/auth"
-	"github.com/rs/zerolog/log"
 	"io"
 	"mime"
 	"mime/multipart"
@@ -16,6 +13,10 @@ import (
 	"net/textproto"
 	"os"
 	"path/filepath"
+
+	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
+	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/middleware/auth"
+	"github.com/rs/zerolog/log"
 
 	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract"
 )
@@ -142,10 +143,10 @@ func (p *clientImpl) Exec(ctx context.Context, query string, v any, variables ma
 
 	if res.StatusCode != http.StatusOK {
 		var basicRes abstract.Response
-		if err = json.Unmarshal(resBody, &basicRes); err == nil {
+		if err = json.Unmarshal(resBody, &basicRes); err == nil && basicRes.Error != "" {
 			return errors.New(basicRes.Error)
 		}
-		return fmt.Errorf("error: %d", res.StatusCode)
+		return fmt.Errorf("request failed with status %d", res.StatusCode)
 	}
 
 	var gqlRes GraphQLResponse
@@ -178,7 +179,7 @@ func (p *clientImpl) ExecWithFile(ctx context.Context, query string, v any, vari
 		return err
 	}
 
-	p.ServiceClient.SetHeader("Content-Type", writer.FormDataContentType())
+	p.SetHeader("Content-Type", writer.FormDataContentType())
 
 	res, err := p.Post(ctx, "query", payload.Bytes())
 	if err != nil {

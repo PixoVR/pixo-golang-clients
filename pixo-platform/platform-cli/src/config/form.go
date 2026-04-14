@@ -22,21 +22,21 @@ func (c *ConfigManager) GetValuesOrSubmitForm(values []Value, cmd *cobra.Command
 	for _, value := range values {
 		switch value.Type {
 		case forms.Input, forms.SensitiveInput, forms.Select:
-			val, ok := c.GetFlagOrConfigValue(value.Question.Key, cmd)
+			val, ok := c.GetFlagOrConfigValue(value.Key, cmd)
 			if ok {
-				vals[value.Question.Key] = forms.String(val)
+				vals[value.Key] = forms.String(val)
 			} else {
 				questions = append(questions, value.Question)
 			}
 		case forms.Confirm:
-			val, ok := c.GetBoolFlagOrConfigValue(value.Question.Key, cmd)
+			val, ok := c.GetBoolFlagOrConfigValue(value.Key, cmd)
 			if ok {
-				vals[value.Question.Key] = forms.Bool(val)
+				vals[value.Key] = forms.Bool(val)
 			} else {
 				questions = append(questions, value.Question)
 			}
 		case forms.SelectID:
-			val, ok := c.GetFlagOrConfigValue(value.Question.Key, cmd)
+			val, ok := c.GetFlagOrConfigValue(value.Key, cmd)
 			if ok {
 				var id int
 				if err := value.GetOptions(context.TODO()); err != nil {
@@ -48,31 +48,31 @@ func (c *ConfigManager) GetValuesOrSubmitForm(values []Value, cmd *cobra.Command
 						break
 					}
 				}
-				vals[value.Question.Key] = id
+				vals[value.Key] = id
 			} else {
 				questions = append(questions, value.Question)
 			}
 		case forms.MultiSelect:
-			val, ok := c.GetFlagOrConfigValue(value.Question.Key, cmd)
+			val, ok := c.GetFlagOrConfigValue(value.Key, cmd)
 			if ok {
-				vals[value.Question.Key] = forms.StringSlice(strings.Split(val, ","))
+				vals[value.Key] = forms.StringSlice(strings.Split(val, ","))
 			} else {
 				questions = append(questions, value.Question)
 			}
 		case forms.MultiSelectIDs:
-			val, ok := c.GetFlagOrConfigValue(value.Question.Key, cmd)
+			val, ok := c.GetFlagOrConfigValue(value.Key, cmd)
 			if ok {
 				strVals := strings.Split(val, ",")
 				ids := make([]int, len(strVals))
 				for i, strVal := range strVals {
 					var id int
 					spinner := loader.NewLoader(context.TODO(), "", c.printer)
-					if err := value.Question.GetOptions(context.TODO()); err != nil {
+					if err := value.GetOptions(context.TODO()); err != nil {
 						spinner.Stop()
 						return nil, err
 					}
 					spinner.Stop()
-					for _, option := range value.Question.Options {
+					for _, option := range value.Options {
 						if strVal == option.Label {
 							id, _ = strconv.Atoi(option.Value)
 							ids[i] = id
@@ -80,12 +80,12 @@ func (c *ConfigManager) GetValuesOrSubmitForm(values []Value, cmd *cobra.Command
 						}
 					}
 				}
-				vals[value.Question.Key] = forms.IntSlice(ids)
+				vals[value.Key] = forms.IntSlice(ids)
 			} else {
 				questions = append(questions, value.Question)
 			}
 		default:
-			return nil, fmt.Errorf("unsupported question type: %s", reflect.ValueOf(value.Question.Type).String())
+			return nil, fmt.Errorf("unsupported question type: %s", reflect.ValueOf(value.Type).String())
 		}
 	}
 

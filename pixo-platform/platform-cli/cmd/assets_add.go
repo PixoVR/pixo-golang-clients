@@ -33,7 +33,7 @@ var assetsAddCmd = &cobra.Command{
 
 		manifest, err := NewManifest()
 		if err != nil {
-			return ManifestNotInitializedError
+			return ErrManifestNotInitialized
 		}
 
 		asset := platform.Asset{

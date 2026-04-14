@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"context"
+
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform-cli/src/forms"
 	"github.com/spf13/cobra"

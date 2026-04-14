@@ -66,7 +66,7 @@ func NewContext(configFiles ...string) *Context {
 }
 
 func (p *Context) SetIO(cmd *cobra.Command) {
-	p.Printer.SetWriter(cmd.OutOrStdout())
+	p.SetWriter(cmd.OutOrStdout())
 	p.FormHandler.SetReader(cmd.InOrStdin())
 	p.FormHandler.SetWriter(cmd.OutOrStdout())
 }

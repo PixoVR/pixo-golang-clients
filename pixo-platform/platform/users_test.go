@@ -2,10 +2,10 @@ package platform_test
 
 import (
 	"context"
-	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
+
 	. "github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
-	"github.com/go-faker/faker/v4"
+	faker "github.com/go-faker/faker/v4"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -14,14 +14,14 @@ var _ = Describe("Users", func() {
 
 	var (
 		ctx             context.Context
-		user            *platform.User
+		user            *User
 		newUserPassword = faker.Password()
 	)
 
 	BeforeEach(func() {
 		ctx = context.Background()
 
-		user = &platform.User{
+		user = &User{
 			FirstName: faker.FirstName(),
 			LastName:  faker.LastName(),
 			Username:  faker.Username(),
@@ -82,7 +82,7 @@ var _ = Describe("Users", func() {
 	})
 
 	It("can return an error if user does not exist when updating", func() {
-		err := tokenClient.UpdateUser(ctx, &platform.User{
+		err := tokenClient.UpdateUser(ctx, &User{
 			ID:       0,
 			Username: faker.Username(),
 		})
@@ -91,7 +91,7 @@ var _ = Describe("Users", func() {
 	})
 
 	It("can update a user", func() {
-		updatedUser := &platform.User{
+		updatedUser := &User{
 			ID:        user.ID,
 			FirstName: faker.FirstName(),
 			LastName:  faker.LastName(),

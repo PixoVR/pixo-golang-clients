@@ -8,6 +8,7 @@ import (
 
 type Org struct {
 	ID              int       `json:"id"`
+	AffiliateID     int       `json:"affiliateId,omitempty"`
 	Name            string    `json:"name"`
 	Type            string    `json:"type"`
 	Status          string    `json:"enabled"`
@@ -88,12 +89,18 @@ func (p *clientImpl) GetOrg(ctx context.Context, id int) (*Org, error) {
 func (p *clientImpl) CreateOrg(ctx context.Context, org Org) (*Org, error) {
 	query := `mutation createOrg($input: OrgInput!) { createOrg(input: $input) { id name } }`
 
+	input := map[string]interface{}{
+		"name":       org.Name,
+		"type":       org.Type,
+		"openAccess": org.OpenAccess,
+	}
+
+	if org.AffiliateID != 0 {
+		input["affiliateId"] = org.AffiliateID
+	}
+
 	variables := map[string]interface{}{
-		"input": map[string]interface{}{
-			"name":       org.Name,
-			"type":       org.Type,
-			"openAccess": org.OpenAccess,
-		},
+		"input": input,
 	}
 
 	var res CreateOrgResponse

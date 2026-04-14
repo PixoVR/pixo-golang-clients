@@ -28,7 +28,7 @@ var setCmd = &cobra.Command{
 		}
 
 		if err := Ctx.ConfigManager.SetActiveEnv(env); err != nil {
-			Ctx.Printer.Println(":exclamation: Unable to set active environment: ", err)
+			Ctx.Println(":exclamation: Unable to set active environment: ", err)
 			return
 		}
 
@@ -45,23 +45,23 @@ var setCmd = &cobra.Command{
 		key, ok := Ctx.ConfigManager.GetFlagValue("key", cmd)
 		if ok {
 			if val, err := cmd.Flags().GetString("val"); err != nil {
-				Ctx.Printer.Println(":exclamation: Unable to get value flag")
+				Ctx.Println(":exclamation: Unable to get value flag")
 				return
 			} else if val != "" {
 				Ctx.ConfigManager.SetConfigValue(key, val)
-				Ctx.Printer.Printf(":rocket: Config value %s set to %s\n", key, val)
+				Ctx.Printf(":rocket: Config value %s set to %s\n", key, val)
 				rootCmd.SetArgs([]string{"config"})
 				_ = rootCmd.Execute()
 				return
 			} else {
-				Ctx.Printer.Println("Value must be provided")
+				Ctx.Println("Value must be provided")
 				return
 			}
 		}
 
-		Ctx.Printer.Println()
-		Ctx.Printer.Println(":check_mark_button:Config updated successfully")
-		Ctx.Printer.Println()
+		Ctx.Println()
+		Ctx.Println(":check_mark_button:Config updated successfully")
+		Ctx.Println()
 		rootCmd.SetArgs([]string{"config"})
 		if cmd != nil {
 			_ = cmd.Execute()

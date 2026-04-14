@@ -40,8 +40,7 @@ var createApiKeyCmd = &cobra.Command{
 		}
 
 		Ctx.ConfigManager.SetConfigValue("api-key", apiKey.Key)
-		Ctx.Printer.Printf(":heavy_check_mark: API key created%s: %s\n", forUser, apiKey.Key)
-		//Ctx.Printer.Println(":heavy_check_mark: API key created: ", "*********") // use this when running the tape, --safe flag ?
+		Ctx.Printf(":heavy_check_mark: API key created%s: %s\n", forUser, apiKey.Key)
 		return nil
 	},
 }

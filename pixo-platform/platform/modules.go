@@ -6,12 +6,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/rs/zerolog/log"
 	"io"
 	"mime/multipart"
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/rs/zerolog/log"
 )
 
 type GitConfig struct {
@@ -28,6 +29,7 @@ type Module struct {
 	ImageLink    string `json:"imageLink,omitempty"`
 	ShortDesc    string `json:"shortDesc,omitempty"`
 	ExternalID   string `json:"externalId,omitempty"`
+	IsAvailable  bool   `json:"isAvailable,omitempty"`
 
 	GitConfigID int       `json:"gitConfigId,omitempty"`
 	GitConfig   GitConfig `json:"gitConfig,omitempty"`
@@ -132,7 +134,7 @@ func (p *clientImpl) CreateModuleVersion(ctx context.Context, input ModuleVersio
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	mapData := map[string][]string{}
 	mapData["0"] = []string{fmt.Sprintf(`variables.%s`, "input.filePath")}
@@ -153,7 +155,7 @@ func (p *clientImpl) CreateModuleVersion(ctx context.Context, input ModuleVersio
 		return nil, err
 	}
 
-	p.ServiceClient.SetHeader("Content-Type", writer.FormDataContentType())
+	p.SetHeader("Content-Type", writer.FormDataContentType())
 
 	res, err := p.Post(context.TODO(), "query", payload.Bytes())
 	if err != nil {
@@ -183,4 +185,19 @@ func (p *clientImpl) CreateModuleVersion(ctx context.Context, input ModuleVersio
 	}
 
 	return &gqlRes.Data.ModuleVersion, nil
+}
+
+func (p *clientImpl) GetModulesForUser(ctx context.Context, userID int) ([]Module, error) {
+	query := `query user($id: ID!){ user(id: $id) { modules{ id name abbreviation description imageLink shortDesc externalId isAvailable gitConfigId gitConfig { provider orgName repoName } createdAt updatedAt } } }`
+
+	variables := map[string]interface{}{
+		"id": userID,
+	}
+
+	var userResponse GetUserResponse
+	if err := p.Exec(ctx, query, &userResponse, variables); err != nil {
+		return nil, err
+	}
+
+	return userResponse.User.Modules, nil
 }

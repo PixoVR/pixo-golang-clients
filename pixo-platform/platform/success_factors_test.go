@@ -3,7 +3,7 @@ package platform_test
 import (
 	"context"
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/platform"
-	"github.com/go-faker/faker/v4"
+	faker "github.com/go-faker/faker/v4"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"time"
@@ -93,7 +93,7 @@ var _ = Describe("SuccessFactors", func() {
 
 			Expect(foundRecord).NotTo(BeNil(), "course data record not found for seeded module")
 			Expect(foundRecord.Name).To(ContainSubstring("360"))
-			Expect(foundRecord.Description).To(Equal("PIXO VR 360 Video Player "))
+			Expect(foundRecord.Description).To(Equal("PIXO VR 360 Video Player"))
 		})
 	})
 
