@@ -18,13 +18,16 @@ var _ = Describe("ModulePlayerVersions", func() {
 		Expect(versions).NotTo(BeNil())
 	})
 
-	It("can get module player versions filtered by params", func() {
+	It("can get module player versions filtered by status", func() {
 		params := &platform.ModulePlayerVersionParams{
 			Status: []string{"enabled"},
 		}
 		versions, err := tokenClient.GetModulePlayerVersions(ctx, params)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(versions).NotTo(BeNil())
+		for _, v := range versions {
+			Expect(v.Status).To(Equal("enabled"))
+		}
 	})
 
 })
