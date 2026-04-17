@@ -175,6 +175,10 @@ type MockClient struct {
 	GetModulesForUserError     error
 	GetModulesForUserIDParam   int
 	GetModulesForUserReturn    []Module
+
+	NumCalledGetModulePlayers int
+	GetModulePlayersError     error
+	GetModulePlayersReturn    []ModulePlayer
 }
 
 func (m *MockClient) Reset() {
@@ -326,6 +330,10 @@ func (m *MockClient) Reset() {
 	m.GetModulesForUserError = nil
 	m.GetModulesForUserIDParam = 0
 	m.GetModulesForUserReturn = nil
+
+	m.NumCalledGetModulePlayers = 0
+	m.GetModulePlayersError = nil
+	m.GetModulePlayersReturn = nil
 }
 
 func (m *MockClient) CheckAuth(ctx context.Context) (User, error) {
@@ -1410,4 +1418,29 @@ func (m *MockClient) GetModulesForUser(ctx context.Context, userID int) ([]Modul
 		return nil, m.GetModulesForUserError
 	}
 	return m.GetModulesForUserReturn, nil
+}
+
+func (m *MockClient) GetModulePlayers(ctx context.Context) ([]ModulePlayer, error) {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.NumCalledGetModulePlayers++
+
+	if m.GetModulePlayersError != nil {
+		return nil, m.GetModulePlayersError
+	}
+
+	if m.GetModulePlayersReturn != nil {
+		return m.GetModulePlayersReturn, nil
+	}
+
+	return []ModulePlayer{
+		{
+			ID:             1,
+			Name:           "test-module-player",
+			DistributorID:  1,
+			LaunchProtocol: "pixo",
+			Distributor:    Org{ID: 1, Name: "test-org"},
+		},
+	}, nil
 }
