@@ -175,6 +175,15 @@ type MockClient struct {
 	GetModulesForUserError     error
 	GetModulesForUserIDParam   int
 	GetModulesForUserReturn    []Module
+
+	NumCalledGetModulePlayers int
+	GetModulePlayersError     error
+	GetModulePlayersReturn    []ModulePlayer
+
+	NumCalledGetModulePlayerVersions  int
+	GetModulePlayerVersionsError      error
+	GetModulePlayerVersionsParameters *ModulePlayerVersionParams
+	GetModulePlayerVersionsReturn     []ModulePlayerVersion
 }
 
 func (m *MockClient) Reset() {
@@ -326,6 +335,15 @@ func (m *MockClient) Reset() {
 	m.GetModulesForUserError = nil
 	m.GetModulesForUserIDParam = 0
 	m.GetModulesForUserReturn = nil
+
+	m.NumCalledGetModulePlayers = 0
+	m.GetModulePlayersError = nil
+	m.GetModulePlayersReturn = nil
+
+	m.NumCalledGetModulePlayerVersions = 0
+	m.GetModulePlayerVersionsError = nil
+	m.GetModulePlayerVersionsParameters = nil
+	m.GetModulePlayerVersionsReturn = nil
 }
 
 func (m *MockClient) CheckAuth(ctx context.Context) (User, error) {
@@ -1410,4 +1428,55 @@ func (m *MockClient) GetModulesForUser(ctx context.Context, userID int) ([]Modul
 		return nil, m.GetModulesForUserError
 	}
 	return m.GetModulesForUserReturn, nil
+}
+
+func (m *MockClient) GetModulePlayers(ctx context.Context) ([]ModulePlayer, error) {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.NumCalledGetModulePlayers++
+
+	if m.GetModulePlayersError != nil {
+		return nil, m.GetModulePlayersError
+	}
+
+	if m.GetModulePlayersReturn != nil {
+		return m.GetModulePlayersReturn, nil
+	}
+
+	return []ModulePlayer{
+		{
+			ID:             1,
+			Name:           "test-module-player",
+			DistributorID:  1,
+			LaunchProtocol: "pixo",
+			Distributor:    Org{ID: 1, Name: "test-org"},
+		},
+	}, nil
+}
+
+func (m *MockClient) GetModulePlayerVersions(ctx context.Context, params *ModulePlayerVersionParams) ([]ModulePlayerVersion, error) {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.NumCalledGetModulePlayerVersions++
+	m.GetModulePlayerVersionsParameters = params
+
+	if m.GetModulePlayerVersionsError != nil {
+		return nil, m.GetModulePlayerVersionsError
+	}
+
+	if m.GetModulePlayerVersionsReturn != nil {
+		return m.GetModulePlayerVersionsReturn, nil
+	}
+
+	return []ModulePlayerVersion{
+		{
+			ID:             1,
+			ModulePlayerID: 1,
+			Status:         "enabled",
+			Version:        "1.0.0",
+			Package:        "com.pixovr.test",
+		},
+	}, nil
 }

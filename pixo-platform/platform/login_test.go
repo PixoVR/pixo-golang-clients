@@ -22,7 +22,7 @@ var _ = Describe("Platform API", func() {
 
 	It("can check if the token is valid", func() {
 		user, err := platformClient.CheckAuth(context.Background())
-		Expect(err).To(MatchError("unauthorized"))
+		Expect(err).To(MatchError("no token provided"))
 		Expect(user).NotTo(BeNil())
 		Expect(user.ID).To(BeZero())
 	})
