@@ -27,6 +27,7 @@ type ModulePlayerVersionParams struct {
 	PlatformShortNames []string `json:"platformShortNames,omitempty"`
 	SortField          *string  `json:"sortField,omitempty"`
 	SortOrder          *string  `json:"sortOrder,omitempty"`
+	UserID             *int     `json:"userId,omitempty"`
 }
 
 type ModulePlayerVersionsResponse struct {

@@ -76,11 +76,28 @@ func TestMockClient_GetModulePlayers_ReturnsError(t *testing.T) {
 	}
 }
 
+func TestMockClient_GetModulePlayers_CapturesParams(t *testing.T) {
+	mock := &platform.MockClient{}
+	userID := 42
+	params := &platform.ModulePlayerParams{UserID: &userID}
+
+	_, err := mock.GetModulePlayers(context.Background(), params)
+
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if mock.GetModulePlayersParameters != params {
+		t.Errorf("expected params to be captured, got %+v", mock.GetModulePlayersParameters)
+	}
+}
+
 func TestMockClient_GetModulePlayers_Reset(t *testing.T) {
+	userID := 1
 	mock := &platform.MockClient{
-		NumCalledGetModulePlayers: 3,
-		GetModulePlayersError:     errors.New("boom"),
-		GetModulePlayersReturn:    []platform.ModulePlayer{{ID: 1}},
+		NumCalledGetModulePlayers:  3,
+		GetModulePlayersError:      errors.New("boom"),
+		GetModulePlayersParameters: &platform.ModulePlayerParams{UserID: &userID},
+		GetModulePlayersReturn:     []platform.ModulePlayer{{ID: 1}},
 	}
 
 	mock.Reset()
@@ -90,6 +107,9 @@ func TestMockClient_GetModulePlayers_Reset(t *testing.T) {
 	}
 	if mock.GetModulePlayersError != nil {
 		t.Errorf("expected GetModulePlayersError nil, got %v", mock.GetModulePlayersError)
+	}
+	if mock.GetModulePlayersParameters != nil {
+		t.Errorf("expected GetModulePlayersParameters nil, got %+v", mock.GetModulePlayersParameters)
 	}
 	if mock.GetModulePlayersReturn != nil {
 		t.Errorf("expected GetModulePlayersReturn nil, got %+v", mock.GetModulePlayersReturn)

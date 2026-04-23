@@ -176,9 +176,10 @@ type MockClient struct {
 	GetModulesForUserIDParam   int
 	GetModulesForUserReturn    []Module
 
-	NumCalledGetModulePlayers int
-	GetModulePlayersError     error
-	GetModulePlayersReturn    []ModulePlayer
+	NumCalledGetModulePlayers  int
+	GetModulePlayersError      error
+	GetModulePlayersParameters *ModulePlayerParams
+	GetModulePlayersReturn     []ModulePlayer
 
 	NumCalledGetModulePlayerVersions  int
 	GetModulePlayerVersionsError      error
@@ -338,6 +339,7 @@ func (m *MockClient) Reset() {
 
 	m.NumCalledGetModulePlayers = 0
 	m.GetModulePlayersError = nil
+	m.GetModulePlayersParameters = nil
 	m.GetModulePlayersReturn = nil
 
 	m.NumCalledGetModulePlayerVersions = 0
@@ -1430,11 +1432,14 @@ func (m *MockClient) GetModulesForUser(ctx context.Context, userID int) ([]Modul
 	return m.GetModulesForUserReturn, nil
 }
 
-func (m *MockClient) GetModulePlayers(ctx context.Context) ([]ModulePlayer, error) {
+func (m *MockClient) GetModulePlayers(ctx context.Context, params ...*ModulePlayerParams) ([]ModulePlayer, error) {
 	m.Lock.Lock()
 	defer m.Lock.Unlock()
 
 	m.NumCalledGetModulePlayers++
+	if len(params) > 0 {
+		m.GetModulePlayersParameters = params[0]
+	}
 
 	if m.GetModulePlayersError != nil {
 		return nil, m.GetModulePlayersError
