@@ -1,7 +1,6 @@
 module github.com/PixoVR/pixo-golang-clients/vertex-ai
 
 go 1.22.0
-
 toolchain go1.24.1
 
 require (
@@ -10,7 +9,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.22.2
 	github.com/onsi/gomega v1.36.2
 	github.com/rs/zerolog v1.33.0
-	golang.org/x/oauth2 v0.23.0
+	golang.org/x/oauth2 v0.29.0
 )
 
 require (
