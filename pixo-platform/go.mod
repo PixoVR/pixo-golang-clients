@@ -3,7 +3,7 @@ module github.com/PixoVR/pixo-golang-clients/pixo-platform
 go 1.25.9
 
 require (
-	github.com/PixoVR/pixo-golang-server-utilities/pixo-platform v0.2.76
+	github.com/PixoVR/pixo-golang-server-utilities/pixo-platform v0.2.77
 	github.com/charmbracelet/bubbletea v1.2.4
 	github.com/charmbracelet/huh v0.6.0
 	github.com/charmbracelet/lipgloss v1.0.0
