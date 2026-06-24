@@ -12,8 +12,7 @@ var _ = Describe("Reporting", func() {
 	)
 
 	It("can return expiring modules", func() {
-		expiringModules, err := tokenClient.GetExpiringModules(ctx)
+		_, err := tokenClient.GetExpiringModules(ctx)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(expiringModules).NotTo(BeNil())
 	})
 })

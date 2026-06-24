@@ -99,6 +99,14 @@ func (p *clientImpl) CreateOrg(ctx context.Context, org Org) (*Org, error) {
 		input["affiliateId"] = org.AffiliateID
 	}
 
+	if org.PrimaryColor != "" {
+		input["primaryColor"] = org.PrimaryColor
+	}
+
+	if org.SecondaryColor != "" {
+		input["secondaryColor"] = org.SecondaryColor
+	}
+
 	variables := map[string]interface{}{
 		"input": input,
 	}

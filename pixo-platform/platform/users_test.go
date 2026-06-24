@@ -96,7 +96,7 @@ var _ = Describe("Users", func() {
 			FirstName: faker.FirstName(),
 			LastName:  faker.LastName(),
 			Username:  faker.Username(),
-			Password:  faker.Password(),
+			Password:  "T3st!Pass",
 			OrgID:     1,
 			Role:      "superadmin",
 		}

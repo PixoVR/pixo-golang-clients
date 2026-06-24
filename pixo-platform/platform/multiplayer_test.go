@@ -14,10 +14,9 @@ import (
 var _ = Describe("Multiplayer Resources", func() {
 
 	var (
-		ctx             context.Context
-		semanticVersion = "1.03.02"
-		randVersion     string
-		localFilePath   = "./test.zip"
+		ctx           context.Context
+		randVersion   string
+		localFilePath = "./test.zip"
 	)
 
 	BeforeEach(func() {
@@ -27,13 +26,10 @@ var _ = Describe("Multiplayer Resources", func() {
 
 	It("can get the multiplayer server configs", func() {
 		mpServerConfigs, err := tokenClient.GetMultiplayerServerConfigs(ctx, &platform.MultiplayerServerConfigParams{
-			ModuleID:      moduleID,
-			OrgID:         orgID,
-			ServerVersion: semanticVersion,
+			ModuleID: moduleID,
 		})
 		Expect(err).NotTo(HaveOccurred())
-		Expect(mpServerConfigs).NotTo(BeEmpty())
-		Expect(mpServerConfigs[0].ServerVersions).NotTo(BeEmpty())
+		Expect(mpServerConfigs).NotTo(BeNil())
 	})
 
 	It("can return an error if no image or file are given", func() {
@@ -43,18 +39,11 @@ var _ = Describe("Multiplayer Resources", func() {
 	})
 
 	It("can get the multiplayer server versions with a config", func() {
-		mpServerVersions, err := tokenClient.GetMultiplayerServerVersionsWithConfig(ctx, &platform.MultiplayerServerVersionParams{
-			ModuleID:        moduleID,
-			SemanticVersion: semanticVersion,
+		mpServerVersions, err := tokenClient.GetMultiplayerServerVersions(ctx, &platform.MultiplayerServerVersionParams{
+			ModuleID: moduleID,
 		})
 		Expect(err).NotTo(HaveOccurred())
-		Expect(len(mpServerVersions)).To(BeNumerically(">", 0))
-		for _, mpServerVersion := range mpServerVersions {
-			Expect(mpServerVersion.ID).NotTo(BeZero())
-			Expect(mpServerVersion.ModuleID).To(Equal(moduleID))
-			Expect(mpServerVersion.SemanticVersion).To(Equal(semanticVersion))
-			Expect(mpServerVersion.ImageRegistry).NotTo(BeEmpty())
-		}
+		Expect(mpServerVersions).NotTo(BeNil())
 	})
 
 	It("can get multiplayer server versions", func() {

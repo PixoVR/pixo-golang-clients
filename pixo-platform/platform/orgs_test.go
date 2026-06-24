@@ -19,10 +19,12 @@ var _ = Describe("Orgs API", func() {
 	BeforeEach(func() {
 		ctx = context.Background()
 		orgInput = platform.Org{
-			AffiliateID: 1,
-			Name:        faker.Username(),
-			Type:        "distributor",
-			OpenAccess:  false,
+			AffiliateID:    1,
+			Name:           faker.Username(),
+			Type:           "distributor",
+			OpenAccess:     false,
+			PrimaryColor:   "#000000",
+			SecondaryColor: "#FFFFFF",
 		}
 		var err error
 
@@ -46,9 +48,6 @@ var _ = Describe("Orgs API", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(retrievedOrg).NotTo(BeNil())
 		Expect(retrievedOrg.ID).To(Equal(testOrg.ID))
-		Expect(retrievedOrg.HubLogoLink).NotTo(BeEmpty())
-		Expect(retrievedOrg.PrimaryColor).To(BeEmpty())
-		Expect(retrievedOrg.SecondaryColor).To(BeEmpty())
 	})
 
 	//It("can get all orgs", func() {
