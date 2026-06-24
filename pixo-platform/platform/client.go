@@ -119,6 +119,7 @@ func newServiceConfig(config urlfinder.ClientConfig) urlfinder.ServiceConfig {
 		Region:      config.Region,
 		Namespace:   fmt.Sprintf("%s-apex", config.Lifecycle),
 		Port:        8000,
+		InternalDNS: config.Internal,
 	}
 }
 
