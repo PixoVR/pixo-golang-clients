@@ -171,6 +171,10 @@ type MockClient struct {
 	GetModuleVersionsParameters *ModuleVersionParams
 	ModuleVersionsReturns       []ModuleVersion
 
+	NumCalledGetVersionLifecycles int
+	GetVersionLifecyclesError     error
+	VersionLifecyclesReturns      []VersionLifecycle
+
 	NumCalledGetModulesForUser int
 	GetModulesForUserError     error
 	GetModulesForUserIDParam   int
@@ -291,6 +295,10 @@ func (m *MockClient) Reset() {
 
 	m.NumCalledCreateModuleVersion = 0
 	m.CreateModuleVersionError = nil
+
+	m.NumCalledGetVersionLifecycles = 0
+	m.GetVersionLifecyclesError = nil
+	m.VersionLifecyclesReturns = nil
 
 	m.NumCalledGetMultiplayerServerConfigs = 0
 	m.GetMultiplayerServerConfigsError = nil
@@ -1421,6 +1429,25 @@ func (m *MockClient) GetModuleVersions(ctx context.Context, params *ModuleVersio
 	}
 
 	return m.ModuleVersionsReturns, nil
+}
+
+func (m *MockClient) GetVersionLifecycles(ctx context.Context) ([]VersionLifecycle, error) {
+	m.NumCalledGetVersionLifecycles++
+
+	if m.GetVersionLifecyclesError != nil {
+		return nil, m.GetVersionLifecyclesError
+	}
+
+	if m.VersionLifecyclesReturns != nil {
+		return m.VersionLifecyclesReturns, nil
+	}
+
+	return []VersionLifecycle{
+		{ID: 1, Name: LifecycleDevelopment},
+		{ID: 2, Name: LifecycleQA},
+		{ID: 3, Name: LifecycleReleased},
+		{ID: 4, Name: LifecycleArchived},
+	}, nil
 }
 
 func (m *MockClient) GetModulesForUser(ctx context.Context, userID int) ([]Module, error) {

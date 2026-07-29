@@ -19,7 +19,7 @@ var _ = Describe("ModuleVersions", func() {
 
 	It("can get all module versions with params", func() {
 		params := &platform.ModuleVersionParams{
-			Status:             []string{"enabled"},
+			Lifecycles:         []string{platform.LifecycleReleased},
 			ModuleID:           &moduleID,
 			PlatformShortNames: []string{"android"},
 			SortField:          nil,
