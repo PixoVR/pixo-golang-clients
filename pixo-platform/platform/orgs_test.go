@@ -19,7 +19,7 @@ var _ = Describe("Orgs API", func() {
 	BeforeEach(func() {
 		ctx = context.Background()
 		orgInput = platform.Org{
-			AffiliateID: 1,
+			AffiliateID: 20,
 			Name:        faker.Username(),
 			Type:        "distributor",
 			OpenAccess:  false,
