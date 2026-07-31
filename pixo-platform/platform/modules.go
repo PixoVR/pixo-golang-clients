@@ -39,18 +39,19 @@ type Module struct {
 }
 
 type ModuleVersion struct {
-	ID              int    `json:"id,omitempty"`
-	ModuleID        int    `json:"moduleId,omitempty"`
-	Module          Module `json:"module,omitempty"`
-	Status          string `json:"status,omitempty"`
-	FileLink        string `json:"fileLink,omitempty"`
-	SemanticVersion string `json:"version,omitempty"`
-	Notes           string `json:"notes,omitempty"`
-	Package         string `json:"package,omitempty"`
-	ExternalID      string `json:"externalId,omitempty"`
-	LocalFilePath   string `json:"-"`
-	ControlIds      []int  `json:"controlIds,omitempty"`
-	PlatformIds     []int  `json:"platformIds,omitempty"`
+	ID              int               `json:"id,omitempty"`
+	ModuleID        int               `json:"moduleId,omitempty"`
+	Module          Module            `json:"module,omitempty"`
+	LifecycleID     int               `json:"lifecycleId,omitempty"`
+	Lifecycle       *VersionLifecycle `json:"lifecycle,omitempty"`
+	FileLink        string            `json:"fileLink,omitempty"`
+	SemanticVersion string            `json:"version,omitempty"`
+	Notes           string            `json:"notes,omitempty"`
+	Package         string            `json:"package,omitempty"`
+	ExternalID      string            `json:"externalId,omitempty"`
+	LocalFilePath   string            `json:"-"`
+	ControlIds      []int             `json:"controlIds,omitempty"`
+	PlatformIds     []int             `json:"platformIds,omitempty"`
 }
 
 type ModuleParams struct {
@@ -81,26 +82,27 @@ func (p *clientImpl) GetModules(ctx context.Context, params ...ModuleParams) ([]
 }
 
 func (p *clientImpl) CreateModuleVersion(ctx context.Context, input ModuleVersion) (*ModuleVersion, error) {
-	query := `mutation createModuleVersion($input: ModuleVersionInput!) { createModuleVersion(input: $input) { id moduleId module { abbreviation } version package status fileLink } }`
+	query := `mutation createModuleVersion($input: ModuleVersionInput!) { createModuleVersion(input: $input) { id moduleId module { abbreviation } version package lifecycleId lifecycle { id name } fileLink } }`
 
 	if input.LocalFilePath == "" {
 		return nil, errors.New("file path must be provided")
 	}
 
-	if input.Status == "" {
-		input.Status = "disabled"
+	inputVariables := map[string]interface{}{
+		"moduleId":    input.ModuleID,
+		"version":     input.SemanticVersion,
+		"notes":       input.Notes,
+		"package":     input.Package,
+		"platformIds": input.PlatformIds,
+		"controlIds":  input.ControlIds,
+	}
+
+	if input.LifecycleID != 0 {
+		inputVariables["lifecycleId"] = input.LifecycleID
 	}
 
 	variables := map[string]interface{}{
-		"input": map[string]interface{}{
-			"moduleId":    input.ModuleID,
-			"version":     input.SemanticVersion,
-			"notes":       input.Notes,
-			"status":      input.Status,
-			"package":     input.Package,
-			"platformIds": input.PlatformIds,
-			"controlIds":  input.ControlIds,
-		},
+		"input": inputVariables,
 	}
 
 	if input.LocalFilePath == "" {

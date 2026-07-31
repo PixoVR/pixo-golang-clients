@@ -69,7 +69,9 @@ var _ = Describe("Modules", func() {
 		Expect(moduleVersion.ModuleID).To(Equal(moduleID))
 		Expect(moduleVersion.SemanticVersion).To(Equal(randVersion))
 		Expect(moduleVersion.Package).To(Equal(input.Package))
-		Expect(moduleVersion.Status).To(Equal("disabled"))
+		Expect(moduleVersion.LifecycleID).To(Equal(1))
+		Expect(moduleVersion.Lifecycle).NotTo(BeNil())
+		Expect(moduleVersion.Lifecycle.Name).To(Equal(LifecycleDevelopment))
 		Expect(moduleVersion.FileLink).NotTo(BeEmpty())
 	})
 

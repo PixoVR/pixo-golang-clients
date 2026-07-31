@@ -42,6 +42,8 @@ type Client interface {
 	CreateModuleVersion(ctx context.Context, input ModuleVersion) (*ModuleVersion, error)
 	// GetModuleVersions retrieves module versions from the platform using the GraphQL interface
 	GetModuleVersions(ctx context.Context, params *ModuleVersionParams) ([]ModuleVersion, error)
+	// GetVersionLifecycles retrieves the module version lifecycles from the platform using the GraphQL interface
+	GetVersionLifecycles(ctx context.Context) ([]VersionLifecycle, error)
 	// GetModulesForUser retrieves a list of modules that the user has access to from the platform using the GraphQL interface
 	GetModulesForUser(ctx context.Context, userID int) ([]Module, error)
 	// GetModulePlayers retrieves module players from the platform using the GraphQL interface
@@ -59,6 +61,12 @@ type Client interface {
 	UpdateOrg(ctx context.Context, org Org) (*Org, error)
 	// DeleteOrg deletes an org on the platform using the GraphQL interface
 	DeleteOrg(ctx context.Context, id int) error
+
+	// CreateOrgModule grants an org access to a module using the GraphQL interface
+	CreateOrgModule(ctx context.Context, input OrgModule) (*OrgModule, error)
+
+	// DeleteOrgModule revokes an org's access to a module using the GraphQL interface
+	DeleteOrgModule(ctx context.Context, orgID, moduleID int) error
 
 	// GetAsset retrieves an asset from the platform using the GraphQL interface
 	GetAsset(ctx context.Context, id int) (*Asset, error)

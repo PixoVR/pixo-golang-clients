@@ -52,6 +52,12 @@ type MockClient struct {
 	NumCalledDeleteOrg int
 	DeleteOrgError     error
 
+	NumCalledCreateOrgModule int
+	CreateOrgModuleError     error
+
+	NumCalledDeleteOrgModule int
+	DeleteOrgModuleError     error
+
 	NumCalledGetWebhooks int
 	GetWebhooksError     error
 
@@ -171,6 +177,10 @@ type MockClient struct {
 	GetModuleVersionsParameters *ModuleVersionParams
 	ModuleVersionsReturns       []ModuleVersion
 
+	NumCalledGetVersionLifecycles int
+	GetVersionLifecyclesError     error
+	VersionLifecyclesReturns      []VersionLifecycle
+
 	NumCalledGetModulesForUser int
 	GetModulesForUserError     error
 	GetModulesForUserIDParam   int
@@ -228,6 +238,10 @@ func (m *MockClient) Reset() {
 
 	m.NumCalledDeleteOrg = 0
 	m.DeleteOrgError = nil
+	m.NumCalledCreateOrgModule = 0
+	m.CreateOrgModuleError = nil
+	m.NumCalledDeleteOrgModule = 0
+	m.DeleteOrgModuleError = nil
 
 	m.NumCalledGetAPIKeys = 0
 	m.GetAPIKeysError = nil
@@ -291,6 +305,10 @@ func (m *MockClient) Reset() {
 
 	m.NumCalledCreateModuleVersion = 0
 	m.CreateModuleVersionError = nil
+
+	m.NumCalledGetVersionLifecycles = 0
+	m.GetVersionLifecyclesError = nil
+	m.VersionLifecyclesReturns = nil
 
 	m.NumCalledGetMultiplayerServerConfigs = 0
 	m.GetMultiplayerServerConfigsError = nil
@@ -651,6 +669,43 @@ func (m *MockClient) DeleteOrg(ctx context.Context, id int) error {
 	}
 
 	return nil
+}
+
+func (m *MockClient) CreateOrgModule(ctx context.Context, input OrgModule) (*OrgModule, error) {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.NumCalledCreateOrgModule++
+
+	if input.OrgID == 0 || input.ModuleID == 0 {
+		return nil, errors.New("org id and module id are required")
+	}
+
+	if m.CreateOrgModuleError != nil {
+		return nil, m.CreateOrgModuleError
+	}
+
+	orgModule := input
+	orgModule.ID = 1
+
+	if input.ExpirDate != nil {
+		orgModule.ExpiresAt = input.ExpirDate.Format(time.RFC3339)
+	}
+
+	return &orgModule, nil
+}
+
+func (m *MockClient) DeleteOrgModule(ctx context.Context, orgID, moduleID int) error {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.NumCalledDeleteOrgModule++
+
+	if orgID == 0 || moduleID == 0 {
+		return errors.New("org id and module id are required")
+	}
+
+	return m.DeleteOrgModuleError
 }
 
 func (m *MockClient) CreateAPIKey(ctx context.Context, input APIKey) (*APIKey, error) {
@@ -1421,6 +1476,25 @@ func (m *MockClient) GetModuleVersions(ctx context.Context, params *ModuleVersio
 	}
 
 	return m.ModuleVersionsReturns, nil
+}
+
+func (m *MockClient) GetVersionLifecycles(ctx context.Context) ([]VersionLifecycle, error) {
+	m.NumCalledGetVersionLifecycles++
+
+	if m.GetVersionLifecyclesError != nil {
+		return nil, m.GetVersionLifecyclesError
+	}
+
+	if m.VersionLifecyclesReturns != nil {
+		return m.VersionLifecyclesReturns, nil
+	}
+
+	return []VersionLifecycle{
+		{ID: 1, Name: LifecycleDevelopment},
+		{ID: 2, Name: LifecycleQA},
+		{ID: 3, Name: LifecycleReleased},
+		{ID: 4, Name: LifecycleArchived},
+	}, nil
 }
 
 func (m *MockClient) GetModulesForUser(ctx context.Context, userID int) ([]Module, error) {
