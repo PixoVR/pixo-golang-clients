@@ -62,6 +62,12 @@ type Client interface {
 	// DeleteOrg deletes an org on the platform using the GraphQL interface
 	DeleteOrg(ctx context.Context, id int) error
 
+	// CreateOrgModule grants an org access to a module using the GraphQL interface
+	CreateOrgModule(ctx context.Context, input OrgModule) (*OrgModule, error)
+
+	// DeleteOrgModule revokes an org's access to a module using the GraphQL interface
+	DeleteOrgModule(ctx context.Context, orgID, moduleID int) error
+
 	// GetAsset retrieves an asset from the platform using the GraphQL interface
 	GetAsset(ctx context.Context, id int) (*Asset, error)
 	// GetAssets retrieves assets from the platform using the GraphQL interface

@@ -52,6 +52,12 @@ type MockClient struct {
 	NumCalledDeleteOrg int
 	DeleteOrgError     error
 
+	NumCalledCreateOrgModule int
+	CreateOrgModuleError     error
+
+	NumCalledDeleteOrgModule int
+	DeleteOrgModuleError     error
+
 	NumCalledGetWebhooks int
 	GetWebhooksError     error
 
@@ -232,6 +238,10 @@ func (m *MockClient) Reset() {
 
 	m.NumCalledDeleteOrg = 0
 	m.DeleteOrgError = nil
+	m.NumCalledCreateOrgModule = 0
+	m.CreateOrgModuleError = nil
+	m.NumCalledDeleteOrgModule = 0
+	m.DeleteOrgModuleError = nil
 
 	m.NumCalledGetAPIKeys = 0
 	m.GetAPIKeysError = nil
@@ -659,6 +669,43 @@ func (m *MockClient) DeleteOrg(ctx context.Context, id int) error {
 	}
 
 	return nil
+}
+
+func (m *MockClient) CreateOrgModule(ctx context.Context, input OrgModule) (*OrgModule, error) {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.NumCalledCreateOrgModule++
+
+	if input.OrgID == 0 || input.ModuleID == 0 {
+		return nil, errors.New("org id and module id are required")
+	}
+
+	if m.CreateOrgModuleError != nil {
+		return nil, m.CreateOrgModuleError
+	}
+
+	orgModule := input
+	orgModule.ID = 1
+
+	if input.ExpirDate != nil {
+		orgModule.ExpiresAt = input.ExpirDate.Format(time.RFC3339)
+	}
+
+	return &orgModule, nil
+}
+
+func (m *MockClient) DeleteOrgModule(ctx context.Context, orgID, moduleID int) error {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.NumCalledDeleteOrgModule++
+
+	if orgID == 0 || moduleID == 0 {
+		return errors.New("org id and module id are required")
+	}
+
+	return m.DeleteOrgModuleError
 }
 
 func (m *MockClient) CreateAPIKey(ctx context.Context, input APIKey) (*APIKey, error) {

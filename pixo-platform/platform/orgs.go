@@ -99,6 +99,10 @@ func (p *clientImpl) CreateOrg(ctx context.Context, org Org) (*Org, error) {
 		input["affiliateId"] = org.AffiliateID
 	}
 
+	if org.Status != "" {
+		input["status"] = org.Status
+	}
+
 	variables := map[string]interface{}{
 		"input": input,
 	}
