@@ -15,7 +15,7 @@ var _ = Describe("Users", func() {
 	var (
 		ctx             context.Context
 		user            *User
-		newUserPassword = faker.Password()
+		newUserPassword = validPassword()
 	)
 
 	BeforeEach(func() {
@@ -96,7 +96,7 @@ var _ = Describe("Users", func() {
 			FirstName: faker.FirstName(),
 			LastName:  faker.LastName(),
 			Username:  faker.Username(),
-			Password:  faker.Password(),
+			Password:  validPassword(),
 			OrgID:     1,
 			Role:      "superadmin",
 		}
@@ -165,3 +165,9 @@ var _ = Describe("Users", func() {
 	})
 
 })
+
+// validPassword returns a random password that satisfies the platform password
+// policy: 8-32 characters with upper, lower and special characters.
+func validPassword() string {
+	return "Aa!" + faker.Password()[:16]
+}
