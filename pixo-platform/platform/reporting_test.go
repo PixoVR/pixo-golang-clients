@@ -42,7 +42,6 @@ var _ = Describe("Reporting", func() {
 
 	AfterEach(func() {
 		Expect(tokenClient.DeleteOrgModule(ctx, org.ID, moduleID)).To(Succeed())
-		Expect(tokenClient.DeleteOrg(ctx, org.ID)).To(Succeed())
 	})
 
 	It("can return expiring modules", func() {
