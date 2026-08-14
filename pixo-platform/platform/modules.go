@@ -91,9 +91,6 @@ type ModuleVersion struct {
 // ModuleParams are the filters accepted by the modules query. Leaving a filter
 // empty leaves that dimension unfiltered.
 type ModuleParams struct {
-	// Name is unused by the platform API and remains for backwards compatibility.
-	Name string `json:"-"`
-
 	LifecycleIds  []int    `json:"lifecycleIds,omitempty"`
 	Statuses      []string `json:"statuses,omitempty"`
 	IsPublic      *bool    `json:"isPublic,omitempty"`
