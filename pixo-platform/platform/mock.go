@@ -52,6 +52,11 @@ type MockClient struct {
 	NumCalledDeleteOrg int
 	DeleteOrgError     error
 
+	NumCalledGetOrgModules  int
+	GetOrgModulesError      error
+	GetOrgModulesParameters *OrgModuleParams
+	GetOrgModulesReturn     []OrgModule
+
 	NumCalledCreateOrgModule int
 	CreateOrgModuleError     error
 
@@ -73,9 +78,16 @@ type MockClient struct {
 	NumCalledDeleteWebhook int
 	DeleteWebhookError     error
 
-	NumCalledGetModules int
-	GetModulesEmpty     bool
-	GetModulesError     error
+	NumCalledGetModules  int
+	GetModulesEmpty      bool
+	GetModulesError      error
+	GetModulesParameters *ModuleParams
+	GetModulesReturn     []Module
+
+	NumCalledGetModule int
+	GetModuleError     error
+	GetModuleIDParam   int
+	GetModuleReturn    *Module
 
 	NumCalledGetAPIKeys int
 	GetAPIKeysEmpty     bool
@@ -238,6 +250,11 @@ func (m *MockClient) Reset() {
 
 	m.NumCalledDeleteOrg = 0
 	m.DeleteOrgError = nil
+	m.NumCalledGetOrgModules = 0
+	m.GetOrgModulesError = nil
+	m.GetOrgModulesParameters = nil
+	m.GetOrgModulesReturn = nil
+
 	m.NumCalledCreateOrgModule = 0
 	m.CreateOrgModuleError = nil
 	m.NumCalledDeleteOrgModule = 0
@@ -270,6 +287,13 @@ func (m *MockClient) Reset() {
 	m.NumCalledGetModules = 0
 	m.GetModulesError = nil
 	m.GetModulesEmpty = false
+	m.GetModulesParameters = nil
+	m.GetModulesReturn = nil
+
+	m.NumCalledGetModule = 0
+	m.GetModuleError = nil
+	m.GetModuleIDParam = 0
+	m.GetModuleReturn = nil
 
 	m.CalledGetAssetWith = nil
 	m.GetAssetReturns = nil
@@ -526,12 +550,20 @@ func (m *MockClient) GetModules(ctx context.Context, params ...ModuleParams) ([]
 
 	m.NumCalledGetModules++
 
+	if len(params) > 0 {
+		m.GetModulesParameters = &params[0]
+	}
+
 	if m.GetModulesError != nil {
 		return nil, m.GetModulesError
 	}
 
 	if m.GetModulesEmpty {
 		return []Module{}, nil
+	}
+
+	if m.GetModulesReturn != nil {
+		return m.GetModulesReturn, nil
 	}
 
 	return []Module{
@@ -542,6 +574,40 @@ func (m *MockClient) GetModules(ctx context.Context, params ...ModuleParams) ([]
 		{
 			ID:           2,
 			Abbreviation: "TST-2",
+		},
+	}, nil
+}
+
+func (m *MockClient) GetModule(ctx context.Context, id int) (*Module, error) {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.NumCalledGetModule++
+	m.GetModuleIDParam = id
+
+	if id == 0 {
+		return nil, errors.New("module id is required")
+	}
+
+	if m.GetModuleError != nil {
+		return nil, m.GetModuleError
+	}
+
+	if m.GetModuleReturn != nil {
+		return m.GetModuleReturn, nil
+	}
+
+	return &Module{
+		ID:           id,
+		Abbreviation: "TST",
+		Versions: []ModuleVersion{
+			{
+				ID:              1,
+				ModuleID:        id,
+				SemanticVersion: "1.0.0",
+				LifecycleID:     1,
+				Platforms:       []Platform{{ID: 1, ShortName: "quest"}},
+			},
 		},
 	}, nil
 }
@@ -669,6 +735,35 @@ func (m *MockClient) DeleteOrg(ctx context.Context, id int) error {
 	}
 
 	return nil
+}
+
+func (m *MockClient) GetOrgModules(ctx context.Context, params OrgModuleParams) ([]OrgModule, error) {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.NumCalledGetOrgModules++
+	m.GetOrgModulesParameters = &params
+
+	if params.OrgID == 0 {
+		return nil, errors.New("org id is required")
+	}
+
+	if m.GetOrgModulesError != nil {
+		return nil, m.GetOrgModulesError
+	}
+
+	if m.GetOrgModulesReturn != nil {
+		return m.GetOrgModulesReturn, nil
+	}
+
+	return []OrgModule{
+		{
+			ID:       1,
+			OrgID:    params.OrgID,
+			Lifetime: true,
+			Module:   &Module{ID: 1, Abbreviation: "TST"},
+		},
+	}, nil
 }
 
 func (m *MockClient) CreateOrgModule(ctx context.Context, input OrgModule) (*OrgModule, error) {

@@ -3,6 +3,7 @@ package platform
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 )
 
@@ -19,8 +20,42 @@ type OrgModule struct {
 	ExpirDate      *time.Time `json:"-"`
 }
 
+// OrgModuleParams identifies the org whose modules should be returned.
+type OrgModuleParams struct {
+	OrgID          int  `json:"orgId"`
+	IncludeExpired bool `json:"includeExpired"`
+}
+
+type GetOrgModulesResponse struct {
+	OrgModules []OrgModule `json:"orgModules"`
+}
+
 type CreateOrgModuleResponse struct {
 	OrgModule OrgModule `json:"createOrgModule"`
+}
+
+// GetOrgModules retrieves the modules an org has access to, including the
+// access type that grants it.
+func (p *clientImpl) GetOrgModules(ctx context.Context, params OrgModuleParams) ([]OrgModule, error) {
+	if params.OrgID == 0 {
+		return nil, errors.New("org id is required")
+	}
+
+	query := fmt.Sprintf(
+		`query orgModules($params: OrgModuleParams!) { orgModules(params: $params) { id orgId lifetime expiresAt externalId learningType completeStatus accessType module { %s } } }`,
+		moduleFields,
+	)
+
+	variables := map[string]interface{}{
+		"params": params,
+	}
+
+	var res GetOrgModulesResponse
+	if err := p.Exec(ctx, query, &res, variables); err != nil {
+		return nil, err
+	}
+
+	return res.OrgModules, nil
 }
 
 type DeleteOrgModuleResponse struct {

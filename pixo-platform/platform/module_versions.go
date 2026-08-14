@@ -2,7 +2,27 @@ package platform
 
 import (
 	"context"
+	"fmt"
 )
+
+// moduleVersionFields is the selection every module version read shares.
+const moduleVersionFields = `
+	id
+	moduleId
+	version
+	notes
+	package
+	public
+	fileLink
+	fileSize
+	uploadStatus
+	externalId
+	lifecycleId
+	lifecycle { id name }
+	platforms { id name shortName }
+	createdAt
+	updatedAt
+`
 
 type ModuleVersionParams struct {
 	ModuleID           *int     `json:"moduleId,omitempty"`
@@ -26,7 +46,11 @@ func (p *clientImpl) GetModuleVersions(ctx context.Context, params *ModuleVersio
 		params = &ModuleVersionParams{}
 	}
 
-	query := `query moduleVersions($params: ModuleVersionParamsInput) { moduleVersions(params: $params) { id moduleId lifecycleId lifecycle { id name } version fileLink package module { id abbreviation description } } }`
+	query := fmt.Sprintf(
+		`query moduleVersions($params: ModuleVersionParamsInput) { moduleVersions(params: $params) { %s module { %s } } }`,
+		moduleVersionFields,
+		moduleFields,
+	)
 	variables := map[string]interface{}{
 		"params": params,
 	}

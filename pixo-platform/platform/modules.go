@@ -21,18 +21,46 @@ type GitConfig struct {
 	RepoName string `json:"repoName,omitempty"`
 }
 
+type Language struct {
+	Language     string `json:"language,omitempty"`
+	LanguageCode string `json:"languageCode,omitempty"`
+	DisplayName  string `json:"displayName,omitempty"`
+}
+
 type Module struct {
 	ID           int    `json:"id,omitempty"`
 	Name         string `json:"name,omitempty"`
 	Abbreviation string `json:"abbreviation,omitempty"`
 	Description  string `json:"description,omitempty"`
 	ImageLink    string `json:"imageLink,omitempty"`
+	PDFLink      string `json:"pdfLink,omitempty"`
 	ShortDesc    string `json:"shortDesc,omitempty"`
+	LongDesc     string `json:"longDesc,omitempty"`
+	Industry     string `json:"industry,omitempty"`
+	Developer    string `json:"developer,omitempty"`
+	Details      string `json:"details,omitempty"`
+	Categories   string `json:"categories,omitempty"`
+	Status       string `json:"status,omitempty"`
 	ExternalID   string `json:"externalId,omitempty"`
-	IsAvailable  bool   `json:"isAvailable,omitempty"`
+
+	IsAvailable           bool `json:"isAvailable,omitempty"`
+	IsPublic              bool `json:"isPublic,omitempty"`
+	IsDemo                bool `json:"isDemo,omitempty"`
+	IsMultiplayer         bool `json:"isMultiplayer,omitempty"`
+	IsAuthenticatedLaunch bool `json:"isAuthenticatedLaunch,omitempty"`
+	PassingScoreEnabled   bool `json:"passingScoreEnabled,omitempty"`
+
+	ModulePlayerID int           `json:"modulePlayerId,omitempty"`
+	ModulePlayer   *ModulePlayer `json:"modulePlayer,omitempty"`
+
+	DistributorID int  `json:"distributorId,omitempty"`
+	Distributor   *Org `json:"distributor,omitempty"`
 
 	GitConfigID int       `json:"gitConfigId,omitempty"`
 	GitConfig   GitConfig `json:"gitConfig,omitempty"`
+
+	AvailableLanguages []Language      `json:"availableLanguages,omitempty"`
+	Versions           []ModuleVersion `json:"versions,omitempty"`
 
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	UpdatedAt time.Time `json:"updatedAt,omitempty"`
@@ -45,21 +73,74 @@ type ModuleVersion struct {
 	LifecycleID     int               `json:"lifecycleId,omitempty"`
 	Lifecycle       *VersionLifecycle `json:"lifecycle,omitempty"`
 	FileLink        string            `json:"fileLink,omitempty"`
+	FileSize        int               `json:"fileSize,omitempty"`
 	SemanticVersion string            `json:"version,omitempty"`
 	Notes           string            `json:"notes,omitempty"`
 	Package         string            `json:"package,omitempty"`
+	Public          bool              `json:"public,omitempty"`
+	UploadStatus    string            `json:"uploadStatus,omitempty"`
 	ExternalID      string            `json:"externalId,omitempty"`
 	LocalFilePath   string            `json:"-"`
 	ControlIds      []int             `json:"controlIds,omitempty"`
 	PlatformIds     []int             `json:"platformIds,omitempty"`
+	Platforms       []Platform        `json:"platforms,omitempty"`
+	CreatedAt       time.Time         `json:"createdAt,omitempty"`
+	UpdatedAt       time.Time         `json:"updatedAt,omitempty"`
 }
 
+// ModuleParams are the filters accepted by the modules query. Leaving a filter
+// empty leaves that dimension unfiltered.
 type ModuleParams struct {
-	Name string `json:"name"`
+	// Name is unused by the platform API and remains for backwards compatibility.
+	Name string `json:"-"`
+
+	LifecycleIds  []int    `json:"lifecycleIds,omitempty"`
+	Statuses      []string `json:"statuses,omitempty"`
+	IsPublic      *bool    `json:"isPublic,omitempty"`
+	DistributorID *int     `json:"distributorId,omitempty"`
 }
+
+// moduleFields is the selection every module read shares. Versions are left out
+// so that listing modules stays a single cheap query - use GetModule or
+// GetModuleVersions when versions are needed.
+const moduleFields = `
+	id
+	name
+	abbreviation
+	description
+	externalId
+	imageLink
+	pdfLink
+	shortDesc
+	longDesc
+	industry
+	developer
+	details
+	categories
+	status
+	isAvailable
+	isPublic
+	isDemo
+	isMultiplayer
+	isAuthenticatedLaunch
+	passingScoreEnabled
+	modulePlayerId
+	modulePlayer { id name description launchProtocol }
+	distributorId
+	distributor { id name type }
+	gitConfigId
+	gitConfig { provider orgName repoName }
+	availableLanguages { language languageCode displayName }
+	createdAt
+	updatedAt
+`
 
 type GetModulesResponse struct {
 	Modules []Module `json:"modules"`
+}
+
+type GetModuleResponse struct {
+	Module Module `json:"module"`
 }
 
 type CreateModuleResponse struct {
@@ -71,14 +152,44 @@ type CreateModuleVersionResponse struct {
 }
 
 func (p *clientImpl) GetModules(ctx context.Context, params ...ModuleParams) ([]Module, error) {
-	query := `query modules { modules { id abbreviation description imageLink shortDesc gitConfigId gitConfig { provider orgName repoName } createdAt updatedAt } }`
+	query := fmt.Sprintf(`query modules($params: ModuleFilterParams) { modules(params: $params) { %s } }`, moduleFields)
+
+	variables := map[string]interface{}{}
+	if len(params) > 0 {
+		variables["params"] = params[0]
+	}
 
 	var res GetModulesResponse
-	if err := p.Exec(ctx, query, &res, nil); err != nil {
+	if err := p.Exec(ctx, query, &res, variables); err != nil {
 		return nil, err
 	}
 
 	return res.Modules, nil
+}
+
+// GetModule retrieves a single module along with its versions and the platforms
+// each version supports.
+func (p *clientImpl) GetModule(ctx context.Context, id int) (*Module, error) {
+	if id == 0 {
+		return nil, errors.New("module id is required")
+	}
+
+	query := fmt.Sprintf(
+		`query module($id: ID!) { module(id: $id) { %s versions { %s } } }`,
+		moduleFields,
+		moduleVersionFields,
+	)
+
+	variables := map[string]interface{}{
+		"id": id,
+	}
+
+	var res GetModuleResponse
+	if err := p.Exec(ctx, query, &res, variables); err != nil {
+		return nil, err
+	}
+
+	return &res.Module, nil
 }
 
 func (p *clientImpl) CreateModuleVersion(ctx context.Context, input ModuleVersion) (*ModuleVersion, error) {
@@ -190,7 +301,7 @@ func (p *clientImpl) CreateModuleVersion(ctx context.Context, input ModuleVersio
 }
 
 func (p *clientImpl) GetModulesForUser(ctx context.Context, userID int) ([]Module, error) {
-	query := `query user($id: ID!){ user(id: $id) { modules{ id name abbreviation description imageLink shortDesc externalId isAvailable gitConfigId gitConfig { provider orgName repoName } createdAt updatedAt } } }`
+	query := fmt.Sprintf(`query user($id: ID!){ user(id: $id) { modules { %s } } }`, moduleFields)
 
 	variables := map[string]interface{}{
 		"id": userID,
