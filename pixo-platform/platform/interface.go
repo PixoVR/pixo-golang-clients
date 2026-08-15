@@ -38,6 +38,8 @@ type Client interface {
 
 	// GetModules retrieves modules from the platform using the GraphQL interface
 	GetModules(ctx context.Context, params ...ModuleParams) ([]Module, error)
+	// GetModule retrieves a module and its versions from the platform using the GraphQL interface
+	GetModule(ctx context.Context, id int) (*Module, error)
 	// CreateModuleVersion retrieves a module from the platform using the GraphQL interface
 	CreateModuleVersion(ctx context.Context, input ModuleVersion) (*ModuleVersion, error)
 	// GetModuleVersions retrieves module versions from the platform using the GraphQL interface
@@ -61,6 +63,9 @@ type Client interface {
 	UpdateOrg(ctx context.Context, org Org) (*Org, error)
 	// DeleteOrg deletes an org on the platform using the GraphQL interface
 	DeleteOrg(ctx context.Context, id int) error
+
+	// GetOrgModules retrieves the modules an org has access to using the GraphQL interface
+	GetOrgModules(ctx context.Context, params OrgModuleParams) ([]OrgModule, error)
 
 	// CreateOrgModule grants an org access to a module using the GraphQL interface
 	CreateOrgModule(ctx context.Context, input OrgModule) (*OrgModule, error)
