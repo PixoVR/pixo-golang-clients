@@ -73,6 +73,7 @@ type ModuleVersion struct {
 	LifecycleID     int               `json:"lifecycleId,omitempty"`
 	Lifecycle       *VersionLifecycle `json:"lifecycle,omitempty"`
 	FileLink        string            `json:"fileLink,omitempty"`
+	FilePath        string            `json:"filePath,omitempty"`
 	FileSize        int               `json:"fileSize,omitempty"`
 	SemanticVersion string            `json:"version,omitempty"`
 	Notes           string            `json:"notes,omitempty"`

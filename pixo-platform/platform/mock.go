@@ -606,6 +606,7 @@ func (m *MockClient) GetModule(ctx context.Context, id int) (*Module, error) {
 				ModuleID:        id,
 				SemanticVersion: "1.0.0",
 				LifecycleID:     1,
+				FilePath:        "ModuleVersions/1/zips/module.zip",
 				Platforms:       []Platform{{ID: 1, ShortName: "quest"}},
 			},
 		},
