@@ -73,6 +73,7 @@ type ModuleVersion struct {
 	LifecycleID     int               `json:"lifecycleId,omitempty"`
 	Lifecycle       *VersionLifecycle `json:"lifecycle,omitempty"`
 	FileLink        string            `json:"fileLink,omitempty"`
+	FilePath        string            `json:"filePath,omitempty"`
 	FileSize        int               `json:"fileSize,omitempty"`
 	SemanticVersion string            `json:"version,omitempty"`
 	Notes           string            `json:"notes,omitempty"`
@@ -124,7 +125,7 @@ const moduleFields = `
 	modulePlayerId
 	modulePlayer { id name description launchProtocol }
 	distributorId
-	distributor { id name type }
+	distributor { id name type logoLink hubLogoLink }
 	gitConfigId
 	gitConfig { provider orgName repoName }
 	availableLanguages { language languageCode displayName }

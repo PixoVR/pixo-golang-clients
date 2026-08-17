@@ -14,6 +14,7 @@ const moduleVersionFields = `
 	package
 	public
 	fileLink
+	filePath
 	fileSize
 	uploadStatus
 	externalId
