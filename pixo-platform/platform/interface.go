@@ -10,6 +10,8 @@ type Client interface {
 	abstract.AbstractClient
 
 	CheckAuth(ctx context.Context) (User, error)
+	// CheckConnection verifies the platform API is reachable and the client's credentials are accepted
+	CheckConnection(ctx context.Context) error
 	ActiveUserID() int
 	ActiveOrgID() int
 

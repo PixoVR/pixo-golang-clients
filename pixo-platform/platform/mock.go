@@ -15,6 +15,9 @@ var _ Client = (*MockClient)(nil)
 type MockClient struct {
 	abstract.MockAbstractClient
 
+	NumCalledCheckConnection int
+	CheckConnectionError     error
+
 	NumCalledGetUser int
 	GetUserResponse  *User
 	GetUserError     error
@@ -213,6 +216,9 @@ func (m *MockClient) Reset() {
 	m.CalledCreateEventWith = nil
 	m.CreateEventError = nil
 
+	m.NumCalledCheckConnection = 0
+	m.CheckConnectionError = nil
+
 	m.CreateSessionError = nil
 
 	m.NumCalledGetUser = 0
@@ -396,6 +402,23 @@ func (m *MockClient) CheckAuth(ctx context.Context) (User, error) {
 	}
 
 	return User{ID: m.ActiveUserID()}, nil
+}
+
+func (m *MockClient) CheckConnection(ctx context.Context) error {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.NumCalledCheckConnection++
+
+	if m.CheckConnectionError != nil {
+		return m.CheckConnectionError
+	}
+
+	if !m.IsAuthenticated() {
+		return ErrNoCredentials
+	}
+
+	return nil
 }
 
 func (m *MockClient) Path() string {
