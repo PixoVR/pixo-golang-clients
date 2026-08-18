@@ -48,4 +48,25 @@ var _ = Describe("Connection Check", func() {
 		Expect(tokenClient.CheckConnection(context.Background())).To(Succeed())
 	})
 
+	It("can mock a working connection", func() {
+		mockClient := &MockClient{}
+		mockClient.SetAPIKey("api-key")
+
+		Expect(mockClient.CheckConnection(context.Background())).To(Succeed())
+		Expect(mockClient.NumCalledCheckConnection).To(Equal(1))
+	})
+
+	It("can mock missing credentials", func() {
+		mockClient := &MockClient{}
+
+		Expect(mockClient.CheckConnection(context.Background())).To(MatchError(ErrNoCredentials))
+	})
+
+	It("can mock a rejected connection", func() {
+		mockClient := &MockClient{CheckConnectionError: ErrUnauthorized}
+		mockClient.SetAPIKey("api-key")
+
+		Expect(mockClient.CheckConnection(context.Background())).To(MatchError(ErrUnauthorized))
+	})
+
 })

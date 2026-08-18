@@ -414,7 +414,9 @@ func (m *MockClient) CheckConnection(ctx context.Context) error {
 		return m.CheckConnectionError
 	}
 
-	if !m.IsAuthenticated() {
+	// IsAuthenticated is hardcoded to false on the embedded mock, so read the credentials the
+	// caller configured instead - otherwise the mock can never report a working connection.
+	if m.APIKey == "" && m.Token == "" {
 		return ErrNoCredentials
 	}
 
