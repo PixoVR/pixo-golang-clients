@@ -105,6 +105,42 @@ var _ = Describe("Modules", func() {
 		Expect(module.Distributor.Name).NotTo(BeEmpty())
 	})
 
+	It("returns the storage path behind the image and guide links of a module", func() {
+		modules, err := tokenClient.GetModules(ctx)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(modules).NotTo(BeEmpty())
+
+		modulesWithAnImage := 0
+		for _, module := range modules {
+			if module.ImagePath == "" {
+				continue
+			}
+
+			modulesWithAnImage++
+			Expect(module.ImageLink).To(ContainSubstring(module.ImagePath))
+		}
+
+		Expect(modulesWithAnImage).NotTo(BeZero())
+	})
+
+	It("returns the storage path behind the logo link of a distributor", func() {
+		modules, err := tokenClient.GetModules(ctx)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(modules).NotTo(BeEmpty())
+
+		distributorsWithALogo := 0
+		for _, module := range modules {
+			if module.Distributor == nil || module.Distributor.LogoPath == "" {
+				continue
+			}
+
+			distributorsWithALogo++
+			Expect(module.Distributor.LogoLink).To(ContainSubstring(module.Distributor.LogoPath))
+		}
+
+		Expect(distributorsWithALogo).NotTo(BeZero())
+	})
+
 	It("can get a module with its versions", func() {
 		module, err := tokenClient.GetModule(ctx, moduleID)
 

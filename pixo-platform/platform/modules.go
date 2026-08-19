@@ -33,7 +33,9 @@ type Module struct {
 	Abbreviation string `json:"abbreviation,omitempty"`
 	Description  string `json:"description,omitempty"`
 	ImageLink    string `json:"imageLink,omitempty"`
+	ImagePath    string `json:"imagePath,omitempty"`
 	PDFLink      string `json:"pdfLink,omitempty"`
+	PDFPath      string `json:"pdfPath,omitempty"`
 	ShortDesc    string `json:"shortDesc,omitempty"`
 	LongDesc     string `json:"longDesc,omitempty"`
 	Industry     string `json:"industry,omitempty"`
@@ -108,7 +110,9 @@ const moduleFields = `
 	description
 	externalId
 	imageLink
+	imagePath
 	pdfLink
+	pdfPath
 	shortDesc
 	longDesc
 	industry
@@ -123,9 +127,9 @@ const moduleFields = `
 	isAuthenticatedLaunch
 	passingScoreEnabled
 	modulePlayerId
-	modulePlayer { id name description launchProtocol }
+	modulePlayer { id name description launchProtocol distributorId }
 	distributorId
-	distributor { id name type logoLink hubLogoLink }
+	distributor { id name type logoLink logoPath hubLogoLink }
 	gitConfigId
 	gitConfig { provider orgName repoName }
 	availableLanguages { language languageCode displayName }
