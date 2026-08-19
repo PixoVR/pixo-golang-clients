@@ -40,6 +40,10 @@ type DeleteUserResponse struct {
 	Success bool `json:"deleteUser"`
 }
 
+type UsersWithModuleAccessResponse struct {
+	Users []User `json:"usersWithModuleAccess"`
+}
+
 func (p *clientImpl) CreateUser(ctx context.Context, user *User) error {
 	if user == nil {
 		return errors.New("user is nil")

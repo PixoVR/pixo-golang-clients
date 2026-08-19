@@ -50,6 +50,8 @@ type Client interface {
 	GetVersionLifecycles(ctx context.Context) ([]VersionLifecycle, error)
 	// GetModulesForUser retrieves a list of modules that the user has access to from the platform using the GraphQL interface
 	GetModulesForUser(ctx context.Context, userID int) ([]Module, error)
+	// GetUsersWithModuleAccess retrieves the users of an org that have access to a module using the GraphQL interface
+	GetUsersWithModuleAccess(ctx context.Context, moduleID, orgID int) ([]User, error)
 	// GetModulePlayers retrieves module players from the platform using the GraphQL interface
 	GetModulePlayers(ctx context.Context, params ...*ModulePlayerParams) ([]ModulePlayer, error)
 	// GetModulePlayerVersions retrieves module player versions from the platform using the GraphQL interface
