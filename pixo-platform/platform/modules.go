@@ -316,3 +316,19 @@ func (p *clientImpl) GetModulesForUser(ctx context.Context, userID int) ([]Modul
 
 	return userResponse.User.Modules, nil
 }
+
+func (p *clientImpl) GetUsersWithModuleAccess(ctx context.Context, moduleID, orgID int) ([]User, error) {
+	query := `query usersWithModuleAccess($moduleId: ID!, $orgId: ID!) { usersWithModuleAccess(moduleId: $moduleId, orgId: $orgId) { id username role orgId } }`
+
+	variables := map[string]interface{}{
+		"moduleId": moduleID,
+		"orgId":    orgID,
+	}
+
+	var response UsersWithModuleAccessResponse
+	if err := p.Exec(ctx, query, &response, variables); err != nil {
+		return nil, err
+	}
+
+	return response.Users, nil
+}

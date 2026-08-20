@@ -159,3 +159,30 @@ func TestMockClient_ModuleReads_Reset(t *testing.T) {
 		t.Error("expected the GetOrgModules state to be reset")
 	}
 }
+
+func TestMockClient_GetUsersWithModuleAccess_CapturesParams(t *testing.T) {
+	mock := &platform.MockClient{}
+
+	users, err := mock.GetUsersWithModuleAccess(context.Background(), 43, 20)
+
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if mock.NumCalledGetUsersWithModuleAccess != 1 {
+		t.Errorf("expected one call, got %d", mock.NumCalledGetUsersWithModuleAccess)
+	}
+	if mock.GetUsersWithModuleAccessModuleID != 43 || mock.GetUsersWithModuleAccessOrgID != 20 {
+		t.Errorf("expected the module and org to be captured, got %d and %d", mock.GetUsersWithModuleAccessModuleID, mock.GetUsersWithModuleAccessOrgID)
+	}
+	if len(users) != 1 || users[0].OrgID != 20 {
+		t.Errorf("unexpected result: %+v", users)
+	}
+}
+
+func TestMockClient_GetUsersWithModuleAccess_ReturnsError(t *testing.T) {
+	mock := &platform.MockClient{GetUsersWithModuleAccessError: errors.New("boom")}
+
+	if _, err := mock.GetUsersWithModuleAccess(context.Background(), 43, 20); err == nil {
+		t.Fatal("expected an error")
+	}
+}
