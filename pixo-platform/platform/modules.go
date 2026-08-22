@@ -137,8 +137,6 @@ const moduleFields = `
 	updatedAt
 `
 
-// enabledPlayerVersionFields asks a module player for the enabled versions it can
-// be launched with, which the platform API batches across the modules of a query.
 const enabledPlayerVersionFields = `
 	modulePlayer {
 		versions(status: ["enabled"]) {
