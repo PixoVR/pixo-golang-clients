@@ -14,6 +14,10 @@ type ModulePlayer struct {
 	Distributor    Org       `json:"distributor,omitempty"`
 	CreatedAt      time.Time `json:"createdAt,omitempty"`
 	UpdatedAt      time.Time `json:"updatedAt,omitempty"`
+
+	// Versions is populated only by GetModule, which asks the player for the
+	// enabled versions it can be launched with.
+	Versions []ModulePlayerVersion `json:"versions,omitempty"`
 }
 
 type ModulePlayerParams struct {
