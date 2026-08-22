@@ -14,6 +14,8 @@ type ModulePlayer struct {
 	Distributor    Org       `json:"distributor,omitempty"`
 	CreatedAt      time.Time `json:"createdAt,omitempty"`
 	UpdatedAt      time.Time `json:"updatedAt,omitempty"`
+
+	Versions []ModulePlayerVersion `json:"versions,omitempty"`
 }
 
 type ModulePlayerParams struct {

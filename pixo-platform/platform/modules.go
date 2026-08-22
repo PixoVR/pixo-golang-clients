@@ -137,6 +137,20 @@ const moduleFields = `
 	updatedAt
 `
 
+const enabledPlayerVersionFields = `
+	modulePlayer {
+		versions(status: ["enabled"]) {
+			id
+			modulePlayerId
+			status
+			version
+			fileName
+			package
+			platforms { id name shortName }
+		}
+	}
+`
+
 type GetModulesResponse struct {
 	Modules []Module `json:"modules"`
 }
@@ -169,16 +183,17 @@ func (p *clientImpl) GetModules(ctx context.Context, params ...ModuleParams) ([]
 	return res.Modules, nil
 }
 
-// GetModule retrieves a single module along with its versions and the platforms
-// each version supports.
+// GetModule retrieves a single module along with its versions, the platforms each
+// version supports and the enabled versions of the player it is launched with.
 func (p *clientImpl) GetModule(ctx context.Context, id int) (*Module, error) {
 	if id == 0 {
 		return nil, errors.New("module id is required")
 	}
 
 	query := fmt.Sprintf(
-		`query module($id: ID!) { module(id: $id) { %s versions { %s } } }`,
+		`query module($id: ID!) { module(id: $id) { %s %s versions { %s } } }`,
 		moduleFields,
+		enabledPlayerVersionFields,
 		moduleVersionFields,
 	)
 
