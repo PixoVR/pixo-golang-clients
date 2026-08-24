@@ -40,6 +40,8 @@ type Client interface {
 
 	// GetModules retrieves modules from the platform using the GraphQL interface
 	GetModules(ctx context.Context, params ...ModuleParams) ([]Module, error)
+	// GetModulesWithAssociations retrieves modules with their versions and the enabled versions of their players from the platform using the GraphQL interface
+	GetModulesWithAssociations(ctx context.Context, params ModuleParams) ([]Module, error)
 	// GetModule retrieves a module and its versions from the platform using the GraphQL interface
 	GetModule(ctx context.Context, id int) (*Module, error)
 	// CreateModuleVersion retrieves a module from the platform using the GraphQL interface

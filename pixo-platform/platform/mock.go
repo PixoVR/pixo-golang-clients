@@ -87,6 +87,12 @@ type MockClient struct {
 	GetModulesParameters *ModuleParams
 	GetModulesReturn     []Module
 
+	NumCalledGetModulesWithAssociations  int
+	GetModulesWithAssociationsEmpty      bool
+	GetModulesWithAssociationsError      error
+	GetModulesWithAssociationsParameters *ModuleParams
+	GetModulesWithAssociationsReturn     []Module
+
 	NumCalledGetModule int
 	GetModuleError     error
 	GetModuleIDParam   int
@@ -301,6 +307,12 @@ func (m *MockClient) Reset() {
 	m.GetModulesEmpty = false
 	m.GetModulesParameters = nil
 	m.GetModulesReturn = nil
+
+	m.NumCalledGetModulesWithAssociations = 0
+	m.GetModulesWithAssociationsError = nil
+	m.GetModulesWithAssociationsEmpty = false
+	m.GetModulesWithAssociationsParameters = nil
+	m.GetModulesWithAssociationsReturn = nil
 
 	m.NumCalledGetModule = 0
 	m.GetModuleError = nil
@@ -611,6 +623,43 @@ func (m *MockClient) GetModules(ctx context.Context, params ...ModuleParams) ([]
 		{
 			ID:           2,
 			Abbreviation: "TST-2",
+		},
+	}, nil
+}
+
+func (m *MockClient) GetModulesWithAssociations(ctx context.Context, params ModuleParams) ([]Module, error) {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.NumCalledGetModulesWithAssociations++
+	m.GetModulesWithAssociationsParameters = &params
+
+	if m.GetModulesWithAssociationsError != nil {
+		return nil, m.GetModulesWithAssociationsError
+	}
+
+	if m.GetModulesWithAssociationsEmpty {
+		return []Module{}, nil
+	}
+
+	if m.GetModulesWithAssociationsReturn != nil {
+		return m.GetModulesWithAssociationsReturn, nil
+	}
+
+	return []Module{
+		{
+			ID:           1,
+			Abbreviation: "TST",
+			Versions: []ModuleVersion{
+				{
+					ID:              1,
+					ModuleID:        1,
+					SemanticVersion: "1.0.0",
+					LifecycleID:     1,
+					FilePath:        "ModuleVersions/1/zips/module.zip",
+					Platforms:       []Platform{{ID: 1, ShortName: "quest"}},
+				},
+			},
 		},
 	}, nil
 }
