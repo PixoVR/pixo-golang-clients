@@ -94,6 +94,7 @@ type ModuleVersion struct {
 // ModuleParams are the filters accepted by the modules query. Leaving a filter
 // empty leaves that dimension unfiltered.
 type ModuleParams struct {
+	IDs           []int    `json:"ids,omitempty"`
 	LifecycleIds  []int    `json:"lifecycleIds,omitempty"`
 	Statuses      []string `json:"statuses,omitempty"`
 	IsPublic      *bool    `json:"isPublic,omitempty"`
@@ -173,6 +174,34 @@ func (p *clientImpl) GetModules(ctx context.Context, params ...ModuleParams) ([]
 	variables := map[string]interface{}{}
 	if len(params) > 0 {
 		variables["params"] = params[0]
+	}
+
+	var res GetModulesResponse
+	if err := p.Exec(ctx, query, &res, variables); err != nil {
+		return nil, err
+	}
+
+	return res.Modules, nil
+}
+
+// GetModulesWithAssociations retrieves modules along with their versions, the
+// platforms each version supports and the enabled versions of the player they are
+// launched with - the selection GetModule makes, for every module the params reach.
+// Reading a known set of modules this way is one request instead of one request
+// per module.
+//
+// A module only reports the versions of the lifecycles the params ask for, so
+// leaving LifecycleIds empty reports no versions at all.
+func (p *clientImpl) GetModulesWithAssociations(ctx context.Context, params ModuleParams) ([]Module, error) {
+	query := fmt.Sprintf(
+		`query modules($params: ModuleFilterParams) { modules(params: $params) { %s %s versions { %s } } }`,
+		moduleFields,
+		enabledPlayerVersionFields,
+		moduleVersionFields,
+	)
+
+	variables := map[string]interface{}{
+		"params": params,
 	}
 
 	var res GetModulesResponse
