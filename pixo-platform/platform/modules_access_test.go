@@ -53,6 +53,19 @@ var _ = Describe("ModulesAccess", func() {
 		Expect(len(modules)).To(BeNumerically(">", 0))
 	})
 
+	It("can return the modules of several users in one request", func() {
+		usersModules, err := tokenClient.GetModulesForUsers(ctx, []int{user.ID})
+		Expect(err).NotTo(HaveOccurred())
+		Expect(usersModules).To(HaveLen(1))
+		Expect(usersModules[0].UserID).To(Equal(user.ID))
+		Expect(len(usersModules[0].Modules)).To(BeNumerically(">", 0))
+	})
+
+	It("can fail to get the modules of several users if one does not exist", func() {
+		_, err := tokenClient.GetModulesForUsers(ctx, []int{user.ID, 999999})
+		Expect(err).To(HaveOccurred())
+	})
+
 	It("can return the users of an org that can access a module", func() {
 		users, err := tokenClient.GetUsersWithModuleAccess(ctx, moduleID, orgID)
 

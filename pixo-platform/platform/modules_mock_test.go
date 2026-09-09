@@ -186,3 +186,30 @@ func TestMockClient_GetUsersWithModuleAccess_ReturnsError(t *testing.T) {
 		t.Fatal("expected an error")
 	}
 }
+
+func TestMockClient_GetModulesForUsers_CapturesParams(t *testing.T) {
+	mock := &platform.MockClient{}
+
+	usersModules, err := mock.GetModulesForUsers(context.Background(), []int{7, 9})
+
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if mock.NumCalledGetModulesForUsers != 1 {
+		t.Errorf("expected one call, got %d", mock.NumCalledGetModulesForUsers)
+	}
+	if len(mock.GetModulesForUsersUserIDs) != 2 || mock.GetModulesForUsersUserIDs[0] != 7 || mock.GetModulesForUsersUserIDs[1] != 9 {
+		t.Errorf("expected the user ids to be captured, got %v", mock.GetModulesForUsersUserIDs)
+	}
+	if len(usersModules) != 2 || usersModules[0].UserID != 7 || usersModules[1].UserID != 9 {
+		t.Errorf("unexpected result: %+v", usersModules)
+	}
+}
+
+func TestMockClient_GetModulesForUsers_ReturnsError(t *testing.T) {
+	mock := &platform.MockClient{GetModulesForUsersError: errors.New("boom")}
+
+	if _, err := mock.GetModulesForUsers(context.Background(), []int{7}); err == nil {
+		t.Fatal("expected an error")
+	}
+}

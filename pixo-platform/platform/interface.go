@@ -54,6 +54,8 @@ type Client interface {
 	GetModulesForUser(ctx context.Context, userID int) ([]Module, error)
 	// GetUsersWithModuleAccess retrieves the users of an org that have access to a module using the GraphQL interface
 	GetUsersWithModuleAccess(ctx context.Context, moduleID, orgID int) ([]User, error)
+	// GetModulesForUsers retrieves the modules each of the given users has access to in one request using the GraphQL interface
+	GetModulesForUsers(ctx context.Context, userIDs []int) ([]UserModules, error)
 	// GetModulePlayers retrieves module players from the platform using the GraphQL interface
 	GetModulePlayers(ctx context.Context, params ...*ModulePlayerParams) ([]ModulePlayer, error)
 	// GetModulePlayerVersions retrieves module player versions from the platform using the GraphQL interface
