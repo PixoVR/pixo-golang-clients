@@ -44,6 +44,16 @@ type UsersWithModuleAccessResponse struct {
 	Users []User `json:"usersWithModuleAccess"`
 }
 
+// UserModules is the set of modules one user can open, as answered by usersModules.
+type UserModules struct {
+	UserID  int      `json:"userId"`
+	Modules []Module `json:"modules"`
+}
+
+type UsersModulesResponse struct {
+	UsersModules []UserModules `json:"usersModules"`
+}
+
 func (p *clientImpl) CreateUser(ctx context.Context, user *User) error {
 	if user == nil {
 		return errors.New("user is nil")

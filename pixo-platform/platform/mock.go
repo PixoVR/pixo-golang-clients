@@ -213,6 +213,11 @@ type MockClient struct {
 	GetUsersWithModuleAccessOrgID     int
 	GetUsersWithModuleAccessReturn    []User
 
+	NumCalledGetModulesForUsers int
+	GetModulesForUsersError     error
+	GetModulesForUsersUserIDs   []int
+	GetModulesForUsersReturn    []UserModules
+
 	NumCalledGetModulePlayers  int
 	GetModulePlayersError      error
 	GetModulePlayersParameters *ModulePlayerParams
@@ -408,6 +413,11 @@ func (m *MockClient) Reset() {
 	m.GetUsersWithModuleAccessModuleID = 0
 	m.GetUsersWithModuleAccessOrgID = 0
 	m.GetUsersWithModuleAccessReturn = nil
+
+	m.NumCalledGetModulesForUsers = 0
+	m.GetModulesForUsersError = nil
+	m.GetModulesForUsersUserIDs = nil
+	m.GetModulesForUsersReturn = nil
 
 	m.NumCalledGetModulePlayers = 0
 	m.GetModulePlayersError = nil
@@ -1704,6 +1714,28 @@ func (m *MockClient) GetUsersWithModuleAccess(ctx context.Context, moduleID, org
 	}
 
 	return []User{{ID: 1, Username: "test-user", Role: "user", OrgID: orgID}}, nil
+}
+
+func (m *MockClient) GetModulesForUsers(ctx context.Context, userIDs []int) ([]UserModules, error) {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.NumCalledGetModulesForUsers++
+	m.GetModulesForUsersUserIDs = userIDs
+	if m.GetModulesForUsersError != nil {
+		return nil, m.GetModulesForUsersError
+	}
+
+	if m.GetModulesForUsersReturn != nil {
+		return m.GetModulesForUsersReturn, nil
+	}
+
+	usersModules := make([]UserModules, 0, len(userIDs))
+	for _, userID := range userIDs {
+		usersModules = append(usersModules, UserModules{UserID: userID, Modules: []Module{{ID: 1, Abbreviation: "test-module"}}})
+	}
+
+	return usersModules, nil
 }
 
 func (m *MockClient) GetModulePlayers(ctx context.Context, params ...*ModulePlayerParams) ([]ModulePlayer, error) {
