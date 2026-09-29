@@ -12,6 +12,7 @@ type ModulePlayerVersion struct {
 	Status         string        `json:"status,omitempty"`
 	Version        string        `json:"version,omitempty"`
 	FileLink       string        `json:"fileLink,omitempty"`
+	FileName       string        `json:"fileName,omitempty"`
 	Package        string        `json:"package,omitempty"`
 	Controls       []ControlType `json:"controls,omitempty"`
 	Platforms      []Platform    `json:"platforms,omitempty"`
@@ -39,7 +40,7 @@ func (p *clientImpl) GetModulePlayerVersions(ctx context.Context, params *Module
 		params = &ModulePlayerVersionParams{}
 	}
 
-	query := `query modulePlayerVersions($params: ModulePlayerVersionParamsInput) { modulePlayerVersions(params: $params) { id modulePlayerId status version fileLink package controls { id name } platforms { id name shortName } modulePlayer { id name description distributor { id name } createdAt updatedAt } createdBy updatedBy createdAt updatedAt } }`
+	query := `query modulePlayerVersions($params: ModulePlayerVersionParamsInput) { modulePlayerVersions(params: $params) { id modulePlayerId status version fileLink fileName package controls { id name } platforms { id name shortName } modulePlayer { id name description distributor { id name } createdAt updatedAt } createdBy updatedBy createdAt updatedAt } }`
 	variables := map[string]interface{}{
 		"params": params,
 	}

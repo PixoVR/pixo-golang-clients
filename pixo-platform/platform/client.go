@@ -142,11 +142,12 @@ func (p *clientImpl) Exec(ctx context.Context, query string, v any, variables ma
 	resBody, _ := io.ReadAll(res.Body)
 
 	if res.StatusCode != http.StatusOK {
+		message := fmt.Sprintf("request failed with status %d", res.StatusCode)
 		var basicRes abstract.Response
 		if err = json.Unmarshal(resBody, &basicRes); err == nil && basicRes.Error != "" {
-			return errors.New(basicRes.Error)
+			message = basicRes.Error
 		}
-		return fmt.Errorf("request failed with status %d", res.StatusCode)
+		return newResponseError(res.StatusCode, message)
 	}
 
 	var gqlRes GraphQLResponse
@@ -189,7 +190,7 @@ func (p *clientImpl) ExecWithFile(ctx context.Context, query string, v any, vari
 	resBody, _ := io.ReadAll(res.Body)
 
 	if res.StatusCode != http.StatusOK {
-		return errors.New(string(resBody))
+		return newResponseError(res.StatusCode, string(resBody))
 	}
 
 	var gqlRes GraphQLResponse

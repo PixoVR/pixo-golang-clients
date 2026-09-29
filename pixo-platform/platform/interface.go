@@ -10,6 +10,8 @@ type Client interface {
 	abstract.AbstractClient
 
 	CheckAuth(ctx context.Context) (User, error)
+	// CheckConnection verifies the platform API is reachable and the client's credentials are accepted
+	CheckConnection(ctx context.Context) error
 	ActiveUserID() int
 	ActiveOrgID() int
 
@@ -38,6 +40,10 @@ type Client interface {
 
 	// GetModules retrieves modules from the platform using the GraphQL interface
 	GetModules(ctx context.Context, params ...ModuleParams) ([]Module, error)
+	// GetModulesWithAssociations retrieves modules with their versions and the enabled versions of their players from the platform using the GraphQL interface
+	GetModulesWithAssociations(ctx context.Context, params ModuleParams) ([]Module, error)
+	// GetModule retrieves a module and its versions from the platform using the GraphQL interface
+	GetModule(ctx context.Context, id int) (*Module, error)
 	// CreateModuleVersion retrieves a module from the platform using the GraphQL interface
 	CreateModuleVersion(ctx context.Context, input ModuleVersion) (*ModuleVersion, error)
 	// GetModuleVersions retrieves module versions from the platform using the GraphQL interface
@@ -46,6 +52,10 @@ type Client interface {
 	GetVersionLifecycles(ctx context.Context) ([]VersionLifecycle, error)
 	// GetModulesForUser retrieves a list of modules that the user has access to from the platform using the GraphQL interface
 	GetModulesForUser(ctx context.Context, userID int) ([]Module, error)
+	// GetUsersWithModuleAccess retrieves the users of an org that have access to a module using the GraphQL interface
+	GetUsersWithModuleAccess(ctx context.Context, moduleID, orgID int) ([]User, error)
+	// GetModulesForUsers retrieves the modules each of the given users has access to in one request using the GraphQL interface
+	GetModulesForUsers(ctx context.Context, userIDs []int) ([]UserModules, error)
 	// GetModulePlayers retrieves module players from the platform using the GraphQL interface
 	GetModulePlayers(ctx context.Context, params ...*ModulePlayerParams) ([]ModulePlayer, error)
 	// GetModulePlayerVersions retrieves module player versions from the platform using the GraphQL interface
@@ -61,6 +71,9 @@ type Client interface {
 	UpdateOrg(ctx context.Context, org Org) (*Org, error)
 	// DeleteOrg deletes an org on the platform using the GraphQL interface
 	DeleteOrg(ctx context.Context, id int) error
+
+	// GetOrgModules retrieves the modules an org has access to using the GraphQL interface
+	GetOrgModules(ctx context.Context, params OrgModuleParams) ([]OrgModule, error)
 
 	// CreateOrgModule grants an org access to a module using the GraphQL interface
 	CreateOrgModule(ctx context.Context, input OrgModule) (*OrgModule, error)

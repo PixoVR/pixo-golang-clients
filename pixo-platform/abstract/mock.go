@@ -27,11 +27,14 @@ type MockAbstractClient struct {
 	LoginError     error
 
 	NumCalledSetAPIKey int
+	APIKey             string
 
 	NumCalledSetToken int
 	Token             string
 
 	NumCalledGetToken int
+
+	NumCalledGetAPIKey int
 
 	NumCalledIsAuthenticated int
 
@@ -116,9 +119,16 @@ func (m *MockAbstractClient) Login(username, password string) error {
 	return nil
 }
 
-// SetAPIKey increments the number of times it was called
+// SetAPIKey sets the api key to the provided value
 func (m *MockAbstractClient) SetAPIKey(key string) {
 	m.NumCalledSetAPIKey++
+	m.APIKey = key
+}
+
+// GetAPIKey returns the api key
+func (m *MockAbstractClient) GetAPIKey() string {
+	m.NumCalledGetAPIKey++
+	return m.APIKey
 }
 
 // SetToken sets the token to the provided value

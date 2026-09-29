@@ -1,6 +1,6 @@
 module github.com/PixoVR/pixo-golang-clients/vertex-ai
 
-go 1.25.0
+go 1.25.10
 
 require (
 	github.com/go-resty/resty/v2 v2.16.5

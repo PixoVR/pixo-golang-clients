@@ -45,6 +45,14 @@ func main() {
 
     fmt.Print(client.IsAuthenticated()) // true
 
+    // IsAuthenticated only reports that credentials are present, so verify them against the API
+    // once at startup - otherwise a missing, revoked or rotated key only shows up as an opaque
+    // failure on every later request
+    if err := client.CheckConnection(context.Background()); err != nil {
+        fmt.Println(err) // platform api connection check failed for https://apex.pixovr.com/v2 using the configured api key: credentials rejected by the platform api: unauthorized
+        return
+    }
+
     modules, err := client.GetModules(context.Background())
     if err != nil {
         fmt.Println(err) // error getting modules

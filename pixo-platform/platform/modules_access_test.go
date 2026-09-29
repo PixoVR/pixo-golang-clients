@@ -52,4 +52,21 @@ var _ = Describe("ModulesAccess", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(len(modules)).To(BeNumerically(">", 0))
 	})
+
+	It("can return the users of an org that can access a module", func() {
+		users, err := tokenClient.GetUsersWithModuleAccess(ctx, moduleID, orgID)
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(users).NotTo(BeEmpty())
+		for _, moduleUser := range users {
+			Expect(moduleUser.ID).NotTo(BeZero())
+			Expect(moduleUser.OrgID).To(Equal(orgID))
+		}
+	})
+
+	It("can fail to get the users that can access a module of an org it cannot read", func() {
+		_, err := tokenClient.GetUsersWithModuleAccess(ctx, moduleID, 0)
+
+		Expect(err).To(HaveOccurred())
+	})
 })

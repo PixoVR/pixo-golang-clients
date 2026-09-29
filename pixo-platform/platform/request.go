@@ -15,8 +15,10 @@ type GraphQLResponse struct {
 }
 
 type Error struct {
-	Path      []string `json:"path"`
-	Message   string   `json:"message"`
+	// Path elements are field names or, inside a list, the index of the element
+	// the error came from, so they are not all strings.
+	Path      []any  `json:"path"`
+	Message   string `json:"message"`
 	Locations []struct {
 		Line int `json:"line"`
 	}

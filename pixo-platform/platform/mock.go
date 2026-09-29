@@ -15,6 +15,9 @@ var _ Client = (*MockClient)(nil)
 type MockClient struct {
 	abstract.MockAbstractClient
 
+	NumCalledCheckConnection int
+	CheckConnectionError     error
+
 	NumCalledGetUser int
 	GetUserResponse  *User
 	GetUserError     error
@@ -52,6 +55,11 @@ type MockClient struct {
 	NumCalledDeleteOrg int
 	DeleteOrgError     error
 
+	NumCalledGetOrgModules  int
+	GetOrgModulesError      error
+	GetOrgModulesParameters *OrgModuleParams
+	GetOrgModulesReturn     []OrgModule
+
 	NumCalledCreateOrgModule int
 	CreateOrgModuleError     error
 
@@ -73,9 +81,22 @@ type MockClient struct {
 	NumCalledDeleteWebhook int
 	DeleteWebhookError     error
 
-	NumCalledGetModules int
-	GetModulesEmpty     bool
-	GetModulesError     error
+	NumCalledGetModules  int
+	GetModulesEmpty      bool
+	GetModulesError      error
+	GetModulesParameters *ModuleParams
+	GetModulesReturn     []Module
+
+	NumCalledGetModulesWithAssociations  int
+	GetModulesWithAssociationsEmpty      bool
+	GetModulesWithAssociationsError      error
+	GetModulesWithAssociationsParameters *ModuleParams
+	GetModulesWithAssociationsReturn     []Module
+
+	NumCalledGetModule int
+	GetModuleError     error
+	GetModuleIDParam   int
+	GetModuleReturn    *Module
 
 	NumCalledGetAPIKeys int
 	GetAPIKeysEmpty     bool
@@ -186,6 +207,17 @@ type MockClient struct {
 	GetModulesForUserIDParam   int
 	GetModulesForUserReturn    []Module
 
+	NumCalledGetUsersWithModuleAccess int
+	GetUsersWithModuleAccessError     error
+	GetUsersWithModuleAccessModuleID  int
+	GetUsersWithModuleAccessOrgID     int
+	GetUsersWithModuleAccessReturn    []User
+
+	NumCalledGetModulesForUsers int
+	GetModulesForUsersError     error
+	GetModulesForUsersUserIDs   []int
+	GetModulesForUsersReturn    []UserModules
+
 	NumCalledGetModulePlayers  int
 	GetModulePlayersError      error
 	GetModulePlayersParameters *ModulePlayerParams
@@ -200,6 +232,9 @@ type MockClient struct {
 func (m *MockClient) Reset() {
 	m.CalledCreateEventWith = nil
 	m.CreateEventError = nil
+
+	m.NumCalledCheckConnection = 0
+	m.CheckConnectionError = nil
 
 	m.CreateSessionError = nil
 
@@ -238,6 +273,11 @@ func (m *MockClient) Reset() {
 
 	m.NumCalledDeleteOrg = 0
 	m.DeleteOrgError = nil
+	m.NumCalledGetOrgModules = 0
+	m.GetOrgModulesError = nil
+	m.GetOrgModulesParameters = nil
+	m.GetOrgModulesReturn = nil
+
 	m.NumCalledCreateOrgModule = 0
 	m.CreateOrgModuleError = nil
 	m.NumCalledDeleteOrgModule = 0
@@ -270,6 +310,19 @@ func (m *MockClient) Reset() {
 	m.NumCalledGetModules = 0
 	m.GetModulesError = nil
 	m.GetModulesEmpty = false
+	m.GetModulesParameters = nil
+	m.GetModulesReturn = nil
+
+	m.NumCalledGetModulesWithAssociations = 0
+	m.GetModulesWithAssociationsError = nil
+	m.GetModulesWithAssociationsEmpty = false
+	m.GetModulesWithAssociationsParameters = nil
+	m.GetModulesWithAssociationsReturn = nil
+
+	m.NumCalledGetModule = 0
+	m.GetModuleError = nil
+	m.GetModuleIDParam = 0
+	m.GetModuleReturn = nil
 
 	m.CalledGetAssetWith = nil
 	m.GetAssetReturns = nil
@@ -355,6 +408,17 @@ func (m *MockClient) Reset() {
 	m.GetModulesForUserIDParam = 0
 	m.GetModulesForUserReturn = nil
 
+	m.NumCalledGetUsersWithModuleAccess = 0
+	m.GetUsersWithModuleAccessError = nil
+	m.GetUsersWithModuleAccessModuleID = 0
+	m.GetUsersWithModuleAccessOrgID = 0
+	m.GetUsersWithModuleAccessReturn = nil
+
+	m.NumCalledGetModulesForUsers = 0
+	m.GetModulesForUsersError = nil
+	m.GetModulesForUsersUserIDs = nil
+	m.GetModulesForUsersReturn = nil
+
 	m.NumCalledGetModulePlayers = 0
 	m.GetModulePlayersError = nil
 	m.GetModulePlayersParameters = nil
@@ -372,6 +436,25 @@ func (m *MockClient) CheckAuth(ctx context.Context) (User, error) {
 	}
 
 	return User{ID: m.ActiveUserID()}, nil
+}
+
+func (m *MockClient) CheckConnection(ctx context.Context) error {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.NumCalledCheckConnection++
+
+	if m.CheckConnectionError != nil {
+		return m.CheckConnectionError
+	}
+
+	// IsAuthenticated is hardcoded to false on the embedded mock, so read the credentials the
+	// caller configured instead - otherwise the mock can never report a working connection.
+	if m.APIKey == "" && m.Token == "" {
+		return ErrNoCredentials
+	}
+
+	return nil
 }
 
 func (m *MockClient) Path() string {
@@ -526,12 +609,20 @@ func (m *MockClient) GetModules(ctx context.Context, params ...ModuleParams) ([]
 
 	m.NumCalledGetModules++
 
+	if len(params) > 0 {
+		m.GetModulesParameters = &params[0]
+	}
+
 	if m.GetModulesError != nil {
 		return nil, m.GetModulesError
 	}
 
 	if m.GetModulesEmpty {
 		return []Module{}, nil
+	}
+
+	if m.GetModulesReturn != nil {
+		return m.GetModulesReturn, nil
 	}
 
 	return []Module{
@@ -542,6 +633,78 @@ func (m *MockClient) GetModules(ctx context.Context, params ...ModuleParams) ([]
 		{
 			ID:           2,
 			Abbreviation: "TST-2",
+		},
+	}, nil
+}
+
+func (m *MockClient) GetModulesWithAssociations(ctx context.Context, params ModuleParams) ([]Module, error) {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.NumCalledGetModulesWithAssociations++
+	m.GetModulesWithAssociationsParameters = &params
+
+	if m.GetModulesWithAssociationsError != nil {
+		return nil, m.GetModulesWithAssociationsError
+	}
+
+	if m.GetModulesWithAssociationsEmpty {
+		return []Module{}, nil
+	}
+
+	if m.GetModulesWithAssociationsReturn != nil {
+		return m.GetModulesWithAssociationsReturn, nil
+	}
+
+	return []Module{
+		{
+			ID:           1,
+			Abbreviation: "TST",
+			Versions: []ModuleVersion{
+				{
+					ID:              1,
+					ModuleID:        1,
+					SemanticVersion: "1.0.0",
+					LifecycleID:     1,
+					FilePath:        "ModuleVersions/1/zips/module.zip",
+					Platforms:       []Platform{{ID: 1, ShortName: "quest"}},
+				},
+			},
+		},
+	}, nil
+}
+
+func (m *MockClient) GetModule(ctx context.Context, id int) (*Module, error) {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.NumCalledGetModule++
+	m.GetModuleIDParam = id
+
+	if id == 0 {
+		return nil, errors.New("module id is required")
+	}
+
+	if m.GetModuleError != nil {
+		return nil, m.GetModuleError
+	}
+
+	if m.GetModuleReturn != nil {
+		return m.GetModuleReturn, nil
+	}
+
+	return &Module{
+		ID:           id,
+		Abbreviation: "TST",
+		Versions: []ModuleVersion{
+			{
+				ID:              1,
+				ModuleID:        id,
+				SemanticVersion: "1.0.0",
+				LifecycleID:     1,
+				FilePath:        "ModuleVersions/1/zips/module.zip",
+				Platforms:       []Platform{{ID: 1, ShortName: "quest"}},
+			},
 		},
 	}, nil
 }
@@ -669,6 +832,35 @@ func (m *MockClient) DeleteOrg(ctx context.Context, id int) error {
 	}
 
 	return nil
+}
+
+func (m *MockClient) GetOrgModules(ctx context.Context, params OrgModuleParams) ([]OrgModule, error) {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.NumCalledGetOrgModules++
+	m.GetOrgModulesParameters = &params
+
+	if params.OrgID == 0 {
+		return nil, errors.New("org id is required")
+	}
+
+	if m.GetOrgModulesError != nil {
+		return nil, m.GetOrgModulesError
+	}
+
+	if m.GetOrgModulesReturn != nil {
+		return m.GetOrgModulesReturn, nil
+	}
+
+	return []OrgModule{
+		{
+			ID:       1,
+			OrgID:    params.OrgID,
+			Lifetime: true,
+			Module:   &Module{ID: 1, Abbreviation: "TST"},
+		},
+	}, nil
 }
 
 func (m *MockClient) CreateOrgModule(ctx context.Context, input OrgModule) (*OrgModule, error) {
@@ -1504,6 +1696,46 @@ func (m *MockClient) GetModulesForUser(ctx context.Context, userID int) ([]Modul
 		return nil, m.GetModulesForUserError
 	}
 	return m.GetModulesForUserReturn, nil
+}
+
+func (m *MockClient) GetUsersWithModuleAccess(ctx context.Context, moduleID, orgID int) ([]User, error) {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.NumCalledGetUsersWithModuleAccess++
+	m.GetUsersWithModuleAccessModuleID = moduleID
+	m.GetUsersWithModuleAccessOrgID = orgID
+	if m.GetUsersWithModuleAccessError != nil {
+		return nil, m.GetUsersWithModuleAccessError
+	}
+
+	if m.GetUsersWithModuleAccessReturn != nil {
+		return m.GetUsersWithModuleAccessReturn, nil
+	}
+
+	return []User{{ID: 1, Username: "test-user", Role: "user", OrgID: orgID}}, nil
+}
+
+func (m *MockClient) GetModulesForUsers(ctx context.Context, userIDs []int) ([]UserModules, error) {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.NumCalledGetModulesForUsers++
+	m.GetModulesForUsersUserIDs = userIDs
+	if m.GetModulesForUsersError != nil {
+		return nil, m.GetModulesForUsersError
+	}
+
+	if m.GetModulesForUsersReturn != nil {
+		return m.GetModulesForUsersReturn, nil
+	}
+
+	usersModules := make([]UserModules, 0, len(userIDs))
+	for _, userID := range userIDs {
+		usersModules = append(usersModules, UserModules{UserID: userID, Modules: []Module{{ID: 1, Abbreviation: "test-module"}}})
+	}
+
+	return usersModules, nil
 }
 
 func (m *MockClient) GetModulePlayers(ctx context.Context, params ...*ModulePlayerParams) ([]ModulePlayer, error) {
