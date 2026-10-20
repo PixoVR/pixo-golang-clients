@@ -80,7 +80,7 @@ func (p *clientImpl) CreateSession(ctx context.Context, session *Session) error 
 		return errors.New("session is nil")
 	}
 
-	query := `mutation createSession($input: SessionInput!) { createSession(input: $input) { id uuid ipAddress deviceId moduleVersion status lessonStatus scenario mode focus specialization maxScore deviceId events { id type payload createdAt } userId user { orgId } moduleId module { id abbreviation } } }`
+	query := `mutation createSession($input: SessionInput!) { createSession(input: $input) { id uuid ipAddress deviceId moduleVersion status lessonStatus scenario mode focus specialization maxScore deviceId userId user { orgId } moduleId module { id abbreviation } } }`
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{
@@ -143,7 +143,7 @@ func (p *clientImpl) CreateSession(ctx context.Context, session *Session) error 
 }
 
 func (p *clientImpl) UpdateSession(ctx context.Context, session Session) (*Session, error) {
-	query := `mutation updateSession($input: SessionInput!) { updateSession(input: $input) { id ipAddress deviceId moduleVersion status lessonStatus scenario mode focus specialization rawScore maxScore scaledScore completedAt duration events { id type payload createdAt } moduleId userId user { orgId } } }`
+	query := `mutation updateSession($input: SessionInput!) { updateSession(input: $input) { id ipAddress deviceId moduleVersion status lessonStatus scenario mode focus specialization rawScore maxScore scaledScore completedAt duration moduleId userId user { orgId } } }`
 
 	variables := map[string]interface{}{
 		"input": map[string]interface{}{},
