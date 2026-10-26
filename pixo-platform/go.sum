@@ -2,8 +2,8 @@ github.com/MakeNowJust/heredoc v1.0.0 h1:cXCdzVdstXyiTqTvfqk9SDHpKNjxuom+DOlyEeQ
 github.com/MakeNowJust/heredoc v1.0.0/go.mod h1:mG5amYoWBHf8vpLOuehzbGGw0EHxpZZ6lCpQ4fNJ8LE=
 github.com/Masterminds/semver/v3 v3.5.0 h1:kQceYJfbupGfZOKZQg0kou0DgAKhzDg2NZPAwZ/2OOE=
 github.com/Masterminds/semver/v3 v3.5.0/go.mod h1:4V+yj/TJE1HU9XfppCwVMZq3I84lprf4nC11bSS5beM=
-github.com/PixoVR/pixo-golang-server-utilities/pixo-platform v0.2.87 h1:YrzBgTmwjrZQx8Rg98tyXwa6N4e26EOlAmmWtEL1gv4=
-github.com/PixoVR/pixo-golang-server-utilities/pixo-platform v0.2.87/go.mod h1:/0jqeJR8BG6RHB+O/n47BcKrUZiybJCtFi5k6CWiBJY=
+github.com/PixoVR/pixo-golang-server-utilities/pixo-platform v0.2.88 h1:T1RhGcK1FqAZMdh3i0COc/pULg7I3EFgLWcK9+w+dJs=
+github.com/PixoVR/pixo-golang-server-utilities/pixo-platform v0.2.88/go.mod h1:/0jqeJR8BG6RHB+O/n47BcKrUZiybJCtFi5k6CWiBJY=
 github.com/atotto/clipboard v0.1.4 h1:EH0zSVneZPSuFR11BlR9YppQTVDbh5+16AmcJi4g1z4=
 github.com/atotto/clipboard v0.1.4/go.mod h1:ZY9tmq7sm5xIbd9bOK4onWV4S6X0u6GY7Vn0Yu86PYI=
 github.com/aymanbagabas/go-osc52/v2 v2.0.1 h1:HwpRHbFMcZLEVr42D4p7XBqjyuxQH5SMiErDT4WkJ2k=
