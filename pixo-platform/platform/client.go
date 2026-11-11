@@ -90,7 +90,7 @@ func (p *clientImpl) CheckAuth(ctx context.Context) (User, error) {
 }
 
 func isAuthRejection(status int) bool {
-	return status == http.StatusBadRequest || status == http.StatusUnauthorized || status == http.StatusForbidden
+	return status == http.StatusUnauthorized || status == http.StatusForbidden
 }
 
 func (p *clientImpl) GetFeaturePermissions(ctx context.Context) ([]string, error) {

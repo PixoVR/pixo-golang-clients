@@ -73,7 +73,7 @@ func TestFeaturePermissionErrors(t *testing.T) {
 		body         string
 		unauthorized bool
 	}{
-		{"bad request", 400, `{"error":"no token provided"}`, true},
+		{"bad request", 400, `{"error":"failed to get user permissions"}`, false},
 		{"unauthorized", 401, `{"error":"unauthorized"}`, true},
 		{"forbidden", 403, `{"error":"forbidden"}`, true},
 		{"empty unauthorized", 401, "", true},
