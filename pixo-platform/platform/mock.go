@@ -3,6 +3,7 @@ package platform
 import (
 	"context"
 	"errors"
+	"slices"
 	"time"
 
 	abstract "github.com/PixoVR/pixo-golang-clients/pixo-platform/abstract"
@@ -17,6 +18,10 @@ type MockClient struct {
 
 	NumCalledCheckConnection int
 	CheckConnectionError     error
+
+	NumCalledGetFeaturePermissions int
+	GetFeaturePermissionsReturn    []string
+	GetFeaturePermissionsError     error
 
 	NumCalledGetUser int
 	GetUserResponse  *User
@@ -235,6 +240,9 @@ func (m *MockClient) Reset() {
 
 	m.NumCalledCheckConnection = 0
 	m.CheckConnectionError = nil
+	m.NumCalledGetFeaturePermissions = 0
+	m.GetFeaturePermissionsReturn = nil
+	m.GetFeaturePermissionsError = nil
 
 	m.CreateSessionError = nil
 
@@ -428,6 +436,27 @@ func (m *MockClient) Reset() {
 	m.GetModulePlayerVersionsError = nil
 	m.GetModulePlayerVersionsParameters = nil
 	m.GetModulePlayerVersionsReturn = nil
+}
+
+func (m *MockClient) GetFeaturePermissions(ctx context.Context) ([]string, error) {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+	m.NumCalledGetFeaturePermissions++
+	if m.GetFeaturePermissionsError != nil {
+		return nil, m.GetFeaturePermissionsError
+	}
+	if m.GetFeaturePermissionsReturn == nil {
+		return []string{}, nil
+	}
+	return m.GetFeaturePermissionsReturn, nil
+}
+
+func (m *MockClient) HasFeaturePermission(ctx context.Context, permission string) (bool, error) {
+	permissions, err := m.GetFeaturePermissions(ctx)
+	if err != nil {
+		return false, err
+	}
+	return slices.Contains(permissions, permission), nil
 }
 
 func (m *MockClient) CheckAuth(ctx context.Context) (User, error) {
