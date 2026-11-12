@@ -9,6 +9,7 @@ import (
 	. "github.com/onsi/gomega"
 	"math/rand"
 	"os"
+	"time"
 )
 
 var _ = Describe("Multiplayer Resources", func() {
@@ -58,14 +59,44 @@ var _ = Describe("Multiplayer Resources", func() {
 	})
 
 	It("can get multiplayer server versions", func() {
+		input := platform.MultiplayerServerVersion{
+			ModuleID:        moduleID,
+			SemanticVersion: fmt.Sprintf("0.0.%d", time.Now().UnixNano()),
+			ImageRegistry:   allocator.SimpleGameServerImage,
+			Engine:          "unreal",
+		}
+		createdVersion, err := tokenClient.CreateMultiplayerServerVersion(ctx, input)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(createdVersion).NotTo(BeNil())
+		DeferCleanup(func() {
+			var response struct {
+				Deleted bool `json:"deleteMultiplayerServerVersion"`
+			}
+			executor, ok := tokenClient.(interface {
+				Exec(context.Context, string, any, map[string]interface{}) error
+			})
+			Expect(ok).To(BeTrue())
+			err := executor.Exec(ctx, `mutation deleteMultiplayerServerVersion($id: ID!) { deleteMultiplayerServerVersion(id: $id) }`, &response, map[string]interface{}{"id": createdVersion.ID})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(response.Deleted).To(BeTrue())
+		})
+		Expect(createdVersion.ID).NotTo(BeZero())
+
 		mpServerVersions, err := tokenClient.GetMultiplayerServerVersions(ctx, nil)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(len(mpServerVersions)).To(BeNumerically(">", 0))
+		var retrievedVersion *platform.MultiplayerServerVersion
 		for _, mpServerVersion := range mpServerVersions {
-			Expect(mpServerVersion.ID).NotTo(BeZero())
-			Expect(mpServerVersion.ModuleID).NotTo(BeZero())
-			Expect(mpServerVersion.SemanticVersion).NotTo(BeEmpty())
+			if mpServerVersion.ID == createdVersion.ID {
+				retrievedVersion = &mpServerVersion
+				break
+			}
 		}
+		Expect(retrievedVersion).NotTo(BeNil())
+		Expect(retrievedVersion.ID).To(Equal(createdVersion.ID))
+		Expect(retrievedVersion.ModuleID).To(Equal(input.ModuleID))
+		Expect(retrievedVersion.SemanticVersion).To(Equal(input.SemanticVersion))
+		Expect(retrievedVersion.ImageRegistry).To(Equal(input.ImageRegistry))
 	})
 
 	Context("managing server versions", func() {

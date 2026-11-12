@@ -18,6 +18,8 @@ type User struct {
 	Email      string `json:"email,omitempty"`
 	ExternalID string `json:"externalId,omitempty"`
 
+	FeaturePermissions []string `json:"featurePermissions,omitempty"`
+
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	UpdatedAt time.Time `json:"updatedAt,omitempty"`
 

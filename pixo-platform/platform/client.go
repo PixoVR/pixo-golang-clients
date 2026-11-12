@@ -13,6 +13,7 @@ import (
 	"net/textproto"
 	"os"
 	"path/filepath"
+	"slices"
 
 	"github.com/PixoVR/pixo-golang-clients/pixo-platform/urlfinder"
 	"github.com/PixoVR/pixo-golang-server-utilities/pixo-platform/middleware/auth"
@@ -65,20 +66,50 @@ func (p *clientImpl) CheckAuth(ctx context.Context) (User, error) {
 	if err != nil {
 		return User{}, err
 	}
+	defer res.Body.Close() //nolint:errcheck
 
 	var resPayload struct {
 		Error string
 		User  User
 	}
 	if err = json.NewDecoder(res.Body).Decode(&resPayload); err != nil {
+		if isAuthRejection(res.StatusCode) {
+			return User{}, fmt.Errorf("%w: %s", ErrUnauthorized, err)
+		}
 		return User{}, err
 	}
 
 	if res.StatusCode != http.StatusOK {
+		if isAuthRejection(res.StatusCode) {
+			return User{}, fmt.Errorf("%w: %s", ErrUnauthorized, resPayload.Error)
+		}
 		return User{}, errors.New(resPayload.Error)
 	}
 
 	return resPayload.User, nil
+}
+
+func isAuthRejection(status int) bool {
+	return status == http.StatusUnauthorized || status == http.StatusForbidden
+}
+
+func (p *clientImpl) GetFeaturePermissions(ctx context.Context) ([]string, error) {
+	user, err := p.CheckAuth(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if user.FeaturePermissions == nil {
+		return []string{}, nil
+	}
+	return user.FeaturePermissions, nil
+}
+
+func (p *clientImpl) HasFeaturePermission(ctx context.Context, permission string) (bool, error) {
+	permissions, err := p.GetFeaturePermissions(ctx)
+	if err != nil {
+		return false, err
+	}
+	return slices.Contains(permissions, permission), nil
 }
 
 func (p *clientImpl) ActiveUserID() int {
