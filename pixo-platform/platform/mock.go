@@ -212,6 +212,11 @@ type MockClient struct {
 	GetModulesForUserIDParam   int
 	GetModulesForUserReturn    []Module
 
+	NumCalledGetLicensesForUser int
+	GetLicensesForUserError     error
+	GetLicensesForUserIDParam   int
+	GetLicensesForUserReturn    []License
+
 	NumCalledGetUsersWithModuleAccess int
 	GetUsersWithModuleAccessError     error
 	GetUsersWithModuleAccessModuleID  int
@@ -415,6 +420,11 @@ func (m *MockClient) Reset() {
 	m.GetModulesForUserError = nil
 	m.GetModulesForUserIDParam = 0
 	m.GetModulesForUserReturn = nil
+
+	m.NumCalledGetLicensesForUser = 0
+	m.GetLicensesForUserError = nil
+	m.GetLicensesForUserIDParam = 0
+	m.GetLicensesForUserReturn = nil
 
 	m.NumCalledGetUsersWithModuleAccess = 0
 	m.GetUsersWithModuleAccessError = nil
@@ -1725,6 +1735,18 @@ func (m *MockClient) GetModulesForUser(ctx context.Context, userID int) ([]Modul
 		return nil, m.GetModulesForUserError
 	}
 	return m.GetModulesForUserReturn, nil
+}
+
+func (m *MockClient) GetLicensesForUser(ctx context.Context, userID int) ([]License, error) {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+
+	m.NumCalledGetLicensesForUser++
+	m.GetLicensesForUserIDParam = userID
+	if m.GetLicensesForUserError != nil {
+		return nil, m.GetLicensesForUserError
+	}
+	return m.GetLicensesForUserReturn, nil
 }
 
 func (m *MockClient) GetUsersWithModuleAccess(ctx context.Context, moduleID, orgID int) ([]User, error) {
