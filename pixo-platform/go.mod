@@ -18,7 +18,7 @@ require (
 	github.com/onsi/gomega v1.44.0
 	github.com/rs/zerolog v1.35.1
 	github.com/spf13/cobra v1.10.2
-	github.com/spf13/pflag v1.0.10
+	github.com/spf13/pflag v1.1.0
 	github.com/spf13/viper v1.21.0
 	gitlab.com/david_mbuvi/go_asterisks v0.0.0-20221114073100-4669d8bedcbe
 	golang.org/x/text v0.42.0
