@@ -24,6 +24,8 @@ type User struct {
 	UpdatedAt time.Time `json:"updatedAt,omitempty"`
 
 	Modules []Module `json:"modules,omitempty"`
+
+	Licenses []License `json:"licenses,omitempty"`
 }
 
 type GetUserResponse struct {
