@@ -215,3 +215,42 @@ func TestGetModule_ReadsThePlayerVersionsOfTheModule(t *testing.T) {
 		t.Errorf("expected the version to support the quest, got %+v", version.Platforms)
 	}
 }
+
+func TestModuleReads_DoNotAskForTheGitConfig(t *testing.T) {
+	reads := map[string]func(Client) error{
+		"GetModules": func(c Client) error { _, err := c.GetModules(context.Background()); return err },
+		"GetModulesWithAssociations": func(c Client) error {
+			_, err := c.GetModulesWithAssociations(context.Background(), ModuleParams{})
+			return err
+		},
+		"GetModule":         func(c Client) error { _, err := c.GetModule(context.Background(), 1); return err },
+		"GetModulesForUser": func(c Client) error { _, err := c.GetModulesForUser(context.Background(), 1); return err },
+		"GetModulesForUsers": func(c Client) error {
+			_, err := c.GetModulesForUsers(context.Background(), []int{1})
+			return err
+		},
+		"GetModuleVersions": func(c Client) error {
+			_, err := c.GetModuleVersions(context.Background(), &ModuleVersionParams{})
+			return err
+		},
+		"GetOrgModules": func(c Client) error {
+			_, err := c.GetOrgModules(context.Background(), OrgModuleParams{OrgID: 1})
+			return err
+		},
+	}
+
+	for name, read := range reads {
+		t.Run(name, func(t *testing.T) {
+			client, asked := newStubbedClient(t, `{"data":{}}`)
+
+			_ = read(client)
+
+			if asked.Query == "" {
+				t.Fatalf("expected %s to send a query", name)
+			}
+			if strings.Contains(asked.Query, "gitConfig") {
+				t.Errorf("expected %s not to ask for the git config, got %s", name, asked.Query)
+			}
+		})
+	}
+}
