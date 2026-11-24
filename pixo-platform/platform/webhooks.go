@@ -17,7 +17,7 @@ type Webhook struct {
 }
 
 type WebhookParams struct {
-	OrgID int `json:"orgId"`
+	OrgIDs []int `json:"orgIds,omitempty"`
 }
 
 type GetWebhooksResponse struct {

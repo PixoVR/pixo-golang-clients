@@ -48,7 +48,7 @@ var _ = Describe("Webhooks", func() {
 	})
 
 	It("can get webhooks by org id", func() {
-		webhooks, err := tokenClient.GetWebhooks(ctx, &WebhookParams{OrgID: testWebhook.OrgID})
+		webhooks, err := tokenClient.GetWebhooks(ctx, &WebhookParams{OrgIDs: []int{testWebhook.OrgID}})
 		Expect(err).NotTo(HaveOccurred())
 		Expect(webhooks).NotTo(BeNil())
 		Expect(len(webhooks)).To(BeNumerically(">", 0))
