@@ -131,8 +131,6 @@ const moduleFields = `
 	modulePlayer { id name description launchProtocol distributorId }
 	distributorId
 	distributor { id name type logoLink logoPath hubLogoLink }
-	gitConfigId
-	gitConfig { provider orgName repoName }
 	availableLanguages { language languageCode displayName }
 	createdAt
 	updatedAt
