@@ -17,7 +17,8 @@ var webhooksListCmd = &cobra.Command{
 	Long:  `List webhooks`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		spinner := loader.NewLoader(cmd.Context(), "Getting webhooks...", Ctx.Printer)
-		webhooks, err := Ctx.PlatformClient.GetWebhooks(cmd.Context(), &platform.WebhookParams{OrgID: Ctx.PlatformClient.ActiveOrgID()})
+		params := &platform.WebhookParams{OrgIDs: []int{Ctx.PlatformClient.ActiveOrgID()}}
+		webhooks, err := Ctx.PlatformClient.GetWebhooks(cmd.Context(), params)
 		spinner.Stop()
 		if err != nil {
 			Ctx.Println(":exclamation: Failed to get webhooks")
