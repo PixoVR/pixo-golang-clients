@@ -3,7 +3,7 @@ module github.com/PixoVR/pixo-golang-clients/pixo-platform
 go 1.26.8
 
 require (
-	github.com/PixoVR/pixo-golang-server-utilities/pixo-platform v0.2.89
+	github.com/PixoVR/pixo-golang-server-utilities/pixo-platform v0.2.90
 	github.com/charmbracelet/bubbletea v1.3.10
 	github.com/charmbracelet/huh v1.0.0
 	github.com/charmbracelet/lipgloss v1.1.0
@@ -51,7 +51,7 @@ require (
 	github.com/fsnotify/fsnotify v1.10.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.15 // indirect
 	github.com/gin-contrib/sse v1.1.2 // indirect
-	github.com/go-jose/go-jose/v3 v3.0.5 // indirect
+	github.com/go-jose/go-jose/v4 v4.1.6 // indirect
 	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-playground/locales v0.14.2 // indirect
 	github.com/go-playground/universal-translator v0.18.2 // indirect
